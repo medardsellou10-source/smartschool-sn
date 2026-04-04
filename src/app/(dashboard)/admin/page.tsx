@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { StatCard } from '@/components/dashboard/StatCard'
+import { TwilioWidget } from '@/components/dashboard/TwilioWidget'
 import { formatFCFA } from '@/lib/utils'
 
 interface DashboardData {
@@ -274,6 +275,32 @@ export default function AdminDashboard() {
               )
             })}
           </div>
+        </div>
+      </div>
+
+      {/* ── Twilio SMS & WhatsApp ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <TwilioWidget />
+        <div className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          <h2 className="text-sm font-bold text-[#94A3B8] uppercase tracking-wider mb-4">📊 Statistiques SMS</h2>
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { label: 'SMS envoyés', value: '—', icon: '📤', color: '#00E676' },
+              { label: 'WhatsApp', value: '—', icon: '💬', color: '#25D366' },
+              { label: 'Absences notifiées', value: '—', icon: '🔔', color: '#FFD600' },
+              { label: 'Paiements confirmés', value: '—', icon: '✅', color: '#00E5FF' },
+            ].map(s => (
+              <div key={s.label} className="p-3 rounded-xl text-center"
+                style={{ background: `${s.color}10`, border: `1px solid ${s.color}20` }}>
+                <div className="text-xl mb-1">{s.icon}</div>
+                <div className="text-lg font-black text-white">{s.value}</div>
+                <div className="text-[10px] text-slate-400">{s.label}</div>
+              </div>
+            ))}
+          </div>
+          <p className="text-[10px] text-slate-500 mt-3 text-center">
+            Numéro actif : <span className="text-white font-mono">+1 (415) 853-9878</span>
+          </p>
         </div>
       </div>
 
