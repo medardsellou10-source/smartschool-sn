@@ -483,6 +483,24 @@
   box-shadow: unset !important;
 }
 
+/* ══════════════════════════════════════════
+   MASQUER LES CONTRÔLES NATIFS DES VIDÉOS
+   (bouton play/stop sur iOS & Android)
+   ══════════════════════════════════════════ */
+video::-webkit-media-controls,
+video::-webkit-media-controls-enclosure,
+video::-webkit-media-controls-panel,
+video::-webkit-media-controls-play-button,
+video::-webkit-media-controls-start-playback-button,
+video::-webkit-media-controls-overlay-play-button {
+  display: none !important;
+  -webkit-appearance: none !important;
+  opacity: 0 !important;
+}
+video {
+  -webkit-media-controls: none;
+}
+
 /* Préférences de mouvement réduit */
 @media (prefers-reduced-motion: reduce) {
   .ss-shimmer,

@@ -80,14 +80,14 @@ export default function SecretaireDashboard() {
               {new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
             </p>
           </div>
-          <div className="flex flex-wrap gap-2 mt-3 lg:mt-0">
+          <div className="hidden lg:flex gap-2">
             <Link href="/secretaire/inscriptions"
-              className="px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all hover:opacity-85"
+              className="px-5 py-2.5 rounded-xl text-sm font-bold transition-all hover:opacity-85"
               style={{ background: `${ACCENT}22`, border: `1px solid ${ACCENT}45`, color: ACCENT }}>
               + Inscription
             </Link>
             <Link href="/secretaire/certificats"
-              className="px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white transition-all hover:opacity-85"
+              className="px-5 py-2.5 rounded-xl text-sm font-bold text-white transition-all hover:opacity-85"
               style={{ background: ACCENT, boxShadow: `0 4px 20px ${ACCENT}50` }}>
               Émettre certificat
             </Link>
