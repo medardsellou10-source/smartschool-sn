@@ -64,7 +64,7 @@ export default function ProfesseurDashboard() {
   }
 
   return (
-    <div className="space-y-5 pb-6 animate-fade-in">
+    <div className="space-y-5 pb-24 lg:pb-6 animate-fade-in">
 
       {/* ── Bannière prof ── */}
       <div className="relative rounded-2xl overflow-hidden min-h-[130px]">
@@ -87,7 +87,7 @@ export default function ProfesseurDashboard() {
       </div>
 
       {/* ── Stats ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
         <StatCard title="Classes enseignées" value={classesEnseignees.length}
           subtitle={classesEnseignees.map(c => c ? `${c.niveau} ${c.nom}` : '').slice(0, 2).join(', ')}
           icon="🏫" color="cyan" />
@@ -102,7 +102,7 @@ export default function ProfesseurDashboard() {
       {/* ── Actions rapides ── */}
       <div className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
         <h2 className="text-sm font-bold text-[#94A3B8] uppercase tracking-wider mb-4">Actions rapides</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
           {[
             { href: '/professeur/appel',    icon: '📋', label: "Faire l'appel",   color: '#00853F' },
             { href: '/professeur/notes',    icon: '📝', label: 'Saisir les notes', color: '#00E5FF' },

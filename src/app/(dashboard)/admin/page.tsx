@@ -128,7 +128,7 @@ export default function AdminDashboard() {
   const presencePct = data.totalProfs ? Math.min(100, Math.round((profsPointes / data.totalProfs) * 100)) : 0
 
   return (
-    <div className="space-y-6 animate-fade-in pb-6">
+    <div className="space-y-6 animate-fade-in pb-24 lg:pb-6">
 
       {/* ── Bannière Hero ── */}
       <div className="relative rounded-2xl overflow-hidden min-h-[140px]">
@@ -155,7 +155,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* ── KPI Cards ── */}
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <StatCard title="Élèves inscrits" value={data.totalEleves.toLocaleString('fr-FR')} subtitle="actifs" icon="👥" trend="up" trendValue="+12" color="cyan" />
         <StatCard title="Professeurs" value={data.totalProfs} subtitle={`${profsPointes} pointés auj.`} icon="👨‍🏫" color="green" />
         <StatCard title="Absences auj." value={data.absencesAujourdhui} subtitle={`${data.absencesNonJustifiees} non justifiées`} icon="⚠️" color={data.absencesAujourdhui > 5 ? 'red' : 'gold'} />

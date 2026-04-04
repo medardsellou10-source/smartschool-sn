@@ -31,14 +31,14 @@ export function StatCard({ title, value, subtitle, icon, trend, trendValue, colo
 
   if (loading) {
     return (
-      <div className="rounded-2xl p-5 min-h-[120px] ss-shimmer"
+      <div className="rounded-2xl p-4 sm:p-5 min-h-[100px] sm:min-h-[120px] ss-shimmer"
         style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }} />
     )
   }
 
   return (
     <div
-      className="group relative rounded-2xl p-5 min-h-[120px] transition-all duration-300 overflow-hidden"
+      className="group relative rounded-2xl p-4 sm:p-5 min-h-[100px] sm:min-h-[120px] transition-all duration-300 overflow-hidden"
       style={{
         background: `linear-gradient(135deg, ${palette.bg}, rgba(11,17,32,0.9))`,
         border: `1px solid ${palette.border}`,
@@ -54,18 +54,18 @@ export function StatCard({ title, value, subtitle, icon, trend, trendValue, colo
       }}
     >
       {/* Orbe de fond */}
-      <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full opacity-20 blur-xl pointer-events-none"
+      <div className="absolute -top-4 -right-4 w-16 h-16 sm:w-20 sm:h-20 rounded-full opacity-20 blur-xl pointer-events-none"
         style={{ background: palette.color }} />
 
       <div className="relative">
         {/* Haut: icône + tendance */}
-        <div className="flex items-start justify-between mb-3">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
+        <div className="flex items-start justify-between mb-2 sm:mb-3">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center text-base sm:text-xl shrink-0"
             style={{ background: palette.bg, border: `1px solid ${palette.border}` }}>
             {icon}
           </div>
           {trend && trendValue && (
-            <span className="flex items-center gap-0.5 text-xs font-bold px-2 py-1 rounded-full"
+            <span className="flex items-center gap-0.5 text-[10px] sm:text-xs font-bold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full shrink-0"
               style={trend === 'up'
                 ? { background: 'rgba(0,230,118,0.15)', color: '#00E676' }
                 : { background: 'rgba(255,23,68,0.15)', color: '#FF1744' }}>
@@ -75,16 +75,16 @@ export function StatCard({ title, value, subtitle, icon, trend, trendValue, colo
         </div>
 
         {/* Valeur */}
-        <p className="text-2xl font-black leading-none mb-1 text-white">
+        <p className="text-xl sm:text-2xl font-black leading-none mb-1 text-white truncate">
           {value}
         </p>
 
         {/* Titre */}
-        <p className="text-sm font-medium text-[#94A3B8] leading-tight">{title}</p>
+        <p className="text-xs sm:text-sm font-medium text-[#94A3B8] leading-tight">{title}</p>
 
         {/* Sous-titre */}
         {subtitle && (
-          <p className="text-xs text-[#475569] mt-1 leading-tight">{subtitle}</p>
+          <p className="text-[10px] sm:text-xs text-[#475569] mt-0.5 sm:mt-1 leading-tight">{subtitle}</p>
         )}
       </div>
     </div>

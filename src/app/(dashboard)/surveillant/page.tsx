@@ -93,7 +93,7 @@ export default function SurveillantDashboard() {
   if (userLoading) return <div className="space-y-4">{[...Array(4)].map((_, i) => <div key={i} className="h-28 rounded-2xl ss-shimmer" style={{ background: 'rgba(255,255,255,0.03)' }} />)}</div>
 
   return (
-    <div className="space-y-5 pb-6 animate-fade-in">
+    <div className="space-y-5 pb-24 lg:pb-6 animate-fade-in">
 
       {/* Bannière */}
       <div className="relative rounded-2xl overflow-hidden min-h-[120px]">
@@ -142,9 +142,9 @@ export default function SurveillantDashboard() {
       </div>
 
       {/* Actions rapides */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-3 sm:grid-cols-3 gap-3">
         {[
-          { href: '/surveillant/absences',      icon: '📋', label: 'Gerer absences',  color: '#FFD600' },
+          { href: '/surveillant/absences',      icon: '📋', label: 'Gérer absences',  color: '#FFD600' },
           { href: '/surveillant/statistiques',  icon: '📊', label: 'Statistiques',    color: '#00E5FF' },
           { href: '/surveillant/export',        icon: '📥', label: 'Export rapports',  color: '#00E676' },
         ].map(a => (
@@ -158,7 +158,7 @@ export default function SurveillantDashboard() {
       </div>
 
       {/* KPI */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <StatCard title="Présents" value={stats.presents} subtitle={`sur ${stats.total}`} icon="🟢" color="green" loading={statsLoading} />
         <StatCard title="Retards légers" value={stats.retards} subtitle="< 20 min" icon="🟡" color="gold" loading={statsLoading} />
         <StatCard title="Retards graves" value={stats.graves} subtitle="≥ 20 min" icon="🔴" color="red" loading={statsLoading} />

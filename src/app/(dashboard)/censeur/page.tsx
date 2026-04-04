@@ -39,7 +39,7 @@ export default function CenseurDashboard() {
     return (
       <div className="space-y-6 p-6 animate-pulse">
         <div className="h-40 rounded-2xl bg-white/5" />
-        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {[...Array(4)].map((_, i) => <div key={i} className="h-32 rounded-2xl bg-white/5" />)}
         </div>
       </div>
@@ -62,7 +62,7 @@ export default function CenseurDashboard() {
                 📚
               </div>
               <div>
-                <h1 className="text-2xl font-extrabold text-white">
+                <h1 className="text-xl sm:text-2xl font-extrabold text-white">
                   Bonjour, {user?.prenom} {user?.nom}
                 </h1>
                 <p className="text-base font-semibold mt-0.5" style={{ color: ACCENT }}>
@@ -74,18 +74,23 @@ export default function CenseurDashboard() {
               {new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
             </p>
           </div>
-          <div className="hidden md:flex gap-3">
+          <div className="flex flex-wrap gap-2 mt-3 lg:mt-0">
             <Link href="/censeur/emplois-temps"
-              className="px-5 py-2.5 rounded-xl text-sm font-bold text-white transition-all hover:opacity-85"
+              className="px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white transition-all hover:opacity-85"
               style={{ background: ACCENT, boxShadow: `0 4px 20px ${ACCENT}50` }}>
               Emplois du temps
+            </Link>
+            <Link href="/censeur/examens"
+              className="px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all hover:opacity-85"
+              style={{ background: `${ACCENT}22`, border: `1px solid ${ACCENT}45`, color: ACCENT }}>
+              Examens
             </Link>
           </div>
         </div>
       </div>
 
       {/* StatCards */}
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <StatCard title="Profs présents" value={`${stats.profsPresents}/${DEMO_PROFESSEURS.length}`} subtitle="aujourd'hui" icon="👨‍🏫" color="indigo" />
         <StatCard title="Cours en cours" value={stats.coursEnCours} subtitle="en ce moment" icon="📖" color="green" />
         <StatCard title="Examens prévus" value={stats.examens} subtitle="à venir / en cours" icon="📝" color="gold" />
@@ -93,7 +98,7 @@ export default function CenseurDashboard() {
       </div>
 
       {/* Grille */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
 
         {/* Examens */}
         <div className="xl:col-span-2 rounded-2xl p-6" style={CARD}>

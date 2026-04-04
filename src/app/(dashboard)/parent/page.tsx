@@ -110,7 +110,7 @@ export default function ParentDashboard() {
   }
 
   return (
-    <div className="max-w-lg mx-auto space-y-4 pb-8 animate-fade-in">
+    <div className="max-w-lg mx-auto space-y-4 pb-28 lg:pb-8 animate-fade-in">
 
       {/* Offline banner */}
       {isOffline && (

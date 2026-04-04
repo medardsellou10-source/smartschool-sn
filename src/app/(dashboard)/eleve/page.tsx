@@ -212,7 +212,7 @@ export default function EleveDashboard() {
   const moyColor = moyenneGenerale !== null ? (moyenneGenerale >= 14 ? '#00E676' : moyenneGenerale >= 10 ? '#FFD600' : '#FF1744') : '#00E5FF'
 
   return (
-    <div className="space-y-5 pb-6 animate-fade-in">
+    <div className="space-y-5 pb-24 lg:pb-6 animate-fade-in">
 
       {/* ── Bannière élève ── */}
       <div className="relative rounded-2xl overflow-hidden min-h-[140px]">
@@ -234,9 +234,9 @@ export default function EleveDashboard() {
 
       {/* ── Stats ── */}
       {loading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">{[...Array(4)].map((_, i) => <div key={i} className="h-28 rounded-2xl ss-shimmer" style={{ background: 'rgba(255,255,255,0.03)' }} />)}</div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">{[...Array(4)].map((_, i) => <div key={i} className="h-28 rounded-2xl ss-shimmer" style={{ background: 'rgba(255,255,255,0.03)' }} />)}</div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <StatCard title="Moyenne générale" value={moyenneGenerale !== null ? `${moyenneGenerale.toFixed(1)}/20` : '--'} subtitle={`Trimestre ${getCurrentTrimestre()}`} icon="📊" color={moyenneGenerale !== null ? (moyenneGenerale >= 10 ? 'green' : 'red') : 'cyan'} />
           <StatCard title="Absences" value={nbAbsences} subtitle="Ce trimestre" icon="📅" color={nbAbsences > 5 ? 'red' : nbAbsences > 0 ? 'gold' : 'green'} />
           <StatCard title="Rang" value={rang !== null ? `${rang}${rang === 1 ? 'er' : 'e'}` : '--'} subtitle="Dans la classe" icon="🏆" color="gold" />
