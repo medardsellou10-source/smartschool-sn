@@ -73,6 +73,39 @@ export const DEMO_USERS = {
     actif: true,
     created_at: '2025-09-01T00:00:00Z',
   },
+  secretaire: {
+    id: 'user-secr-001',
+    ecole_id: 'ecole-demo-001',
+    nom: 'Mbaye',
+    prenom: 'Rokhaya',
+    telephone: '776123456',
+    role: 'secretaire' as const,
+    photo_url: null,
+    actif: true,
+    created_at: '2025-09-01T00:00:00Z',
+  },
+  intendant: {
+    id: 'user-int-001',
+    ecole_id: 'ecole-demo-001',
+    nom: 'Cissé',
+    prenom: 'Oumar',
+    telephone: '775234567',
+    role: 'intendant' as const,
+    photo_url: null,
+    actif: true,
+    created_at: '2025-09-01T00:00:00Z',
+  },
+  censeur: {
+    id: 'user-cens-001',
+    ecole_id: 'ecole-demo-001',
+    nom: 'Sy',
+    prenom: 'Aïssatou',
+    telephone: '774345678',
+    role: 'censeur' as const,
+    photo_url: null,
+    actif: true,
+    created_at: '2025-09-01T00:00:00Z',
+  },
 }
 
 export const DEMO_CLASSES = [
@@ -302,8 +335,183 @@ export const DEMO_EMPLOIS_TEMPS = [
   { id: 'edt-010', classe_id: 'classe-001', matiere_id: 'mat-007', prof_id: 'user-prof-008', jour_semaine: 5, heure_debut: '10:15', heure_fin: '12:15', salle: 'Salle 105' },
 ]
 
-export function isDemoMode(): boolean {
-  if (typeof window === 'undefined') return true
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
-  return !url || url.includes('placeholder') || url.includes('[PROJECT_REF]')
+export function getDemoRoleCookie(): string | null {
+  if (typeof document === 'undefined') return null
+  const match = document.cookie.split('; ').find(r => r.startsWith('ss_demo_role='))
+  return match ? match.split('=')[1] : null
 }
+
+export function isDemoMode(): boolean {
+  if (typeof window === 'undefined') return false
+  // Vrai si cookie démo présent OU localStorage (rétrocompatibilité)
+  return !!(getDemoRoleCookie() || localStorage.getItem('ss_demo_role'))
+}
+
+/* ══════════════════════════════════════════
+   DONNÉES DÉMO — TRANSPORT SCOLAIRE
+   ══════════════════════════════════════════ */
+
+export const DEMO_VEHICULE = {
+  id: 'vehicule-001',
+  immatriculation: 'DK-3478-AB',
+  chauffeur_nom: 'Moussa Ndiaye',
+  chauffeur_telephone: '+221 77 123 45 67',
+  latitude: 14.7167,
+  longitude: -17.4677,
+  vitesse: 35,
+  derniere_position_at: new Date(Date.now() - 3 * 60000).toISOString(),
+}
+
+export const DEMO_TRAJETS = [
+  { id: 'trajet-001', nom: 'Ligne 1 — Plateau → Lycée', type: 'aller' as const, vehicule_id: 'vehicule-001' },
+  { id: 'trajet-002', nom: 'Ligne 1 — Lycée → Plateau', type: 'retour' as const, vehicule_id: 'vehicule-001' },
+]
+
+export const DEMO_ARRETS = [
+  { id: 'arret-001', nom: 'Place de l\'Indépendance', adresse: 'Plateau, Dakar', heure_passage: '06:45', ordre: 1, trajet_id: 'trajet-001' },
+  { id: 'arret-002', nom: 'Marché Sandaga', adresse: 'Rue Blanchot, Dakar', heure_passage: '06:55', ordre: 2, trajet_id: 'trajet-001' },
+  { id: 'arret-003', nom: 'Rond-point Jet d\'eau', adresse: 'Avenue Cheikh Anta Diop', heure_passage: '07:05', ordre: 3, trajet_id: 'trajet-001' },
+  { id: 'arret-004', nom: 'Station Total Liberté', adresse: 'Liberté 5, Dakar', heure_passage: '07:15', ordre: 4, trajet_id: 'trajet-001' },
+  { id: 'arret-005', nom: 'Lycée Cheikh Anta Diop', adresse: 'Avenue Cheikh Anta Diop', heure_passage: '07:30', ordre: 5, trajet_id: 'trajet-001' },
+]
+
+export const DEMO_ABONNEMENT_TRANSPORT = {
+  id: 'abo-transport-001',
+  eleve_id: 'eleve-classe-001-1',
+  trajet_id: 'trajet-001',
+  arret_id: 'arret-003',
+  actif: true,
+}
+
+export const DEMO_NOTIFICATIONS_TRANSPORT = [
+  { id: 'notif-t-001', type: 'depart' as const, message: 'Le bus a quitté Place de l\'Indépendance', created_at: new Date(Date.now() - 45 * 60000).toISOString() },
+  { id: 'notif-t-002', type: 'approche' as const, message: 'Le bus approche de Rond-point Jet d\'eau (5 min)', created_at: new Date(Date.now() - 25 * 60000).toISOString() },
+  { id: 'notif-t-003', type: 'arrivee' as const, message: 'Votre enfant est arrivé au lycée', created_at: new Date(Date.now() - 5 * 60000).toISOString() },
+  { id: 'notif-t-004', type: 'retard' as const, message: 'Retard estimé de 10 min — embouteillage Route de Ouakam', created_at: new Date(Date.now() - 2 * 24 * 3600000).toISOString() },
+]
+
+/* ══════════════════════════════════════════
+   DONNÉES DÉMO — CANTINE SCOLAIRE
+   ══════════════════════════════════════════ */
+
+function getDemoMonday(): string {
+  const d = new Date()
+  const day = d.getDay()
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1)
+  const monday = new Date(d)
+  monday.setDate(diff)
+  return monday.toISOString().split('T')[0]
+}
+
+export const DEMO_MENUS_CANTINE = [
+  { id: 'menu-001', semaine_debut: getDemoMonday(), jour: 'Lundi', entree: 'Salade de concombres', plat_principal: 'Thiéboudienne (riz au poisson)', dessert: 'Mangue fraîche', prix: 1500 },
+  { id: 'menu-002', semaine_debut: getDemoMonday(), jour: 'Mardi', entree: 'Soupe de légumes', plat_principal: 'Yassa poulet (riz + oignons)', dessert: 'Yaourt nature', prix: 1500 },
+  { id: 'menu-003', semaine_debut: getDemoMonday(), jour: 'Mercredi', entree: 'Salade de betteraves', plat_principal: 'Mafé bœuf (sauce arachide)', dessert: 'Banane', prix: 1500 },
+  { id: 'menu-004', semaine_debut: getDemoMonday(), jour: 'Jeudi', entree: 'Beignets de niébé (accara)', plat_principal: 'Thiéré millet au lait caillé', dessert: 'Pastèque', prix: 1200 },
+  { id: 'menu-005', semaine_debut: getDemoMonday(), jour: 'Vendredi', entree: 'Fataya viande', plat_principal: 'Ceebu jën rouge (riz tomate poisson)', dessert: 'Bissap glacé', prix: 1500 },
+]
+
+export const DEMO_ABONNEMENT_CANTINE = {
+  id: 'abo-cantine-001',
+  eleve_id: 'eleve-classe-001-1',
+  actif: true,
+  montant_mensuel: 25000,
+  regime_special: null as string | null,
+}
+
+export function getDemoRepasPris(): { id: string; eleve_id: string; date: string; present: boolean }[] {
+  const repas = []
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = now.getMonth()
+  for (let day = 1; day <= now.getDate(); day++) {
+    const d = new Date(year, month, day)
+    const dow = d.getDay()
+    if (dow >= 1 && dow <= 5) {
+      repas.push({
+        id: `repas-${day}`,
+        eleve_id: 'eleve-classe-001-1',
+        date: d.toISOString().split('T')[0],
+        present: Math.random() > 0.15,
+      })
+    }
+  }
+  return repas
+}
+
+/* ══════════════════════════════════════════════════════════════
+   DONNÉES DÉMO — SECRÉTAIRE
+   ══════════════════════════════════════════════════════════════ */
+
+export const DEMO_INSCRIPTIONS = [
+  { id: 'insc-001', nom: 'Diallo', prenom: 'Awa', classe: 'Terminale S1', type: 'reinscription', date: '2026-03-02', statut: 'valide', dossier_complet: true },
+  { id: 'insc-002', nom: 'Ndiaye', prenom: 'Lamine', classe: '3ème A', type: 'inscription', date: '2026-03-03', statut: 'en_attente', dossier_complet: false },
+  { id: 'insc-003', nom: 'Fall', prenom: 'Seynabou', classe: 'Seconde A', type: 'reinscription', date: '2026-03-04', statut: 'valide', dossier_complet: true },
+  { id: 'insc-004', nom: 'Sow', prenom: 'Moussa', classe: 'Première S1', type: 'inscription', date: '2026-03-05', statut: 'incomplet', dossier_complet: false },
+  { id: 'insc-005', nom: 'Ba', prenom: 'Fatou', classe: '4ème A', type: 'reinscription', date: '2026-03-05', statut: 'valide', dossier_complet: true },
+]
+
+export const DEMO_CERTIFICATS = [
+  { id: 'cert-001', type: 'certificat_scolarite', eleve_nom: 'Awa Diallo', classe: 'Terminale S1', date_emission: '2026-01-10', demandeur: 'Parent', statut: 'emis', reference: 'CERT-2026-001' },
+  { id: 'cert-002', type: 'attestation_frequentation', eleve_nom: 'Lamine Ndiaye', classe: '3ème A', date_emission: '2026-01-12', demandeur: 'Élève', statut: 'emis', reference: 'ATTEST-2026-001' },
+  { id: 'cert-003', type: 'certificat_scolarite', eleve_nom: 'Seynabou Fall', classe: 'Seconde A', date_emission: '2026-02-05', demandeur: 'Parent', statut: 'en_attente', reference: null },
+  { id: 'cert-004', type: 'releve_notes', eleve_nom: 'Moussa Sow', classe: 'Première S1', date_emission: '2026-02-08', demandeur: 'Élève', statut: 'emis', reference: 'REL-2026-001' },
+  { id: 'cert-005', type: 'attestation_frequentation', eleve_nom: 'Khady Gueye', classe: '6ème A', date_emission: '2026-03-15', demandeur: 'Parent', statut: 'emis', reference: 'ATTEST-2026-002' },
+]
+
+export const DEMO_COURRIERS = [
+  { id: 'courr-001', type: 'entrant', sujet: 'Demande de bourse MESRI', expediteur: "Ministère de l'Éducation", destinataire: null, date: '2026-03-10', statut: 'traite', reference: 'MESRI-2026-0123' },
+  { id: 'courr-002', type: 'sortant', sujet: "Rapport trimestriel d'effectifs", expediteur: null, destinataire: 'IDEN Dakar', date: '2026-03-12', statut: 'envoye', reference: 'LCD-OUT-2026-045' },
+  { id: 'courr-003', type: 'entrant', sujet: 'Convocation inspection pédagogique', expediteur: "Inspecteur d'Académie", destinataire: null, date: '2026-03-18', statut: 'en_attente', reference: 'IA-2026-0789' },
+  { id: 'courr-004', type: 'sortant', sujet: 'Liste des admis au BFEM', expediteur: null, destinataire: 'IDEN Dakar', date: '2026-03-20', statut: 'envoye', reference: 'LCD-OUT-2026-046' },
+  { id: 'courr-005', type: 'entrant', sujet: 'Subvention matériel didactique', expediteur: 'Conseil Régional Dakar', destinataire: null, date: '2026-03-25', statut: 'en_attente', reference: 'CRD-2026-0234' },
+]
+
+/* ══════════════════════════════════════════════════════════════
+   DONNÉES DÉMO — INTENDANT
+   ══════════════════════════════════════════════════════════════ */
+
+export const DEMO_BUDGET = {
+  annee: '2025-2026',
+  total_budget: 45000000,
+  depenses_engagees: 18750000,
+  recettes_encaissees: 32500000,
+  solde: 13750000,
+  lignes: [
+    { id: 'lig-001', categorie: 'Personnel', budget: 25000000, depense: 12000000, reste: 13000000 },
+    { id: 'lig-002', categorie: 'Fournitures scolaires', budget: 3500000, depense: 1800000, reste: 1700000 },
+    { id: 'lig-003', categorie: 'Entretien & Réparations', budget: 2000000, depense: 950000, reste: 1050000 },
+    { id: 'lig-004', categorie: 'Cantine', budget: 5000000, depense: 2200000, reste: 2800000 },
+    { id: 'lig-005', categorie: 'Transport', budget: 4500000, depense: 1800000, reste: 2700000 },
+    { id: 'lig-006', categorie: 'Équipements', budget: 5000000, depense: 0, reste: 5000000 },
+  ],
+}
+
+export const DEMO_INVENTAIRE = [
+  { id: 'inv-001', categorie: 'Mobilier', designation: 'Tables élèves', quantite: 320, etat: 'bon', valeur_unitaire: 25000, localisation: 'Salles 101-110' },
+  { id: 'inv-002', categorie: 'Mobilier', designation: 'Chaises élèves', quantite: 320, etat: 'bon', valeur_unitaire: 8000, localisation: 'Salles 101-110' },
+  { id: 'inv-003', categorie: 'Informatique', designation: 'Ordinateurs portables', quantite: 25, etat: 'bon', valeur_unitaire: 450000, localisation: 'Salle informatique' },
+  { id: 'inv-004', categorie: 'Informatique', designation: 'Vidéoprojecteurs', quantite: 8, etat: 'moyen', valeur_unitaire: 350000, localisation: 'Salles 101, 103, 105, 107' },
+  { id: 'inv-005', categorie: 'Matériel lab', designation: 'Microscopes optiques', quantite: 12, etat: 'bon', valeur_unitaire: 180000, localisation: 'Labo SVT' },
+  { id: 'inv-006', categorie: 'Fournitures', designation: 'Rames de papier A4', quantite: 48, etat: 'bon', valeur_unitaire: 4500, localisation: 'Réserve secrétariat' },
+]
+
+/* ══════════════════════════════════════════════════════════════
+   DONNÉES DÉMO — CENSEUR
+   ══════════════════════════════════════════════════════════════ */
+
+export const DEMO_EXAMENS = [
+  { id: 'exam-001', titre: 'Compositions T2 — 6ème A', type: 'composition', date_debut: '2026-03-16', date_fin: '2026-03-20', classes: ['6ème A', '6ème B'], statut: 'en_cours', salle: 'Salles 101-102' },
+  { id: 'exam-002', titre: 'Compositions T2 — 5ème A', type: 'composition', date_debut: '2026-03-17', date_fin: '2026-03-21', classes: ['5ème A'], statut: 'en_cours', salle: 'Salle 103' },
+  { id: 'exam-003', titre: 'Épreuve blanche BFEM', type: 'bfem', date_debut: '2026-04-07', date_fin: '2026-04-09', classes: ['3ème A'], statut: 'planifie', salle: 'Grand amphi' },
+  { id: 'exam-004', titre: 'BAC blanc Terminale S1', type: 'bac', date_debut: '2026-04-14', date_fin: '2026-04-16', classes: ['Terminale S1'], statut: 'planifie', salle: 'Grand amphi' },
+  { id: 'exam-005', titre: 'Compositions T1 — Toutes classes', type: 'composition', date_debut: '2025-11-10', date_fin: '2025-11-14', classes: ['Toutes'], statut: 'termine', salle: 'Toutes salles' },
+]
+
+export const DEMO_BULLETINS_CENSEUR = [
+  { id: 'bull-001', classe: '6ème A', trimestre: 2, nb_bulletins: 35, valides: 35, en_attente: 0, statut: 'valide' },
+  { id: 'bull-002', classe: '6ème B', trimestre: 2, nb_bulletins: 32, valides: 28, en_attente: 4, statut: 'en_cours' },
+  { id: 'bull-003', classe: '5ème A', trimestre: 2, nb_bulletins: 30, valides: 0, en_attente: 30, statut: 'en_attente' },
+  { id: 'bull-004', classe: '4ème A', trimestre: 2, nb_bulletins: 28, valides: 0, en_attente: 28, statut: 'en_attente' },
+  { id: 'bull-005', classe: 'Terminale S1', trimestre: 2, nb_bulletins: 35, valides: 35, en_attente: 0, statut: 'valide' },
+]

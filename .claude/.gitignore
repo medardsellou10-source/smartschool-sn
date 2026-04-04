@@ -1,0 +1,5 @@
+# Local settings with secrets
+*.local.json
+
+# Scheduled tasks and temp
+scheduled-tasks/

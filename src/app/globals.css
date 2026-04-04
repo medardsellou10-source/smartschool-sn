@@ -5,6 +5,34 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  /* ===== SmartSchool SN — Design System Futuriste ===== */
+
+  /* Backgrounds profonds */
+  --color-ss-bg:           #020617;
+  --color-ss-bg-secondary: #0B1120;
+  --color-ss-bg-card:      #111827;
+
+  /* Couleurs néon Sénégal */
+  --color-ss-green:  #00E676;
+  --color-ss-gold:   #FFD600;
+  --color-ss-red:    #FF1744;
+  --color-ss-cyan:   #00E5FF;
+  --color-ss-purple: #D500F9;
+
+  /* Typographie */
+  --color-ss-text:           #F8FAFC;
+  --color-ss-text-secondary: #94A3B8;
+  --color-ss-text-muted:     #475569;
+
+  /* Bordures */
+  --color-ss-border: #1E293B;
+
+  /* Drapeau Sénégal */
+  --sn-green:  #00853F;
+  --sn-yellow: #FDEF42;
+  --sn-red:    #E31B23;
+
+  /* Système shadcn */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
@@ -48,83 +76,419 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-:root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
+/* ===== Classes utilitaires couleurs Sénégal ===== */
+.bg-sn-green  { background-color: #00853F; }
+.bg-sn-yellow { background-color: #FDEF42; }
+.bg-sn-red    { background-color: #E31B23; }
+.text-sn-green  { color: #00853F; }
+.text-sn-yellow { color: #FDEF42; }
+.text-sn-red    { color: #E31B23; }
+.border-sn-green  { border-color: #00853F; }
+.border-sn-yellow { border-color: #FDEF42; }
+.border-sn-red    { border-color: #E31B23; }
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+:root {
+  --background: oklch(0.06 0.01 250);
+  --foreground: oklch(0.97 0 0);
+  --card: oklch(0.1 0.015 250);
+  --card-foreground: oklch(0.97 0 0);
+  --popover: oklch(0.1 0.015 250);
+  --popover-foreground: oklch(0.97 0 0);
+  --primary: oklch(0.75 0.18 145);
+  --primary-foreground: oklch(0.1 0 0);
+  --secondary: oklch(0.15 0.02 250);
+  --secondary-foreground: oklch(0.85 0 0);
+  --muted: oklch(0.15 0.02 250);
+  --muted-foreground: oklch(0.55 0 0);
+  --accent: oklch(0.15 0.02 250);
+  --accent-foreground: oklch(0.85 0 0);
+  --destructive: oklch(0.6 0.25 25);
+  --border: oklch(0.2 0.02 250);
+  --input: oklch(0.2 0.02 250);
+  --ring: oklch(0.75 0.18 145);
+  --chart-1: oklch(0.75 0.18 145);
+  --chart-2: oklch(0.75 0.18 200);
+  --chart-3: oklch(0.75 0.18 50);
+  --chart-4: oklch(0.6 0.25 25);
+  --chart-5: oklch(0.7 0.2 290);
+  --radius: 0.75rem;
+  --sidebar: oklch(0.08 0.015 250);
+  --sidebar-foreground: oklch(0.85 0 0);
+  --sidebar-primary: oklch(0.75 0.18 145);
+  --sidebar-primary-foreground: oklch(0.1 0 0);
+  --sidebar-accent: oklch(0.12 0.02 250);
+  --sidebar-accent-foreground: oklch(0.85 0 0);
+  --sidebar-border: oklch(0.18 0.02 250);
+  --sidebar-ring: oklch(0.75 0.18 145);
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
+  * { @apply border-border outline-ring/50; }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-ss-bg text-ss-text;
+    font-feature-settings: "cv02","cv03","cv04","cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   html {
     @apply font-sans;
+    scroll-behavior: smooth;
   }
+
+  /* Scrollbar personnalisée */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: #1E293B;
+    border-radius: 99px;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: #334155; }
+}
+
+/* =====================================================
+   ANIMATIONS FUTURISTES
+   ===================================================== */
+
+@keyframes aurora {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-8px); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 20px currentColor; }
+  50%       { opacity: 0.7; box-shadow: 0 0 40px currentColor, 0 0 80px currentColor; }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes slide-in-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes scan-line {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+@keyframes rotate-border {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes number-count {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(100%); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes toast-out {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(100%); }
+}
+
+@keyframes particle-float {
+  0%   { transform: translateY(0) translateX(0) scale(1); opacity: 0.6; }
+  33%  { transform: translateY(-30px) translateX(15px) scale(1.1); opacity: 0.4; }
+  66%  { transform: translateY(-60px) translateX(-10px) scale(0.9); opacity: 0.2; }
+  100% { transform: translateY(-100px) translateX(5px) scale(0.8); opacity: 0; }
+}
+
+/* =====================================================
+   CLASSES UTILITAIRES GLASSMORPHISME & NÉON
+   ===================================================== */
+
+/* Glass effect */
+.glass {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.glass-dark {
+  background: rgba(2, 6, 23, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateY(-2px);
+}
+
+/* Néon glow */
+.glow-green  { box-shadow: 0 0 20px rgba(0, 230, 118, 0.35), 0 0 60px rgba(0, 230, 118, 0.15); }
+.glow-gold   { box-shadow: 0 0 20px rgba(255, 214, 0, 0.35), 0 0 60px rgba(255, 214, 0, 0.15); }
+.glow-red    { box-shadow: 0 0 20px rgba(255, 23, 68, 0.35), 0 0 60px rgba(255, 23, 68, 0.15); }
+.glow-cyan   { box-shadow: 0 0 20px rgba(0, 229, 255, 0.35), 0 0 60px rgba(0, 229, 255, 0.15); }
+.glow-purple { box-shadow: 0 0 20px rgba(213, 0, 249, 0.35), 0 0 60px rgba(213, 0, 249, 0.15); }
+
+/* Néon text glow */
+.neon-green  { color: #00E676; text-shadow: 0 0 20px rgba(0, 230, 118, 0.8); }
+.neon-gold   { color: #FFD600; text-shadow: 0 0 20px rgba(255, 214, 0, 0.8); }
+.neon-cyan   { color: #00E5FF; text-shadow: 0 0 20px rgba(0, 229, 255, 0.8); }
+.neon-red    { color: #FF1744; text-shadow: 0 0 20px rgba(255, 23, 68, 0.8); }
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #00E676 0%, #00E5FF 50%, #D500F9 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-sn {
+  background: linear-gradient(135deg, #00853F 0%, #FDEF42 50%, #E31B23 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-gold {
+  background: linear-gradient(135deg, #FFD600 0%, #FF6D00 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Bordure animée aurora */
+.aurora-border {
+  position: relative;
+}
+.aurora-border::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, #00E676, #00E5FF, #D500F9, #00E676);
+  background-size: 300% 300%;
+  animation: aurora 4s ease infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+/* Background aurora animé */
+.aurora-bg {
+  background: linear-gradient(-45deg, #020617, #0D1426, #061510, #0A0716);
+  background-size: 400% 400%;
+  animation: aurora 12s ease infinite;
+}
+
+/* Animations d'entrée */
+.animate-slide-up   { animation: slide-in-up 0.5s ease forwards; }
+.animate-slide-right { animation: slide-in-right 0.5s ease forwards; }
+.animate-fade-in    { animation: fade-in 0.4s ease forwards; }
+.animate-float      { animation: float 4s ease-in-out infinite; }
+
+/* Shimmer pour skeleton loading */
+.ss-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.03) 25%,
+    rgba(255,255,255,0.08) 50%,
+    rgba(255,255,255,0.03) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Toasts */
+.ss-toast-in  { animation: toast-in 0.3s ease-out; }
+.ss-toast-out { animation: toast-out 0.3s ease-in forwards; }
+
+/* Barre drapeau Sénégal */
+.sn-flag-bar {
+  background: linear-gradient(90deg, #00853F 33.33%, #FDEF42 33.33%, #FDEF42 66.66%, #E31B23 66.66%);
+}
+
+/* Hover scale */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+
+/* Scrollbar hide */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+
+/* Capsule active indicator */
+.active-dot::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  background: #00E676;
+  border-radius: 50%;
+  border: 2px solid #020617;
+  box-shadow: 0 0 10px rgba(0, 230, 118, 0.8);
+}
+
+/* Particules CSS */
+.particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #00E676;
+  animation: particle-float 6s ease-in-out infinite;
+}
+
+/* Ligne de scan holographique */
+.scan-effect::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,229,255,0.8), transparent);
+  animation: scan-line 4s linear infinite;
+  pointer-events: none;
+}
+
+/* ══════════════════════════════════════════
+   MODE VIDÉO PARENT — Glassmorphisme total
+   Activé via JS class "parent-video-mode"
+   ══════════════════════════════════════════ */
+
+/* Background principal → transparent */
+.parent-video-mode {
+  background: transparent !important;
+}
+
+/* Sidebar → glassmorphique collée à gauche, AUCUN gap */
+.parent-video-mode > aside {
+  background: rgba(2, 6, 23, 0.65) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border-right: 1px solid rgba(0, 229, 255, 0.12) !important;
+  margin: 0 !important;
+  padding-left: 0 !important;
+}
+
+/* Navbar → glassmorphique */
+.parent-video-mode > div > header,
+.parent-video-mode > div > nav,
+.parent-video-mode > div > div:first-child {
+  background: rgba(2, 6, 23, 0.55) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-bottom: 1px solid rgba(0, 229, 255, 0.08) !important;
+}
+
+/* Zone de contenu principal → transparent */
+.parent-video-mode > div > main {
+  background: transparent !important;
+}
+
+/* Scrollbar custom cyan */
+.parent-video-mode > div > main::-webkit-scrollbar {
+  width: 4px;
+}
+.parent-video-mode > div > main::-webkit-scrollbar-track {
+  background: transparent;
+}
+.parent-video-mode > div > main::-webkit-scrollbar-thumb {
+  background: rgba(0, 229, 255, 0.2);
+  border-radius: 10px;
+}
+.parent-video-mode > div > main::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 229, 255, 0.35);
+}
+
+/* ══════════════════════════════════════════
+   MODE VIDÉO — Glassmorphisme cards lisibles
+   Les layouts vidéo rendent le fond transparent,
+   donc les cards doivent être plus opaques.
+   ══════════════════════════════════════════ */
+
+/* Cards dans les dashboards avec vidéo background */
+[data-dashboard][style*="transparent"] main .rounded-2xl,
+[data-dashboard][style*="transparent"] main .rounded-xl {
+  background-color: rgba(2, 6, 23, 0.78) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* KPI stat cards — encore plus opaques */
+[data-dashboard][style*="transparent"] main .grid .rounded-2xl,
+[data-dashboard][style*="transparent"] main .grid .rounded-xl {
+  background-color: rgba(2, 6, 23, 0.85) !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Hero banner dans les dashboards vidéo */
+[data-dashboard][style*="transparent"] main .relative.rounded-2xl.overflow-hidden {
+  background-color: rgba(2, 6, 23, 0.70) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+}
+
+/* Inputs et selects restent opaques */
+[data-dashboard][style*="transparent"] main input,
+[data-dashboard][style*="transparent"] main select {
+  background-color: rgba(2, 6, 23, 0.90) !important;
+}
+
+/* Petits badges / pills - pas de forçage */
+[data-dashboard][style*="transparent"] main .rounded-full {
+  background-color: unset !important;
+  backdrop-filter: unset !important;
+  -webkit-backdrop-filter: unset !important;
+  border-color: unset !important;
+  box-shadow: unset !important;
+}
+
+/* Préférences de mouvement réduit */
+@media (prefers-reduced-motion: reduce) {
+  .ss-shimmer,
+  .ss-toast-in,
+  .ss-toast-out,
+  .animate-float,
+  .aurora-bg,
+  .aurora-border::before { animation: none; }
 }
