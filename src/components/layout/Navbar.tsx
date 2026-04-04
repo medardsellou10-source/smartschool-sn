@@ -1,8 +1,10 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useUser } from '@/hooks/useUser'
+import { useEcole } from '@/hooks/useEcole'
 import { ROLE_LABELS } from '@/lib/constants'
 import type { Role } from '@/lib/constants'
 
@@ -12,6 +14,9 @@ const ROLE_COLORS: Record<string, string> = {
   surveillant: '#FFD600',
   parent: '#00E5FF',
   eleve: '#D500F9',
+  secretaire: '#FF6D00',
+  intendant: '#00BCD4',
+  censeur: '#3D5AFE',
 }
 
 function roleFromPath(pathname: string): string {
@@ -19,17 +24,25 @@ function roleFromPath(pathname: string): string {
   if (pathname.startsWith('/surveillant')) return 'surveillant'
   if (pathname.startsWith('/parent')) return 'parent'
   if (pathname.startsWith('/eleve')) return 'eleve'
+  if (pathname.startsWith('/secretaire')) return 'secretaire'
+  if (pathname.startsWith('/intendant')) return 'intendant'
+  if (pathname.startsWith('/censeur')) return 'censeur'
   return 'admin_global'
 }
 
 export function Navbar() {
   const pathname = usePathname()
   const { user, logout } = useUser()
+  const { ecole } = useEcole()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const role = user?.role || roleFromPath(pathname)
   const roleLabel = ROLE_LABELS[role as Role] ?? role
-  const accentColor = ROLE_COLORS[role] || '#00E676'
+  const accentColor = ecole?.couleur_primaire || ROLE_COLORS[role] || '#00E676'
+  const ecoleNom = ecole?.nom || 'SmartSchool SN'
+  const ecoleInitiales = ecole?.nom
+    ? ecole.nom.split(' ').slice(0, 2).map((w: string) => w[0]).join('').toUpperCase()
+    : 'SS'
 
   return (
     <header
@@ -52,7 +65,17 @@ export function Navbar() {
             <path d="M3 5h14M3 10h14M3 15h14" strokeLinecap="round" />
           </svg>
         </button>
-        <span className="text-sm font-bold text-white lg:hidden">SmartSchool SN</span>
+        {/* Logo école sur mobile */}
+        <div className="flex items-center gap-2 lg:hidden">
+          <div className="w-7 h-7 rounded-lg overflow-hidden flex items-center justify-center text-xs font-black text-white shrink-0"
+            style={{ background: ecole?.logo_url ? 'transparent' : `linear-gradient(135deg, ${accentColor}cc, ${accentColor}66)` }}>
+            {ecole?.logo_url
+              ? <Image src={ecole.logo_url} alt={ecoleNom} width={28} height={28} className="w-full h-full object-contain" />
+              : <span>{ecoleInitiales}</span>
+            }
+          </div>
+          <span className="text-sm font-bold text-white truncate max-w-[140px]">{ecoleNom}</span>
+        </div>
       </div>
 
       {/* Centre */}
@@ -118,11 +141,14 @@ export function Navbar() {
           >
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center font-black text-sm text-white"
-                  style={{ background: 'linear-gradient(135deg, #00853F, #FDEF42, #E31B23)' }}>
-                  SS
+                <div className="w-9 h-9 rounded-xl overflow-hidden flex items-center justify-center font-black text-sm text-white shrink-0"
+                  style={{ background: ecole?.logo_url ? 'transparent' : `linear-gradient(135deg, ${accentColor}cc, ${accentColor}66)` }}>
+                  {ecole?.logo_url
+                    ? <Image src={ecole.logo_url} alt={ecoleNom} width={36} height={36} className="w-full h-full object-contain" />
+                    : <span>{ecoleInitiales}</span>
+                  }
                 </div>
-                <span className="font-bold text-white">SmartSchool SN</span>
+                <span className="font-bold text-white truncate max-w-[150px]">{ecoleNom}</span>
               </div>
               <button
                 onClick={() => setMobileMenuOpen(false)}

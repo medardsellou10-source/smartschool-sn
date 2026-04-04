@@ -1,9 +1,11 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { useUser } from '@/hooks/useUser'
+import { useEcole } from '@/hooks/useEcole'
 import type { UserRole } from '@/lib/types/database.types'
 import type { ReactElement } from 'react'
 
@@ -145,10 +147,18 @@ function roleFromPath(pathname: string): string {
 export function Sidebar() {
   const pathname = usePathname()
   const { user, logout } = useUser()
+  const { ecole } = useEcole()
 
   const role = (user?.role || roleFromPath(pathname)) as UserRole
   const items = MENUS[role] || MENUS.admin_global
-  const accentColor = ROLE_COLORS[role] || '#00E676'
+  // Utiliser la couleur de l'école si disponible, sinon la couleur du rôle
+  const ecoleColor = ecole?.couleur_primaire
+  const accentColor = ecoleColor || ROLE_COLORS[role] || '#00E676'
+
+  // Initiales de l'école pour le fallback logo
+  const ecoleInitiales = ecole?.nom
+    ? ecole.nom.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()
+    : 'SS'
 
   return (
     <aside className="hidden lg:flex flex-col w-60 shrink-0 relative"
@@ -162,22 +172,28 @@ export function Sidebar() {
       <div className="absolute top-0 left-0 w-40 h-40 rounded-full opacity-10 blur-3xl pointer-events-none"
         style={{ background: `radial-gradient(circle, ${accentColor}, transparent 70%)` }} />
 
-      {/* Logo */}
+      {/* Logo école */}
       <div className="p-5" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        {/* Barre couleur école */}
         <div className="flex h-1 rounded-full overflow-hidden mb-4">
-          <div className="flex-1 bg-[#00853F]" />
-          <div className="flex-1 bg-[#FDEF42]" />
-          <div className="flex-1 bg-[#E31B23]" />
+          <div className="flex-1 rounded-full" style={{ background: accentColor }} />
         </div>
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 font-black text-sm text-white"
-            style={{ background: 'linear-gradient(135deg, #00853F, #FDEF42, #E31B23)' }}>
-            SS
+          {/* Logo ou initiales */}
+          <div className="w-9 h-9 rounded-xl shrink-0 overflow-hidden flex items-center justify-center font-black text-sm text-white"
+            style={{ background: ecole?.logo_url ? 'transparent' : `linear-gradient(135deg, ${accentColor}cc, ${accentColor}66)` }}>
+            {ecole?.logo_url ? (
+              <Image src={ecole.logo_url} alt={ecole.nom} width={36} height={36} className="w-full h-full object-contain" />
+            ) : (
+              <span>{ecoleInitiales}</span>
+            )}
           </div>
-          <div>
-            <p className="text-sm font-bold text-white leading-none">SmartSchool SN</p>
-            <p className="text-[10px] font-medium mt-0.5" style={{ color: accentColor }}>
-              v2.0 — Mode Démo
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-bold text-white leading-none truncate">
+              {ecole?.nom || 'SmartSchool SN'}
+            </p>
+            <p className="text-[10px] font-medium mt-0.5 truncate" style={{ color: `${accentColor}99` }}>
+              {ecole?.slogan || 'Espace de travail'}
             </p>
           </div>
         </div>
