@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useCallback, useRef } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { useUser } from '@/hooks/useUser'
 import {
   isDemoMode,
@@ -195,14 +195,105 @@ function BulletinPrint({ b, classe, trimestre, annee }: {
   )
 }
 
+// ── Générateur HTML bulletin (fenêtre propre) ─────────────────
+function bulletinToHTML(b: EleveBulletin, classe: string, trimestre: number, annee: string, isLast = true): string {
+  const rows = b.matieres.map((m, i) => `
+    <tr style="background:${i % 2 === 0 ? '#f0f4ff' : '#fff'}">
+      <td style="border:1px solid #ccc;padding:5px 8px;font-weight:600">${m.nom}</td>
+      <td style="border:1px solid #ccc;padding:5px 8px;text-align:center">${m.coefficient}</td>
+      <td style="border:1px solid #ccc;padding:5px 8px;text-align:center">${m.nbEvals}</td>
+      <td style="border:1px solid #ccc;padding:5px 8px;text-align:center;font-weight:bold;color:${m.moyenne !== null ? (m.moyenne >= 10 ? '#16a34a' : '#dc2626') : '#888'}">
+        ${m.moyenne !== null ? m.moyenne.toFixed(2) : '—'}
+      </td>
+      <td style="border:1px solid #ccc;padding:5px 8px;text-align:center">
+        ${m.moyenne !== null ? (m.moyenne * m.coefficient).toFixed(2) : '—'}
+      </td>
+      <td style="border:1px solid #ccc;padding:5px 8px;text-align:center;font-size:10px;font-style:italic">${m.mention}</td>
+    </tr>`).join('')
+
+  const signataires = ['Le Censeur', 'Le Proviseur / Principal', 'Signature Parent / Tuteur']
+    .map(lbl => `
+      <div style="text-align:center">
+        <div style="height:50px;border-bottom:1px solid #999;margin-bottom:6px"></div>
+        <p style="margin:0;font-size:10px;font-weight:bold;color:#333">${lbl}</p>
+      </div>`).join('')
+
+  return `
+  <div style="font-family:Arial,sans-serif;font-size:12px;color:#000;background:#fff;padding:24px;width:100%;box-sizing:border-box;${isLast ? '' : 'page-break-after:always'}">
+    <div style="text-align:center;border-bottom:2px solid #1e3a5f;padding-bottom:12px;margin-bottom:14px">
+      <p style="margin:0;font-size:10px;font-weight:bold;text-transform:uppercase;letter-spacing:1px">République du Sénégal — Un Peuple, Un But, Une Foi</p>
+      <p style="margin:2px 0;font-size:10px;color:#555">Ministère de l'Éducation Nationale</p>
+      <h2 style="margin:8px 0 2px;font-size:15px;text-transform:uppercase;color:#1e3a5f">${DEMO_ECOLE.nom}</h2>
+      <p style="margin:0;font-size:10px;color:#666">Code IAE : ${DEMO_ECOLE.code_iae} · ${DEMO_ECOLE.ville}, ${DEMO_ECOLE.region}</p>
+      <h3 style="margin:10px 0 2px;font-size:13px;font-weight:bold;background:#1e3a5f;color:#fff;padding:4px 16px;display:inline-block;border-radius:4px">
+        BULLETIN DE NOTES — TRIMESTRE ${trimestre}
+      </h3>
+      <p style="margin:4px 0 0;font-size:10px">Année scolaire ${annee}</p>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;padding:8px 12px;border:1px solid #ccc;border-radius:4px;background:#f9fafb">
+      <div><strong>Nom :</strong> ${b.prenom} ${b.nom}</div>
+      <div><strong>Matricule :</strong> ${b.matricule}</div>
+      <div><strong>Classe :</strong> ${classe}</div>
+      <div><strong>Rang :</strong> ${b.rang}e / ${b.totalEleves} élèves</div>
+      <div><strong>Moyenne générale :</strong> <span style="font-weight:bold;color:${b.moyenneGenerale !== null && b.moyenneGenerale >= 10 ? '#16a34a' : '#dc2626'}">${b.moyenneGenerale !== null ? b.moyenneGenerale.toFixed(2) : '—'} / 20</span></div>
+      <div><strong>Mention :</strong> <span style="font-weight:bold">${b.mention}</span></div>
+    </div>
+    <table style="width:100%;border-collapse:collapse;margin-bottom:14px;font-size:11px">
+      <thead>
+        <tr style="background:#1e3a5f;color:#fff">
+          <th style="border:1px solid #bbb;padding:6px 8px;text-align:left;width:28%">Matière</th>
+          <th style="border:1px solid #bbb;padding:6px 8px;text-align:center;width:8%">Coeff.</th>
+          <th style="border:1px solid #bbb;padding:6px 8px;text-align:center;width:12%">Nb Évals</th>
+          <th style="border:1px solid #bbb;padding:6px 8px;text-align:center;width:14%">Moyenne /20</th>
+          <th style="border:1px solid #bbb;padding:6px 8px;text-align:center;width:14%">Moy × Coeff</th>
+          <th style="border:1px solid #bbb;padding:6px 8px;text-align:center;width:24%">Appréciation</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+      <tfoot>
+        <tr style="background:#1e3a5f;color:#fff;font-weight:bold">
+          <td colspan="3" style="border:1px solid #bbb;padding:6px 8px;text-align:right;font-size:12px">MOYENNE GÉNÉRALE</td>
+          <td style="border:1px solid #bbb;padding:6px 8px;text-align:center;font-size:14px">${b.moyenneGenerale !== null ? b.moyenneGenerale.toFixed(2) : '—'} / 20</td>
+          <td colspan="2" style="border:1px solid #bbb;padding:6px 8px;text-align:center;font-size:12px">${b.mention}</td>
+        </tr>
+      </tfoot>
+    </table>
+    <div style="border:1px solid #ccc;padding:10px 12px;margin-bottom:16px;border-radius:4px;background:#f9fafb">
+      <strong>Avis du conseil de classe :</strong>
+      <p style="margin:4px 0 0;font-style:italic">${b.conseil}</p>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-top:28px">${signataires}</div>
+  </div>`
+}
+
+function openBulletinWindow(html: string, title: string, autoPrint: boolean) {
+  const win = window.open('', '_blank', 'width=960,height=700')
+  if (!win) { alert('Autorisez les popups pour imprimer/télécharger.'); return }
+  win.document.write(`<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>${title}</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 0; background: #fff; }
+    @media print { @page { margin: 12mm; size: A4; } }
+  </style>
+</head>
+<body>${html}</body>
+</html>`)
+  win.document.close()
+  if (autoPrint) {
+    win.addEventListener('load', () => { win.focus(); win.print() })
+    setTimeout(() => { try { win.focus(); win.print() } catch { /* ignore */ } }, 600)
+  }
+}
+
 // ── Page principale ────────────────────────────────────────────
 export default function BulletinsPage() {
   useUser()
-  const printRef = useRef<HTMLDivElement>(null)
-
   const [selectedClasse, setSelectedClasse] = useState('classe-001')
   const [selectedTrimestre, setSelectedTrimestre] = useState(2)
-  const [selectedEleve, setSelectedEleve] = useState<EleveBulletin | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [sortBy, setSortBy] = useState<'rang' | 'nom' | 'moyenne'>('rang')
   const [validated, setValidated] = useState(false)
@@ -234,14 +325,21 @@ export default function BulletinsPage() {
   const uniqueMatieres = bulletins[0]?.matieres ?? []
 
   const handlePrint = useCallback((b: EleveBulletin) => {
-    setSelectedEleve(b)
-    setTimeout(() => window.print(), 200)
-  }, [])
+    const html = bulletinToHTML(b, classeLabel, selectedTrimestre, ANNEE)
+    openBulletinWindow(html, `Bulletin — ${b.prenom} ${b.nom} — T${selectedTrimestre}`, true)
+  }, [classeLabel, selectedTrimestre])
+
+  const handleDownloadPdf = useCallback((b: EleveBulletin) => {
+    const html = bulletinToHTML(b, classeLabel, selectedTrimestre, ANNEE)
+    openBulletinWindow(html, `Bulletin — ${b.prenom} ${b.nom} — T${selectedTrimestre}`, true)
+  }, [classeLabel, selectedTrimestre])
 
   const handlePrintAll = useCallback(() => {
-    setSelectedEleve(null)
-    setTimeout(() => window.print(), 200)
-  }, [])
+    const htmlContent = filteredBulletins.map((b, i) =>
+      bulletinToHTML(b, classeLabel, selectedTrimestre, ANNEE, i === filteredBulletins.length - 1)
+    ).join('')
+    openBulletinWindow(htmlContent, `Bulletins — ${classeLabel} — T${selectedTrimestre}`, true)
+  }, [filteredBulletins, classeLabel, selectedTrimestre])
 
   const handleValidate = useCallback(async () => {
     setValidating(true)
@@ -378,7 +476,7 @@ export default function BulletinsPage() {
                   ))}
                   <th className="px-3 py-3 text-center text-xs text-ss-text-muted font-semibold min-w-[90px]">Moy. Gén.</th>
                   <th className="px-3 py-3 text-center text-xs text-ss-text-muted font-semibold">Mention</th>
-                  <th className="px-3 py-3 text-center text-xs text-ss-text-muted font-semibold">Action</th>
+                  <th className="px-3 py-3 text-center text-xs text-ss-text-muted font-semibold">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -410,10 +508,16 @@ export default function BulletinsPage() {
                       </span>
                     </td>
                     <td className="px-3 py-2.5 text-center">
-                      <button onClick={() => handlePrint(b)}
-                        className="text-[11px] text-indigo-400 hover:text-indigo-300 border border-indigo-500/30 hover:border-indigo-400/60 px-2 py-1 rounded-lg transition-all">
-                        🖨️
-                      </button>
+                      <div className="flex items-center justify-center gap-1">
+                        <button onClick={() => handlePrint(b)} title="Imprimer"
+                          className="text-[11px] text-indigo-400 hover:text-indigo-300 border border-indigo-500/30 hover:border-indigo-400/60 px-2 py-1 rounded-lg transition-all min-h-[28px]">
+                          🖨️
+                        </button>
+                        <button onClick={() => handleDownloadPdf(b)} title="Télécharger PDF"
+                          className="text-[11px] text-ss-cyan hover:text-ss-cyan/80 border border-ss-cyan/30 hover:border-ss-cyan/60 px-2 py-1 rounded-lg transition-all min-h-[28px]">
+                          ⬇️
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -429,18 +533,6 @@ export default function BulletinsPage() {
         )}
       </div>
 
-      {/* ── Vue impression ────────────────────────────────────── */}
-      <div className="hidden print:block" ref={printRef}>
-        {selectedEleve ? (
-          <BulletinPrint b={selectedEleve} classe={classeLabel} trimestre={selectedTrimestre} annee={ANNEE} />
-        ) : (
-          filteredBulletins.map((b, i) => (
-            <div key={b.eleveId} style={{ pageBreakAfter: i < filteredBulletins.length - 1 ? 'always' : 'auto' }}>
-              <BulletinPrint b={b} classe={classeLabel} trimestre={selectedTrimestre} annee={ANNEE} />
-            </div>
-          ))
-        )}
-      </div>
     </>
   )
 }
