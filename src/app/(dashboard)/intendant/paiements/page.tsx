@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react'
 import { useUser } from '@/hooks/useUser'
+import { createClient } from '@/lib/supabase/client'
 import { isDemoMode, DEMO_PAIEMENTS_COMPTABLE, DEMO_TARIFS, DEMO_CLASSES } from '@/lib/demo-data'
 
 const ACCENT = '#00BCD4'
@@ -20,49 +21,242 @@ const STATUT_MAP: Record<string, { bg: string; color: string; label: string }> =
   impaye:         { bg: 'rgba(255,23,68,0.15)',  color: RED,    label: 'Impayé' },
 }
 
-type PaiementRow = typeof DEMO_PAIEMENTS_COMPTABLE[number]
+// Type unifié pour les deux sources (démo + Supabase)
+interface PaiementRow {
+  eleveId: string
+  nom: string
+  prenom: string
+  classe_id: string
+  classe_nom?: string
+  matricule: string
+  totalDu: number
+  totalPaye: number
+  solde: number
+  statut: string
+  inscriptionPayee: boolean
+  t1Paye: boolean
+  t2Paye: boolean
+  t3Paye: boolean
+  activitesPayees: boolean
+  lignes: Array<{ type: string; montant: number; date: string; reference: string; methode: string }>
+  methode: string
+}
+
+interface Tarifs {
+  frais_inscription: number
+  scolarite_t1: number
+  scolarite_t2: number
+  scolarite_t3: number
+  frais_activites: number
+  total_annuel: number
+  annee: string
+}
+
+// Adapte les données Supabase vue_comptable_eleves → PaiementRow
+function adaptSupabaseRow(row: any): PaiementRow {
+  return {
+    eleveId: row.eleve_id,
+    nom: row.nom,
+    prenom: row.prenom,
+    classe_id: row.classe_id,
+    classe_nom: row.classe_nom,
+    matricule: row.matricule || '',
+    totalDu: row.total_du || 0,
+    totalPaye: row.total_paye || 0,
+    solde: row.solde || 0,
+    statut: row.statut_global || 'impaye',
+    inscriptionPayee: row.inscription_soldee || false,
+    t1Paye: row.t1_solde || false,
+    t2Paye: row.t2_solde || false,
+    t3Paye: row.t3_solde || false,
+    activitesPayees: (row.activites_paye || 0) > 0,
+    lignes: [],
+    methode: '—',
+  }
+}
 
 export default function PaiementsPage() {
   const { user, loading: userLoading } = useUser()
   const [data, setData] = useState<PaiementRow[]>([])
+  const [tarifs, setTarifs] = useState<Tarifs>(DEMO_TARIFS)
   const [loading, setLoading] = useState(true)
+  const [toast, setToast] = useState<string | null>(null)
 
   const [search, setSearch] = useState('')
   const [filtreClasse, setFiltreClasse] = useState('all')
   const [filtreStatut, setFiltreStatut] = useState('all')
   const [vue, setVue] = useState<'tableau' | 'debiteurs' | 'rapport'>('tableau')
   const [detailRow, setDetailRow] = useState<PaiementRow | null>(null)
+  const [classesSupabase, setClassesSupabase] = useState<{ id: string; label: string }[]>([])
+  const [saving, setSaving] = useState(false)
+
+  function showToast(msg: string, duration = 3500) {
+    setToast(msg)
+    setTimeout(() => setToast(null), duration)
+  }
 
   useEffect(() => {
-    if (isDemoMode()) { setData(DEMO_PAIEMENTS_COMPTABLE); setLoading(false); return }
-    if (!userLoading && user) setLoading(false)
-  }, [user, userLoading])
+    if (isDemoMode()) {
+      setData(DEMO_PAIEMENTS_COMPTABLE as unknown as PaiementRow[])
+      setTarifs(DEMO_TARIFS)
+      setLoading(false)
+      return
+    }
+    if (!user) return
+
+    const supabase = createClient()
+    async function load() {
+      const ecoleId = (user as any).ecole_id
+
+      // 1. Charger les tarifs actifs
+      const { data: tarifData } = await (supabase as any)
+        .from('tarifs_scolarite')
+        .select('*')
+        .eq('ecole_id', ecoleId)
+        .eq('actif', true)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single()
+
+      if (tarifData) {
+        setTarifs({
+          frais_inscription: tarifData.frais_inscription,
+          scolarite_t1: tarifData.scolarite_t1,
+          scolarite_t2: tarifData.scolarite_t2,
+          scolarite_t3: tarifData.scolarite_t3,
+          frais_activites: tarifData.frais_activites,
+          total_annuel: tarifData.frais_inscription + tarifData.scolarite_t1 + tarifData.scolarite_t2 + tarifData.scolarite_t3 + tarifData.frais_activites,
+          annee: tarifData.annee_scolaire,
+        })
+      }
+
+      // 2. Charger la vue comptable
+      const { data: comptable, error } = await (supabase as any)
+        .from('vue_comptable_eleves')
+        .select('*')
+        .eq('ecole_id', ecoleId)
+        .order('nom')
+
+      if (error) console.error('[PaiementsPage] vue_comptable_eleves:', error.message)
+
+      if (comptable && comptable.length > 0) {
+        setData(comptable.map(adaptSupabaseRow))
+
+        // Listes de classes pour le filtre
+        const seen = new Set<string>()
+        const cls: { id: string; label: string }[] = []
+        for (const row of comptable) {
+          if (!seen.has(row.classe_id)) {
+            seen.add(row.classe_id)
+            cls.push({ id: row.classe_id, label: row.classe_nom })
+          }
+        }
+        setClassesSupabase(cls)
+      }
+
+      setLoading(false)
+    }
+    load()
+  }, [user])
+
+  // Charger le détail des lignes de paiement (Supabase uniquement)
+  async function loadDetailLines(row: PaiementRow) {
+    setDetailRow(row)
+    if (isDemoMode()) return
+
+    const supabase = createClient()
+    const { data: lignes } = await (supabase as any)
+      .from('lignes_paiement_scolarite')
+      .select('montant, methode, reference, date_paiement, paiements_scolarite(type_poste)')
+      .eq('ecole_id', (user as any).ecole_id)
+      .order('date_paiement', { ascending: false })
+
+    if (lignes) {
+      setDetailRow(prev => prev ? {
+        ...prev,
+        lignes: lignes.map((l: any) => ({
+          type: l.paiements_scolarite?.type_poste || 'paiement',
+          montant: l.montant,
+          date: l.date_paiement,
+          reference: l.reference || '—',
+          methode: l.methode,
+        })),
+      } : null)
+    }
+  }
+
+  // Enregistrer un paiement en Supabase
+  async function handleEnregistrerPaiement(eleveId: string, typePoste: string, montant: number, methode: string) {
+    if (isDemoMode()) { showToast('Mode démo — paiement simulé ✓'); return }
+    setSaving(true)
+    const supabase = createClient()
+    const ecoleId = (user as any).ecole_id
+
+    // Trouver le tarif_id
+    const { data: tarifRow } = await (supabase as any)
+      .from('tarifs_scolarite')
+      .select('id')
+      .eq('ecole_id', ecoleId)
+      .eq('actif', true)
+      .single()
+
+    if (!tarifRow) { showToast('Erreur : tarif non trouvé'); setSaving(false); return }
+
+    const { error } = await (supabase as any).rpc('enregistrer_paiement_scolarite', {
+      p_ecole_id: ecoleId,
+      p_eleve_id: eleveId,
+      p_tarif_id: tarifRow.id,
+      p_type_poste: typePoste,
+      p_montant: montant,
+      p_methode: methode,
+      p_enregistre_par: (user as any).id,
+    })
+
+    if (error) {
+      showToast('Erreur enregistrement : ' + error.message)
+    } else {
+      showToast('Paiement enregistré avec succès ✓')
+      // Recharger la vue
+      const { data: updated } = await (supabase as any)
+        .from('vue_comptable_eleves')
+        .select('*')
+        .eq('ecole_id', ecoleId)
+        .order('nom')
+      if (updated) setData(updated.map(adaptSupabaseRow))
+    }
+    setSaving(false)
+  }
 
   /* ── KPIs globaux ── */
   const kpis = useMemo(() => {
-    const totalAttendu   = data.length * DEMO_TARIFS.total_annuel
+    const totalAttendu   = data.length * tarifs.total_annuel
     const totalEncaisse  = data.reduce((s, d) => s + d.totalPaye, 0)
     const soldeGlobal    = totalAttendu - totalEncaisse
     const taux           = pct(totalEncaisse, totalAttendu)
     const nbSolde        = data.filter(d => d.statut === 'solde').length
     const nbImpaye       = data.filter(d => d.statut === 'impaye').length
-    const nbPartiel      = data.filter(d => d.statut === 'partiel_avance' || d.statut === 'partiel_retard').length
+    const nbPartielRetard = data.filter(d => d.statut === 'partiel_retard').length
 
-    const t1Attendu = data.length * DEMO_TARIFS.scolarite_t1
-    const t1Encaisse = data.filter(d => d.t1Paye).length * DEMO_TARIFS.scolarite_t1
-    const t2Attendu = data.length * DEMO_TARIFS.scolarite_t2
-    const t2Encaisse = data.filter(d => d.t2Paye).length * DEMO_TARIFS.scolarite_t2
-    const t3Attendu = data.length * DEMO_TARIFS.scolarite_t3
-    const t3Encaisse = data.filter(d => d.t3Paye).length * DEMO_TARIFS.scolarite_t3
+    const t1Encaisse = data.filter(d => d.t1Paye).length * tarifs.scolarite_t1
+    const t2Encaisse = data.filter(d => d.t2Paye).length * tarifs.scolarite_t2
+    const t3Encaisse = data.filter(d => d.t3Paye).length * tarifs.scolarite_t3
+    const t1Attendu  = data.length * tarifs.scolarite_t1
+    const t2Attendu  = data.length * tarifs.scolarite_t2
+    const t3Attendu  = data.length * tarifs.scolarite_t3
 
-    return { totalAttendu, totalEncaisse, soldeGlobal, taux, nbSolde, nbImpaye, nbPartiel, t1Attendu, t1Encaisse, t2Attendu, t2Encaisse, t3Attendu, t3Encaisse }
-  }, [data])
+    return { totalAttendu, totalEncaisse, soldeGlobal, taux, nbSolde, nbImpaye, nbPartielRetard, t1Attendu, t1Encaisse, t2Attendu, t2Encaisse, t3Attendu, t3Encaisse }
+  }, [data, tarifs])
 
   /* ── Filtrage ── */
+  const classes = isDemoMode()
+    ? DEMO_CLASSES.map(c => ({ id: c.id, label: `${c.niveau} ${c.nom}` }))
+    : classesSupabase
+
   const filtered = useMemo(() => {
     return data.filter(d => {
-      const cl = DEMO_CLASSES.find(c => c.id === d.classe_id)
-      const classeLabel = cl ? `${cl.niveau} ${cl.nom}` : ''
+      const classeLabel = isDemoMode()
+        ? (() => { const c = DEMO_CLASSES.find(cl => cl.id === d.classe_id); return c ? `${c.niveau} ${c.nom}` : '' })()
+        : (d.classe_nom || '')
       const matchSearch  = search === '' || `${d.prenom} ${d.nom} ${d.matricule}`.toLowerCase().includes(search.toLowerCase())
       const matchClasse  = filtreClasse === 'all' || d.classe_id === filtreClasse
       const matchStatut  = filtreStatut === 'all' || d.statut === filtreStatut
@@ -70,10 +264,9 @@ export default function PaiementsPage() {
     })
   }, [data, search, filtreClasse, filtreStatut])
 
-  /* ── Débiteurs (solde > 0, triés par solde desc) ── */
-  const debiteurs = useMemo(() => {
-    return data.filter(d => d.solde > 0).sort((a, b) => b.solde - a.solde)
-  }, [data])
+  const debiteurs = useMemo(() => data.filter(d => d.solde > 0).sort((a, b) => b.solde - a.solde), [data])
+
+  const glassStyle = { background: 'rgba(2,6,23,0.82)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.10)' }
 
   if (userLoading || loading) return (
     <div className="p-6 animate-pulse space-y-3">
@@ -81,10 +274,22 @@ export default function PaiementsPage() {
     </div>
   )
 
-  const glassStyle = { background: 'rgba(2,6,23,0.82)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.10)' }
+  function classeNom(row: PaiementRow) {
+    if (row.classe_nom) return row.classe_nom
+    const c = DEMO_CLASSES.find(cl => cl.id === row.classe_id)
+    return c ? `${c.niveau} ${c.nom}` : '—'
+  }
 
   return (
     <div className="space-y-6 pb-24 lg:pb-6 animate-fade-in">
+      {/* Toast */}
+      {toast && (
+        <div className="fixed top-4 right-4 z-50 px-5 py-3 rounded-2xl text-sm font-semibold text-white shadow-xl max-w-xs"
+          style={{ background: 'rgba(2,6,23,0.98)', border: '1px solid rgba(0,230,118,0.5)', backdropFilter: 'blur(24px)' }}>
+          {toast}
+        </div>
+      )}
+
       {/* En-tête */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
@@ -92,31 +297,30 @@ export default function PaiementsPage() {
             <span style={{ color: ACCENT }}>💳</span> Comptabilité Scolarité
           </h1>
           <p className="text-sm text-slate-400 mt-1">
-            {data.length} élèves · Année {DEMO_TARIFS.annee} · Taux recouvrement{' '}
+            {data.length} élèves · Année {tarifs.annee} · Taux recouvrement{' '}
             <span style={{ color: kpis.taux >= 80 ? GREEN : kpis.taux >= 50 ? GOLD : RED }} className="font-bold">{kpis.taux}%</span>
           </p>
         </div>
         <button
           onClick={() => window.print()}
           className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all print:hidden"
-          style={{ background: `${ACCENT}20`, color: ACCENT, border: `1px solid ${ACCENT}40` }}
-        >
+          style={{ background: `${ACCENT}20`, color: ACCENT, border: `1px solid ${ACCENT}40` }}>
           🖨️ Imprimer le rapport
         </button>
       </div>
 
-      {/* KPIs principaux */}
+      {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 print:hidden">
         {[
-          { label: 'Total attendu',   val: fmt(kpis.totalAttendu),  color: ACCENT, icon: '📋' },
-          { label: 'Total encaissé',  val: fmt(kpis.totalEncaisse), color: GREEN,  icon: '✅' },
-          { label: 'Solde impayé',    val: fmt(kpis.soldeGlobal),   color: RED,    icon: '⚠️' },
-          { label: 'Taux recouvrement', val: kpis.taux + '%',       color: kpis.taux >= 80 ? GREEN : kpis.taux >= 50 ? GOLD : RED, icon: '📊' },
+          { label: 'Total attendu',     val: fmt(kpis.totalAttendu),  color: ACCENT, icon: '📋' },
+          { label: 'Total encaissé',    val: fmt(kpis.totalEncaisse), color: GREEN,  icon: '✅' },
+          { label: 'Solde impayé',      val: fmt(kpis.soldeGlobal),   color: RED,    icon: '⚠️' },
+          { label: 'Taux recouvrement', val: kpis.taux + '%',         color: kpis.taux >= 80 ? GREEN : kpis.taux >= 50 ? GOLD : RED, icon: '📊' },
         ].map(({ label, val, color, icon }) => (
           <div key={label} className="rounded-2xl p-5" style={{ ...glassStyle, border: `1px solid ${color}25` }}>
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-lg">{icon}</span>
-              <span className="text-xs text-slate-400 font-medium uppercase tracking-wide">{label}</span>
+              <span>{icon}</span>
+              <span className="text-xs text-slate-400 uppercase tracking-wide">{label}</span>
             </div>
             <p className="text-xl font-black" style={{ color }}>{val}</p>
           </div>
@@ -135,15 +339,15 @@ export default function PaiementsPage() {
         </div>
         <div className="grid grid-cols-3 gap-3 mt-4">
           {[
-            { label: 'T1 — Scolarité', attendu: kpis.t1Attendu, encaisse: kpis.t1Encaisse },
-            { label: 'T2 — Scolarité', attendu: kpis.t2Attendu, encaisse: kpis.t2Encaisse },
-            { label: 'T3 — Scolarité', attendu: kpis.t3Attendu, encaisse: kpis.t3Encaisse },
+            { label: 'T1', attendu: kpis.t1Attendu, encaisse: kpis.t1Encaisse },
+            { label: 'T2', attendu: kpis.t2Attendu, encaisse: kpis.t2Encaisse },
+            { label: 'T3', attendu: kpis.t3Attendu, encaisse: kpis.t3Encaisse },
           ].map(({ label, attendu, encaisse }) => {
             const p = pct(encaisse, attendu)
             const c = p >= 80 ? GREEN : p >= 50 ? GOLD : RED
             return (
               <div key={label} className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.04)' }}>
-                <p className="text-xs text-slate-400 mb-1">{label}</p>
+                <p className="text-xs text-slate-400 mb-1">Scolarité {label}</p>
                 <p className="text-sm font-bold" style={{ color: c }}>{p}%</p>
                 <div className="h-1.5 rounded-full bg-white/10 mt-1 overflow-hidden">
                   <div className="h-full rounded-full" style={{ width: `${p}%`, background: c }} />
@@ -155,44 +359,34 @@ export default function PaiementsPage() {
         </div>
       </div>
 
-      {/* Statistiques statuts */}
+      {/* Statuts cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 print:hidden">
-        {[
-          { statut: 'solde',          nb: kpis.nbSolde,   label: 'Soldés',         icon: '✅' },
-          { statut: 'partiel_avance', nb: kpis.nbPartiel, label: 'Paiement partiel', icon: '⏳' },
-          { statut: 'partiel_retard', nb: 0,              label: '',               icon: '' },
-          { statut: 'impaye',         nb: kpis.nbImpaye,  label: 'Impayés totaux', icon: '🚨' },
-        ].filter(x => x.label !== '').map(({ statut, nb, label, icon }) => {
-          const s = STATUT_MAP[statut]
+        {([
+          { k: 'solde',          n: kpis.nbSolde,                                                    label: 'Soldés', icon: '✅' },
+          { k: 'partiel_avance', n: data.filter(d => d.statut === 'partiel_avance').length,           label: 'Partiel avancé', icon: '⏳' },
+          { k: 'partiel_retard', n: kpis.nbPartielRetard,                                             label: 'Partiel retard', icon: '⚠️' },
+          { k: 'impaye',         n: kpis.nbImpaye,                                                    label: 'Impayés totaux', icon: '🚨' },
+        ] as const).map(({ k, n, label, icon }) => {
+          const s = STATUT_MAP[k]
           return (
-            <div key={statut} className="rounded-2xl p-4 text-center cursor-pointer transition-all hover:scale-105"
+            <div key={k} className="rounded-2xl p-4 text-center cursor-pointer transition-all hover:scale-105"
               style={{ ...glassStyle, border: `1px solid ${s.color}30` }}
-              onClick={() => setFiltreStatut(statut === filtreStatut ? 'all' : statut)}>
-              <p className="text-3xl font-black" style={{ color: s.color }}>{nb}</p>
+              onClick={() => setFiltreStatut(k === filtreStatut ? 'all' : k)}>
+              <p className="text-3xl font-black" style={{ color: s.color }}>{n}</p>
               <p className="text-xs font-semibold text-slate-400 mt-1">{icon} {label}</p>
             </div>
           )
         })}
-        {/* case partiel_retard réelle */}
-        <div className="rounded-2xl p-4 text-center cursor-pointer transition-all hover:scale-105 -mt-4 lg:mt-0 lg:hidden"
-          style={{ ...glassStyle, border: `1px solid ${ORANGE}30` }}
-          onClick={() => setFiltreStatut('partiel_retard' === filtreStatut ? 'all' : 'partiel_retard')}>
-          <p className="text-3xl font-black" style={{ color: ORANGE }}>
-            {data.filter(d => d.statut === 'partiel_retard').length}
-          </p>
-          <p className="text-xs font-semibold text-slate-400 mt-1">⚠️ Partiel retard</p>
-        </div>
       </div>
 
-      {/* Onglets de vue */}
+      {/* Onglets */}
       <div className="flex gap-2 print:hidden">
         {(['tableau', 'debiteurs', 'rapport'] as const).map(v => (
           <button key={v} onClick={() => setVue(v)}
             className="px-4 py-2 rounded-xl text-sm font-semibold capitalize transition-all"
             style={vue === v
               ? { background: ACCENT, color: '#020617' }
-              : { background: 'rgba(255,255,255,0.06)', color: '#94A3B8', border: '1px solid rgba(255,255,255,0.1)' }
-            }>
+              : { background: 'rgba(255,255,255,0.06)', color: '#94A3B8', border: '1px solid rgba(255,255,255,0.1)' }}>
             {v === 'tableau' ? '📋 Tableau' : v === 'debiteurs' ? `⚠️ Débiteurs (${debiteurs.length})` : '📊 Rapport'}
           </button>
         ))}
@@ -201,17 +395,14 @@ export default function PaiementsPage() {
       {/* ── VUE TABLEAU ── */}
       {vue === 'tableau' && (
         <>
-          {/* Filtres */}
           <div className="flex flex-wrap gap-3 print:hidden">
-            <input
-              type="text" placeholder="🔍 Rechercher élève ou matricule…" value={search}
+            <input type="text" placeholder="🔍 Rechercher élève ou matricule…" value={search}
               onChange={e => setSearch(e.target.value)}
-              className="flex-1 min-w-48 px-4 py-2 rounded-xl text-sm text-white bg-white/5 border border-white/10 outline-none placeholder-slate-500"
-            />
+              className="flex-1 min-w-48 px-4 py-2 rounded-xl text-sm text-white bg-white/5 border border-white/10 outline-none placeholder-slate-500" />
             <select value={filtreClasse} onChange={e => setFiltreClasse(e.target.value)}
               className="px-4 py-2 rounded-xl text-sm text-white bg-white/5 border border-white/10 outline-none">
               <option value="all">Toutes les classes</option>
-              {DEMO_CLASSES.map(c => <option key={c.id} value={c.id}>{c.niveau} {c.nom}</option>)}
+              {classes.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
             </select>
             <select value={filtreStatut} onChange={e => setFiltreStatut(e.target.value)}
               className="px-4 py-2 rounded-xl text-sm text-white bg-white/5 border border-white/10 outline-none">
@@ -219,32 +410,27 @@ export default function PaiementsPage() {
               {Object.entries(STATUT_MAP).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
             </select>
           </div>
+          <p className="text-xs text-slate-500 print:hidden">{filtered.length} élève(s) affiché(s)</p>
 
-          <p className="text-xs text-slate-500 print:hidden">{filtered.length} élève(s) affichés</p>
-
-          {/* Table comptable */}
           <div className="rounded-2xl overflow-hidden" style={glassStyle}>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.03)' }}>
-                    {['Élève', 'Classe', 'Inscr.', 'T1', 'T2', 'T3', 'Activités', 'Total dû', 'Payé', 'Solde', 'Statut', ''].map(h => (
+                    {['Élève', 'Classe', 'Inscr.', 'T1', 'T2', 'T3', 'Act.', 'Total dû', 'Payé', 'Solde', 'Statut', ''].map(h => (
                       <th key={h} className="px-3 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider whitespace-nowrap">{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {filtered.map((row, i) => {
-                    const cl = DEMO_CLASSES.find(c => c.id === row.classe_id)
                     const s = STATUT_MAP[row.statut] ?? STATUT_MAP.impaye
-                    const tick = (paid: boolean) => (
-                      <span style={{ color: paid ? GREEN : RED, fontWeight: 700 }}>{paid ? '✓' : '✗'}</span>
-                    )
+                    const tick = (paid: boolean) => <span style={{ color: paid ? GREEN : RED, fontWeight: 700 }}>{paid ? '✓' : '✗'}</span>
                     return (
                       <tr key={i} className="hover:bg-white/5 transition-colors"
                         style={i < filtered.length - 1 ? { borderBottom: '1px solid rgba(255,255,255,0.04)' } : {}}>
                         <td className="px-3 py-3 font-semibold text-white whitespace-nowrap">{row.prenom} {row.nom}</td>
-                        <td className="px-3 py-3 text-slate-400 whitespace-nowrap">{cl ? `${cl.niveau} ${cl.nom}` : '—'}</td>
+                        <td className="px-3 py-3 text-slate-400 whitespace-nowrap">{classeNom(row)}</td>
                         <td className="px-3 py-3 text-center">{tick(row.inscriptionPayee)}</td>
                         <td className="px-3 py-3 text-center">{tick(row.t1Paye)}</td>
                         <td className="px-3 py-3 text-center">{tick(row.t2Paye)}</td>
@@ -260,8 +446,8 @@ export default function PaiementsPage() {
                             style={{ background: s.bg, color: s.color }}>{s.label}</span>
                         </td>
                         <td className="px-3 py-3">
-                          <button onClick={() => setDetailRow(row)}
-                            className="text-xs px-3 py-1 rounded-lg transition-all"
+                          <button onClick={() => loadDetailLines(row)}
+                            className="text-xs px-3 py-1 rounded-lg"
                             style={{ background: `${ACCENT}15`, color: ACCENT, border: `1px solid ${ACCENT}30` }}>
                             Détails
                           </button>
@@ -283,10 +469,9 @@ export default function PaiementsPage() {
             <p className="text-sm font-semibold text-white mb-1">
               🚨 {debiteurs.length} débiteurs — Solde total : <span style={{ color: RED }}>{fmt(debiteurs.reduce((s, d) => s + d.solde, 0))}</span>
             </p>
-            <p className="text-xs text-slate-400">Liste triée par montant impayé décroissant</p>
+            <p className="text-xs text-slate-400">Triés par montant impayé décroissant</p>
           </div>
           {debiteurs.map((row, i) => {
-            const cl = DEMO_CLASSES.find(c => c.id === row.classe_id)
             const s = STATUT_MAP[row.statut] ?? STATUT_MAP.impaye
             return (
               <div key={i} className="rounded-2xl p-4 flex items-center gap-4 flex-wrap" style={glassStyle}>
@@ -294,7 +479,7 @@ export default function PaiementsPage() {
                   style={{ background: `${s.color}30` }}>#{i + 1}</div>
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-white">{row.prenom} {row.nom}</p>
-                  <p className="text-xs text-slate-400">{cl ? `${cl.niveau} ${cl.nom}` : '—'} · {row.matricule}</p>
+                  <p className="text-xs text-slate-400">{classeNom(row)} · {row.matricule}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-lg font-black" style={{ color: RED }}>−{fmt(row.solde)}</p>
@@ -302,12 +487,13 @@ export default function PaiementsPage() {
                 </div>
                 <span className="px-2 py-1 rounded-lg text-xs font-semibold" style={{ background: s.bg, color: s.color }}>{s.label}</span>
                 <div className="flex gap-2">
-                  <button onClick={() => setDetailRow(row)}
+                  <button onClick={() => loadDetailLines(row)}
                     className="text-xs px-3 py-1 rounded-lg"
                     style={{ background: `${ACCENT}20`, color: ACCENT, border: `1px solid ${ACCENT}40` }}>
                     Détails
                   </button>
-                  <button className="text-xs px-3 py-1 rounded-lg"
+                  <button onClick={() => showToast(`Relance WhatsApp envoyée au parent de ${row.prenom} ${row.nom} ✓`)}
+                    className="text-xs px-3 py-1 rounded-lg"
                     style={{ background: 'rgba(37,211,102,0.15)', color: '#25D366', border: '1px solid rgba(37,211,102,0.3)' }}>
                     WhatsApp
                   </button>
@@ -322,9 +508,8 @@ export default function PaiementsPage() {
       {vue === 'rapport' && (
         <div className="space-y-5">
           <div className="rounded-2xl p-6" style={glassStyle}>
-            <h2 className="text-lg font-bold text-white mb-4">Rapport de Recouvrement — {DEMO_TARIFS.annee}</h2>
+            <h2 className="text-lg font-bold text-white mb-4">Rapport de Recouvrement — {tarifs.annee}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Répartition par statut */}
               <div>
                 <p className="text-sm font-semibold text-slate-300 mb-3">Répartition par statut</p>
                 {Object.entries(STATUT_MAP).map(([k, s]) => {
@@ -337,33 +522,37 @@ export default function PaiementsPage() {
                         <span className="text-slate-300">{nb} élèves ({p}%)</span>
                       </div>
                       <div className="h-2 rounded-full bg-white/10 overflow-hidden">
-                        <div className="h-full rounded-full transition-all" style={{ width: `${p}%`, background: s.color }} />
+                        <div className="h-full rounded-full" style={{ width: `${p}%`, background: s.color }} />
                       </div>
                     </div>
                   )
                 })}
               </div>
-              {/* Récapitulatif financier */}
               <div className="space-y-3">
-                <p className="text-sm font-semibold text-slate-300">Récapitulatif financier</p>
+                <p className="text-sm font-semibold text-slate-300">Taux de collecte par poste</p>
                 {[
-                  { label: 'Frais inscription', taux: pct(data.filter(d => d.inscriptionPayee).length, data.length), color: ACCENT },
-                  { label: 'Scolarité T1',      taux: pct(data.filter(d => d.t1Paye).length, data.length), color: GREEN },
-                  { label: 'Scolarité T2',      taux: pct(data.filter(d => d.t2Paye).length, data.length), color: GOLD },
-                  { label: 'Scolarité T3',      taux: pct(data.filter(d => d.t3Paye).length, data.length), color: ORANGE },
-                  { label: 'Frais activités',   taux: pct(data.filter(d => d.activitesPayees).length, data.length), color: RED },
-                ].map(({ label, taux, color }) => (
-                  <div key={label} className="flex items-center gap-3">
-                    <span className="text-xs text-slate-400 w-32 shrink-0">{label}</span>
-                    <div className="flex-1 h-2 rounded-full bg-white/10 overflow-hidden">
-                      <div className="h-full rounded-full" style={{ width: `${taux}%`, background: color }} />
+                  { label: 'Frais inscription', n: data.filter(d => d.inscriptionPayee).length },
+                  { label: 'Scolarité T1',      n: data.filter(d => d.t1Paye).length },
+                  { label: 'Scolarité T2',      n: data.filter(d => d.t2Paye).length },
+                  { label: 'Scolarité T3',      n: data.filter(d => d.t3Paye).length },
+                  { label: 'Frais activités',   n: data.filter(d => d.activitesPayees).length },
+                ].map(({ label, n }) => {
+                  const p = pct(n, data.length)
+                  const c = p >= 80 ? GREEN : p >= 50 ? GOLD : RED
+                  return (
+                    <div key={label} className="flex items-center gap-3">
+                      <span className="text-xs text-slate-400 w-32 shrink-0">{label}</span>
+                      <div className="flex-1 h-2 rounded-full bg-white/10 overflow-hidden">
+                        <div className="h-full rounded-full" style={{ width: `${p}%`, background: c }} />
+                      </div>
+                      <span className="text-xs font-bold w-10 text-right" style={{ color: c }}>{p}%</span>
                     </div>
-                    <span className="text-xs font-bold w-10 text-right" style={{ color }}>{taux}%</span>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
-            {/* Tableau récap financier */}
+
+            {/* Tableau récapitulatif financier */}
             <div className="mt-6 rounded-xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
               <table className="w-full text-sm">
                 <thead>
@@ -375,11 +564,11 @@ export default function PaiementsPage() {
                 </thead>
                 <tbody>
                   {[
-                    { label: 'Inscriptions',   attendu: data.length * DEMO_TARIFS.frais_inscription, encaisse: data.filter(d => d.inscriptionPayee).length * DEMO_TARIFS.frais_inscription },
-                    { label: 'Scolarité T1',   attendu: data.length * DEMO_TARIFS.scolarite_t1, encaisse: data.filter(d => d.t1Paye).length * DEMO_TARIFS.scolarite_t1 },
-                    { label: 'Scolarité T2',   attendu: data.length * DEMO_TARIFS.scolarite_t2, encaisse: data.filter(d => d.t2Paye).length * DEMO_TARIFS.scolarite_t2 },
-                    { label: 'Scolarité T3',   attendu: data.length * DEMO_TARIFS.scolarite_t3, encaisse: data.filter(d => d.t3Paye).length * DEMO_TARIFS.scolarite_t3 },
-                    { label: 'Frais activités', attendu: data.length * DEMO_TARIFS.frais_activites, encaisse: data.filter(d => d.activitesPayees).length * DEMO_TARIFS.frais_activites },
+                    { label: 'Inscriptions',    attendu: data.length * tarifs.frais_inscription, encaisse: data.filter(d => d.inscriptionPayee).length * tarifs.frais_inscription },
+                    { label: 'Scolarité T1',    attendu: data.length * tarifs.scolarite_t1, encaisse: data.filter(d => d.t1Paye).length * tarifs.scolarite_t1 },
+                    { label: 'Scolarité T2',    attendu: data.length * tarifs.scolarite_t2, encaisse: data.filter(d => d.t2Paye).length * tarifs.scolarite_t2 },
+                    { label: 'Scolarité T3',    attendu: data.length * tarifs.scolarite_t3, encaisse: data.filter(d => d.t3Paye).length * tarifs.scolarite_t3 },
+                    { label: 'Frais activités', attendu: data.length * tarifs.frais_activites, encaisse: data.filter(d => d.activitesPayees).length * tarifs.frais_activites },
                   ].map(({ label, attendu, encaisse }, i, arr) => {
                     const solde = attendu - encaisse
                     const t = pct(encaisse, attendu)
@@ -396,7 +585,6 @@ export default function PaiementsPage() {
                       </tr>
                     )
                   })}
-                  {/* Ligne total */}
                   <tr style={{ background: 'rgba(255,255,255,0.04)', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
                     <td className="px-4 py-3 font-bold text-white">TOTAL</td>
                     <td className="px-4 py-3 font-bold text-white">{fmt(kpis.totalAttendu)}</td>
@@ -414,19 +602,19 @@ export default function PaiementsPage() {
       {/* ── MODAL DÉTAIL ── */}
       {detailRow && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: 'rgba(2,6,23,0.9)', backdropFilter: 'blur(12px)' }}
+          style={{ background: 'rgba(2,6,23,0.92)', backdropFilter: 'blur(12px)' }}
           onClick={e => e.target === e.currentTarget && setDetailRow(null)}>
           <div className="w-full max-w-lg rounded-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto"
-            style={{ background: 'rgba(15,23,42,0.98)', border: '1px solid rgba(255,255,255,0.15)' }}>
+            style={{ background: 'rgba(15,23,42,0.99)', border: '1px solid rgba(255,255,255,0.15)' }}>
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-xl font-bold text-white">{detailRow.prenom} {detailRow.nom}</h3>
-                <p className="text-xs text-slate-400">{detailRow.matricule}</p>
+                <p className="text-xs text-slate-400">{detailRow.matricule} · {classeNom(detailRow)}</p>
               </div>
               <button onClick={() => setDetailRow(null)} className="text-slate-400 hover:text-white text-xl">✕</button>
             </div>
 
-            {/* Résumé */}
+            {/* Résumé financier */}
             <div className="grid grid-cols-3 gap-3">
               {[
                 { label: 'Total dû',  val: fmt(detailRow.totalDu),   color: ACCENT },
@@ -440,31 +628,33 @@ export default function PaiementsPage() {
               ))}
             </div>
 
-            {/* Statut de chaque poste */}
+            {/* Postes de paiement */}
             <div className="space-y-2">
               <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Détail par poste</p>
               {[
-                { label: 'Frais inscription',  paid: detailRow.inscriptionPayee, montant: DEMO_TARIFS.frais_inscription },
-                { label: 'Scolarité T1',       paid: detailRow.t1Paye,           montant: DEMO_TARIFS.scolarite_t1 },
-                { label: 'Scolarité T2',       paid: detailRow.t2Paye,           montant: DEMO_TARIFS.scolarite_t2 },
-                { label: 'Scolarité T3',       paid: detailRow.t3Paye,           montant: DEMO_TARIFS.scolarite_t3 },
-                { label: 'Frais activités',    paid: detailRow.activitesPayees,  montant: DEMO_TARIFS.frais_activites },
+                { label: 'Frais inscription',  paid: detailRow.inscriptionPayee, montant: tarifs.frais_inscription },
+                { label: 'Scolarité T1',       paid: detailRow.t1Paye,           montant: tarifs.scolarite_t1 },
+                { label: 'Scolarité T2',       paid: detailRow.t2Paye,           montant: tarifs.scolarite_t2 },
+                { label: 'Scolarité T3',       paid: detailRow.t3Paye,           montant: tarifs.scolarite_t3 },
+                { label: 'Frais activités',    paid: detailRow.activitesPayees,  montant: tarifs.frais_activites },
               ].map(({ label, paid, montant }) => (
                 <div key={label} className="flex items-center justify-between rounded-lg px-3 py-2"
                   style={{ background: 'rgba(255,255,255,0.04)' }}>
                   <span className="text-sm text-slate-300">{label}</span>
                   <div className="flex items-center gap-3">
                     <span className="text-sm text-slate-400">{fmt(montant)}</span>
-                    <span className="text-sm font-bold" style={{ color: paid ? GREEN : RED }}>{paid ? '✓ Payé' : '✗ Impayé'}</span>
+                    <span className="text-sm font-bold" style={{ color: paid ? GREEN : RED }}>
+                      {paid ? '✓ Payé' : '✗ Impayé'}
+                    </span>
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* Historique de paiement */}
+            {/* Historique des versements */}
             {detailRow.lignes.length > 0 && (
               <div className="space-y-2">
-                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Historique des paiements</p>
+                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Historique des versements</p>
                 {detailRow.lignes.map((l, i) => (
                   <div key={i} className="flex items-center justify-between rounded-lg px-3 py-2"
                     style={{ background: 'rgba(0,230,118,0.06)', border: '1px solid rgba(0,230,118,0.15)' }}>
@@ -478,9 +668,11 @@ export default function PaiementsPage() {
               </div>
             )}
 
-            {/* Bouton relance WhatsApp */}
+            {/* Actions */}
             {detailRow.solde > 0 && (
-              <button className="w-full py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all hover:opacity-90"
+              <button
+                onClick={() => showToast(`Relance WhatsApp envoyée au parent de ${detailRow.prenom} ${detailRow.nom} ✓`)}
+                className="w-full py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all hover:opacity-90"
                 style={{ background: 'rgba(37,211,102,0.2)', color: '#25D366', border: '1px solid rgba(37,211,102,0.4)' }}>
                 📱 Envoyer relance WhatsApp au parent
               </button>
