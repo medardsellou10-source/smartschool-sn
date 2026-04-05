@@ -9,12 +9,26 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: 'SmartSchool SN - Gestion Scolaire Sénégal',
-  description: 'Plateforme de gestion scolaire intelligente pour le Sénégal',
+  description: 'Plateforme numérique de gestion scolaire intelligente pour le Sénégal — bulletins, notes, comptabilité, correction IA',
   manifest: '/manifest.json',
+  icons: {
+    icon: [
+      { url: '/icons/icon-32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+    ],
+    apple: '/icons/apple-touch-icon.png',
+    shortcut: '/icons/icon-32.png',
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
     title: 'SmartSchool SN',
+  },
+  openGraph: {
+    title: 'SmartSchool SN',
+    description: 'Plateforme numérique de gestion scolaire pour le Sénégal',
+    images: ['/icons/icon-512.png'],
+    type: 'website',
   },
   formatDetection: {
     telephone: false,

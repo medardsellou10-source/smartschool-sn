@@ -1,17 +1,23 @@
 {
-  "name": "SmartSchool SN — Espace Parent",
+  "name": "SmartSchool SN — Gestion Scolaire",
   "short_name": "SmartSchool",
-  "description": "Suivez la scolarité de votre enfant",
-  "start_url": "/parent",
+  "description": "Plateforme numérique de gestion scolaire pour le Sénégal — bulletins, notes, comptabilité, correction IA",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#0A0E27",
-  "theme_color": "#00C853",
+  "theme_color": "#00E5FF",
   "orientation": "portrait-primary",
   "icons": [
+    { "src": "/icons/icon-16.png",  "sizes": "16x16",   "type": "image/png" },
+    { "src": "/icons/icon-32.png",  "sizes": "32x32",   "type": "image/png" },
     { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icons/apple-touch-icon.png", "sizes": "180x180", "type": "image/png", "purpose": "apple touch" }
   ],
-  "categories": ["education"],
+  "categories": ["education", "productivity"],
   "lang": "fr",
-  "dir": "ltr"
+  "dir": "ltr",
+  "screenshots": [],
+  "related_applications": [],
+  "prefer_related_applications": false
 }
