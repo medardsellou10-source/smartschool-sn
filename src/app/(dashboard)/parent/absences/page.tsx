@@ -5,6 +5,19 @@ import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { isDemoMode, DEMO_ABSENCES, DEMO_ELEVES } from '@/lib/demo-data'
 
+interface NotifParent {
+  uniqueKey: string
+  eleveId: string
+  eleveNom: string
+  elevePrenom: string
+  statut: 'absent' | 'retard'
+  classeNom: string
+  date: string
+  commentaire: string
+  envoyeAt: string
+  lu: boolean
+}
+
 interface Enfant {
   id: string
   nom: string
@@ -27,6 +40,21 @@ export default function AbsencesPage() {
   const [enfants, setEnfants] = useState<Enfant[]>([])
   const [selectedEnfant, setSelectedEnfant] = useState('')
   const [absences, setAbsences] = useState<Absence[]>([])
+  const [alertesAujourdHui, setAlertesAujourdHui] = useState<NotifParent[]>([])
+  const [alertesDismissed, setAlertesDismissed] = useState(false)
+
+  // Charger notifications du surveillant depuis localStorage
+  useEffect(() => {
+    const today = new Date().toISOString().split('T')[0]
+    const raw = localStorage.getItem('ss_notifs_parents')
+    if (raw) {
+      try {
+        const notifs = JSON.parse(raw) as NotifParent[]
+        const duJour = notifs.filter(n => n.date === today)
+        setAlertesAujourdHui(duJour)
+      } catch { /* ignore */ }
+    }
+  }, [])
   const [moisOffset, setMoisOffset] = useState(0)
   const [loading, setLoading] = useState(true)
   const [justifModal, setJustifModal] = useState<Absence | null>(null)
@@ -177,6 +205,55 @@ export default function AbsencesPage() {
   return (
     <div className="max-w-lg mx-auto space-y-4">
       <h1 className="text-2xl font-bold text-ss-text">Absences</h1>
+
+      {/* Alertes du jour envoyées par le Surveillant */}
+      {alertesAujourdHui.length > 0 && !alertesDismissed && (
+        <div className="bg-ss-red/10 border border-ss-red/30 rounded-xl overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-ss-red/20">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">🚨</span>
+              <p className="text-sm font-bold text-ss-red">
+                Alerte absence — Aujourd&apos;hui
+              </p>
+            </div>
+            <button
+              onClick={() => setAlertesDismissed(true)}
+              className="text-ss-text-muted hover:text-ss-text text-lg leading-none"
+            >
+              ✕
+            </button>
+          </div>
+          <div className="divide-y divide-ss-red/10">
+            {alertesAujourdHui.map(alerte => (
+              <div key={alerte.uniqueKey} className="px-4 py-3 space-y-1">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-semibold text-ss-text">
+                    {alerte.elevePrenom} {alerte.eleveNom}
+                  </p>
+                  <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full ${
+                    alerte.statut === 'absent'
+                      ? 'bg-ss-red/20 text-ss-red'
+                      : 'bg-ss-gold/20 text-ss-gold'
+                  }`}>
+                    {alerte.statut === 'absent' ? 'Absent(e)' : 'En retard'}
+                  </span>
+                </div>
+                <p className="text-xs text-ss-text-muted">{alerte.classeNom}</p>
+                {alerte.commentaire && (
+                  <p className="text-xs text-ss-text-secondary italic">
+                    &ldquo;{alerte.commentaire}&rdquo;
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+          <div className="px-4 py-2.5 bg-ss-red/5">
+            <p className="text-xs text-ss-text-muted text-center">
+              Signalez au Surveillant Général si vous avez un justificatif
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Sélecteur enfant */}
       {enfants.length > 1 && (
