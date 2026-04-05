@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { isDemoMode } from '@/lib/demo-data'
-import Link from 'next/link'
 
 const ACCENT = '#FF1744'
 
@@ -31,9 +30,64 @@ interface Plan {
 }
 
 const PLANS_DEMO: Plan[] = [
-  { id: 'basique', nom: 'Basique', emoji: '🥉', couleur: '#00E676', prix_mensuel: 25000, prix_annuel: 240000, max_eleves: 200, max_classes: 5, fonctionnalites: ['200 élèves', '5 classes', 'Bulletins PDF', 'Pointage GPS', 'Transport', 'Cantine'] },
-  { id: 'standard', nom: 'Standard', emoji: '🥈', couleur: '#00E5FF', prix_mensuel: 50000, prix_annuel: 480000, max_eleves: 600, max_classes: 15, fonctionnalites: ['600 élèves', '15 classes', 'WhatsApp', 'IA Gemini', 'Export IMEN', 'Stats avancées'] },
-  { id: 'etablissement', nom: 'Établissement', emoji: '🥇', couleur: '#FFD600', prix_mensuel: 100000, prix_annuel: 960000, max_eleves: 1500, max_classes: null, fonctionnalites: ['1500 élèves', 'Classes illimitées', '5 admins', 'API REST', 'Wave/OM intégré', 'Support 24h'] },
+  {
+    id: 'basique',
+    nom: 'Basique',
+    emoji: '🥉',
+    couleur: '#00E676',
+    prix_mensuel: 25000,
+    prix_annuel: 240000,
+    max_eleves: 200,
+    max_classes: 5,
+    fonctionnalites: [
+      '200 élèves · 5 classes',
+      'Bulletins PDF imprimables',
+      'Pointage GPS professeurs',
+      'Gestion transport',
+      'Gestion cantine',
+      'Inscriptions & dossiers',
+    ],
+  },
+  {
+    id: 'standard',
+    nom: 'Standard',
+    emoji: '🥈',
+    couleur: '#00E5FF',
+    prix_mensuel: 50000,
+    prix_annuel: 480000,
+    max_eleves: 600,
+    max_classes: 15,
+    fonctionnalites: [
+      '600 élèves · 15 classes',
+      'Tout le plan Basique',
+      'Notes temps réel + classements',
+      'Bulletins automatiques IA',
+      'Correction IA (Vision)',
+      'Alertes WhatsApp & SMS',
+      'Export IMEN / Ministère',
+      'Comptabilité scolarité complète',
+    ],
+  },
+  {
+    id: 'etablissement',
+    nom: 'Établissement',
+    emoji: '🥇',
+    couleur: '#FFD600',
+    prix_mensuel: 100000,
+    prix_annuel: 960000,
+    max_eleves: 1500,
+    max_classes: null,
+    fonctionnalites: [
+      '1 500 élèves · Classes illimitées',
+      'Tout le plan Standard',
+      '5 comptes administrateurs',
+      'E-learning & vidéos',
+      'API REST documentée',
+      'Wave / Orange Money intégrés',
+      'Tableau de bord analytique avancé',
+      'Support prioritaire 24h/24',
+    ],
+  },
 ]
 
 const ABO_DEMO: Abonnement = {
@@ -45,6 +99,15 @@ const ABO_DEMO: Abonnement = {
   date_fin: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString(),
   montant_paye: 50000,
 }
+
+const NOUVELLES_FONCTIONNALITES = [
+  { icon: '🤖', titre: 'Correction IA (Vision)', desc: 'Le professeur upload le corrigé + les copies scannées → Claude note automatiquement chaque copie avec points forts/faibles.' },
+  { icon: '📊', titre: 'Notes temps réel + Classements', desc: 'Les élèves voient leurs notes publiées en direct avec rang dans la classe, badges et graphiques d\'évolution.' },
+  { icon: '📋', titre: 'Bulletins automatiques', desc: 'Le censeur génère les bulletins en un clic à partir des notes saisies — moyenne pondérée, mention officielle, impression PDF.' },
+  { icon: '💳', titre: 'Comptabilité scolarité', desc: 'Suivi complet : total attendu, encaissé, solde impayé par élève, taux de recouvrement par trimestre, liste des débiteurs.' },
+  { icon: '📱', titre: 'Relances parents (WhatsApp)', desc: 'Envoi automatique de rappels de paiement aux parents via WhatsApp et SMS avec le montant impayé.' },
+  { icon: '🧑‍💼', titre: '8 rôles complets', desc: 'Admin, Professeur, Surveillant, Censeur, Secrétaire, Intendant, Parent, Élève — chacun avec son dashboard dédié.' },
+]
 
 function daysLeft(dateStr: string) {
   const diff = new Date(dateStr).getTime() - Date.now()
@@ -64,7 +127,7 @@ export default function AbonnementPage() {
 
   function showToast(msg: string) {
     setToast(msg)
-    setTimeout(() => setToast(null), 3000)
+    setTimeout(() => setToast(null), 4000)
   }
 
   useEffect(() => {
@@ -102,42 +165,44 @@ export default function AbonnementPage() {
   const urgence = joursRestants <= 7
 
   const statutConfig = {
-    trial: { label: 'Essai gratuit', color: '#00E676', bg: 'rgba(0,230,118,0.1)' },
-    actif: { label: 'Actif', color: '#00E676', bg: 'rgba(0,230,118,0.1)' },
-    expire: { label: 'Expiré', color: '#FF1744', bg: 'rgba(255,23,68,0.1)' },
-    suspendu: { label: 'Suspendu', color: '#FFD600', bg: 'rgba(255,214,0,0.1)' },
-    annule: { label: 'Annulé', color: '#94A3B8', bg: 'rgba(148,163,184,0.1)' },
+    trial:    { label: 'Essai gratuit', color: '#00E676', bg: 'rgba(0,230,118,0.1)' },
+    actif:    { label: 'Actif',         color: '#00E676', bg: 'rgba(0,230,118,0.1)' },
+    expire:   { label: 'Expiré',        color: '#FF1744', bg: 'rgba(255,23,68,0.1)' },
+    suspendu: { label: 'Suspendu',      color: '#FFD600', bg: 'rgba(255,214,0,0.1)' },
+    annule:   { label: 'Annulé',        color: '#94A3B8', bg: 'rgba(148,163,184,0.1)' },
   }
+
+  const glassStyle = { background: 'rgba(2,6,23,0.7)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.08)' }
 
   if (loading || userLoading) {
     return (
       <div className="space-y-6">
-        <div className="h-8 w-64 bg-ss-bg-secondary rounded-lg ss-shimmer" />
-        <div className="h-40 bg-ss-bg-secondary rounded-2xl ss-shimmer" />
+        <div className="h-8 w-64 bg-white/5 rounded-lg animate-pulse" />
+        <div className="h-40 bg-white/5 rounded-2xl animate-pulse" />
         <div className="grid grid-cols-3 gap-4">
-          {[0,1,2].map(i => <div key={i} className="h-64 bg-ss-bg-secondary rounded-2xl ss-shimmer" />)}
+          {[0,1,2].map(i => <div key={i} className="h-64 bg-white/5 rounded-2xl animate-pulse" />)}
         </div>
       </div>
     )
   }
 
   return (
-    <div className="space-y-8 pb-12">
+    <div className="space-y-8 pb-12 animate-fade-in">
       {/* Toast */}
       {toast && (
-        <div className="fixed top-4 right-4 z-50 px-5 py-3 rounded-2xl text-sm font-semibold text-white shadow-xl"
-          style={{ background: 'rgba(2,6,23,0.96)', border: `1px solid ${ACCENT}60`, backdropFilter: 'blur(24px)' }}>
-          <span style={{ color: ACCENT }}>ℹ️</span> {toast}
+        <div className="fixed top-4 right-4 z-50 px-5 py-3 rounded-2xl text-sm font-semibold text-white shadow-xl max-w-sm"
+          style={{ background: 'rgba(2,6,23,0.98)', border: `1px solid #00E57660`, backdropFilter: 'blur(24px)' }}>
+          ✅ {toast}
         </div>
       )}
 
       {/* En-tête */}
       <div>
-        <h1 className="text-2xl font-bold text-ss-text">Mon Abonnement</h1>
-        <p className="text-ss-text-muted text-sm mt-1">Gérez votre plan et votre facturation</p>
+        <h1 className="text-2xl font-bold text-white">Mon Abonnement</h1>
+        <p className="text-slate-400 text-sm mt-1">Gérez votre plan et votre facturation SmartSchool SN</p>
       </div>
 
-      {/* Carte abonnement actuel */}
+      {/* Abonnement actuel */}
       {abonnement && planActuel && (
         <div className="rounded-2xl p-6"
           style={{ background: `linear-gradient(135deg, ${planActuel.couleur}10, rgba(2,6,23,0.9))`, border: `1px solid ${planActuel.couleur}30` }}>
@@ -146,7 +211,7 @@ export default function AbonnementPage() {
               <div className="flex items-center gap-3 mb-2">
                 <span className="text-3xl">{planActuel.emoji}</span>
                 <div>
-                  <h2 className="text-xl font-black text-ss-text">Plan {planActuel.nom}</h2>
+                  <h2 className="text-xl font-black text-white">Plan {planActuel.nom}</h2>
                   <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full"
                     style={{ background: statutConfig[abonnement.statut].bg, color: statutConfig[abonnement.statut].color }}>
                     <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: statutConfig[abonnement.statut].color }} />
@@ -154,26 +219,25 @@ export default function AbonnementPage() {
                   </span>
                 </div>
               </div>
-              <div className="flex flex-wrap gap-4 text-sm text-ss-text-muted mt-3">
+              <div className="flex flex-wrap gap-4 text-sm text-slate-400 mt-3">
                 <span>📅 Début : {formatDate(abonnement.date_debut)}</span>
                 <span>⏳ Fin : {formatDate(abonnement.date_fin)}</span>
               </div>
             </div>
             <div className="text-right">
-              <div className="text-3xl font-black" style={{ color: urgence ? '#FF1744' : planActuel.couleur }}>
+              <div className="text-4xl font-black" style={{ color: urgence ? '#FF1744' : planActuel.couleur }}>
                 {joursRestants}j
               </div>
-              <div className="text-xs text-ss-text-muted">restants</div>
+              <div className="text-xs text-slate-400">restants</div>
               {urgence && joursRestants > 0 && (
                 <div className="text-xs text-red-400 mt-1 font-semibold">⚠️ Renouveler maintenant</div>
               )}
             </div>
           </div>
 
-          {/* Barre progression */}
           <div className="mt-5">
-            <div className="flex justify-between text-xs text-ss-text-muted mb-1.5">
-              <span>Progression du cycle</span>
+            <div className="flex justify-between text-xs text-slate-400 mb-1.5">
+              <span>Progression du cycle (30 jours)</span>
               <span>{joursRestants} jours restants</span>
             </div>
             <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
@@ -185,7 +249,6 @@ export default function AbonnementPage() {
             </div>
           </div>
 
-          {/* Features du plan actuel */}
           <div className="mt-5 flex flex-wrap gap-2">
             {planActuel.fonctionnalites.map((f: string) => (
               <span key={f} className="text-xs px-2.5 py-1 rounded-full font-medium"
@@ -195,17 +258,16 @@ export default function AbonnementPage() {
             ))}
           </div>
 
-          {/* Action renouvellement */}
-          <div className="mt-5 flex gap-3">
+          <div className="mt-5 flex gap-3 flex-wrap">
             <button
-              onClick={() => showToast('Renouvellement disponible — contactez support@smartschool.sn ou effectuez un paiement Wave/OM.')}
+              onClick={() => showToast('Pour renouveler, contactez billing@smartschool.sn ou Wave / OM : +221 77 000 00 00')}
               className="px-5 py-2.5 rounded-xl font-bold text-sm text-[#020617] hover:opacity-90 transition-opacity"
               style={{ background: planActuel.couleur }}>
               {abonnement.statut === 'expire' ? '🔄 Réactiver' : '💳 Renouveler'}
             </button>
             <button
-              onClick={() => showToast('Factures disponibles — fonctionnalité activée avec le paiement réel.')}
-              className="px-5 py-2.5 rounded-xl font-bold text-sm text-ss-text-muted hover:text-ss-text transition-colors"
+              onClick={() => showToast('Vos factures sont disponibles — activé avec le paiement réel.')}
+              className="px-5 py-2.5 rounded-xl font-bold text-sm text-slate-400 hover:text-white transition-colors"
               style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
               📄 Voir les factures
             </button>
@@ -213,47 +275,77 @@ export default function AbonnementPage() {
         </div>
       )}
 
+      {/* Nouveautés */}
+      <div>
+        <div className="flex items-center gap-3 mb-4">
+          <h2 className="text-lg font-bold text-white">🚀 Nouvelles fonctionnalités (2025-2026)</h2>
+          <span className="px-2.5 py-1 rounded-full text-xs font-bold"
+            style={{ background: 'rgba(0,229,255,0.15)', color: '#00E5FF' }}>NOUVEAU</span>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {NOUVELLES_FONCTIONNALITES.map(({ icon, titre, desc }) => (
+            <div key={titre} className="rounded-2xl p-4" style={glassStyle}>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-2xl">{icon}</span>
+                <p className="font-semibold text-white text-sm">{titre}</p>
+              </div>
+              <p className="text-xs text-slate-400 leading-relaxed">{desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Plans disponibles */}
       <div>
-        <h2 className="text-lg font-bold text-ss-text mb-4">Changer de plan</h2>
+        <h2 className="text-lg font-bold text-white mb-4">Changer de plan</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {plans.filter(p => p.id !== 'essai' && p.id !== 'reseau').map(plan => {
+          {plans.map(plan => {
             const estActuel = plan.id === abonnement?.plan_id
             return (
               <div key={plan.id}
-                className="rounded-2xl p-5 flex flex-col transition-all hover:-translate-y-0.5"
+                className="rounded-2xl p-5 flex flex-col transition-all hover:-translate-y-1"
                 style={{
                   background: estActuel ? `${plan.couleur}08` : 'rgba(255,255,255,0.03)',
-                  border: estActuel ? `1px solid ${plan.couleur}40` : '1px solid rgba(255,255,255,0.08)',
+                  border: estActuel ? `2px solid ${plan.couleur}50` : '1px solid rgba(255,255,255,0.08)',
                 }}>
+                {estActuel && (
+                  <div className="text-center mb-3">
+                    <span className="text-xs font-bold px-3 py-1 rounded-full" style={{ background: `${plan.couleur}20`, color: plan.couleur }}>
+                      ✓ Plan actuel
+                    </span>
+                  </div>
+                )}
                 <div className="flex items-center gap-2 mb-3">
                   <span className="text-2xl">{plan.emoji}</span>
-                  <div>
-                    <div className="font-bold text-ss-text">{plan.nom}</div>
-                    {estActuel && <span className="text-xs font-semibold" style={{ color: plan.couleur }}>Plan actuel</span>}
-                  </div>
+                  <div className="font-bold text-white">{plan.nom}</div>
                 </div>
-                <div className="mb-3">
+                <div className="mb-1">
                   <span className="text-2xl font-black" style={{ color: plan.couleur }}>
                     {plan.prix_mensuel.toLocaleString('fr-SN')}
                   </span>
-                  <span className="text-ss-text-muted text-sm"> FCFA/mois</span>
+                  <span className="text-slate-400 text-sm"> FCFA/mois</span>
+                </div>
+                <div className="text-xs text-slate-500 mb-4">
+                  ou {plan.prix_annuel.toLocaleString('fr-SN')} FCFA/an (−{Math.round((1 - plan.prix_annuel / (plan.prix_mensuel * 12)) * 100)}%)
                 </div>
                 <ul className="space-y-1.5 flex-1 mb-4">
                   {plan.fonctionnalites.map(f => (
-                    <li key={f} className="flex items-center gap-1.5 text-xs text-ss-text-muted">
-                      <span style={{ color: plan.couleur }}>✓</span> {f}
+                    <li key={f} className="flex items-start gap-1.5 text-xs text-slate-400">
+                      <span style={{ color: plan.couleur }} className="mt-0.5 shrink-0">✓</span> {f}
                     </li>
                   ))}
                 </ul>
                 <button
-                  onClick={() => showToast(estActuel ? `Vous êtes déjà sur le plan ${plan.nom}.` : `Upgrade vers ${plan.nom} — contactez support@smartschool.sn`)}
+                  onClick={() => showToast(estActuel
+                    ? `Vous êtes déjà sur le plan ${plan.nom}.`
+                    : `Pour passer au plan ${plan.nom}, contactez : billing@smartschool.sn`
+                  )}
                   className="w-full py-2.5 rounded-xl font-bold text-sm transition-all hover:opacity-90"
                   style={estActuel
                     ? { background: `${plan.couleur}15`, color: plan.couleur, border: `1px solid ${plan.couleur}30` }
-                    : { background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.6)', border: '1px solid rgba(255,255,255,0.1)' }
+                    : { background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.1)' }
                   }>
-                  {estActuel ? '✓ Plan actuel' : `Passer à ${plan.nom}`}
+                  {estActuel ? '✓ Plan actuel' : `Choisir ${plan.nom} →`}
                 </button>
               </div>
             )
@@ -261,14 +353,14 @@ export default function AbonnementPage() {
         </div>
       </div>
 
-      {/* Plan réseau */}
+      {/* Plan réseau scolaire */}
       <div className="rounded-2xl p-5 flex items-center justify-between flex-wrap gap-4"
         style={{ background: 'rgba(213,0,249,0.05)', border: '1px solid rgba(213,0,249,0.2)' }}>
         <div className="flex items-center gap-4">
           <span className="text-3xl">🏆</span>
           <div>
-            <div className="font-bold text-ss-text">Réseau Scolaire — Plusieurs campus</div>
-            <div className="text-sm text-ss-text-muted">Multi-établissements, tableau de bord consolidé, SLA 99.9%</div>
+            <div className="font-bold text-white">Réseau Scolaire — Multi-établissements</div>
+            <div className="text-sm text-slate-400">Tableau de bord consolidé, accès multi-campus, SLA 99.9%, support dédié</div>
           </div>
         </div>
         <a href="mailto:contact@smartschool.sn"
@@ -278,29 +370,28 @@ export default function AbonnementPage() {
         </a>
       </div>
 
-      {/* Informations de facturation */}
-      <div className="rounded-2xl p-5"
-        style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-        <h3 className="font-bold text-ss-text mb-4">Méthodes de paiement acceptées</h3>
+      {/* Méthodes de paiement */}
+      <div className="rounded-2xl p-5" style={glassStyle}>
+        <h3 className="font-bold text-white mb-4">Méthodes de paiement acceptées</h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
-            { icon: '🌊', label: 'Wave Sénégal', desc: 'Transfert instantané' },
-            { icon: '🟠', label: 'Orange Money', desc: 'Réseau Orange' },
-            { icon: '💳', label: 'Carte bancaire', desc: 'Visa / Mastercard' },
-            { icon: '🏦', label: 'Virement', desc: 'Banque vers banque' },
+            { icon: '🌊', label: 'Wave Sénégal',   desc: 'Transfert instantané' },
+            { icon: '🟠', label: 'Orange Money',    desc: 'Réseau Orange' },
+            { icon: '💳', label: 'Carte bancaire',  desc: 'Visa / Mastercard' },
+            { icon: '🏦', label: 'Virement bancaire', desc: 'SGBS · CBAO · BHS' },
           ].map(m => (
             <div key={m.label} className="rounded-xl p-3 text-center"
               style={{ background: 'rgba(255,255,255,0.04)' }}>
               <div className="text-2xl mb-1">{m.icon}</div>
-              <div className="text-xs font-bold text-ss-text">{m.label}</div>
-              <div className="text-xs text-ss-text-muted">{m.desc}</div>
+              <div className="text-xs font-bold text-white">{m.label}</div>
+              <div className="text-xs text-slate-400">{m.desc}</div>
             </div>
           ))}
         </div>
-        <p className="text-xs text-ss-text-muted mt-4">
-          Pour tout renouvellement ou upgrade, contactez :{' '}
-          <a href="mailto:billing@smartschool.sn" className="text-ss-cyan hover:underline">billing@smartschool.sn</a>
-          {' '}ou WhatsApp : +221 77 000 00 00
+        <p className="text-xs text-slate-400 mt-4">
+          Renouvellement & upgrade :{' '}
+          <a href="mailto:billing@smartschool.sn" className="text-cyan-400 hover:underline">billing@smartschool.sn</a>
+          {' '}· WhatsApp : <span className="text-white font-semibold">+221 77 000 00 00</span>
         </p>
       </div>
     </div>

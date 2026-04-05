@@ -574,3 +574,98 @@ export const DEMO_BULLETINS_CENSEUR = [
   { id: 'bull-004', classe: '4ème A', trimestre: 2, nb_bulletins: 28, valides: 0, en_attente: 28, statut: 'en_attente' },
   { id: 'bull-005', classe: 'Terminale S1', trimestre: 2, nb_bulletins: 35, valides: 35, en_attente: 0, statut: 'valide' },
 ]
+
+/* ══════════════════════════════════════════════════════════════
+   DONNÉES DÉMO — COMPTABILITÉ / PAIEMENTS SCOLARITÉ
+   ══════════════════════════════════════════════════════════════ */
+
+// Structure tarifaire annuelle (FCFA)
+export const DEMO_TARIFS = {
+  frais_inscription: 25000,
+  scolarite_t1: 35000,
+  scolarite_t2: 35000,
+  scolarite_t3: 30000,
+  frais_activites: 15000,
+  fdfp: 2500,
+  total_annuel: 142500,
+  annee: '2025-2026',
+}
+
+// Générateur de paiements déterministe par élève
+function genPaiement(eleveId: string, idx: number) {
+  const r = (seed: number) => { const x = Math.sin(seed * 9301 + idx * 49297 + 1) * 10000; return x - Math.floor(x) }
+  const scenarios = [
+    // Payé intégralement
+    { inscription: true, t1: true, t2: true, t3: true, activites: true },
+    // T1+T2 payé, T3 en attente
+    { inscription: true, t1: true, t2: true, t3: false, activites: true },
+    // T1 seulement
+    { inscription: true, t1: true, t2: false, t3: false, activites: false },
+    // Inscription + T1 partiel
+    { inscription: true, t1: false, t2: false, t3: false, activites: false },
+    // Rien payé
+    { inscription: false, t1: false, t2: false, t3: false, activites: false },
+  ]
+  const weights = [0.35, 0.25, 0.20, 0.12, 0.08]
+  let cumul = 0; let scenario = scenarios[0]
+  const rand = r(idx)
+  for (let i = 0; i < weights.length; i++) {
+    cumul += weights[i]
+    if (rand < cumul) { scenario = scenarios[i]; break }
+  }
+
+  const METHODES = ['Espèces', 'Wave', 'Orange Money', 'Virement', 'Chèque']
+  const methode = METHODES[Math.floor(r(idx + 100) * METHODES.length)]
+
+  const lignes: Array<{ type: string; montant: number; date: string; reference: string; methode: string }> = []
+  const dateBase = new Date('2025-10-01')
+
+  if (scenario.inscription) {
+    const d = new Date(dateBase); d.setDate(1 + Math.floor(r(idx + 1) * 30))
+    lignes.push({ type: 'inscription', montant: DEMO_TARIFS.frais_inscription, date: d.toISOString().split('T')[0], reference: `INS-${eleveId.slice(-4)}-001`, methode })
+  }
+  if (scenario.t1) {
+    const d = new Date('2025-10-15'); d.setDate(15 + Math.floor(r(idx + 2) * 20))
+    lignes.push({ type: 'scolarite_t1', montant: DEMO_TARIFS.scolarite_t1, date: d.toISOString().split('T')[0], reference: `T1-${eleveId.slice(-4)}-001`, methode })
+  }
+  if (scenario.t2) {
+    const d = new Date('2026-01-10'); d.setDate(10 + Math.floor(r(idx + 3) * 25))
+    lignes.push({ type: 'scolarite_t2', montant: DEMO_TARIFS.scolarite_t2, date: d.toISOString().split('T')[0], reference: `T2-${eleveId.slice(-4)}-001`, methode })
+  }
+  if (scenario.t3) {
+    const d = new Date('2026-04-01'); d.setDate(1 + Math.floor(r(idx + 4) * 20))
+    lignes.push({ type: 'scolarite_t3', montant: DEMO_TARIFS.scolarite_t3, date: d.toISOString().split('T')[0], reference: `T3-${eleveId.slice(-4)}-001`, methode })
+  }
+  if (scenario.activites) {
+    const d = new Date('2025-11-01')
+    lignes.push({ type: 'frais_activites', montant: DEMO_TARIFS.frais_activites, date: d.toISOString().split('T')[0], reference: `ACT-${eleveId.slice(-4)}-001`, methode })
+  }
+
+  const totalPaye = lignes.reduce((s, l) => s + l.montant, 0)
+  const totalDu = DEMO_TARIFS.frais_inscription + DEMO_TARIFS.scolarite_t1 + DEMO_TARIFS.scolarite_t2 + DEMO_TARIFS.scolarite_t3 + DEMO_TARIFS.frais_activites
+  const solde = totalDu - totalPaye
+  const statut = solde === 0 ? 'solde' : totalPaye === 0 ? 'impaye' : solde <= DEMO_TARIFS.scolarite_t3 ? 'partiel_avance' : 'partiel_retard'
+
+  return {
+    eleveId,
+    totalDu,
+    totalPaye,
+    solde,
+    statut,
+    lignes,
+    t1Paye: scenario.t1,
+    t2Paye: scenario.t2,
+    t3Paye: scenario.t3,
+    inscriptionPayee: scenario.inscription,
+    activitesPayees: scenario.activites,
+    methode,
+  }
+}
+
+export const DEMO_PAIEMENTS_COMPTABLE = DEMO_ELEVES.map((e, i) => ({
+  ...genPaiement(e.id, i),
+  nom: e.nom,
+  prenom: e.prenom,
+  classe_id: e.classe_id,
+  matricule: e.matricule,
+}))
