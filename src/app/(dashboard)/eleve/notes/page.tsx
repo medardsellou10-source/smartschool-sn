@@ -393,7 +393,7 @@ export default function EleveNotesPage() {
         coefficient: eval_.coefficient_eval,
         matiereId: matiere.id,
         matiereNom: matiere.nom,
-        matiereCouleur: matiere.couleur || '#00E5FF',
+        matiereCouleur: (matiere as any).couleur || '#00E5FF',
         note: n.note,
         absent: false,
         observation: null,

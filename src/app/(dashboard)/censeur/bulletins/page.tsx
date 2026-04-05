@@ -1,137 +1,446 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { useState, useMemo, useCallback, useRef } from 'react'
 import { useUser } from '@/hooks/useUser'
-import { isDemoMode, DEMO_BULLETINS_CENSEUR } from '@/lib/demo-data'
+import {
+  isDemoMode,
+  DEMO_CLASSES, DEMO_MATIERES, DEMO_ELEVES,
+  DEMO_EVALUATIONS_EXTENDED, DEMO_NOTES_EXTENDED,
+  DEMO_ECOLE,
+} from '@/lib/demo-data'
 
-const ACCENT = '#3D5AFE'
-
-type BulletinCenseur = typeof DEMO_BULLETINS_CENSEUR[0]
-
-const STATUT_STYLE: Record<string, { bg: string; color: string; label: string }> = {
-  valide:     { bg: 'rgba(0,230,118,0.15)',  color: '#00E676', label: 'Validé' },
-  en_cours:   { bg: `rgba(61,90,254,0.15)`,  color: ACCENT,    label: 'En cours' },
-  en_attente: { bg: 'rgba(255,214,0,0.15)',  color: '#FFD600', label: 'En attente' },
+// ── Types ──────────────────────────────────────────────────────
+interface MatiereBulletin {
+  matiereId: string
+  nom: string
+  coefficient: number
+  moyenne: number | null
+  nbEvals: number
+  mention: string
 }
 
-export default function BulletinsCenseurPage() {
-  const { user, loading: userLoading } = useUser()
-  const supabase = createClient()
-  const [bulletins, setBulletins] = useState<BulletinCenseur[]>([])
-  const [loading, setLoading] = useState(true)
-  const [toast, setToast] = useState<string | null>(null)
+interface EleveBulletin {
+  eleveId: string
+  nom: string
+  prenom: string
+  matricule: string
+  matieres: MatiereBulletin[]
+  moyenneGenerale: number | null
+  rang: number
+  totalEleves: number
+  mention: string
+  mentionColor: string
+  conseil: string
+}
 
-  function showToast(msg: string) { setToast(msg); setTimeout(() => setToast(null), 3000) }
+// ── Mention sénégalaise ────────────────────────────────────────
+function getMention(avg: number | null): { mention: string; color: string; conseil: string } {
+  if (avg === null) return { mention: '—', color: '#64748B', conseil: 'Données insuffisantes' }
+  if (avg >= 18) return { mention: 'Excellent', color: '#FFD600', conseil: 'Félicitations du conseil de classe' }
+  if (avg >= 16) return { mention: 'Très Bien', color: '#00E676', conseil: 'Mention Honorable avec félicitations' }
+  if (avg >= 14) return { mention: 'Bien', color: '#00E5FF', conseil: 'Mention Honorable' }
+  if (avg >= 12) return { mention: 'Assez Bien', color: '#7C4DFF', conseil: 'Mention Assez Bien' }
+  if (avg >= 10) return { mention: 'Passable', color: '#FF6D00', conseil: 'Admis(e) — Effort à poursuivre' }
+  if (avg >= 8)  return { mention: 'Insuffisant', color: '#FF6D00', conseil: 'Redoublement à envisager' }
+  return { mention: 'Très Insuffisant', color: '#FF1744', conseil: 'Redoublement fortement recommandé' }
+}
 
-  useEffect(() => {
-    if (!isDemoMode() || !user) return
-    setBulletins(DEMO_BULLETINS_CENSEUR)
-    setLoading(false)
-  }, [user])
+// ── Moteur de calcul ───────────────────────────────────────────
+function calcBulletins(classeId: string, trimestre: number): EleveBulletin[] {
+  const evals = DEMO_EVALUATIONS_EXTENDED.filter(e => e.classe_id === classeId && e.trimestre === trimestre)
+  if (evals.length === 0) return []
 
-  useEffect(() => {
-    if (isDemoMode() || !user) return
-    async function load() {
-      // Agrégation des notes par classe pour la validation des bulletins
-      const { data: classes } = await (supabase.from('classes') as any)
-        .select('id, nom')
-        .eq('ecole_id', (user as any).ecole_id)
-        .order('nom')
-      const rows = (classes || []).map((c: any, idx: number) => ({
-        id: c.id,
-        classe: c.nom,
-        trimestre: 2,
-        nb_bulletins: 30,
-        valides: Math.floor(Math.random() * 25 + 5),
-        en_attente: Math.floor(Math.random() * 5),
-        statut: idx % 3 === 0 ? 'valide' : idx % 3 === 1 ? 'en_cours' : 'en_attente',
-      }))
-      setBulletins(rows)
-      setLoading(false)
+  const matiereIds = [...new Set(evals.map(e => e.matiere_id))]
+  const eleves = DEMO_ELEVES.filter(e => e.classe_id === classeId && e.actif)
+
+  const rawBulletins = eleves.map(eleve => {
+    const matieresData: MatiereBulletin[] = matiereIds.map(matId => {
+      const matEvals = evals.filter(e => e.matiere_id === matId)
+      const matNotes = matEvals
+        .map(ev => {
+          const n = DEMO_NOTES_EXTENDED.find(n => n.evaluation_id === ev.id && n.eleve_id === eleve.id)
+          return n && !n.absent_eval ? { note: n.note, coeff: ev.coefficient_eval } : null
+        })
+        .filter(Boolean) as Array<{ note: number; coeff: number }>
+
+      const totalCoeff = matNotes.reduce((s, n) => s + n.coeff, 0)
+      const totalWeighted = matNotes.reduce((s, n) => s + n.note * n.coeff, 0)
+      const moyenne = totalCoeff > 0 ? Math.round((totalWeighted / totalCoeff) * 100) / 100 : null
+
+      const matiere = DEMO_MATIERES.find(m => m.id === matId)!
+      return {
+        matiereId: matId,
+        nom: matiere.nom,
+        coefficient: matiere.coefficient,
+        moyenne,
+        nbEvals: matEvals.length,
+        mention: getMention(moyenne).mention,
+      }
+    })
+
+    const validMat = matieresData.filter(m => m.moyenne !== null)
+    const totalCoeffMat = validMat.reduce((s, m) => s + m.coefficient, 0)
+    const totalWeightedMat = validMat.reduce((s, m) => s + m.moyenne! * m.coefficient, 0)
+    const moyenneGenerale = totalCoeffMat > 0 ? Math.round((totalWeightedMat / totalCoeffMat) * 100) / 100 : null
+    const { mention, color: mentionColor, conseil } = getMention(moyenneGenerale)
+
+    return {
+      eleveId: eleve.id,
+      nom: eleve.nom,
+      prenom: eleve.prenom,
+      matricule: eleve.matricule,
+      matieres: matieresData,
+      moyenneGenerale,
+      rang: 0,
+      totalEleves: eleves.length,
+      mention,
+      mentionColor,
+      conseil,
     }
-    load()
-  }, [user])
+  })
 
-  if (userLoading || loading) return <div className="p-6 animate-pulse space-y-4">{[...Array(5)].map((_, i) => <div key={i} className="h-16 rounded-xl bg-white/5" />)}</div>
+  const sorted = [...rawBulletins].sort((a, b) => (b.moyenneGenerale ?? 0) - (a.moyenneGenerale ?? 0))
+  return sorted.map((b, i) => ({ ...b, rang: i + 1 }))
+}
 
-  const totalValides = bulletins.reduce((s, b) => s + b.valides, 0)
-  const totalBulletins = bulletins.reduce((s, b) => s + b.nb_bulletins, 0)
-  const pctGlobal = totalBulletins > 0 ? Math.round((totalValides / totalBulletins) * 100) : 0
+function noteColor(note: number | null): string {
+  if (note === null) return '#475569'
+  if (note >= 16) return '#FFD600'
+  if (note >= 14) return '#00E676'
+  if (note >= 10) return '#00E5FF'
+  if (note >= 8)  return '#FF6D00'
+  return '#FF1744'
+}
 
+// ── Bulletin imprimable ────────────────────────────────────────
+function BulletinPrint({ b, classe, trimestre, annee }: {
+  b: EleveBulletin; classe: string; trimestre: number; annee: string
+}) {
   return (
-    <div className="space-y-6 pb-24 lg:pb-6 animate-fade-in">
-      {toast && (
-        <div className="fixed top-4 right-4 z-50 px-5 py-3 rounded-2xl text-sm font-semibold text-white shadow-xl"
-          style={{ background: 'rgba(2,6,23,0.96)', border: `1px solid ${ACCENT}60`, backdropFilter: 'blur(24px)', maxWidth: '340px' }}>
-          <span style={{ color: ACCENT }}>ℹ️</span> {toast}
-        </div>
-      )}
-      <div>
-        <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-          <span style={{ color: ACCENT }}>✅</span> Validation des Bulletins
-        </h1>
-        <p className="text-sm text-slate-400 mt-1">Trimestre 2 — {totalValides}/{totalBulletins} bulletins validés ({pctGlobal}%)</p>
+    <div style={{ fontFamily: 'Arial, sans-serif', fontSize: '12px', color: '#000', background: '#fff', padding: '24px', width: '100%', boxSizing: 'border-box' }}>
+      <div style={{ textAlign: 'center', borderBottom: '2px solid #1e3a5f', paddingBottom: '12px', marginBottom: '14px' }}>
+        <p style={{ margin: 0, fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>République du Sénégal — Un Peuple, Un But, Une Foi</p>
+        <p style={{ margin: '2px 0', fontSize: '10px', color: '#555' }}>Ministère de l&apos;Éducation Nationale</p>
+        <h2 style={{ margin: '8px 0 2px', fontSize: '15px', textTransform: 'uppercase', color: '#1e3a5f' }}>{DEMO_ECOLE.nom}</h2>
+        <p style={{ margin: 0, fontSize: '10px', color: '#666' }}>Code IAE : {DEMO_ECOLE.code_iae} · {DEMO_ECOLE.ville}, {DEMO_ECOLE.region}</p>
+        <h3 style={{ margin: '10px 0 2px', fontSize: '13px', fontWeight: 'bold', background: '#1e3a5f', color: '#fff', padding: '4px 16px', display: 'inline-block', borderRadius: '4px' }}>
+          BULLETIN DE NOTES — TRIMESTRE {trimestre}
+        </h3>
+        <p style={{ margin: '4px 0 0', fontSize: '10px' }}>Année scolaire {annee}</p>
       </div>
 
-      {/* Barre de progression globale */}
-      <div className="rounded-2xl p-5" style={{ background: 'rgba(2,6,23,0.82)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: `1px solid ${ACCENT}40` }}>
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-sm font-bold text-white">Progression globale T2</span>
-          <span className="text-lg font-black" style={{ color: ACCENT }}>{pctGlobal}%</span>
-        </div>
-        <div className="h-3 rounded-full bg-white/10 overflow-hidden">
-          <div className="h-full rounded-full transition-all"
-            style={{ width: `${pctGlobal}%`, background: `linear-gradient(90deg, ${ACCENT}, #00E5FF)`, boxShadow: `0 0 12px ${ACCENT}` }} />
-        </div>
-        <p className="text-xs text-slate-400 mt-2">{totalValides} bulletins validés sur {totalBulletins} total</p>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', marginBottom: '14px', padding: '8px 12px', border: '1px solid #ccc', borderRadius: '4px', background: '#f9fafb' }}>
+        <div><strong>Nom :</strong> {b.prenom} {b.nom}</div>
+        <div><strong>Matricule :</strong> {b.matricule}</div>
+        <div><strong>Classe :</strong> {classe}</div>
+        <div><strong>Rang :</strong> {b.rang}e / {b.totalEleves} élèves</div>
+        <div><strong>Moyenne générale :</strong> <span style={{ fontWeight: 'bold', color: b.moyenneGenerale !== null && b.moyenneGenerale >= 10 ? '#16a34a' : '#dc2626' }}>{b.moyenneGenerale !== null ? b.moyenneGenerale.toFixed(2) : '—'} / 20</span></div>
+        <div><strong>Mention :</strong> <span style={{ fontWeight: 'bold' }}>{b.mention}</span></div>
       </div>
 
-      {/* Par classe */}
-      <div className="space-y-3">
-        {bulletins.map(b => {
-          const pct = Math.round((b.valides / b.nb_bulletins) * 100)
-          const s = STATUT_STYLE[b.statut] || STATUT_STYLE.en_attente
-          return (
-            <div key={b.id} className="rounded-2xl p-5"
-              style={{ background: 'rgba(2,6,23,0.80)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: `1px solid ${s.color}35` }}>
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg"
-                    style={{ background: `${s.color}15` }}>
-                    📋
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-white">{b.classe}</p>
-                    <p className="text-xs text-slate-400">Trimestre {b.trimestre} · {b.nb_bulletins} élèves</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-sm font-black text-white">{b.valides}/{b.nb_bulletins}</span>
-                  <span className="px-2 py-1 rounded-lg text-xs font-semibold"
-                    style={{ background: s.bg, color: s.color }}>{s.label}</span>
-                </div>
-              </div>
-              <div className="h-2 rounded-full bg-white/10 overflow-hidden">
-                <div className="h-full rounded-full transition-all"
-                  style={{ width: `${pct}%`, background: s.color, boxShadow: `0 0 6px ${s.color}` }} />
-              </div>
-              {b.en_attente > 0 && (
-                <div className="flex items-center justify-between mt-3">
-                  <p className="text-xs text-slate-500">{b.en_attente} bulletins en attente de validation</p>
-                  {b.statut !== 'valide' && (
-                    <button className="text-xs px-3 py-1.5 rounded-xl font-semibold transition-all"
-                      style={{ background: `${ACCENT}20`, color: ACCENT, border: `1px solid ${ACCENT}40` }}
-                      onClick={() => showToast(`Validation des bulletins de ${b.classe} — disponible avec la base de données.`)}>
-                      Valider
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
-          )
-        })}
+      <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '14px', fontSize: '11px' }}>
+        <thead>
+          <tr style={{ background: '#1e3a5f', color: '#fff' }}>
+            <th style={{ border: '1px solid #bbb', padding: '6px 8px', textAlign: 'left', width: '28%' }}>Matière</th>
+            <th style={{ border: '1px solid #bbb', padding: '6px 8px', textAlign: 'center', width: '8%' }}>Coeff.</th>
+            <th style={{ border: '1px solid #bbb', padding: '6px 8px', textAlign: 'center', width: '12%' }}>Nb Évals</th>
+            <th style={{ border: '1px solid #bbb', padding: '6px 8px', textAlign: 'center', width: '14%' }}>Moyenne /20</th>
+            <th style={{ border: '1px solid #bbb', padding: '6px 8px', textAlign: 'center', width: '14%' }}>Moy × Coeff</th>
+            <th style={{ border: '1px solid #bbb', padding: '6px 8px', textAlign: 'center', width: '24%' }}>Appréciation</th>
+          </tr>
+        </thead>
+        <tbody>
+          {b.matieres.map((m, i) => (
+            <tr key={m.matiereId} style={{ background: i % 2 === 0 ? '#f0f4ff' : '#fff' }}>
+              <td style={{ border: '1px solid #ccc', padding: '5px 8px', fontWeight: '600' }}>{m.nom}</td>
+              <td style={{ border: '1px solid #ccc', padding: '5px 8px', textAlign: 'center' }}>{m.coefficient}</td>
+              <td style={{ border: '1px solid #ccc', padding: '5px 8px', textAlign: 'center' }}>{m.nbEvals}</td>
+              <td style={{ border: '1px solid #ccc', padding: '5px 8px', textAlign: 'center', fontWeight: 'bold', color: m.moyenne !== null ? (m.moyenne >= 10 ? '#16a34a' : '#dc2626') : '#888' }}>
+                {m.moyenne !== null ? m.moyenne.toFixed(2) : '—'}
+              </td>
+              <td style={{ border: '1px solid #ccc', padding: '5px 8px', textAlign: 'center' }}>
+                {m.moyenne !== null ? (m.moyenne * m.coefficient).toFixed(2) : '—'}
+              </td>
+              <td style={{ border: '1px solid #ccc', padding: '5px 8px', textAlign: 'center', fontSize: '10px', fontStyle: 'italic' }}>{m.mention}</td>
+            </tr>
+          ))}
+        </tbody>
+        <tfoot>
+          <tr style={{ background: '#1e3a5f', color: '#fff', fontWeight: 'bold' }}>
+            <td colSpan={3} style={{ border: '1px solid #bbb', padding: '6px 8px', textAlign: 'right', fontSize: '12px' }}>MOYENNE GÉNÉRALE</td>
+            <td style={{ border: '1px solid #bbb', padding: '6px 8px', textAlign: 'center', fontSize: '14px' }}>
+              {b.moyenneGenerale !== null ? b.moyenneGenerale.toFixed(2) : '—'} / 20
+            </td>
+            <td colSpan={2} style={{ border: '1px solid #bbb', padding: '6px 8px', textAlign: 'center', fontSize: '12px' }}>
+              {b.mention}
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <div style={{ border: '1px solid #ccc', padding: '10px 12px', marginBottom: '16px', borderRadius: '4px', background: '#f9fafb' }}>
+        <strong>Avis du conseil de classe :</strong>
+        <p style={{ margin: '4px 0 0', fontStyle: 'italic' }}>{b.conseil}</p>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', marginTop: '28px' }}>
+        {['Le Censeur', 'Le Proviseur / Principal', 'Signature Parent / Tuteur'].map(label => (
+          <div key={label} style={{ textAlign: 'center' }}>
+            <div style={{ height: '50px', borderBottom: '1px solid #999', marginBottom: '6px' }} />
+            <p style={{ margin: 0, fontSize: '10px', fontWeight: 'bold', color: '#333' }}>{label}</p>
+          </div>
+        ))}
       </div>
     </div>
+  )
+}
+
+// ── Page principale ────────────────────────────────────────────
+export default function BulletinsPage() {
+  useUser()
+  const printRef = useRef<HTMLDivElement>(null)
+
+  const [selectedClasse, setSelectedClasse] = useState('classe-001')
+  const [selectedTrimestre, setSelectedTrimestre] = useState(2)
+  const [selectedEleve, setSelectedEleve] = useState<EleveBulletin | null>(null)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [sortBy, setSortBy] = useState<'rang' | 'nom' | 'moyenne'>('rang')
+  const [validated, setValidated] = useState(false)
+  const [validating, setValidating] = useState(false)
+
+  const ANNEE = '2025–2026'
+  const classeObj = DEMO_CLASSES.find(c => c.id === selectedClasse)
+  const classeLabel = classeObj ? `${classeObj.niveau} ${classeObj.nom}` : ''
+
+  const bulletins = useMemo(() => {
+    if (isDemoMode()) return calcBulletins(selectedClasse, selectedTrimestre)
+    return []
+  }, [selectedClasse, selectedTrimestre])
+
+  const filteredBulletins = useMemo(() => {
+    let list = bulletins.filter(b =>
+      `${b.prenom} ${b.nom}`.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    if (sortBy === 'rang') return [...list].sort((a, b) => a.rang - b.rang)
+    if (sortBy === 'nom')  return [...list].sort((a, b) => a.nom.localeCompare(b.nom))
+    return [...list].sort((a, b) => (b.moyenneGenerale ?? 0) - (a.moyenneGenerale ?? 0))
+  }, [bulletins, searchTerm, sortBy])
+
+  const nbAdmis = bulletins.filter(b => (b.moyenneGenerale ?? 0) >= 10).length
+  const classeMoyenne = bulletins.length > 0
+    ? bulletins.filter(b => b.moyenneGenerale !== null).reduce((s, b) => s + b.moyenneGenerale!, 0) / bulletins.filter(b => b.moyenneGenerale !== null).length
+    : 0
+
+  const uniqueMatieres = bulletins[0]?.matieres ?? []
+
+  const handlePrint = useCallback((b: EleveBulletin) => {
+    setSelectedEleve(b)
+    setTimeout(() => window.print(), 200)
+  }, [])
+
+  const handlePrintAll = useCallback(() => {
+    setSelectedEleve(null)
+    setTimeout(() => window.print(), 200)
+  }, [])
+
+  const handleValidate = useCallback(async () => {
+    setValidating(true)
+    await new Promise(r => setTimeout(r, 1200))
+    setValidated(true)
+    setValidating(false)
+  }, [])
+
+  return (
+    <>
+      {/* ── Vue écran ─────────────────────────────────────────── */}
+      <div className="print:hidden space-y-5 max-w-6xl mx-auto">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <div>
+            <h1 className="text-2xl font-bold text-ss-text">📋 Bulletins de Notes</h1>
+            <p className="text-ss-text-muted text-sm mt-0.5">Calcul automatique des moyennes — {ANNEE}</p>
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            <button onClick={handlePrintAll}
+              className="text-sm px-4 py-2.5 rounded-xl border border-ss-border text-ss-text-secondary hover:border-ss-cyan hover:text-ss-cyan transition-all min-h-[44px]">
+              🖨️ Imprimer tous
+            </button>
+            <button onClick={handleValidate} disabled={validating || validated}
+              className={`text-sm px-4 py-2.5 rounded-xl font-bold min-h-[44px] transition-all ${validated
+                ? 'bg-ss-green/20 border border-ss-green text-ss-green'
+                : 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white hover:opacity-90 disabled:opacity-60'}`}>
+              {validating ? '⏳ Validation...' : validated ? '✅ Bulletins validés' : '✔ Valider les bulletins'}
+            </button>
+          </div>
+        </div>
+
+        {/* KPIs */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {[
+            { label: 'Total élèves', value: bulletins.length, color: '#3D5AFE', icon: '👥' },
+            { label: 'Admis (≥10)', value: nbAdmis, color: '#00E676', icon: '✅' },
+            { label: 'Moy. classe', value: classeMoyenne > 0 ? classeMoyenne.toFixed(2) : '—', color: '#00E5FF', icon: '📊' },
+            { label: 'Taux réussite', value: bulletins.length > 0 ? `${Math.round(nbAdmis / bulletins.length * 100)}%` : '—', color: '#FFD600', icon: '🎯' },
+          ].map(kpi => (
+            <div key={kpi.label} className="bg-ss-bg-secondary rounded-xl border border-ss-border p-4 text-center">
+              <span className="text-xl">{kpi.icon}</span>
+              <p style={{ color: kpi.color }} className="text-2xl font-bold mt-1">{kpi.value}</p>
+              <p className="text-ss-text-muted text-xs mt-1">{kpi.label}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Filtres */}
+        <div className="bg-ss-bg-secondary rounded-xl border border-ss-border p-4 flex flex-wrap gap-3">
+          <div className="flex-1 min-w-[140px]">
+            <label className="block text-xs text-ss-text-muted mb-1">Classe</label>
+            <select value={selectedClasse} onChange={e => { setSelectedClasse(e.target.value); setValidated(false) }}
+              className="w-full bg-ss-bg border border-ss-border text-ss-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              {DEMO_CLASSES.map(c => <option key={c.id} value={c.id}>{c.niveau} {c.nom}</option>)}
+            </select>
+          </div>
+          <div className="w-32">
+            <label className="block text-xs text-ss-text-muted mb-1">Trimestre</label>
+            <select value={selectedTrimestre} onChange={e => { setSelectedTrimestre(Number(e.target.value)); setValidated(false) }}
+              className="w-full bg-ss-bg border border-ss-border text-ss-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              {[1, 2, 3].map(t => <option key={t} value={t}>Trimestre {t}</option>)}
+            </select>
+          </div>
+          <div className="flex-1 min-w-[160px]">
+            <label className="block text-xs text-ss-text-muted mb-1">Rechercher</label>
+            <input type="text" placeholder="Nom de l'élève..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
+              className="w-full bg-ss-bg border border-ss-border text-ss-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+          <div className="w-36">
+            <label className="block text-xs text-ss-text-muted mb-1">Trier par</label>
+            <select value={sortBy} onChange={e => setSortBy(e.target.value as typeof sortBy)}
+              className="w-full bg-ss-bg border border-ss-border text-ss-text rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="rang">Rang</option>
+              <option value="moyenne">Moyenne</option>
+              <option value="nom">Nom</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Distribution des mentions */}
+        {bulletins.length > 0 && (
+          <div className="bg-ss-bg-secondary rounded-xl border border-ss-border p-4">
+            <p className="text-xs font-semibold text-ss-text-secondary mb-3">Distribution des mentions — {classeLabel} T{selectedTrimestre}</p>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { label: 'Excellent', color: '#FFD600', min: 18 },
+                { label: 'Très Bien', color: '#00E676', min: 16 },
+                { label: 'Bien', color: '#00E5FF', min: 14 },
+                { label: 'Assez Bien', color: '#7C4DFF', min: 12 },
+                { label: 'Passable', color: '#FF6D00', min: 10 },
+                { label: 'Insuffisant', color: '#FF1744', min: 0 },
+              ].map(m => {
+                const count = bulletins.filter(b => {
+                  const avg = b.moyenneGenerale ?? 0
+                  if (m.label === 'Insuffisant') return avg < 10
+                  if (m.label === 'Passable') return avg >= 10 && avg < 12
+                  if (m.label === 'Assez Bien') return avg >= 12 && avg < 14
+                  if (m.label === 'Bien') return avg >= 14 && avg < 16
+                  if (m.label === 'Très Bien') return avg >= 16 && avg < 18
+                  return avg >= 18
+                }).length
+                if (count === 0) return null
+                return (
+                  <div key={m.label} style={{ background: m.color + '15', borderColor: m.color + '40' }}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg border">
+                    <span style={{ color: m.color }} className="text-sm font-bold">{count}</span>
+                    <span className="text-xs text-ss-text-secondary">{m.label}</span>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Tableau */}
+        {bulletins.length === 0 ? (
+          <div className="bg-ss-bg-secondary rounded-xl border border-ss-border p-10 text-center">
+            <span className="text-4xl block mb-3">📭</span>
+            <p className="text-ss-text-secondary text-sm">Aucune note saisie pour cette classe/trimestre.</p>
+            <p className="text-ss-text-muted text-xs mt-1">Les professeurs doivent saisir et publier leurs notes d&apos;abord.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto rounded-xl border border-ss-border">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-ss-bg-secondary border-b border-ss-border">
+                  <th className="px-3 py-3 text-left text-xs text-ss-text-muted font-semibold sticky left-0 bg-ss-bg-secondary w-10">Rg</th>
+                  <th className="px-3 py-3 text-left text-xs text-ss-text-muted font-semibold sticky left-10 bg-ss-bg-secondary min-w-[140px]">Élève</th>
+                  {uniqueMatieres.map(m => (
+                    <th key={m.matiereId} className="px-2 py-3 text-center text-[10px] text-ss-text-muted font-semibold min-w-[70px]">
+                      {m.nom.length > 7 ? m.nom.slice(0, 6) + '…' : m.nom}
+                      <br /><span className="text-[9px] text-ss-text-muted/60">c.{m.coefficient}</span>
+                    </th>
+                  ))}
+                  <th className="px-3 py-3 text-center text-xs text-ss-text-muted font-semibold min-w-[90px]">Moy. Gén.</th>
+                  <th className="px-3 py-3 text-center text-xs text-ss-text-muted font-semibold">Mention</th>
+                  <th className="px-3 py-3 text-center text-xs text-ss-text-muted font-semibold">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredBulletins.map((b, idx) => (
+                  <tr key={b.eleveId} className={`border-b border-ss-border/40 hover:bg-ss-bg-secondary/50 transition-colors ${idx % 2 === 1 ? 'bg-white/[0.015]' : ''}`}>
+                    <td className="px-3 py-2.5 text-center text-xs font-bold sticky left-0 bg-inherit text-ss-text-muted">
+                      {b.rang <= 3 ? ['🥇', '🥈', '🥉'][b.rang - 1] : `${b.rang}e`}
+                    </td>
+                    <td className="px-3 py-2.5 sticky left-10 bg-inherit">
+                      <p className="font-semibold text-ss-text text-sm">{b.prenom} {b.nom}</p>
+                      <p className="text-[10px] text-ss-text-muted">{b.matricule}</p>
+                    </td>
+                    {b.matieres.map(m => (
+                      <td key={m.matiereId} className="px-2 py-2.5 text-center">
+                        <span style={{ color: noteColor(m.moyenne) }} className="text-sm font-semibold tabular-nums">
+                          {m.moyenne !== null ? m.moyenne.toFixed(1) : '—'}
+                        </span>
+                      </td>
+                    ))}
+                    <td className="px-3 py-2.5 text-center">
+                      <span style={{ color: noteColor(b.moyenneGenerale) }} className="text-base font-bold tabular-nums">
+                        {b.moyenneGenerale !== null ? b.moyenneGenerale.toFixed(2) : '—'}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2.5 text-center">
+                      <span style={{ color: b.mentionColor, background: b.mentionColor + '18', borderColor: b.mentionColor + '35' }}
+                        className="text-[10px] font-bold px-2 py-0.5 rounded-full border whitespace-nowrap">
+                        {b.mention}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2.5 text-center">
+                      <button onClick={() => handlePrint(b)}
+                        className="text-[11px] text-indigo-400 hover:text-indigo-300 border border-indigo-500/30 hover:border-indigo-400/60 px-2 py-1 rounded-lg transition-all">
+                        🖨️
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {isDemoMode() && bulletins.length > 0 && (
+          <p className="text-center text-xs text-ss-text-muted/60">
+            ✅ Moyennes calculées automatiquement depuis les notes saisies par les professeurs — Mode démo
+          </p>
+        )}
+      </div>
+
+      {/* ── Vue impression ────────────────────────────────────── */}
+      <div className="hidden print:block" ref={printRef}>
+        {selectedEleve ? (
+          <BulletinPrint b={selectedEleve} classe={classeLabel} trimestre={selectedTrimestre} annee={ANNEE} />
+        ) : (
+          filteredBulletins.map((b, i) => (
+            <div key={b.eleveId} style={{ pageBreakAfter: i < filteredBulletins.length - 1 ? 'always' : 'auto' }}>
+              <BulletinPrint b={b} classe={classeLabel} trimestre={selectedTrimestre} annee={ANNEE} />
+            </div>
+          ))
+        )}
+      </div>
+    </>
   )
 }

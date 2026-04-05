@@ -177,12 +177,28 @@ export const DEMO_EVALUATIONS = [
   { id: 'eval-003', classe_id: 'classe-001', matiere_id: 'mat-002', prof_id: 'user-prof-002', type_eval: 'devoir', titre: 'Devoir n°1 Français', date_eval: '2026-01-20', trimestre: 2, coefficient_eval: 1 },
 ]
 
+// Générateur déterministe (même résultat à chaque chargement → bulletins stables)
+function seedRand(evalIdx: number, eleveIdx: number): number {
+  const x = Math.sin(evalIdx * 7919 + eleveIdx * 9973 + 1) * 10000
+  return x - Math.floor(x)
+}
+function genNotesSeeded(evalId: string, evalIdx: number, classeEleves: typeof DEMO_ELEVES) {
+  return classeEleves.map((e, i) => ({
+    eleve_id: e.id,
+    evaluation_id: evalId,
+    note: Math.round((seedRand(evalIdx, i) * 16 + 4) * 2) / 2,
+    absent_eval: seedRand(evalIdx * 2 + 1, i) < 0.05,
+    observation: null as string | null,
+    saisi_par: 'user-prof-001',
+  }))
+}
+
 // Notes générées aléatoirement pour les 35 élèves de classe-001
 function genNotes(evalId: string, classeEleves: typeof DEMO_ELEVES) {
   return classeEleves.map(e => ({
     eleve_id: e.id,
     evaluation_id: evalId,
-    note: Math.round((Math.random() * 16 + 4) * 2) / 2, // entre 4 et 20, pas de 0.5
+    note: Math.round((Math.random() * 16 + 4) * 2) / 2,
     absent_eval: Math.random() < 0.05,
     observation: null,
     saisi_par: 'user-prof-001',
@@ -194,6 +210,49 @@ export const DEMO_NOTES = [
   ...genNotes('eval-001', classe001Eleves),
   ...genNotes('eval-002', classe001Eleves),
   ...genNotes('eval-003', classe001Eleves),
+]
+
+// ── Évaluations complètes T2 — classe-001 (toutes matières) pour les bulletins ──
+export const DEMO_EVALUATIONS_EXTENDED = [
+  ...DEMO_EVALUATIONS,
+  // Français — composition T2
+  { id: 'eval-012', classe_id: 'classe-001', matiere_id: 'mat-002', prof_id: 'user-prof-002', type_eval: 'composition', titre: 'Composition Français T2', date_eval: '2026-03-11', trimestre: 2, coefficient_eval: 2 },
+  // Anglais
+  { id: 'eval-004', classe_id: 'classe-001', matiere_id: 'mat-003', prof_id: 'user-prof-003', type_eval: 'devoir', titre: 'Devoir Anglais', date_eval: '2026-01-22', trimestre: 2, coefficient_eval: 1 },
+  { id: 'eval-005', classe_id: 'classe-001', matiere_id: 'mat-003', prof_id: 'user-prof-003', type_eval: 'composition', titre: 'Composition Anglais T2', date_eval: '2026-03-12', trimestre: 2, coefficient_eval: 2 },
+  // Sciences Physiques
+  { id: 'eval-006', classe_id: 'classe-001', matiere_id: 'mat-004', prof_id: 'user-prof-004', type_eval: 'devoir', titre: 'Devoir Physique', date_eval: '2026-01-25', trimestre: 2, coefficient_eval: 1 },
+  { id: 'eval-007', classe_id: 'classe-001', matiere_id: 'mat-004', prof_id: 'user-prof-004', type_eval: 'composition', titre: 'Composition Physique T2', date_eval: '2026-03-14', trimestre: 2, coefficient_eval: 2 },
+  // SVT
+  { id: 'eval-008', classe_id: 'classe-001', matiere_id: 'mat-005', prof_id: 'user-prof-005', type_eval: 'devoir', titre: 'Devoir SVT', date_eval: '2026-02-03', trimestre: 2, coefficient_eval: 1 },
+  { id: 'eval-009', classe_id: 'classe-001', matiere_id: 'mat-005', prof_id: 'user-prof-005', type_eval: 'composition', titre: 'Composition SVT T2', date_eval: '2026-03-15', trimestre: 2, coefficient_eval: 2 },
+  // Histoire-Géo
+  { id: 'eval-010', classe_id: 'classe-001', matiere_id: 'mat-006', prof_id: 'user-prof-006', type_eval: 'devoir', titre: 'Devoir Hist-Géo', date_eval: '2026-02-05', trimestre: 2, coefficient_eval: 1 },
+  { id: 'eval-011', classe_id: 'classe-001', matiere_id: 'mat-006', prof_id: 'user-prof-006', type_eval: 'composition', titre: 'Composition Hist-Géo T2', date_eval: '2026-03-16', trimestre: 2, coefficient_eval: 2 },
+  // Philosophie
+  { id: 'eval-013', classe_id: 'classe-001', matiere_id: 'mat-007', prof_id: 'user-prof-007', type_eval: 'devoir', titre: 'Devoir Philosophie', date_eval: '2026-02-10', trimestre: 2, coefficient_eval: 1 },
+  { id: 'eval-014', classe_id: 'classe-001', matiere_id: 'mat-007', prof_id: 'user-prof-007', type_eval: 'composition', titre: 'Composition Philo T2', date_eval: '2026-03-17', trimestre: 2, coefficient_eval: 2 },
+  // EPS
+  { id: 'eval-015', classe_id: 'classe-001', matiere_id: 'mat-008', prof_id: 'user-prof-008', type_eval: 'devoir', titre: 'Épreuve EPS', date_eval: '2026-02-20', trimestre: 2, coefficient_eval: 1 },
+]
+
+// Notes seeded (stables) pour toutes les évaluations étendues
+export const DEMO_NOTES_EXTENDED = [
+  ...genNotesSeeded('eval-001', 1, classe001Eleves),
+  ...genNotesSeeded('eval-002', 2, classe001Eleves),
+  ...genNotesSeeded('eval-003', 3, classe001Eleves),
+  ...genNotesSeeded('eval-012', 12, classe001Eleves),
+  ...genNotesSeeded('eval-004', 4, classe001Eleves),
+  ...genNotesSeeded('eval-005', 5, classe001Eleves),
+  ...genNotesSeeded('eval-006', 6, classe001Eleves),
+  ...genNotesSeeded('eval-007', 7, classe001Eleves),
+  ...genNotesSeeded('eval-008', 8, classe001Eleves),
+  ...genNotesSeeded('eval-009', 9, classe001Eleves),
+  ...genNotesSeeded('eval-010', 10, classe001Eleves),
+  ...genNotesSeeded('eval-011', 11, classe001Eleves),
+  ...genNotesSeeded('eval-013', 13, classe001Eleves),
+  ...genNotesSeeded('eval-014', 14, classe001Eleves),
+  ...genNotesSeeded('eval-015', 15, classe001Eleves),
 ]
 
 // Pointages des 7 derniers jours pour les profs

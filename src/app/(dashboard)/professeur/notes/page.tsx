@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { GrilleNotes } from '@/components/notes/GrilleNotes'
-import { isDemoMode, DEMO_CLASSES, DEMO_MATIERES, DEMO_EVALUATIONS, DEMO_ELEVES } from '@/lib/demo-data'
+import { isDemoMode, DEMO_CLASSES, DEMO_MATIERES, DEMO_EVALUATIONS, DEMO_ELEVES, DEMO_ECOLE } from '@/lib/demo-data'
 
 interface Classe {
   id: string
@@ -36,8 +36,8 @@ interface Eleve {
 // Trimestre courant basé sur la date
 function getCurrentTrimestre(): number {
   const month = new Date().getMonth() + 1
-  if (month >= 10 || month <= 12) return 1
-  if (month >= 1 && month <= 3) return 2
+  if (month >= 10) return 1
+  if (month <= 3) return 2
   return 3
 }
 
@@ -108,7 +108,7 @@ export default function NotesPage() {
     if (isDemoMode()) {
       setEvaluations(
         DEMO_EVALUATIONS
-          .filter(e => e.classe_id === selectedClasse && e.matiere_id === selectedMatiere && e.trimestre === trimestre)
+          .filter(e => e.classe_id === selectedClasse && e.matiere_id === selectedMatiere)
           .map(e => ({ id: e.id, titre: e.titre, type_eval: e.type_eval, date_eval: e.date_eval, trimestre: e.trimestre, coefficient_eval: e.coefficient_eval }))
       )
       return
@@ -330,6 +330,12 @@ export default function NotesPage() {
           eleves={eleves}
           userId={user?.id ?? 'demo'}
           trimestre={trimestre}
+          evaluationTitre={evaluations.find(e => e.id === selectedEval)?.titre ?? ''}
+          typeEval={evaluations.find(e => e.id === selectedEval)?.type_eval ?? ''}
+          matiereNom={matieres.find(m => m.id === selectedMatiere)?.nom ?? ''}
+          classeNom={(() => { const c = classes.find(cl => cl.id === selectedClasse); return c ? `${c.niveau} ${c.nom}` : '' })()}
+          ecoleNom={isDemoMode() ? DEMO_ECOLE.nom : ''}
+          profNom={user ? `${user.prenom} ${user.nom}` : ''}
         />
       )}
 
