@@ -4,8 +4,9 @@ import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { isDemoMode, DEMO_PROFESSEURS, DEMO_USERS, DEMO_ELEVES, DEMO_CLASSES } from '@/lib/demo-data'
+import { getAdminOnglets, type TypeEtablissement, type UserRoleKey } from '@/lib/school-roles'
 
-type Role = 'professeur' | 'surveillant' | 'parent' | 'eleve' | 'secretaire' | 'intendant' | 'censeur'
+type Role = UserRoleKey
 
 interface Utilisateur {
   id: string
@@ -28,15 +29,8 @@ interface EleveSimple {
   prenom: string
 }
 
-const ONGLETS: { key: Role; label: string; icon: string }[] = [
-  { key: 'professeur', label: 'Professeurs', icon: '👨‍🏫' },
-  { key: 'surveillant', label: 'Surveillants', icon: '👁️' },
-  { key: 'parent', label: 'Parents', icon: '👨‍👩‍👧' },
-  { key: 'eleve', label: 'Élèves', icon: '🎒' },
-  { key: 'secretaire', label: 'Secrétaires', icon: '📋' },
-  { key: 'intendant', label: 'Intendants', icon: '🏦' },
-  { key: 'censeur', label: 'Censeurs', icon: '🎓' },
-]
+// ONGLETS est désormais calculé dynamiquement selon le type d'école
+// (remplacé par getAdminOnglets(typeEtablissement) dans le composant)
 
 function generateTempPassword() {
   return 'Temp' + Math.random().toString(36).slice(2, 8) + '!'
@@ -49,7 +43,7 @@ function demoUser(key: keyof typeof DEMO_USERS, role: Role): Utilisateur {
 }
 
 // Demo data by role
-const DEMO_UTILISATEURS: Record<Role, Utilisateur[]> = {
+const DEMO_UTILISATEURS: Partial<Record<Role, Utilisateur[]>> = {
   professeur: DEMO_PROFESSEURS.map(p => ({
     id: p.id, nom: p.nom, prenom: p.prenom, telephone: p.telephone, role: 'professeur' as Role, actif: p.actif,
   })),
@@ -65,6 +59,7 @@ const DEMO_UTILISATEURS: Record<Role, Utilisateur[]> = {
 
 export default function UtilisateursPage() {
   const { user, loading: userLoading } = useUser()
+  const [typeEtablissement, setTypeEtablissement] = useState<TypeEtablissement>('lycee')
   const [onglet, setOnglet] = useState<Role>('professeur')
   const [utilisateurs, setUtilisateurs] = useState<Utilisateur[]>([])
   const [classes, setClasses] = useState<Classe[]>([])
@@ -90,7 +85,9 @@ export default function UtilisateursPage() {
     setLoading(true)
 
     if (isDemoMode()) {
-      setUtilisateurs(DEMO_UTILISATEURS[onglet])
+      // Mode démo : lycée par défaut (montre tous les rôles)
+      setTypeEtablissement('lycee')
+      setUtilisateurs(DEMO_UTILISATEURS[onglet] ?? [])
       setClasses(DEMO_CLASSES.map(c => ({ id: c.id, nom: c.nom, niveau: c.niveau })))
       setEleves(DEMO_ELEVES.slice(0, 20).map(e => ({ id: e.id, nom: e.nom, prenom: e.prenom })))
       setLoading(false)
@@ -98,6 +95,23 @@ export default function UtilisateursPage() {
     }
 
     const supabase = createClient()
+
+    // Charger le type d'établissement de l'école
+    const { data: ecoleData } = await supabase
+      .from('ecoles')
+      .select('type_etablissement')
+      .eq('id', ecoleId)
+      .single()
+    if (ecoleData && (ecoleData as any).type_etablissement) {
+      const newType = (ecoleData as any).type_etablissement as TypeEtablissement
+      setTypeEtablissement(newType)
+      // Ajuster l'onglet si le rôle actuel n'est pas disponible pour ce type
+      const available = getAdminOnglets(newType).map(r => r.key)
+      if (!available.includes(onglet)) {
+        setOnglet(available[0] ?? 'professeur')
+      }
+    }
+
     const [usersRes, classesRes, elevesRes] = await Promise.all([
       supabase
         .from('utilisateurs')
@@ -245,16 +259,11 @@ export default function UtilisateursPage() {
     }
   }
 
-  // Singulier pour les labels
-  const roleSingulier: Record<Role, string> = {
-    professeur: 'Professeur',
-    surveillant: 'Surveillant',
-    parent: 'Parent',
-    eleve: 'Élève',
-    secretaire: 'Secrétaire',
-    intendant: 'Intendant',
-    censeur: 'Censeur',
-  }
+  // Labels dynamiques selon le type d'école
+  const onglets = getAdminOnglets(typeEtablissement)
+  const roleSingulier: Record<string, string> = Object.fromEntries(
+    onglets.map(o => [o.key, o.label])
+  )
 
   if (userLoading) {
     return (
@@ -286,12 +295,12 @@ export default function UtilisateursPage() {
         </button>
       </div>
 
-      {/* Onglets */}
+      {/* Onglets — filtrés par type d'établissement */}
       <div className="flex flex-wrap gap-1 border-b border-ss-border">
-        {ONGLETS.map(o => (
+        {getAdminOnglets(typeEtablissement).map(o => (
           <button
             key={o.key}
-            onClick={() => setOnglet(o.key)}
+            onClick={() => setOnglet(o.key as Role)}
             className={`flex items-center gap-1.5 px-3 py-2.5 text-sm font-medium transition-all rounded-t-lg ${
               onglet === o.key
                 ? 'bg-ss-cyan/10 text-ss-cyan border-b-2 border-ss-cyan'

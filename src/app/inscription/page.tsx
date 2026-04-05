@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Suspense } from 'react'
+import { getRolesForType, type TypeEtablissement } from '@/lib/school-roles'
 
 const PLANS = [
   { id: 'basique', nom: 'Basique', emoji: '🥉', couleur: '#00E676', prix: 25000, desc: "Jusqu'à 200 élèves, 5 classes" },
@@ -17,13 +18,13 @@ const REGIONS = [
   'Tambacounda', 'Ziguinchor', 'Kaffrine', 'Kédougou',
 ]
 const TYPES = [
-  { v: 'prive', l: 'École privée laïque' },
-  { v: 'franco_arabe', l: 'Franco-arabe / Islamique' },
-  { v: 'public', l: 'École publique' },
-  { v: 'maternelle', l: "Maternelle / Jardin d'enfants" },
-  { v: 'primaire', l: 'École primaire' },
-  { v: 'college', l: 'Collège' },
-  { v: 'lycee', l: 'Lycée' },
+  { v: 'prive',        l: 'École privée laïque',          badge: '🏫' },
+  { v: 'franco_arabe', l: 'Franco-arabe / Islamique',     badge: '🕌' },
+  { v: 'public',       l: 'École publique',               badge: '🇸🇳' },
+  { v: 'maternelle',   l: "Maternelle / Préscolaire",     badge: '🧸' },
+  { v: 'primaire',     l: 'École primaire',               badge: '📚' },
+  { v: 'college',      l: 'Collège (CEM)',                badge: '🏛️' },
+  { v: 'lycee',        l: 'Lycée',                        badge: '🎓' },
 ]
 
 /* ── Composant Dropdown custom (thème sombre) ── */
@@ -32,7 +33,7 @@ function Dropdown({
 }: {
   value: string
   onChange: (v: string) => void
-  options: { v: string; l: string }[]
+  options: { v: string; l: string; badge?: string }[]
   label: string
 }) {
   const [open, setOpen] = useState(false)
@@ -60,7 +61,10 @@ function Dropdown({
           color: 'white',
         }}
       >
-        <span>{current?.l ?? value}</span>
+        <span className="flex items-center gap-2">
+          {current && 'badge' in current && <span>{current.badge}</span>}
+          {current?.l ?? value}
+        </span>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
           style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', opacity: 0.5, flexShrink: 0 }}>
           <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
@@ -80,7 +84,7 @@ function Dropdown({
               key={opt.v}
               type="button"
               onClick={() => { onChange(opt.v); setOpen(false) }}
-              className="w-full text-left px-4 py-2.5 text-sm transition-colors"
+              className="w-full text-left px-4 py-2.5 text-sm transition-colors flex items-center gap-2"
               style={{
                 color: opt.v === value ? '#00E676' : 'rgba(255,255,255,0.8)',
                 background: opt.v === value ? 'rgba(0,230,118,0.08)' : 'transparent',
@@ -88,7 +92,9 @@ function Dropdown({
               onMouseEnter={e => { if (opt.v !== value) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.05)' }}
               onMouseLeave={e => { if (opt.v !== value) (e.currentTarget as HTMLElement).style.background = 'transparent' }}
             >
-              {opt.v === value && <span className="mr-2">✓</span>}{opt.l}
+              {'badge' in opt && <span>{opt.badge}</span>}
+              {opt.v === value && <span style={{ color: '#00E676' }}>✓</span>}
+              {opt.l}
             </button>
           ))}
         </div>
@@ -279,6 +285,38 @@ function InscriptionForm() {
                   options={REGIONS.map(r => ({ v: r, l: r }))}
                 />
               </div>
+
+              {/* Aperçu des rôles disponibles pour ce type */}
+              {(() => {
+                const roles = getRolesForType(typeEtab as TypeEtablissement).filter(r => r.key !== 'admin_global')
+                const typeInfo = TYPES.find(t => t.v === typeEtab)
+                return (
+                  <div className="rounded-xl p-4 space-y-2.5"
+                    style={{ background: 'rgba(0,229,255,0.04)', border: '1px solid rgba(0,229,255,0.12)' }}>
+                    <p className="text-xs font-semibold flex items-center gap-2" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                      <span>{typeInfo?.badge}</span>
+                      Rôles inclus pour {typeInfo?.l} ({roles.length + 1} accès)
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {/* Admin toujours en premier */}
+                      <span className="flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full"
+                        style={{ background: 'rgba(0,229,255,0.1)', color: '#00E5FF', border: '1px solid rgba(0,229,255,0.2)' }}>
+                        🏫 {getRolesForType(typeEtab as TypeEtablissement).find(r => r.key === 'admin_global')?.label ?? 'Directeur'}
+                      </span>
+                      {roles.map(r => (
+                        <span key={r.key}
+                          className="flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-full"
+                          style={{ background: `${r.color}12`, color: r.color, border: `1px solid ${r.color}25` }}>
+                          {r.icon} {r.label}
+                        </span>
+                      ))}
+                    </div>
+                    <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                      Ces rôles seront disponibles dans votre dashboard. Vous pourrez ajouter les utilisateurs après inscription.
+                    </p>
+                  </div>
+                )
+              })()}
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
