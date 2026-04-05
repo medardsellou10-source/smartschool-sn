@@ -173,7 +173,22 @@ function InscriptionForm() {
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || "Erreur lors de l'inscription")
-      router.push(`/inscription/confirmation?ecole=${encodeURIComponent(nomEcole)}&email=${encodeURIComponent(adminEmail)}&plan=${planChoisi}`)
+
+      // Redirection Wave checkout (plan payant)
+      if (data.redirect_url) {
+        window.location.href = data.redirect_url
+        return
+      }
+
+      // Redirection confirmation (essai ou mode démo)
+      const params = new URLSearchParams({
+        ecole: nomEcole,
+        email: adminEmail,
+        plan: planChoisi,
+        status: 'success',
+        ...(data.mode === 'demo' && { demo: '1' }),
+      })
+      router.push(`/inscription/confirmation?${params.toString()}`)
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Une erreur est survenue')
     } finally {

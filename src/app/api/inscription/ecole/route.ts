@@ -1,43 +1,62 @@
-import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
+
+function isSupabaseConfigured(): boolean {
+  return !!(
+    process.env.NEXT_PUBLIC_SUPABASE_URL?.startsWith('https://') &&
+    process.env.SUPABASE_SERVICE_ROLE_KEY &&
+    process.env.SUPABASE_SERVICE_ROLE_KEY.length > 30 &&
+    !process.env.SUPABASE_SERVICE_ROLE_KEY.includes('placeholder')
+  )
+}
 
 export async function POST(req: Request) {
   try {
-    const { ecole, admin, abonnement } = await req.json()
+    const body = await req.json()
+    const { ecole, admin, abonnement } = body
 
-    // Validation de base
-    if (!ecole?.nom || !admin?.email || !admin?.mot_de_passe) {
-      return NextResponse.json({ error: 'Données manquantes' }, { status: 400 })
+    // ── Validation ───────────────────────────────────────────────────────
+    if (!ecole?.nom?.trim())        return NextResponse.json({ error: "Nom de l'école requis" }, { status: 400 })
+    if (!admin?.email?.includes('@')) return NextResponse.json({ error: 'Email invalide' }, { status: 400 })
+    if (!admin?.mot_de_passe)       return NextResponse.json({ error: 'Mot de passe requis' }, { status: 400 })
+    if (admin.mot_de_passe.length < 8) return NextResponse.json({ error: 'Mot de passe minimum 8 caractères' }, { status: 400 })
+
+    const planId = abonnement?.plan_id || 'essai'
+    const isTrial = planId === 'essai' || abonnement?.methode_paiement === 'essai'
+
+    // ── MODE DÉMO (Supabase non configuré) ─────────────────────────────────
+    if (!isSupabaseConfigured()) {
+      await new Promise(r => setTimeout(r, 1200)) // Délai réaliste
+      const demoId = `demo-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
+      return NextResponse.json({
+        success: true,
+        mode: 'demo',
+        ecole_id: demoId,
+        message: 'École créée avec succès (mode démonstration)',
+        redirect_url: null,
+      })
     }
 
-    if (admin.mot_de_passe.length < 8) {
-      return NextResponse.json({ error: 'Mot de passe trop court (8 caractères minimum)' }, { status: 400 })
-    }
-
-    // Client admin Supabase (service role)
+    // ── MODE PRODUCTION ─────────────────────────────────────────────────
+    const { createClient } = await import('@supabase/supabase-js')
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!,
       { auth: { autoRefreshToken: false, persistSession: false } }
     )
 
-    // 1. Créer le compte auth
+    // 1. Créer le compte auth Supabase
     const { data: authData, error: authError } = await supabase.auth.admin.createUser({
       email: admin.email.trim().toLowerCase(),
       password: admin.mot_de_passe,
-      email_confirm: true, // Confirmer directement en prod
-      user_metadata: {
-        nom: admin.nom,
-        prenom: admin.prenom,
-        role: 'admin_global',
-      },
+      email_confirm: true,
+      user_metadata: { nom: admin.nom, prenom: admin.prenom, role: 'admin_global' },
     })
 
     if (authError || !authData?.user) {
       if (authError?.message?.includes('already registered')) {
-        return NextResponse.json({ error: 'Cet email est déjà utilisé' }, { status: 409 })
+        return NextResponse.json({ error: 'Cet email est déjà utilisé. Connectez-vous à la place.' }, { status: 409 })
       }
-      return NextResponse.json({ error: authError?.message || 'Erreur création du compte' }, { status: 500 })
+      return NextResponse.json({ error: 'Erreur création du compte : ' + (authError?.message || 'inconnue') }, { status: 500 })
     }
 
     const userId = authData.user.id
@@ -52,84 +71,103 @@ export async function POST(req: Request) {
         ville: ecole.ville?.trim() || ecole.region || 'Dakar',
         telephone: ecole.telephone?.trim() || null,
         site_web: ecole.site_web?.trim() || null,
-        plan_id: abonnement.plan_id || 'essai',
+        plan_id: isTrial ? 'essai' : planId,
         abonnement_statut: 'trial',
         trial_fin: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
         latitude: 14.6937,
         longitude: -17.4441,
+        actif: true,
       })
-      .select('id')
-      .single()
+      .select('id').single()
 
     if (ecoleError || !ecoleData) {
-      // Rollback: supprimer le compte auth créé
       await supabase.auth.admin.deleteUser(userId)
-      return NextResponse.json({ error: 'Erreur création de l\'école' }, { status: 500 })
+      return NextResponse.json({ error: "Erreur création de l'école" }, { status: 500 })
     }
 
     const ecoleId = ecoleData.id
 
-    // 3. Créer le profil utilisateur admin
-    const { error: userError } = await supabase
-      .from('utilisateurs')
-      .insert({
-        id: userId,
-        ecole_id: ecoleId,
-        nom: admin.nom?.trim() || '',
-        prenom: admin.prenom?.trim() || '',
-        telephone: admin.telephone?.trim() || null,
-        role: 'admin_global',
-        actif: true,
-      })
+    // 3. Profil admin
+    const { error: userError } = await supabase.from('utilisateurs').insert({
+      id: userId,
+      ecole_id: ecoleId,
+      nom: admin.nom?.trim() || '',
+      prenom: admin.prenom?.trim() || '',
+      telephone: admin.telephone?.trim() || null,
+      role: 'admin_global',
+      actif: true,
+    })
 
     if (userError) {
       await supabase.auth.admin.deleteUser(userId)
       await supabase.from('ecoles').delete().eq('id', ecoleId)
-      return NextResponse.json({ error: 'Erreur création du profil admin' }, { status: 500 })
+      return NextResponse.json({ error: 'Erreur profil admin : ' + userError.message }, { status: 500 })
     }
 
-    // 4. Créer l'abonnement
-    const planId = abonnement.plan_id || 'essai'
-    const isTrial = planId === 'essai' || abonnement.methode_paiement === 'essai'
+    // 4. Abonnement
     const dateDebut = new Date()
-    const dateFin = new Date(dateDebut.getTime() + (isTrial ? 14 : 30) * 24 * 60 * 60 * 1000)
-
-    await supabase
-      .from('abonnements')
-      .insert({
+    const dateFin = new Date(dateDebut.getTime() + 14 * 24 * 60 * 60 * 1000)
+    try {
+      await supabase.from('abonnements').insert({
         ecole_id: ecoleId,
         plan_id: isTrial ? 'essai' : planId,
         statut: 'trial',
-        mode_facturation: abonnement.mode_facturation || 'mensuel',
+        mode_facturation: abonnement?.mode_facturation || 'mensuel',
         date_debut: dateDebut.toISOString(),
         date_fin: dateFin.toISOString(),
-        montant_paye: isTrial ? 0 : null,
-        methode_paiement: isTrial ? null : abonnement.methode_paiement,
+        montant_paye: 0,
+        methode_paiement: null,
       })
+    } catch { /* non bloquant */ }
 
-    // 5. Envoyer un SMS de bienvenue (si Africastalking configuré)
-    if (admin.telephone && process.env.AFRICASTALKING_API_KEY && process.env.AFRICASTALKING_API_KEY !== 'placeholder-at-key') {
-      try {
-        await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/sms/send`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            to: admin.telephone,
-            message: `Bienvenue sur SmartSchool SN ! Votre école "${ecole.nom}" est maintenant active. Connectez-vous sur smartschool-sn.vercel.app`,
-          }),
-        })
-      } catch {
-        // Non bloquant
+    // 5. Tarifs de scolarité par défaut
+    try {
+      await supabase.from('tarifs_scolarite').insert({
+        ecole_id: ecoleId,
+        annee_scolaire: '2025-2026',
+        frais_inscription: 25000,
+        scolarite_t1: 35000,
+        scolarite_t2: 35000,
+        scolarite_t3: 30000,
+        frais_activites: 15000,
+        fdfp: 2500,
+        actif: true,
+      })
+    } catch { /* non bloquant */ }
+
+    // 6. Si paiement Wave demandé (plan payant) → créer session Wave
+    let waveRedirectUrl: string | null = null
+    if (!isTrial && abonnement?.methode_paiement === 'wave' && process.env.WAVE_API_KEY) {
+      const prixMensuel: Record<string, number> = { basique: 25000, standard: 50000, etablissement: 100000 }
+      const montant = prixMensuel[planId] || 25000
+      const waveRes = await fetch('https://api.wave.com/v1/checkout/sessions', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${process.env.WAVE_API_KEY}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          currency: 'XOF',
+          amount: montant,
+          error_url: `${process.env.NEXT_PUBLIC_APP_URL}/inscription/confirmation?ecole=${encodeURIComponent(ecole.nom)}&email=${encodeURIComponent(admin.email)}&plan=${planId}&status=error`,
+          success_url: `${process.env.NEXT_PUBLIC_APP_URL}/inscription/confirmation?ecole=${encodeURIComponent(ecole.nom)}&email=${encodeURIComponent(admin.email)}&plan=${planId}&status=success`,
+          client_reference: `SS-ABONNEMENT-${ecoleId}`,
+        }),
+      }).catch(() => null)
+
+      if (waveRes?.ok) {
+        const waveData = await waveRes.json()
+        waveRedirectUrl = waveData.wave_launch_url || null
       }
     }
 
     return NextResponse.json({
       success: true,
+      mode: 'production',
       ecole_id: ecoleId,
       message: 'École créée avec succès',
+      redirect_url: waveRedirectUrl,
     })
-  } catch (err) {
-    console.error('Erreur inscription école:', err)
-    return NextResponse.json({ error: 'Erreur interne du serveur' }, { status: 500 })
+
+  } catch (err: any) {
+    console.error('[Inscription] Erreur:', err)
+    return NextResponse.json({ error: 'Erreur serveur : ' + (err?.message || 'inconnue') }, { status: 500 })
   }
 }

@@ -9,6 +9,9 @@ function ConfirmationContent() {
   const ecole = params.get('ecole') || 'votre école'
   const email = params.get('email') || ''
   const plan = params.get('plan') || 'essai'
+  const status = params.get('status') || 'success'
+  const isDemo = params.get('demo') === '1'
+  const isPaymentError = status === 'error'
 
   const planLabels: Record<string, { nom: string; couleur: string; emoji: string }> = {
     essai: { nom: 'Essai Gratuit 14 jours', couleur: '#00E676', emoji: '🆓' },
@@ -22,19 +25,45 @@ function ConfirmationContent() {
     <main className="min-h-screen bg-[#020617] flex items-center justify-center px-4">
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full opacity-10"
-          style={{ background: 'radial-gradient(circle, #00E676, transparent 70%)', filter: 'blur(80px)' }} />
+          style={{ background: `radial-gradient(circle, ${isPaymentError ? '#EF4444' : '#00E676'}, transparent 70%)`, filter: 'blur(80px)' }} />
       </div>
 
       <div className="relative w-full max-w-md text-center">
-        {/* Animation succès */}
+
+        {/* Bannière paiement échoué */}
+        {isPaymentError && (
+          <div className="rounded-xl px-4 py-3 mb-6 text-sm"
+            style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#FCA5A5' }}>
+            ⚠️ Le paiement Wave n'a pas abouti. Votre école a quand même été créée — vous pouvez payer plus tard depuis votre dashboard.
+          </div>
+        )}
+
+        {/* Bannière mode démo */}
+        {isDemo && !isPaymentError && (
+          <div className="rounded-xl px-4 py-3 mb-6 text-sm"
+            style={{ background: 'rgba(0,229,255,0.08)', border: '1px solid rgba(0,229,255,0.25)', color: '#67E8F9' }}>
+            ℹ️ Mode démonstration — Pour activer la production, configurez <strong>SUPABASE_SERVICE_ROLE_KEY</strong> dans vos variables d'environnement Vercel.
+          </div>
+        )}
+
+        {/* Animation succès / erreur */}
         <div className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6"
-          style={{ background: 'linear-gradient(135deg, #00E676, #00BCD4)', boxShadow: '0 0 60px rgba(0,230,118,0.4)' }}>
-          <span className="text-5xl">✓</span>
+          style={{
+            background: isPaymentError
+              ? 'linear-gradient(135deg, #EF4444, #F97316)'
+              : 'linear-gradient(135deg, #00E676, #00BCD4)',
+            boxShadow: isPaymentError
+              ? '0 0 60px rgba(239,68,68,0.4)'
+              : '0 0 60px rgba(0,230,118,0.4)',
+          }}>
+          <span className="text-5xl">{isPaymentError ? '⚠' : '✓'}</span>
         </div>
 
-        <h1 className="text-3xl font-black text-white mb-2">Bienvenue sur SmartSchool SN !</h1>
+        <h1 className="text-3xl font-black text-white mb-2">
+          {isPaymentError ? 'Paiement non finalisé' : 'Bienvenue sur SmartSchool SN !'}
+        </h1>
         <p className="text-white/50 mb-8">
-          <strong className="text-white">{ecole}</strong> est maintenant inscrit.
+          <strong className="text-white">{ecole}</strong>{isPaymentError ? ' a été créée, en attente de paiement.' : ' est maintenant inscrit.'}
         </p>
 
         {/* Plan activé */}
