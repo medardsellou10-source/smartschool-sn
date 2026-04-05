@@ -94,6 +94,7 @@ const MENUS: Record<string, NavItem[]> = {
   ],
   eleve: [
     { href: '/eleve', label: 'Mon espace', icon: Icons.trophy },
+    { href: '/eleve/notes', label: 'Mes Notes & Classements', icon: Icons.chart },
     { href: '/eleve/bulletins', label: 'Bulletins', icon: Icons.file },
     { href: '/eleve/emploi-temps', label: 'Emploi du temps', icon: Icons.calendar },
     { href: '/eleve/cahier-texte', label: 'Cahier de texte', icon: Icons.book },

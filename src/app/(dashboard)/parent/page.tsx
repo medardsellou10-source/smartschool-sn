@@ -29,8 +29,24 @@ export default function ParentDashboard() {
   const [selectedEnfant, setSelectedEnfant] = useState<string>('')
   const [data, setData] = useState<DashboardData | null>(null)
   const [loading, setLoading] = useState(true)
+  // Alerte nouvelle note en temps réel
+  const [gradeAlert, setGradeAlert] = useState<{ matiereNom: string; evaluationTitre: string; classeNom: string; profNom: string } | null>(null)
 
   const ecoleId = user?.ecole_id
+
+  // ── Écouter les nouvelles notes publiées en temps réel ──
+  useEffect(() => {
+    if (!user) return
+    const channel = supabase
+      .channel('grade-published')
+      .on('broadcast', { event: 'new_grade' }, (payload) => {
+        const p = payload.payload as any
+        setGradeAlert({ matiereNom: p.matiereNom, evaluationTitre: p.evaluationTitre, classeNom: p.classeNom, profNom: p.profNom })
+        setTimeout(() => setGradeAlert(null), 8000)
+      })
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [user, supabase])
 
   useEffect(() => {
     if (!user) return
@@ -111,6 +127,27 @@ export default function ParentDashboard() {
 
   return (
     <div className="max-w-lg mx-auto space-y-4 pb-28 lg:pb-8 animate-fade-in">
+
+      {/* Toast nouvelle note en temps réel */}
+      {gradeAlert && (
+        <div
+          className="fixed top-4 right-4 z-50 max-w-sm rounded-2xl p-4 border backdrop-blur-sm cursor-pointer"
+          style={{ background: 'rgba(0,230,118,0.1)', borderColor: 'rgba(0,230,118,0.3)' }}
+          onClick={() => setGradeAlert(null)}
+        >
+          <div className="flex items-start gap-3">
+            <span className="text-2xl animate-bounce">🔔</span>
+            <div>
+              <p className="text-sm font-bold" style={{ color: '#00E676' }}>Nouvelle note disponible !</p>
+              <p className="text-xs text-ss-text mt-0.5">{gradeAlert.matiereNom} — {gradeAlert.evaluationTitre}</p>
+              <p className="text-[11px] text-ss-text-muted mt-0.5">Par {gradeAlert.profNom} · Classe {gradeAlert.classeNom}</p>
+              <Link href="/parent/bulletins" className="text-[11px] underline mt-1 block" style={{ color: '#00E676' }}>
+                Voir les résultats →
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Offline banner */}
       {isOffline && (

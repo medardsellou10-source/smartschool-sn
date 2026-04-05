@@ -11,6 +11,13 @@ interface Eleve {
   prenom: string
 }
 
+// Calcul du rang d'une note dans un tableau de notes
+function calcRang(note: number | null, allNotes: (number | null)[]): number {
+  if (note === null) return 0
+  const valid = allNotes.filter(n => n !== null) as number[]
+  return valid.filter(n => n > note).length + 1
+}
+
 interface NoteRow {
   eleve_id: string
   note: number | null
@@ -25,6 +32,13 @@ interface GrilleNotesProps {
   eleves: Eleve[]
   userId: string
   trimestre: number
+  // Métadonnées pour les notifications
+  evaluationTitre?: string
+  typeEval?: string
+  matiereNom?: string
+  classeNom?: string
+  ecoleNom?: string
+  profNom?: string
 }
 
 type SyncStatus = 'idle' | 'saving' | 'saved' | 'error'
@@ -107,11 +121,17 @@ const NoteCell = memo(function NoteCell({
   )
 })
 
-export function GrilleNotes({ classeId, matiereId, evaluationId, eleves, userId, trimestre }: GrilleNotesProps) {
+export function GrilleNotes({ classeId, matiereId, evaluationId, eleves, userId, trimestre, evaluationTitre, typeEval, matiereNom, classeNom, ecoleNom, profNom }: GrilleNotesProps) {
   const [notes, setNotes] = useState<Map<string, { note: number | null; absent: boolean }>>(new Map())
   const [moyennes, setMoyennes] = useState<Map<string, number>>(new Map())
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle')
   const [pendingCount, setPendingCount] = useState(0)
+  // Remarques
+  const [remarqueGlobale, setRemarqueGlobale] = useState('')
+  const [showRemarques, setShowRemarques] = useState(false)
+  // Publication
+  const [publishing, setPublishing] = useState(false)
+  const [publishResult, setPublishResult] = useState<{ sent: number; demo: boolean } | null>(null)
   const supabase = createClient()
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const inputRefs = useRef<Map<string, HTMLInputElement>>(new Map())
@@ -258,6 +278,56 @@ export function GrilleNotes({ classeId, matiereId, evaluationId, eleves, userId,
     count: allNotes.filter(n => Math.floor(n) === i).length,
   }))
 
+  // Publier les notes + notifier les parents
+  const handlePublish = useCallback(async () => {
+    if (allNotes.length === 0) return
+    setPublishing(true)
+    setPublishResult(null)
+
+    // Calculer les rangs
+    const sortedNotes = [...allNotes].sort((a, b) => b - a)
+    const notesPayload = eleves.map(e => {
+      const n = notes.get(e.id)
+      const note = n?.absent ? null : (n?.note ?? null)
+      const rang = note !== null ? sortedNotes.filter(v => v > note).length + 1 : 0
+      return {
+        eleveId: e.id,
+        elevenom: e.nom,
+        elevePrenom: e.prenom,
+        parentTelephone: undefined as string | undefined,
+        note,
+        absent: n?.absent ?? false,
+        rang,
+        totalEleves: eleves.length,
+      }
+    })
+
+    try {
+      const res = await fetch('/api/notifications/grade', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          evaluationId,
+          evaluationTitre: evaluationTitre || typeEval || 'Évaluation',
+          matiereNom: matiereNom || 'Matière',
+          typeEval: typeEval || 'devoir',
+          classeMoyenne: classeStats.moyenne,
+          classeNom: classeNom || 'Classe',
+          remarqueGlobale,
+          ecoleNom: ecoleNom || 'SmartSchool SN',
+          notes: notesPayload,
+          profNom: profNom || 'Le professeur',
+        }),
+      })
+      const data = await res.json()
+      setPublishResult({ sent: data.sent || 0, demo: data.demo || true })
+    } catch (e) {
+      console.error('[Publish] Erreur:', e)
+    }
+
+    setPublishing(false)
+  }, [allNotes, eleves, notes, evaluationId, evaluationTitre, typeEval, matiereNom, classeNom, remarqueGlobale, ecoleNom, profNom, classeStats.moyenne])
+
   // Export CSV (léger, pas besoin de xlsx)
   const handleExport = () => {
     const header = 'Nom,Prénom,Note,Observation\n'
@@ -355,6 +425,65 @@ export function GrilleNotes({ classeId, matiereId, evaluationId, eleves, userId,
           </table>
         </div>
       </div>
+
+      {/* Section Remarques + Publication */}
+      {allNotes.length > 0 && (
+        <div className="bg-ss-bg-secondary rounded-xl border border-ss-border p-4 space-y-3">
+          <button
+            onClick={() => setShowRemarques(!showRemarques)}
+            className="flex items-center gap-2 text-sm text-ss-text-secondary hover:text-ss-text transition-colors"
+          >
+            <span>{showRemarques ? '▼' : '▶'}</span>
+            <span>💬 Remarques pour la classe</span>
+            {remarqueGlobale && <span className="text-[10px] text-ss-cyan bg-ss-cyan/10 px-2 py-0.5 rounded-full">Rédigée</span>}
+          </button>
+
+          {showRemarques && (
+            <textarea
+              value={remarqueGlobale}
+              onChange={e => setRemarqueGlobale(e.target.value)}
+              placeholder="Ex: Bon travail d'ensemble. Les exercices sur les équations ont été bien maîtrisés. Attention à la présentation des copies..."
+              rows={3}
+              className="w-full bg-ss-bg border border-ss-border text-ss-text rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-ss-cyan resize-none"
+            />
+          )}
+
+          {/* Bouton publier */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handlePublish}
+              disabled={publishing || allNotes.length === 0}
+              className="flex-1 bg-gradient-to-r from-ss-green to-ss-cyan text-white py-3 rounded-xl text-sm font-bold hover:opacity-90 disabled:opacity-50 transition-all min-h-[48px] flex items-center justify-center gap-2"
+            >
+              {publishing ? (
+                <>
+                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Publication en cours...
+                </>
+              ) : (
+                <>📤 Publier les notes &amp; notifier les parents</>
+              )}
+            </button>
+          </div>
+
+          {/* Résultat publication */}
+          {publishResult && (
+            <div className={`flex items-center gap-2 text-sm rounded-xl p-3 ${publishResult.demo ? 'bg-ss-gold/10 border border-ss-gold/20 text-ss-gold' : 'bg-ss-green/10 border border-ss-green/20 text-ss-green'}`}>
+              {publishResult.demo ? (
+                <>
+                  <span>✅</span>
+                  <span>Notes publiées en mode démo — les parents seraient notifiés par WhatsApp/SMS en production</span>
+                </>
+              ) : (
+                <>
+                  <span>✅</span>
+                  <span>{publishResult.sent} parent(s) notifié(s) par WhatsApp/SMS</span>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Statistiques de classe */}
       {allNotes.length > 0 && (
