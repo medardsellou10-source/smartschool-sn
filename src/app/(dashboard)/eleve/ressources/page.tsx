@@ -12,12 +12,12 @@ import { ANNALES, type AnnaleDoc } from '@/lib/annales-sn'
 import { CONTENU_NATIF } from '@/lib/contenu-pedagogique'
 
 const TYPE_META: Record<RessourceEnLigne['type'], { icon: string; label: string; color: string; description: string }> = {
-  annale:      { icon: '📝', label: 'Annales BAC',          color: '#FF1744', description: 'Sujets corriges de 2010 a 2024 par serie et matiere' },
-  video:       { icon: '🎥', label: 'Cours Video',          color: '#00E5FF', description: 'Lecons video par des enseignants certifies' },
-  tp_virtuel:  { icon: '🔬', label: 'TP Virtuels',          color: '#00E676', description: 'Travaux pratiques interactifs avec simulation' },
-  exercice:    { icon: '📊', label: 'Exercices Interactifs', color: '#FFD600', description: 'Quiz et exercices autocorriges avec score instantane' },
-  resume:      { icon: '📚', label: 'Resumes de Cours',     color: '#D500F9', description: 'Fiches synthese disponibles apres validation par le professeur' },
-  tutorat:     { icon: '🤝', label: 'Tutorat en Ligne',     color: '#448AFF', description: 'Forum Q&A et sessions de tutorat avec des eleves tuteurs certifies' },
+  annale:      { icon: '📝', label: 'Annales BAC',          color: '#3B82F6', description: 'Sujets corriges de 2010 a 2024 par serie et matiere' },
+  video:       { icon: '🎥', label: 'Cours Video',          color: '#3B82F6', description: 'Lecons video par des enseignants certifies' },
+  tp_virtuel:  { icon: '🔬', label: 'TP Virtuels',          color: '#3B82F6', description: 'Travaux pratiques interactifs avec simulation' },
+  exercice:    { icon: '📊', label: 'Exercices Interactifs', color: '#3B82F6', description: 'Quiz et exercices autocorriges avec score instantane' },
+  resume:      { icon: '📚', label: 'Resumes de Cours',     color: '#3B82F6', description: 'Fiches synthese disponibles apres validation par le professeur' },
+  tutorat:     { icon: '🤝', label: 'Tutorat en Ligne',     color: '#3B82F6', description: 'Forum Q&A et sessions de tutorat avec des eleves tuteurs certifies' },
 }
 
 const ALL_TYPES = Object.keys(TYPE_META) as RessourceEnLigne['type'][]
@@ -90,7 +90,7 @@ export default function RessourcesElevePage() {
       case 'video':
         return `https://www.youtube.com/results?search_query=${encodeURIComponent(res.titre + ' cours terminale sénégal')}`
       case 'annale':
-        return 'https://www.senexam.sn'
+        return 'https://samabac.sn/sen-annales-bac/'
       case 'tutorat':
         return `https://www.youtube.com/results?search_query=${encodeURIComponent(res.matiere + ' cours terminale sénégal')}`
       default:
@@ -345,16 +345,20 @@ function answer(qi,ci){
           </p>
 
           {/* Compteurs rapides */}
-          <div className="flex flex-wrap gap-3 mt-4">
+          <div className="flex flex-wrap gap-2 mt-4">
             {ALL_TYPES.map(type => {
               const meta = TYPE_META[type]
+              const isActive = selectedType === type
               return (
                 <button key={type} onClick={() => { setSelectedType(type); setActiveSection('catalogue') }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 hover:scale-105"
-                  style={{ background: `${meta.color}12`, color: meta.color, border: `1px solid ${meta.color}25` }}>
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200"
+                  style={isActive
+                    ? { background: '#3B82F6', color: '#fff' }
+                    : { background: 'rgba(255,255,255,0.07)', color: '#94A3B8', border: '1px solid rgba(255,255,255,0.1)' }}>
                   <span>{meta.icon}</span>
                   <span>{meta.label}</span>
-                  <span className="px-1.5 py-0.5 rounded-full text-[10px] ml-1" style={{ background: `${meta.color}20` }}>
+                  <span className="ml-1 px-1.5 py-0.5 rounded-full text-[10px]"
+                    style={{ background: isActive ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)' }}>
                     {stats[type] || 0}
                   </span>
                 </button>
@@ -365,21 +369,19 @@ function answer(qi,ci){
       </div>
 
       {/* ── Toggle Catalogue / Programme ── */}
-      <div className="flex gap-2">
-        <button onClick={() => setActiveSection('catalogue')}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200"
-          style={activeSection === 'catalogue'
-            ? { background: 'rgba(213,0,249,0.15)', color: '#D500F9', border: '1px solid rgba(213,0,249,0.3)' }
-            : { background: 'rgba(255,255,255,0.03)', color: '#94A3B8', border: '1px solid rgba(255,255,255,0.07)' }}>
-          📚 Catalogue de Ressources
-        </button>
-        <button onClick={() => setActiveSection('programme')}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200"
-          style={activeSection === 'programme'
-            ? { background: 'rgba(0,229,255,0.15)', color: '#00E5FF', border: '1px solid rgba(0,229,255,0.3)' }
-            : { background: 'rgba(255,255,255,0.03)', color: '#94A3B8', border: '1px solid rgba(255,255,255,0.07)' }}>
-          📖 Mon Programme
-        </button>
+      <div className="flex gap-2 p-1 rounded-xl" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+        {[
+          { key: 'catalogue', label: '📚 Ressources' },
+          { key: 'programme', label: '📖 Mon Programme' },
+        ].map(tab => (
+          <button key={tab.key} onClick={() => setActiveSection(tab.key as any)}
+            className="flex-1 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200"
+            style={activeSection === tab.key
+              ? { background: '#3B82F6', color: '#fff' }
+              : { color: '#94A3B8' }}>
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       {/* ══════════════════════════════════════════════════════════ */}
@@ -388,41 +390,29 @@ function answer(qi,ci){
       {activeSection === 'catalogue' && (
         <div className="space-y-4">
           {/* Filtres + Recherche */}
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-2">
             <div className="relative flex-1 min-w-[200px]">
               <input type="text" placeholder="Rechercher une ressource..."
                 value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-2.5 pl-10 rounded-xl text-sm text-white placeholder-[#475569]"
+                className="w-full px-4 py-2.5 pl-9 rounded-xl text-sm text-white placeholder-[#475569]"
                 style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', outline: 'none' }} />
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm">🔍</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-[#64748B]">🔍</span>
             </div>
-            <select value={selectedType} onChange={e => setSelectedType(e.target.value as any)}
-              className="px-3 py-2.5 rounded-xl text-sm font-semibold text-white"
-              style={{ background: 'rgba(213,0,249,0.1)', border: '1px solid rgba(213,0,249,0.3)', outline: 'none' }}>
-              <option value="all">Tous les types</option>
-              {ALL_TYPES.map(t => <option key={t} value={t}>{TYPE_META[t].icon} {TYPE_META[t].label}</option>)}
-            </select>
-            <select value={selectedMatiere} onChange={e => setSelectedMatiere(e.target.value)}
-              className="px-3 py-2.5 rounded-xl text-sm font-semibold text-white"
-              style={{ background: 'rgba(0,230,118,0.1)', border: '1px solid rgba(0,230,118,0.3)', outline: 'none' }}>
-              <option value="all">Toutes matieres</option>
-              {matieresDisponibles.map(m => <option key={m} value={m}>{m}</option>)}
-            </select>
-            <select value={selectedNiveau} onChange={e => setSelectedNiveau(e.target.value)}
-              className="px-3 py-2.5 rounded-xl text-sm font-semibold text-white"
-              style={{ background: 'rgba(0,229,255,0.1)', border: '1px solid rgba(0,229,255,0.3)', outline: 'none' }}>
-              <option value="all">Tous niveaux</option>
-              {[...NIVEAUX_COLLEGE, ...NIVEAUX_LYCEE].map(n => <option key={n} value={n}>{n}</option>)}
-            </select>
-            <select value={selectedSerie} onChange={e => setSelectedSerie(e.target.value)}
-              className="px-3 py-2.5 rounded-xl text-sm font-semibold text-white"
-              style={{ background: 'rgba(255,214,0,0.1)', border: '1px solid rgba(255,214,0,0.3)', outline: 'none' }}>
-              <option value="all">Toutes series</option>
-              {SERIES_LYCEE.map(s => <option key={s} value={s}>Serie {s}</option>)}
-            </select>
+            {[
+              { value: selectedType, onChange: (v: string) => setSelectedType(v as any), options: [['all', 'Tous types'], ...ALL_TYPES.map(t => [t, `${TYPE_META[t].icon} ${TYPE_META[t].label}`])] },
+              { value: selectedMatiere, onChange: (v: string) => setSelectedMatiere(v), options: [['all', 'Toutes matières'], ...matieresDisponibles.map(m => [m, m])] },
+              { value: selectedNiveau, onChange: (v: string) => setSelectedNiveau(v), options: [['all', 'Tous niveaux'], ...[...NIVEAUX_COLLEGE, ...NIVEAUX_LYCEE].map(n => [n, n])] },
+              { value: selectedSerie, onChange: (v: string) => setSelectedSerie(v), options: [['all', 'Toutes séries'], ...SERIES_LYCEE.map(s => [s, `Série ${s}`])] },
+            ].map((sel, i) => (
+              <select key={i} value={sel.value} onChange={e => sel.onChange(e.target.value)}
+                className="px-3 py-2.5 rounded-xl text-sm text-[#CBD5E1]"
+                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', outline: 'none' }}>
+                {sel.options.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+              </select>
+            ))}
           </div>
 
-          {/* Résultats stats */}
+            {/* Résultats stats */}
           <div className="flex items-center justify-between px-1">
             <p className="text-sm font-semibold text-[#94A3B8]">
               {filteredRessources.length} ressource{filteredRessources.length > 1 ? 's' : ''} trouvee{filteredRessources.length > 1 ? 's' : ''}
@@ -441,58 +431,61 @@ function answer(qi,ci){
             if (items.length === 0) return null
             return (
               <div key={type} className="rounded-2xl p-5"
-                style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
-                    style={{ background: `${meta.color}15`, border: `1px solid ${meta.color}30` }}>
-                    {meta.icon}
-                  </div>
+                style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                {/* En-tête de section */}
+                <div className="flex items-center gap-3 mb-4 pb-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                  <span className="text-xl">{meta.icon}</span>
                   <div>
                     <h2 className="text-sm font-bold text-white">{meta.label}</h2>
-                    <p className="text-xs" style={{ color: '#94A3B8' }}>{meta.description}</p>
+                    <p className="text-xs text-[#64748B]">{meta.description}</p>
                   </div>
-                  <span className="ml-auto px-2.5 py-1 rounded-full text-xs font-bold"
-                    style={{ background: `${meta.color}15`, color: meta.color }}>
+                  <span className="ml-auto px-2.5 py-1 rounded-full text-xs font-bold bg-[#3B82F6]/10 text-[#3B82F6]">
                     {items.length}
                   </span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {items.map(res => (
-                    <div key={res.id} className="rounded-xl p-4 transition-all duration-200 hover:scale-[1.02] group flex flex-col"
-                      style={{ background: `${meta.color}06`, border: `1px solid ${meta.color}18` }}>
-                      <div className="flex items-start gap-3 flex-1">
-                        <span className="text-2xl shrink-0 mt-0.5">{meta.icon}</span>
-                        <div className="min-w-0 flex-1">
-                          <h3 className="text-sm font-bold text-white group-hover:opacity-80 transition-colors line-clamp-2">{res.titre}</h3>
-                          <p className="text-xs mt-1 line-clamp-2" style={{ color: '#94A3B8' }}>{res.description}</p>
-                          <div className="flex flex-wrap items-center gap-1.5 mt-2">
-                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
-                              style={{ background: 'rgba(0,229,255,0.1)', color: '#00E5FF' }}>{res.matiere}</span>
-                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
-                              style={{ background: 'rgba(255,255,255,0.05)', color: '#475569' }}>{res.niveau}</span>
-                            {res.serie && (
-                              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
-                                style={{ background: 'rgba(213,0,249,0.1)', color: '#D500F9' }}>{res.serie}</span>
-                            )}
-                            {res.annee && (
-                              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
-                                style={{ background: 'rgba(255,214,0,0.1)', color: '#FFD600' }}>{res.annee}</span>
-                            )}
+                  {items.map(res => {
+                    const hasNative = !!CONTENU_NATIF[res.id]
+                    const externalUrl = getResourceUrl(res)
+                    return (
+                      <div key={res.id} className="rounded-xl p-4 flex flex-col group transition-all duration-200 hover:shadow-lg"
+                        style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                        <div className="flex items-start gap-3 flex-1">
+                          <span className="text-xl shrink-0 mt-0.5">{meta.icon}</span>
+                          <div className="min-w-0 flex-1">
+                            <h3 className="text-sm font-semibold text-white line-clamp-2 leading-snug">{res.titre}</h3>
+                            <p className="text-xs mt-1 line-clamp-2 text-[#94A3B8]">{res.description}</p>
+                            <div className="flex flex-wrap gap-1 mt-2">
+                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-[#94A3B8]">{res.matiere}</span>
+                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-[#94A3B8]">{res.niveau}</span>
+                              {res.serie && <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-[#94A3B8]">Série {res.serie}</span>}
+                              {res.annee && <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-[#94A3B8]">{res.annee}</span>}
+                              {hasNative && <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#22C55E]/10 text-[#22C55E] font-semibold">● Natif</span>}
+                            </div>
                           </div>
-                          {res.source && (
-                            <p className="text-[10px] mt-1.5" style={{ color: '#475569' }}>Source : {res.source}</p>
+                        </div>
+                        {/* Boutons action */}
+                        <div className="mt-3 flex gap-2">
+                          <button
+                            onClick={() => handleOuvrirRessource(res)}
+                            className="flex-1 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-150 hover:opacity-90 active:scale-95 cursor-pointer text-white"
+                            style={{ background: '#3B82F6' }}>
+                            {res.type === 'video' ? '▶ Vidéo' : res.type === 'tp_virtuel' ? '🔬 TP' : res.type === 'annale' ? '📝 Annale' : res.type === 'exercice' ? '✏️ Quiz' : res.type === 'resume' ? '📄 Cours' : '💬 Rejoindre'}
+                          </button>
+                          {externalUrl && (
+                            <button
+                              onClick={() => window.open(externalUrl, '_blank', 'noopener,noreferrer')}
+                              className="px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-150 hover:opacity-90 active:scale-95 cursor-pointer"
+                              style={{ background: 'rgba(255,255,255,0.06)', color: '#94A3B8', border: '1px solid rgba(255,255,255,0.1)' }}
+                              title="Ouvrir sur le site externe">
+                              🔗
+                            </button>
                           )}
                         </div>
                       </div>
-                      <button
-                        onClick={() => handleOuvrirRessource(res)}
-                        className="mt-3 w-full py-1.5 rounded-lg text-[11px] font-bold transition-all duration-200 hover:opacity-80 active:scale-95 cursor-pointer"
-                        style={{ background: `${meta.color}18`, color: meta.color, border: `1px solid ${meta.color}30` }}>
-                        {res.type === 'video' ? '▶ Regarder la vidéo' : res.type === 'tp_virtuel' ? '🔬 Démarrer le TP' : res.type === 'annale' ? '📝 Ouvrir l\'annale' : res.type === 'exercice' ? '✏️ Faire le quiz' : res.type === 'resume' ? '📄 Ouvrir la fiche' : '💬 Rejoindre'}
-                      </button>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               </div>
             )
@@ -525,29 +518,24 @@ function answer(qi,ci){
           {/* Filtres niveau */}
           <div className="flex flex-wrap gap-2">
             <select value={selectedNiveau} onChange={e => setSelectedNiveau(e.target.value)}
-              className="px-3 py-2 rounded-xl text-sm font-semibold text-white"
-              style={{ background: 'rgba(0,229,255,0.1)', border: '1px solid rgba(0,229,255,0.3)', outline: 'none' }}>
+              className="px-3 py-2 rounded-xl text-sm text-[#CBD5E1]"
+              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', outline: 'none' }}>
               <option value="all">Tous niveaux</option>
               {[...NIVEAUX_COLLEGE, ...NIVEAUX_LYCEE].map(n => <option key={n} value={n}>{n}</option>)}
             </select>
             {NIVEAUX_LYCEE.includes(selectedNiveau) && selectedNiveau !== 'Seconde' && (
               <select value={selectedSerie} onChange={e => setSelectedSerie(e.target.value)}
-                className="px-3 py-2 rounded-xl text-sm font-semibold text-white"
-                style={{ background: 'rgba(213,0,249,0.1)', border: '1px solid rgba(213,0,249,0.3)', outline: 'none' }}>
-                <option value="all">Toutes series</option>
-                {SERIES_LYCEE.map(s => <option key={s} value={s}>Serie {s}</option>)}
+                className="px-3 py-2 rounded-xl text-sm text-[#CBD5E1]"
+                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', outline: 'none' }}>
+                <option value="all">Toutes séries</option>
+                {SERIES_LYCEE.map(s => <option key={s} value={s}>Série {s}</option>)}
               </select>
             )}
           </div>
 
           {/* Programme détaillé avec résumés */}
           {programmes.length > 0 ? programmes.map(prog => {
-            const colors: Record<string, string> = {
-              'Mathématiques': '#00E5FF', 'Sciences Physiques': '#00E676', 'SVT': '#76FF03',
-              'Philosophie': '#448AFF', 'Français': '#FFD600', 'Histoire-Géographie': '#D500F9',
-              'Anglais': '#FF6D00',
-            }
-            const color = colors[prog.matiere] || '#00E5FF'
+            const color = '#3B82F6'
             const resCount = RESSOURCES_EN_LIGNE.filter(r =>
               r.matiere === prog.matiere && (r.niveau === prog.niveau || !r.niveau)
             ).length
