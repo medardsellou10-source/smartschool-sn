@@ -9,6 +9,7 @@ import {
   getProgressionHebdo, getRessources,
   type ProgrammeMatiere, type Module, type Lecon, type GrilleHoraire, type RessourceEnLigne
 } from '@/lib/curriculum-senegal'
+import { ANNALES, type AnnaleDoc } from '@/lib/annales-sn'
 
 // ── Couleurs par matière ──
 const MATIERE_COLORS: Record<string, string> = {
@@ -175,19 +176,19 @@ export default function SupportPedagogiquePage() {
     switch (res.type) {
       case 'tp_virtuel':
         if (res.titre.toLowerCase().includes('chute') || res.titre.toLowerCase().includes('projectile'))
-          return 'https://phet.colorado.edu/sims/html/projectile-motion/latest/projectile-motion_all.html'
+          return 'https://phet.colorado.edu/sims/html/projectile-motion/latest/projectile-motion_fr.html'
         if (res.titre.toLowerCase().includes('rlc') || res.titre.toLowerCase().includes('circuit'))
-          return 'https://phet.colorado.edu/sims/html/circuit-construction-kit-ac/latest/circuit-construction-kit-ac_all.html'
+          return 'https://phet.colorado.edu/sims/html/circuit-construction-kit-ac/latest/circuit-construction-kit-ac_fr.html'
         if (res.titre.toLowerCase().includes('dosage') || res.titre.toLowerCase().includes('acido'))
-          return 'https://phet.colorado.edu/sims/html/acid-base-solutions/latest/acid-base-solutions_all.html'
+          return 'https://phet.colorado.edu/sims/html/acid-base-solutions/latest/acid-base-solutions_fr.html'
         if (res.titre.toLowerCase().includes('diffraction') || res.titre.toLowerCase().includes('lumière'))
-          return 'https://phet.colorado.edu/sims/html/wave-interference/latest/wave-interference_all.html'
+          return 'https://phet.colorado.edu/sims/html/wave-interference/latest/wave-interference_fr.html'
         if (res.titre.toLowerCase().includes('cellule') || res.titre.toLowerCase().includes('microscope'))
-          return 'https://phet.colorado.edu/sims/html/gene-expression-essentials/latest/gene-expression-essentials_all.html'
+          return 'https://phet.colorado.edu/sims/html/gene-expression-essentials/latest/gene-expression-essentials_fr.html'
         if (res.titre.toLowerCase().includes('immunodiffusion') || res.titre.toLowerCase().includes('anticorps'))
-          return 'https://phet.colorado.edu/sims/html/natural-selection/latest/natural-selection_all.html'
+          return 'https://phet.colorado.edu/sims/html/natural-selection/latest/natural-selection_fr.html'
         if (res.titre.toLowerCase().includes('roche') || res.titre.toLowerCase().includes('tectonique'))
-          return 'https://phet.colorado.edu/sims/html/plate-tectonics/latest/plate-tectonics_all.html'
+          return 'https://phet.colorado.edu/sims/html/plate-tectonics/latest/plate-tectonics_fr.html'
         return 'https://phet.colorado.edu/fr/simulations'
       case 'video':
         return `https://www.youtube.com/results?search_query=${encodeURIComponent(res.titre + ' cours terminale sénégal')}`
@@ -376,9 +377,89 @@ function answer(qi,ci){
     win.document.close()
   }
 
+  function ouvrirAnnale(res: RessourceEnLigne) {
+    // Chercher dans la base d'annales intégrée
+    const annale: AnnaleDoc | undefined = ANNALES.find(a =>
+      a.matiere === res.matiere &&
+      (res.serie ? a.serie === res.serie : true) &&
+      (res.annee ? a.annee === res.annee : true) &&
+      a.niveau === res.niveau
+    )
+    if (!annale) {
+      // Fallback : ouvrir senexam.sn
+      window.open('https://www.senexam.sn', '_blank', 'noopener,noreferrer')
+      return
+    }
+    const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">
+<title>${annale.titre}</title>
+<style>
+  *{box-sizing:border-box}body{font-family:'Segoe UI',Arial,sans-serif;max-width:860px;margin:0 auto;padding:28px 32px;color:#1a1a2e;background:#fff;font-size:14px}
+  .entete{text-align:center;border:2px solid #1a3a5c;padding:16px;margin-bottom:24px;background:#f8f9ff}
+  .entete h1{font-size:1.1em;color:#1a3a5c;margin:4px 0}
+  .entete .meta{display:flex;justify-content:center;gap:20px;margin-top:8px;font-size:0.85em}
+  .badge{padding:3px 10px;border-radius:10px;background:#e8eaf6;color:#3949ab;font-weight:700;font-size:0.78em}
+  .section{margin:20px 0}
+  h3{color:#1a3a5c;border-bottom:2px solid #e0e0e0;padding-bottom:6px;font-size:1em;margin-top:24px}
+  h4{color:#3949ab;margin:16px 0 8px;font-size:0.93em}
+  ol,ul{padding-left:20px;line-height:1.9}
+  li{margin-bottom:4px}
+  blockquote{border-left:4px solid #7986cb;padding:12px 16px;background:#f3f4ff;margin:12px 0;font-style:italic;color:#444}
+  table{border-collapse:collapse;width:100%;margin:12px 0}
+  th,td{border:1px solid #ccc;padding:6px 10px;font-size:0.88em}
+  th{background:#e8eaf6;color:#1a3a5c;font-weight:700}
+  .correction-section{display:none;background:#f1f8e9;border:2px solid #4caf50;padding:16px;margin-top:16px;border-radius:8px}
+  .correction-section.visible{display:block}
+  .correction-section h3{color:#2e7d32}
+  .btn-bar{position:sticky;top:0;background:#fff;padding:10px 0;z-index:100;display:flex;gap:10px;border-bottom:1px solid #eee;margin-bottom:16px}
+  .btn{padding:8px 18px;border-radius:6px;cursor:pointer;font-size:0.88em;font-weight:700;border:none}
+  .btn-print{background:#1a3a5c;color:#fff}
+  .btn-corr{background:#2e7d32;color:#fff}
+  .btn-corr.active{background:#c62828}
+  .footer{border-top:1px solid #eee;margin-top:24px;padding-top:10px;font-size:0.78em;color:#888;display:flex;justify-content:space-between}
+  @media print{.btn-bar{display:none}.correction-section{display:block!important}@page{margin:15mm;size:A4}}
+</style></head><body>
+<div class="btn-bar">
+  <button class="btn btn-print" onclick="window.print()">🖨️ Imprimer / PDF</button>
+  <button class="btn btn-corr" id="btnCorr" onclick="toggleCorr()">✅ Voir le corrigé</button>
+  <button class="btn" style="background:#ff6d00;color:#fff" onclick="window.open('https://www.senexam.sn','_blank')">🔗 senexam.sn</button>
+</div>
+<div class="entete">
+  <h1>${annale.examen} ${annale.annee} — ${annale.matiere}${annale.serie ? ' (Série ' + annale.serie + ')' : ''}</h1>
+  <h1>${annale.niveau}</h1>
+  <div class="meta">
+    <span class="badge">⏱ Durée : ${annale.duree}</span>
+    <span class="badge">Coefficient : ${annale.coefficient}</span>
+    <span class="badge">Sénégal — MEN / Office du BAC</span>
+  </div>
+</div>
+<div class="section">${annale.sujet_html}</div>
+<div class="correction-section" id="corrDiv">
+  <h3>✅ CORRIGÉ OFFICIEL</h3>
+  ${annale.correction_html}
+</div>
+<div class="footer">
+  <span>SmartSchool SN — Annales officielles MEN Sénégal</span>
+  <span>${annale.examen} ${annale.annee}</span>
+</div>
+<script>
+function toggleCorr(){
+  const d=document.getElementById('corrDiv');
+  const b=document.getElementById('btnCorr');
+  d.classList.toggle('visible');
+  b.textContent=d.classList.contains('visible')?'🚫 Cacher le corrigé':'✅ Voir le corrigé';
+  b.classList.toggle('active');
+}
+</script></body></html>`
+    const win = window.open('', '_blank', 'width=960,height=750')
+    if (!win) { alert('Autorisez les popups pour afficher l\'annale.'); return }
+    win.document.write(html)
+    win.document.close()
+  }
+
   function handleOuvrirRessource(res: RessourceEnLigne) {
     if (res.type === 'resume') { ouvrirFiche(res); return }
     if (res.type === 'exercice') { ouvrirQuiz(res); return }
+    if (res.type === 'annale') { ouvrirAnnale(res); return }
     const url = getResourceUrl(res)
     if (url) window.open(url, '_blank', 'noopener,noreferrer')
     else alert('Cette ressource sera disponible très prochainement.')
@@ -387,6 +468,7 @@ function answer(qi,ci){
   function handleApercu(res: RessourceEnLigne) {
     if (res.type === 'resume') { ouvrirFiche(res); return }
     if (res.type === 'exercice') { ouvrirQuiz(res); return }
+    if (res.type === 'annale') { ouvrirAnnale(res); return }
     const url = getResourceUrl(res)
     if (url) window.open(url, '_blank', 'noopener,noreferrer')
     else alert('Aperçu non disponible pour cette ressource.')
