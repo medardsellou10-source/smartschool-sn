@@ -6,8 +6,8 @@ import { StatCard } from '@/components/dashboard/StatCard'
 import {
   GRILLES_HORAIRES, PROGRAMMES, PLANNING_SEMESTRIEL,
   NIVEAUX_COLLEGE, NIVEAUX_LYCEE, SERIES_LYCEE,
-  getProgressionHebdo,
-  type ProgrammeMatiere, type Module, type Lecon, type GrilleHoraire
+  getProgressionHebdo, getRessources,
+  type ProgrammeMatiere, type Module, type Lecon, type GrilleHoraire, type RessourceEnLigne
 } from '@/lib/curriculum-senegal'
 
 // ── Couleurs par matière ──
@@ -35,7 +35,17 @@ const TYPE_COLORS: Record<string, string> = {
   cours: '#00E676', tp: '#00E5FF', td: '#FFD600', revision: '#FF6D00', evaluation: '#FF1744',
 }
 
-type TabId = 'grille' | 'planning' | 'modules' | 'suivi' | 'semestre' | 'semaine'
+type TabId = 'grille' | 'planning' | 'modules' | 'suivi' | 'semestre' | 'semaine' | 'ressources'
+
+const RESSOURCE_ICONS: Record<string, string> = {
+  annale: '📄', video: '▶️', tp_virtuel: '🔬', exercice: '✏️', resume: '📋', tutorat: '🤝',
+}
+const RESSOURCE_COLORS: Record<string, string> = {
+  annale: '#FF6D00', video: '#FF1744', tp_virtuel: '#00E5FF', exercice: '#7C4DFF', resume: '#00E676', tutorat: '#FFD600',
+}
+const RESSOURCE_LABELS: Record<string, string> = {
+  annale: 'Annale', video: 'Vidéo', tp_virtuel: 'TP Virtuel', exercice: 'Exercice', resume: 'Fiche', tutorat: 'Tutorat',
+}
 
 export default function SupportPedagogiquePage() {
   const { user, loading: userLoading } = useUser()
@@ -135,6 +145,20 @@ export default function SupportPedagogiquePage() {
     })
   }, [allProgrammes, semaineActuelle, leconsValidees])
 
+  // ── Ressources en ligne ──
+  const [filtreTypeRes, setFiltreTypeRes] = useState<RessourceEnLigne['type'] | 'all'>('all')
+
+  const ressources = useMemo(() => {
+    const filters: Parameters<typeof getRessources>[0] = {
+      niveau: selectedNiveau,
+    }
+    if (NIVEAUX_LYCEE.includes(selectedNiveau) && selectedNiveau !== 'Seconde' && selectedSerie) {
+      filters.serie = selectedSerie
+    }
+    if (filtreTypeRes !== 'all') filters.type = filtreTypeRes
+    return getRessources(filters)
+  }, [selectedNiveau, selectedSerie, filtreTypeRes])
+
   const tabs: { id: TabId; label: string; icon: string }[] = [
     { id: 'semaine', label: 'Ma Semaine', icon: '🗓️' },
     { id: 'grille', label: 'Grille Horaire', icon: '📅' },
@@ -142,6 +166,7 @@ export default function SupportPedagogiquePage() {
     { id: 'modules', label: 'Modules & Leçons', icon: '📚' },
     { id: 'suivi', label: 'Suivi des Cours', icon: '✅' },
     { id: 'semestre', label: 'Planning Semestriel', icon: '📊' },
+    { id: 'ressources', label: 'Ressources', icon: '🌐' },
   ]
 
   if (userLoading) {
@@ -716,7 +741,7 @@ export default function SupportPedagogiquePage() {
             </div>
           )}
 
-          {/* Résumé pour élèves — à communiquer */}
+          {/* Résumé pour élèves — à communiquer  */}
           {allProgrammes.length > 0 && (
             <div className="rounded-2xl p-5" style={{ background: 'rgba(213,0,249,0.04)', border: '1px solid rgba(213,0,249,0.15)' }}>
               <div className="flex items-center gap-3 mb-3">
@@ -744,6 +769,116 @@ export default function SupportPedagogiquePage() {
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════════════ */}
+      {/* TAB: Ressources Élèves & Annales BAC/BFEM                */}
+      {/* ══════════════════════════════════════════════════════════ */}
+      {activeTab === 'ressources' && (
+        <div className="space-y-4">
+
+          {/* KPIs */}
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+            {(['all', 'annale', 'video', 'exercice', 'resume', 'tp_virtuel'] as const).map(t => {
+              const count = t === 'all'
+                ? getRessources({ niveau: selectedNiveau, serie: NIVEAUX_LYCEE.includes(selectedNiveau) && selectedNiveau !== 'Seconde' ? selectedSerie : undefined }).length
+                : getRessources({ niveau: selectedNiveau, type: t, serie: NIVEAUX_LYCEE.includes(selectedNiveau) && selectedNiveau !== 'Seconde' ? selectedSerie : undefined }).length
+              const color = t === 'all' ? '#00E5FF' : RESSOURCE_COLORS[t]
+              const icon = t === 'all' ? '🌐' : RESSOURCE_ICONS[t]
+              const label = t === 'all' ? 'Tout' : RESSOURCE_LABELS[t]
+              return (
+                <button
+                  key={t}
+                  onClick={() => setFiltreTypeRes(t)}
+                  className="rounded-xl p-3 text-center transition-all duration-200"
+                  style={{
+                    background: filtreTypeRes === t ? `${color}15` : 'rgba(255,255,255,0.03)',
+                    border: `1px solid ${filtreTypeRes === t ? color + '40' : 'rgba(255,255,255,0.07)'}`,
+                  }}>
+                  <span className="text-lg block">{icon}</span>
+                  <span className="text-xs font-bold block mt-1" style={{ color: filtreTypeRes === t ? color : '#94A3B8' }}>
+                    {label}
+                  </span>
+                  <span className="text-[10px] font-black" style={{ color: filtreTypeRes === t ? color : '#475569' }}>
+                    {count}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Liste ressources */}
+          {ressources.length === 0 ? (
+            <div className="rounded-2xl p-10 text-center" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+              <span className="text-3xl block mb-3">📭</span>
+              <p className="text-[#94A3B8] text-sm">Aucune ressource disponible pour cette sélection.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {ressources.map(res => {
+                const color = RESSOURCE_COLORS[res.type] || '#00E5FF'
+                const icon = RESSOURCE_ICONS[res.type] || '📄'
+                const label = RESSOURCE_LABELS[res.type] || res.type
+                const matiereColor = MATIERE_COLORS[res.matiere] || '#00E5FF'
+                return (
+                  <div key={res.id} className="rounded-xl overflow-hidden transition-all duration-200 hover:scale-[1.01]"
+                    style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid ${color}18` }}>
+                    <div className="px-4 py-3 flex items-center gap-3" style={{ borderBottom: `1px solid ${color}10`, background: `${color}05` }}>
+                      <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0"
+                        style={{ background: `${color}15`, border: `1px solid ${color}30` }}>
+                        {icon}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-white leading-snug truncate">{res.titre}</p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
+                            style={{ background: `${color}15`, color }}>{label}</span>
+                          <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full"
+                            style={{ background: `${matiereColor}10`, color: matiereColor }}>{res.matiere}</span>
+                          {res.annee && (
+                            <span className="text-[10px]" style={{ color: '#475569' }}>{res.annee}</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="px-4 py-3">
+                      <p className="text-xs text-[#94A3B8] leading-relaxed">{res.description}</p>
+                      {res.source && (
+                        <p className="text-[10px] mt-2 font-semibold" style={{ color: '#475569' }}>
+                          Source : {res.source}
+                        </p>
+                      )}
+                      <div className="mt-3 flex gap-2">
+                        <button className="flex-1 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-200"
+                          style={{ background: `${color}12`, color, border: `1px solid ${color}25` }}>
+                          {res.type === 'video' ? '▶ Regarder' : res.type === 'tp_virtuel' ? '🔬 Démarrer' : res.type === 'tutorat' ? '💬 Rejoindre' : res.type === 'exercice' ? '✏️ Faire l\'exercice' : '📥 Télécharger'}
+                        </button>
+                        <button className="px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-200"
+                          style={{ background: 'rgba(255,255,255,0.04)', color: '#94A3B8', border: '1px solid rgba(255,255,255,0.08)' }}>
+                          👁 Aperçu
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+
+          {/* Bannière info */}
+          <div className="rounded-2xl p-4 flex items-start gap-3"
+            style={{ background: 'rgba(0,229,255,0.05)', border: '1px solid rgba(0,229,255,0.15)' }}>
+            <span className="text-xl shrink-0 mt-0.5">💡</span>
+            <div>
+              <p className="text-sm font-bold text-white">Ressources accessibles aux élèves</p>
+              <p className="text-xs mt-1" style={{ color: '#94A3B8' }}>
+                Ces ressources (annales, fiches de révision, exercices interactifs et TP virtuels) sont également
+                disponibles dans l&apos;espace élève sous &ldquo;E-learning&rdquo;. Encouragez vos élèves à les utiliser
+                pour réviser et s&apos;entraîner au BAC / BFEM.
+              </p>
+            </div>
+          </div>
         </div>
       )}
 
