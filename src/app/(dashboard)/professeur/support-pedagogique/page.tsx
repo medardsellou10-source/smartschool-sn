@@ -169,6 +169,229 @@ export default function SupportPedagogiquePage() {
     { id: 'ressources', label: 'Ressources', icon: '🌐' },
   ]
 
+  // ── Helpers ressources ──
+  function getResourceUrl(res: RessourceEnLigne): string | null {
+    if (res.url) return res.url
+    switch (res.type) {
+      case 'tp_virtuel':
+        if (res.titre.toLowerCase().includes('chute') || res.titre.toLowerCase().includes('projectile'))
+          return 'https://phet.colorado.edu/sims/html/projectile-motion/latest/projectile-motion_all.html'
+        if (res.titre.toLowerCase().includes('rlc') || res.titre.toLowerCase().includes('circuit'))
+          return 'https://phet.colorado.edu/sims/html/circuit-construction-kit-ac/latest/circuit-construction-kit-ac_all.html'
+        if (res.titre.toLowerCase().includes('dosage') || res.titre.toLowerCase().includes('acido'))
+          return 'https://phet.colorado.edu/sims/html/acid-base-solutions/latest/acid-base-solutions_all.html'
+        if (res.titre.toLowerCase().includes('diffraction') || res.titre.toLowerCase().includes('lumière'))
+          return 'https://phet.colorado.edu/sims/html/wave-interference/latest/wave-interference_all.html'
+        if (res.titre.toLowerCase().includes('cellule') || res.titre.toLowerCase().includes('microscope'))
+          return 'https://phet.colorado.edu/sims/html/gene-expression-essentials/latest/gene-expression-essentials_all.html'
+        if (res.titre.toLowerCase().includes('immunodiffusion') || res.titre.toLowerCase().includes('anticorps'))
+          return 'https://phet.colorado.edu/sims/html/natural-selection/latest/natural-selection_all.html'
+        if (res.titre.toLowerCase().includes('roche') || res.titre.toLowerCase().includes('tectonique'))
+          return 'https://phet.colorado.edu/sims/html/plate-tectonics/latest/plate-tectonics_all.html'
+        return 'https://phet.colorado.edu/fr/simulations'
+      case 'video':
+        return `https://www.youtube.com/results?search_query=${encodeURIComponent(res.titre + ' cours terminale sénégal')}`
+      case 'annale':
+        return 'https://www.senexam.sn'
+      case 'tutorat':
+        return `https://www.youtube.com/results?search_query=${encodeURIComponent(res.matiere + ' cours terminale sénégal')}`
+      default:
+        return null
+    }
+  }
+
+  function ouvrirFiche(res: RessourceEnLigne) {
+    const color = RESSOURCE_COLORS[res.type] || '#00E5FF'
+    const pts = res.description.split(' — ').map(s => `<li>${s.trim()}</li>`).join('')
+    const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">
+<title>${res.titre}</title>
+<style>
+  *{box-sizing:border-box}body{font-family:'Segoe UI',Arial,sans-serif;max-width:780px;margin:0 auto;padding:28px 32px;color:#1a1a2e;background:#fff}
+  .header{border-left:5px solid ${color};padding:10px 16px;background:#f8f9ff;margin-bottom:20px}
+  h1{margin:0 0 6px;font-size:1.3em;color:#1a1a2e}
+  .badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .badge{padding:3px 10px;border-radius:10px;font-size:0.78em;font-weight:700;background:#e8eaf6;color:#3949ab}
+  .section{margin:18px 0}
+  h2{font-size:1em;color:#1a3a5c;border-bottom:2px solid #e0e0e0;padding-bottom:4px;margin-bottom:10px}
+  p{line-height:1.75;font-size:0.93em;color:#333}
+  ul{padding-left:20px;margin:8px 0}
+  li{line-height:1.8;font-size:0.92em;color:#333;margin-bottom:2px}
+  .formule{background:#f0f4ff;border-left:4px solid ${color};padding:10px 14px;border-radius:4px;font-family:monospace;font-size:0.95em;margin:10px 0}
+  .footer{border-top:1px solid #eee;margin-top:24px;padding-top:10px;font-size:0.78em;color:#888;display:flex;justify-content:space-between;align-items:center}
+  .btn{background:${color};color:#fff;border:none;padding:8px 18px;border-radius:6px;cursor:pointer;font-size:0.88em;font-weight:600}
+  @media print{.btn{display:none}@page{margin:15mm;size:A4}}
+</style></head><body>
+<button class="btn" onclick="window.print()">🖨️ Imprimer / PDF</button>
+<div class="header">
+  <h1>${res.titre}</h1>
+  <div class="badges">
+    <span class="badge">${res.matiere}</span>
+    <span class="badge">${res.niveau}</span>
+    ${res.serie ? `<span class="badge">Série ${res.serie}</span>` : ''}
+    ${res.annee ? `<span class="badge">${res.annee}</span>` : ''}
+    <span class="badge" style="background:#e8f5e9;color:#2e7d32">${RESSOURCE_LABELS[res.type]}</span>
+  </div>
+</div>
+<div class="section">
+  <h2>📋 Résumé du contenu</h2>
+  <p>${res.description}</p>
+</div>
+<div class="section">
+  <h2>🔑 Points clés</h2>
+  <ul>${pts || `<li>${res.description}</li>`}</ul>
+</div>
+<div class="section">
+  <h2>📌 Conseils pour réviser</h2>
+  <ul>
+    <li>Lire attentivement le cours et noter les définitions importantes</li>
+    <li>Faire des exercices d'application immédiatement après chaque leçon</li>
+    <li>Revoir les annales pour identifier les types de questions fréquents au BAC</li>
+    <li>Utiliser les TP virtuels pour visualiser les phénomènes abstraits</li>
+    <li>Rejoindre les forums de tutorat pour poser vos questions</li>
+  </ul>
+</div>
+<div class="footer">
+  <span>Source : ${res.source || 'SmartSchool SN'}</span>
+  <span>SmartSchool SN © ${new Date().getFullYear()} — Curriculum MEN Sénégal</span>
+</div>
+</body></html>`
+    const win = window.open('', '_blank', 'width=900,height=720')
+    if (!win) { alert('Autorisez les popups pour afficher la fiche.'); return }
+    win.document.write(html)
+    win.document.close()
+  }
+
+  function ouvrirQuiz(res: RessourceEnLigne) {
+    const questions: { q: string; c: string[]; a: number }[] = res.titre.toLowerCase().includes('suite') ? [
+      { q: 'Une suite arithmétique a u₁=5 et r=3. Quelle est la valeur de u₄?', c: ['14', '11', '17', '20'], a: 0 },
+      { q: 'Pour une suite géométrique de raison q=2, u₁=1. Quel est u₅?', c: ['16', '8', '32', '10'], a: 0 },
+      { q: 'La suite (uₙ) définie par uₙ=2n+1 est :', c: ['Arithmétique de raison 2', 'Géométrique de raison 2', 'Ni arithmétique ni géométrique', 'Arithmétique de raison 1'], a: 0 },
+      { q: 'Si uₙ₊₁/uₙ = constante, la suite est :', c: ['Géométrique', 'Arithmétique', 'Convergente', 'Divergente'], a: 0 },
+      { q: 'La somme des 5 premiers termes de la suite géométrique q=2, u₁=1 vaut :', c: ['31', '15', '63', '16'], a: 0 },
+    ] : res.titre.toLowerCase().includes('intégr') ? [
+      { q: 'Quelle est la primitive de f(x)=3x²?', c: ['x³+C', '6x+C', 'x³/3+C', '3x³+C'], a: 0 },
+      { q: '∫₀² x dx vaut :', c: ['2', '4', '1', '3'], a: 0 },
+      { q: 'La primitive de f(x)=cos(x) est :', c: ['sin(x)+C', '-sin(x)+C', 'cos(x)+C', 'tan(x)+C'], a: 0 },
+      { q: '∫ eˣ dx est égal à :', c: ['eˣ+C', 'eˣ⁺¹+C', 'xeˣ+C', '(x+1)eˣ+C'], a: 0 },
+      { q: 'Pour calculer ∫ u·v′ dx on utilise :', c: ['Intégration par parties', 'Le changement de variable', 'La formule de Taylor', 'La dérivation composée'], a: 0 },
+    ] : res.titre.toLowerCase().includes('complexe') ? [
+      { q: 'Le module de z = 3+4i est :', c: ['5', '7', '25', '1'], a: 0 },
+      { q: 'L\'argument de z = i est :', c: ['π/2', '0', 'π', '-π/2'], a: 0 },
+      { q: 'Le conjugué de 2+3i est :', c: ['2-3i', '-2-3i', '2+3i', '-2+3i'], a: 0 },
+      { q: '(1+i)² est égal à :', c: ['2i', '2', '1+2i', '0'], a: 0 },
+      { q: 'La forme trigonométrique de z=1+i est :', c: ['√2(cos π/4 + i sin π/4)', '√2(cos π/3 + i sin π/3)', '2(cos π/4 + i sin π/4)', '√3(cos π/6 + i sin π/6)'], a: 0 },
+    ] : res.titre.toLowerCase().includes('newton') || res.titre.toLowerCase().includes('mécan') ? [
+      { q: 'La 2ème loi de Newton s\'écrit :', c: ['ΣF = ma', 'ΣF = mv', 'ΣF = m/a', 'ΣF = pa'], a: 0 },
+      { q: 'Un objet de masse 5 kg soumis à une force de 20 N a une accélération de :', c: ['4 m/s²', '100 m/s²', '0.25 m/s²', '25 m/s²'], a: 0 },
+      { q: 'L\'énergie cinétique s\'exprime par :', c: ['½mv²', 'mv²', '2mv', 'mv²/2g'], a: 0 },
+      { q: 'Le principe d\'inertie (1ère loi de Newton) stipule qu\'un objet non soumis à une force :', c: ['Reste immobile ou en MRU', 'Accélère', 'Décélère', 'Suit un cercle'], a: 0 },
+      { q: 'L\'unité du poids est :', c: ['Newton (N)', 'Kilogramme (kg)', 'Pascal (Pa)', 'Joule (J)'], a: 0 },
+    ] : res.titre.toLowerCase().includes('génét') ? [
+      { q: 'La méiose produit combien de cellules filles?', c: ['4', '2', '8', '1'], a: 0 },
+      { q: 'Un individu de génotype Aa est :', c: ['Hétérozygote', 'Homozygote dominant', 'Homozygote récessif', 'Impossible'], a: 0 },
+      { q: 'Le crossing-over a lieu pendant :', c: ['Méiose I (prophase I)', 'Méiose II', 'Mitose', 'Interphase'], a: 0 },
+      { q: 'Si A est dominant sur a, le phénotype de [AA] et [Aa] est :', c: ['Identique', 'Différent', 'Dépend de l\'environnement', 'Mixte'], a: 0 },
+      { q: 'Une mutation est :', c: ['Une modification de la séquence d\'ADN', 'Une division cellulaire', 'Un type de reproduction', 'Une hormone'], a: 0 },
+    ] : [
+      { q: `Dans le chapitre "${res.matiere}", quelle affirmation est correcte?`, c: ['La définition rigoureuse est essentielle', 'Les exemples ne sont pas nécessaires', 'La pratique n\'aide pas à retenir', 'Les formules sont inutiles'], a: 0 },
+      { q: 'Pour réussir au BAC, il est conseillé de :', c: ['Refaire les annales des années précédentes', 'Mémoriser sans comprendre', 'Éviter les exercices difficiles', 'Ne pas réviser les définitions'], a: 0 },
+      { q: 'La meilleure stratégie de révision est :', c: ['Espacer les révisions dans le temps', 'Tout réviser la veille', 'Lire sans exercices', 'Copier le cours sans relire'], a: 0 },
+      { q: 'Pour comprendre un cours, il faut :', c: ['Chercher les exemples concrets et les appliquer', 'Mémoriser sans faire d\'exercices', 'Attendre le dernier moment', 'Copier le cours de quelqu\'un d\'autre'], a: 0 },
+      { q: 'Les annales du BAC permettent de :', c: ['Identifier les types de questions fréquents', 'Remplacer le cours', 'Éviter de faire des exercices', 'Rien d\'utile'], a: 0 },
+    ]
+
+    const questionsJson = JSON.stringify(questions)
+    const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">
+<title>Quiz — ${res.titre}</title>
+<style>
+  *{box-sizing:border-box}body{font-family:'Segoe UI',Arial,sans-serif;max-width:700px;margin:0 auto;padding:24px;color:#1a1a2e;background:#f8f9ff}
+  h1{font-size:1.2em;color:#1a3a5c;border-bottom:3px solid #7C4DFF;padding-bottom:8px}
+  .badge{display:inline-block;padding:3px 10px;border-radius:10px;font-size:0.78em;font-weight:700;background:#ede7f6;color:#512da8;margin-right:8px}
+  .question{background:#fff;border-radius:12px;padding:16px 20px;margin:16px 0;box-shadow:0 2px 8px rgba(0,0,0,0.07);border:2px solid transparent;transition:border .2s}
+  .question.correct{border-color:#4caf50;background:#f1f8e9}
+  .question.wrong{border-color:#f44336;background:#fce4ec}
+  .q-num{font-size:0.78em;color:#9575cd;font-weight:700;margin-bottom:6px}
+  .q-text{font-weight:600;margin-bottom:12px;font-size:0.95em;line-height:1.5}
+  .choices{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .choice{padding:8px 12px;border-radius:8px;border:1.5px solid #e0e0e0;cursor:pointer;font-size:0.88em;background:#f9f9f9;transition:all .15s;text-align:left}
+  .choice:hover:not(:disabled){border-color:#7C4DFF;background:#ede7f6}
+  .choice.selected-correct{background:#c8e6c9;border-color:#43a047;color:#1b5e20;font-weight:700}
+  .choice.selected-wrong{background:#ffcdd2;border-color:#e53935;color:#b71c1c;font-weight:700}
+  .choice.reveal-correct{background:#c8e6c9;border-color:#43a047}
+  .feedback{font-size:0.82em;margin-top:8px;font-weight:600}
+  .feedback.ok{color:#2e7d32}
+  .feedback.ko{color:#c62828}
+  #score-box{display:none;text-align:center;background:#fff;border-radius:16px;padding:24px;margin-top:20px;box-shadow:0 4px 16px rgba(0,0,0,0.1)}
+  #score-box h2{font-size:1.4em;color:#1a3a5c}
+  .score-big{font-size:3em;font-weight:700;color:#7C4DFF}
+  .btn{background:#7C4DFF;color:#fff;border:none;padding:10px 24px;border-radius:8px;cursor:pointer;font-size:0.92em;font-weight:700;margin-top:16px}
+  .btn:hover{background:#6200ea}
+</style></head><body>
+<h1>✏️ ${res.titre}</h1>
+<p style="font-size:0.85em;color:#666"><span class="badge">${res.matiere}</span><span class="badge">${res.niveau}${res.serie ? ' ' + res.serie : ''}</span>${questions.length} questions — cliquez sur la bonne réponse</p>
+<div id="quiz"></div>
+<div id="score-box">
+  <h2>🎉 Quiz terminé !</h2>
+  <div class="score-big" id="score-val"></div>
+  <p id="score-msg"></p>
+  <button class="btn" onclick="location.reload()">🔄 Recommencer</button>
+</div>
+<script>
+const qs=${questionsJson};
+let answered=0;let correct=0;
+const quiz=document.getElementById('quiz');
+qs.forEach((q,i)=>{
+  const div=document.createElement('div');div.className='question';div.id='q'+i;
+  div.innerHTML='<div class="q-num">Question '+(i+1)+'/'+qs.length+'</div>'
+    +'<div class="q-text">'+q.q+'</div>'
+    +'<div class="choices">'+q.c.map((c,j)=>'<button class="choice" id="c'+i+'_'+j+'" onclick="answer('+i+','+j+')">'+c+'</button>').join('')+'</div>'
+    +'<div class="feedback" id="fb'+i+'"></div>';
+  quiz.appendChild(div);
+});
+function answer(qi,ci){
+  const q=qs[qi];
+  const isRight=ci===q.a;
+  if(isRight)correct++;
+  answered++;
+  document.querySelectorAll('#q'+qi+' .choice').forEach((b,j)=>{
+    b.disabled=true;
+    if(j===q.a)b.classList.add('reveal-correct');
+    if(j===ci&&!isRight)b.classList.add('selected-wrong');
+    if(j===ci&&isRight)b.classList.add('selected-correct');
+  });
+  const fb=document.getElementById('fb'+qi);
+  fb.textContent=isRight?'✅ Bonne réponse !':'❌ Mauvaise réponse. La bonne réponse était : '+q.c[q.a];
+  fb.className='feedback '+(isRight?'ok':'ko');
+  if(answered===qs.length){
+    document.getElementById('score-box').style.display='block';
+    document.getElementById('score-val').textContent=correct+'/'+qs.length;
+    const pct=Math.round(correct/qs.length*100);
+    document.getElementById('score-msg').textContent=pct>=80?'Excellent ! Continuez comme ça 🌟':pct>=60?'Bien ! Encore quelques révisions 📚':'Révisez ce chapitre et réessayez 💪';
+  }
+}
+</script></body></html>`
+    const win = window.open('', '_blank', 'width=740,height=700')
+    if (!win) { alert('Autorisez les popups pour afficher le quiz.'); return }
+    win.document.write(html)
+    win.document.close()
+  }
+
+  function handleOuvrirRessource(res: RessourceEnLigne) {
+    if (res.type === 'resume') { ouvrirFiche(res); return }
+    if (res.type === 'exercice') { ouvrirQuiz(res); return }
+    const url = getResourceUrl(res)
+    if (url) window.open(url, '_blank', 'noopener,noreferrer')
+    else alert('Cette ressource sera disponible très prochainement.')
+  }
+
+  function handleApercu(res: RessourceEnLigne) {
+    if (res.type === 'resume') { ouvrirFiche(res); return }
+    if (res.type === 'exercice') { ouvrirQuiz(res); return }
+    const url = getResourceUrl(res)
+    if (url) window.open(url, '_blank', 'noopener,noreferrer')
+    else alert('Aperçu non disponible pour cette ressource.')
+  }
+
   if (userLoading) {
     return <div className="space-y-4">{[...Array(4)].map((_, i) => <div key={i} className="h-28 rounded-2xl ss-shimmer" style={{ background: 'rgba(255,255,255,0.03)' }} />)}</div>
   }
@@ -850,12 +1073,16 @@ export default function SupportPedagogiquePage() {
                         </p>
                       )}
                       <div className="mt-3 flex gap-2">
-                        <button className="flex-1 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-200"
-                          style={{ background: `${color}12`, color, border: `1px solid ${color}25` }}>
-                          {res.type === 'video' ? '▶ Regarder' : res.type === 'tp_virtuel' ? '🔬 Démarrer' : res.type === 'tutorat' ? '💬 Rejoindre' : res.type === 'exercice' ? '✏️ Faire l\'exercice' : '📥 Télécharger'}
+                        <button
+                          onClick={() => handleOuvrirRessource(res)}
+                          className="flex-1 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-200 hover:opacity-80 active:scale-95 cursor-pointer"
+                          style={{ background: `${color}18`, color, border: `1px solid ${color}35` }}>
+                          {res.type === 'video' ? '▶ Regarder' : res.type === 'tp_virtuel' ? '🔬 Démarrer le TP' : res.type === 'tutorat' ? '💬 Rejoindre' : res.type === 'exercice' ? '✏️ Faire le quiz' : res.type === 'resume' ? '📄 Ouvrir la fiche' : '📥 Voir les annales'}
                         </button>
-                        <button className="px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-200"
-                          style={{ background: 'rgba(255,255,255,0.04)', color: '#94A3B8', border: '1px solid rgba(255,255,255,0.08)' }}>
+                        <button
+                          onClick={() => handleApercu(res)}
+                          className="px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-200 hover:opacity-80 active:scale-95 cursor-pointer"
+                          style={{ background: 'rgba(255,255,255,0.06)', color: '#CBD5E1', border: '1px solid rgba(255,255,255,0.1)' }}>
                           👁 Aperçu
                         </button>
                       </div>
