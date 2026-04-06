@@ -14,13 +14,13 @@ const PLANS = [
     max_eleves: '200 élèves',
     populaire: false,
     features: [
-      '200 élèves maximum',
-      '5 classes',
-      'Gestion élèves & notes',
-      'Bulletins PDF',
+      '200 élèves · 5 classes',
+      'Gestion élèves, notes & dossiers',
+      'Bulletins PDF imprimables',
       'Pointage GPS professeurs',
-      'Transport scolaire',
-      'Cantine',
+      'Transport scolaire & cantine',
+      'Inscriptions en ligne',
+      'Dashboard parent & élève',
       'Support email',
     ],
   },
@@ -34,13 +34,14 @@ const PLANS = [
     max_eleves: '600 élèves',
     populaire: true,
     features: [
-      '600 élèves maximum',
-      '15 classes',
+      '600 élèves · 15 classes',
       'Tout le plan Basique',
-      'Notifications WhatsApp',
-      'Assistant IA Gemini',
-      'Export IMEN ministère',
-      'Statistiques avancées',
+      'Correction IA (Vision) — copies scannées',
+      'Cours natifs + annales BAC/BFEM corrigées',
+      'Notifications WhatsApp & SMS parents',
+      'Bulletins automatiques + export PDF',
+      'Comptabilité scolarité & relances parents',
+      'Export IMEN / Ministère',
       'Support prioritaire 48h',
     ],
   },
@@ -54,27 +55,32 @@ const PLANS = [
     max_eleves: '1 500 élèves',
     populaire: false,
     features: [
-      '1 500 élèves maximum',
-      'Classes illimitées',
+      '1 500 élèves · Classes illimitées',
       'Tout le plan Standard',
       '5 comptes administrateurs',
-      'API REST complète',
-      'Paiement Wave / Orange Money',
-      'Rapports personnalisés',
-      'Support 24h + formation',
+      'Support pédagogique complet (CI → Terminale)',
+      'TP virtuels PhET en français',
+      'Wave / Orange Money intégrés',
+      'API REST documentée',
+      'Tableau de bord analytique avancé',
+      'Support 24h/24 + formation incluse',
     ],
   },
 ]
 
 const FONCTIONNALITES = [
-  { icon: '👨‍🎓', titre: 'Gestion des élèves', desc: 'Dossiers complets, cartes scolaires, historique et photos' },
-  { icon: '📊', titre: 'Notes & Bulletins', desc: 'Saisie des notes, calcul automatique, PDF imprimable' },
-  { icon: '📍', titre: 'Pointage GPS', desc: 'Présence professeurs géolocalisée en temps réel' },
-  { icon: '💳', titre: 'Paiements Wave / OM', desc: 'Collecte des frais scolaires par mobile money' },
-  { icon: '📱', titre: 'Alertes WhatsApp', desc: 'Notifiez automatiquement les parents d\'absences' },
-  { icon: '🤖', titre: 'Assistant IA', desc: 'Gemini AI intégré pour conseils pédagogiques' },
-  { icon: '🚌', titre: 'Transport scolaire', desc: 'Suivi GPS des bus et notifications d\'arrivée' },
-  { icon: '🍽️', titre: 'Cantine', desc: 'Menus, présences cantine et facturation parents' },
+  { icon: '👨‍🎓', titre: 'Gestion des élèves', desc: 'Dossiers complets, cartes scolaires, historique et photos d\'identité.' },
+  { icon: '📊', titre: 'Notes & Bulletins IA', desc: 'Saisie des notes, calcul automatique, bulletins PDF en un clic — mention officielle incluse.' },
+  { icon: '🤖', titre: 'Correction IA (Vision)', desc: 'Le prof scanne les copies → l\'IA Claude les corrige automatiquement avec points forts/faibles.' },
+  { icon: '📚', titre: 'Cours & Ressources Natifs', desc: '19 cours complets intégrés (Maths, SVT, Philo, Français, HG) + annales BAC/BFEM corrigées.' },
+  { icon: '📱', titre: 'Alertes WhatsApp & SMS', desc: 'Absences, notes, paiements — les parents sont notifiés automatiquement en temps réel.' },
+  { icon: '💳', titre: 'Paiements Wave / OM', desc: 'Collecte des frais scolaires par mobile money. Suivi des impayés et relances automatiques.' },
+  { icon: '📍', titre: 'Pointage GPS professeurs', desc: 'Présence géolocalisée en temps réel. Le directeur voit qui est en classe ou absent.' },
+  { icon: '🎓', titre: 'Support pédagogique', desc: 'TP virtuels PhET en français, quiz interactifs, fiches de révision — pour tous les niveaux.' },
+  { icon: '🚌', titre: 'Transport scolaire', desc: 'Suivi GPS des bus et notifications d\'arrivée aux parents.' },
+  { icon: '🍽️', titre: 'Cantine', desc: 'Menus, présences cantine et facturation parents intégrée.' },
+  { icon: '🧑‍💼', titre: '8 rôles & dashboards', desc: 'Directeur, Prof, Surveillant, Censeur, Secrétaire, Intendant, Parent, Élève — chacun son espace.' },
+  { icon: '📈', titre: 'Analytique avancée', desc: 'Taux de recouvrement, évolution des moyennes, assiduité — pilotez avec des données réelles.' },
 ]
 
 const TEMOIGNAGES = [
@@ -168,7 +174,7 @@ export default function LandingPage() {
 
           <p className="max-w-2xl mx-auto text-lg text-white/60 mb-10 leading-relaxed">
             SmartSchool SN connecte élèves, professeurs, parents et administration en un seul outil.
-            Bulletins, paiements Wave, alertes WhatsApp — tout automatisé.
+            Correction IA, cours natifs, bulletins automatiques, paiements Wave, alertes WhatsApp — tout intégré.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
@@ -189,8 +195,8 @@ export default function LandingPage() {
             {[
               { v: '14 j', l: 'Essai gratuit', c: '#00E676' },
               { v: '8', l: 'Rôles & dashboards', c: '#00E5FF' },
-              { v: 'Wave', l: 'Paiement mobile', c: '#FFD600' },
-              { v: 'IA', l: 'Assistant Gemini', c: '#D500F9' },
+              { v: '19+', l: 'Cours natifs intégrés', c: '#FFD600' },
+              { v: 'IA', l: 'Correction & Conseils', c: '#D500F9' },
             ].map(s => (
               <div key={s.l} className="rounded-2xl py-4 px-3 text-center"
                 style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
@@ -210,7 +216,7 @@ export default function LandingPage() {
             <h2 className="text-4xl sm:text-5xl font-black text-white mb-4">Tout ce dont votre école a besoin</h2>
             <p className="text-white/50 text-lg max-w-xl mx-auto">Un seul outil pour 8 profils : directeur, professeur, surveillant, censeur, secrétaire, intendant, parent et élève.</p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {FONCTIONNALITES.map(f => (
               <div key={f.titre} className="rounded-2xl p-5 group hover:-translate-y-1 transition-transform cursor-default"
                 style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>

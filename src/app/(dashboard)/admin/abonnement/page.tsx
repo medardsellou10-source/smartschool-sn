@@ -41,11 +41,13 @@ const PLANS_DEMO: Plan[] = [
     max_classes: 5,
     fonctionnalites: [
       '200 élèves · 5 classes',
+      'Gestion élèves, notes & dossiers',
       'Bulletins PDF imprimables',
       'Pointage GPS professeurs',
-      'Gestion transport',
-      'Gestion cantine',
-      'Inscriptions & dossiers',
+      'Transport scolaire & cantine',
+      'Dashboard parent & élève',
+      'Inscriptions en ligne',
+      'Support email',
     ],
   },
   {
@@ -60,12 +62,15 @@ const PLANS_DEMO: Plan[] = [
     fonctionnalites: [
       '600 élèves · 15 classes',
       'Tout le plan Basique',
+      '🤖 Correction IA (copies scannées)',
+      '📚 Cours natifs intégrés (19 modules)',
+      '🎓 Annales BAC/BFEM corrigées',
       'Notes temps réel + classements',
-      'Bulletins automatiques IA',
-      'Correction IA (Vision)',
-      'Alertes WhatsApp & SMS',
+      'Bulletins automatiques + PDF',
+      'Alertes WhatsApp & SMS parents',
+      'Comptabilité & relances scolarité',
       'Export IMEN / Ministère',
-      'Comptabilité scolarité complète',
+      'Support prioritaire 48h',
     ],
   },
   {
@@ -81,11 +86,13 @@ const PLANS_DEMO: Plan[] = [
       '1 500 élèves · Classes illimitées',
       'Tout le plan Standard',
       '5 comptes administrateurs',
-      'E-learning & vidéos',
-      'API REST documentée',
+      '🏫 Support pédagogique complet (CI → Tle)',
+      '🔬 TP virtuels PhET en français',
+      '📊 Quiz interactifs + fiches de révision',
       'Wave / Orange Money intégrés',
+      'API REST documentée',
       'Tableau de bord analytique avancé',
-      'Support prioritaire 24h/24',
+      'Support 24h/24 + formation incluse',
     ],
   },
 ]
@@ -101,12 +108,14 @@ const ABO_DEMO: Abonnement = {
 }
 
 const NOUVELLES_FONCTIONNALITES = [
-  { icon: '🤖', titre: 'Correction IA (Vision)', desc: 'Le professeur upload le corrigé + les copies scannées → Claude note automatiquement chaque copie avec points forts/faibles.' },
-  { icon: '📊', titre: 'Notes temps réel + Classements', desc: 'Les élèves voient leurs notes publiées en direct avec rang dans la classe, badges et graphiques d\'évolution.' },
-  { icon: '📋', titre: 'Bulletins automatiques', desc: 'Le censeur génère les bulletins en un clic à partir des notes saisies — moyenne pondérée, mention officielle, impression PDF.' },
-  { icon: '💳', titre: 'Comptabilité scolarité', desc: 'Suivi complet : total attendu, encaissé, solde impayé par élève, taux de recouvrement par trimestre, liste des débiteurs.' },
-  { icon: '📱', titre: 'Relances parents (WhatsApp)', desc: 'Envoi automatique de rappels de paiement aux parents via WhatsApp et SMS avec le montant impayé.' },
-  { icon: '🧑‍💼', titre: '8 rôles complets', desc: 'Admin, Professeur, Surveillant, Censeur, Secrétaire, Intendant, Parent, Élève — chacun avec son dashboard dédié.' },
+  { icon: '🤖', titre: 'Correction IA (Vision)', desc: 'Le professeur upload le corrigé + les copies scannées → Claude note automatiquement chaque copie avec points forts/faibles.', plan: 'Standard' },
+  { icon: '📚', titre: 'Cours Natifs Intégrés', desc: '19 cours complets (Maths S1/S2, Physique, SVT, Philo, Français, HG) s\'ouvrent directement dans SmartSchool — sans redirection externe.', plan: 'Standard' },
+  { icon: '🎓', titre: 'Ressources Élève Complètes', desc: 'Annales BAC/BFEM corrigées, TP virtuels PhET en français, quiz interactifs, fiches de révision — tout accessible depuis le dashboard élève.', plan: 'Standard' },
+  { icon: '📊', titre: 'Notes temps réel + Classements', desc: 'Les élèves voient leurs notes publiées en direct avec rang dans la classe, badges et graphiques d\'évolution.', plan: 'Standard' },
+  { icon: '📋', titre: 'Bulletins automatiques', desc: 'Le censeur génère les bulletins en un clic à partir des notes saisies — moyenne pondérée, mention officielle, impression PDF.', plan: 'Standard' },
+  { icon: '💳', titre: 'Comptabilité scolarité', desc: 'Suivi complet : total attendu, encaissé, solde impayé par élève, taux de recouvrement par trimestre, liste des débiteurs.', plan: 'Standard' },
+  { icon: '📱', titre: 'Relances parents (WhatsApp)', desc: 'Envoi automatique de rappels de paiement aux parents via WhatsApp et SMS avec le montant impayé.', plan: 'Standard' },
+  { icon: '🏫', titre: 'Support pédagogique professeur', desc: 'Le professeur accède au programme officiel MEN, aux ressources par matière/niveau, et peut préparer ses cours avec les mêmes ressources que les élèves.', plan: 'Établissement' },
 ]
 
 function daysLeft(dateStr: string) {
@@ -280,14 +289,24 @@ export default function AbonnementPage() {
         <div className="flex items-center gap-3 mb-4">
           <h2 className="text-lg font-bold text-white">🚀 Nouvelles fonctionnalités (2025-2026)</h2>
           <span className="px-2.5 py-1 rounded-full text-xs font-bold"
-            style={{ background: 'rgba(0,229,255,0.15)', color: '#00E5FF' }}>NOUVEAU</span>
+            style={{ background: 'rgba(0,229,255,0.15)', color: '#00E5FF' }}>8 NOUVELLES</span>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {NOUVELLES_FONCTIONNALITES.map(({ icon, titre, desc }) => (
+          {NOUVELLES_FONCTIONNALITES.map(({ icon, titre, desc, plan }) => (
             <div key={titre} className="rounded-2xl p-4" style={glassStyle}>
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-2xl">{icon}</span>
-                <p className="font-semibold text-white text-sm">{titre}</p>
+              <div className="flex items-start justify-between gap-2 mb-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">{icon}</span>
+                  <p className="font-semibold text-white text-sm leading-snug">{titre}</p>
+                </div>
+                <span className="shrink-0 text-[9px] font-bold px-2 py-0.5 rounded-full"
+                  style={{
+                    background: plan === 'Établissement' ? 'rgba(255,214,0,0.12)' : 'rgba(0,229,255,0.12)',
+                    color: plan === 'Établissement' ? '#FFD600' : '#00E5FF',
+                    border: `1px solid ${plan === 'Établissement' ? 'rgba(255,214,0,0.2)' : 'rgba(0,229,255,0.2)'}`,
+                  }}>
+                  {plan}
+                </span>
               </div>
               <p className="text-xs text-slate-400 leading-relaxed">{desc}</p>
             </div>
