@@ -9,6 +9,7 @@ import {
   type RessourceEnLigne, type ProgrammeMatiere
 } from '@/lib/curriculum-senegal'
 import { ANNALES, type AnnaleDoc } from '@/lib/annales-sn'
+import { CONTENU_NATIF } from '@/lib/contenu-pedagogique'
 
 const TYPE_META: Record<RessourceEnLigne['type'], { icon: string; label: string; color: string; description: string }> = {
   annale:      { icon: '📝', label: 'Annales BAC',          color: '#FF1744', description: 'Sujets corriges de 2010 a 2024 par serie et matiere' },
@@ -299,7 +300,20 @@ function answer(qi,ci){
     win.document.close()
   }
 
+  function ouvrirContenuNatif(res: RessourceEnLigne) {
+    const contenu = CONTENU_NATIF[res.id]
+    if (!contenu) return false
+    const win = window.open('', '_blank', 'width=960,height=800')
+    if (!win) { alert('Autorisez les popups pour afficher le cours.'); return true }
+    win.document.write(contenu.html)
+    win.document.close()
+    return true
+  }
+
   function handleOuvrirRessource(res: RessourceEnLigne) {
+    // Priorité 1 : contenu natif intégré dans SmartSchool
+    if (CONTENU_NATIF[res.id]) { ouvrirContenuNatif(res); return }
+    // Priorité 2 : fonctions spécialisées par type
     if (res.type === 'resume') { ouvrirFiche(res); return }
     if (res.type === 'exercice') { ouvrirQuiz(res); return }
     if (res.type === 'annale') { ouvrirAnnale(res); return }

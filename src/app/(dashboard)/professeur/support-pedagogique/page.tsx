@@ -10,6 +10,7 @@ import {
   type ProgrammeMatiere, type Module, type Lecon, type GrilleHoraire, type RessourceEnLigne
 } from '@/lib/curriculum-senegal'
 import { ANNALES, type AnnaleDoc } from '@/lib/annales-sn'
+import { CONTENU_NATIF } from '@/lib/contenu-pedagogique'
 
 // ── Couleurs par matière ──
 const MATIERE_COLORS: Record<string, string> = {
@@ -456,7 +457,18 @@ function toggleCorr(){
     win.document.close()
   }
 
+  function ouvrirContenuNatif(res: RessourceEnLigne) {
+    const contenu = CONTENU_NATIF[res.id]
+    if (!contenu) return false
+    const win = window.open('', '_blank', 'width=960,height=800')
+    if (!win) { alert('Autorisez les popups pour afficher le cours.'); return true }
+    win.document.write(contenu.html)
+    win.document.close()
+    return true
+  }
+
   function handleOuvrirRessource(res: RessourceEnLigne) {
+    if (CONTENU_NATIF[res.id]) { ouvrirContenuNatif(res); return }
     if (res.type === 'resume') { ouvrirFiche(res); return }
     if (res.type === 'exercice') { ouvrirQuiz(res); return }
     if (res.type === 'annale') { ouvrirAnnale(res); return }
@@ -466,6 +478,7 @@ function toggleCorr(){
   }
 
   function handleApercu(res: RessourceEnLigne) {
+    if (CONTENU_NATIF[res.id]) { ouvrirContenuNatif(res); return }
     if (res.type === 'resume') { ouvrirFiche(res); return }
     if (res.type === 'exercice') { ouvrirQuiz(res); return }
     if (res.type === 'annale') { ouvrirAnnale(res); return }
