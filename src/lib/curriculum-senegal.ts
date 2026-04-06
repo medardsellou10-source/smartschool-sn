@@ -802,6 +802,408 @@ export const PROGRAMMES: ProgrammeMatiere[] = [
       },
     ],
   },
+
+  // ═══════════════════════════════════════════════════════════
+  // PHILOSOPHIE — Terminale L
+  // ═══════════════════════════════════════════════════════════
+  {
+    matiere_id: 'mat-006-l', matiere: 'Philosophie', niveau: 'Terminale', serie: 'L',
+    coefficient: 6, heures_hebdo: 8, heures_annuelles: 240,
+    modules: [
+      {
+        id: 'philo-tl-m1', numero: 1, titre: 'La conscience et l\'inconscient', duree_heures: 30,
+        lecons: [
+          { id: 'philo-tl-m1-l1', titre: 'La conscience', duree_heures: 6, objectifs: ['Définir la conscience', 'Approches cartésienne et phénoménologique', 'La conscience de soi et du monde'], type: 'cours' },
+          { id: 'philo-tl-m1-l2', titre: 'L\'inconscient freudien', duree_heures: 6, objectifs: ['La théorie psychanalytique de Freud', 'Ça, Moi, Surmoi', 'Les mécanismes de défense'], type: 'cours' },
+          { id: 'philo-tl-m1-l3', titre: 'Conscience et identité personnelle', duree_heures: 5, objectifs: ['Continuité de l\'identité', 'Locke, Hume, Sartre sur le moi', 'Conscience et liberté'], type: 'cours' },
+          { id: 'philo-tl-m1-l4', titre: 'TD — Dissertations sur la conscience', duree_heures: 8, objectifs: ['Rédiger une dissertation sur la conscience', 'Structurer une argumentation philosophique'], type: 'td' },
+          { id: 'philo-tl-m1-l5', titre: 'DS — La conscience et l\'inconscient', duree_heures: 5, objectifs: ['Évaluation sur dissertation ou commentaire de texte'], type: 'evaluation' },
+        ],
+      },
+      {
+        id: 'philo-tl-m2', numero: 2, titre: 'La connaissance', duree_heures: 28,
+        lecons: [
+          { id: 'philo-tl-m2-l1', titre: 'Théories de la connaissance', duree_heures: 6, objectifs: ['Rationalisme vs empirisme', 'Kant et la critique de la raison pure', 'Les limites de la connaissance humaine'], type: 'cours' },
+          { id: 'philo-tl-m2-l2', titre: 'Vérité et méthode scientifique', duree_heures: 6, objectifs: ['Vérité formelle, empirique et pragmatique', 'La démarche scientifique', 'Popper et la réfutabilité'], type: 'cours' },
+          { id: 'philo-tl-m2-l3', titre: 'Foi et raison', duree_heures: 5, objectifs: ['Relations entre foi religieuse et raison philosophique', 'Contexte africain et sénégalais', 'Tolérance et pluralisme'], type: 'cours' },
+          { id: 'philo-tl-m2-l4', titre: 'TD — Dissertations sur la connaissance', duree_heures: 8, objectifs: ['Exercices de dissertation sur la vérité et la science'], type: 'td' },
+          { id: 'philo-tl-m2-l5', titre: 'DS — La connaissance', duree_heures: 3, objectifs: ['Évaluation sur la connaissance et la vérité'], type: 'evaluation' },
+        ],
+      },
+      {
+        id: 'philo-tl-m3', numero: 3, titre: 'La liberté', duree_heures: 30,
+        lecons: [
+          { id: 'philo-tl-m3-l1', titre: 'Déterminisme et liberté', duree_heures: 8, objectifs: ['Déterminisme physique et biologique', 'Liberté comme indéterminisme', 'Spinoza, Sartre, Marx'], type: 'cours' },
+          { id: 'philo-tl-m3-l2', titre: 'Liberté et responsabilité', duree_heures: 7, objectifs: ['Le libre arbitre', 'Responsabilité morale et juridique', 'Liberté et contrainte sociale'], type: 'cours' },
+          { id: 'philo-tl-m3-l3', titre: 'Liberté politique', duree_heures: 5, objectifs: ['Liberté civile et politique', 'Droits de l\'homme', 'Liberté et égalité'], type: 'cours' },
+          { id: 'philo-tl-m3-l4', titre: 'TD — Dissertations sur la liberté', duree_heures: 8, objectifs: ['Rédiger des dissertations sur la liberté et le déterminisme'], type: 'td' },
+          { id: 'philo-tl-m3-l5', titre: 'DS — La liberté', duree_heures: 2, objectifs: ['Évaluation sur la liberté'], type: 'evaluation' },
+        ],
+      },
+      {
+        id: 'philo-tl-m4', numero: 4, titre: 'Autrui', duree_heures: 25,
+        lecons: [
+          { id: 'philo-tl-m4-l1', titre: 'Le problème d\'autrui', duree_heures: 6, objectifs: ['Existence d\'autrui comme problème philosophique', 'Husserl, Sartre, Levinas', 'Alter ego et intersubjectivité'], type: 'cours' },
+          { id: 'philo-tl-m4-l2', titre: 'La communication et le langage', duree_heures: 6, objectifs: ['Langage comme médiation', 'Parole et écriture', 'Communication authentique'], type: 'cours' },
+          { id: 'philo-tl-m4-l3', titre: 'Vivre ensemble', duree_heures: 5, objectifs: ['Relations à autrui', 'Amour, amitié, altérité', 'Conflit et reconnaissance'], type: 'cours' },
+          { id: 'philo-tl-m4-l4', titre: 'TD — Dissertations sur autrui', duree_heures: 6, objectifs: ['Exercices de dissertation sur autrui et la communication'], type: 'td' },
+          { id: 'philo-tl-m4-l5', titre: 'DS — Autrui', duree_heures: 2, objectifs: ['Évaluation sur la notion d\'autrui'], type: 'evaluation' },
+        ],
+      },
+      {
+        id: 'philo-tl-m5', numero: 5, titre: 'La société et l\'État', duree_heures: 28,
+        lecons: [
+          { id: 'philo-tl-m5-l1', titre: 'Fondements de la société', duree_heures: 6, objectifs: ['Contrat social : Hobbes, Locke, Rousseau', 'Société naturelle vs société civile', 'Lien social et cohésion'], type: 'cours' },
+          { id: 'philo-tl-m5-l2', titre: 'La démocratie et ses enjeux', duree_heures: 6, objectifs: ['Démocratie directe et représentative', 'Droits et devoirs du citoyen', 'Démocratie en Afrique'], type: 'cours' },
+          { id: 'philo-tl-m5-l3', titre: 'Justice sociale', duree_heures: 5, objectifs: ['Conceptions de la justice', 'Rawls et la justice comme équité', 'Inégalités et équité'], type: 'cours' },
+          { id: 'philo-tl-m5-l4', titre: 'L\'État africain', duree_heures: 5, objectifs: ['Spécificités de l\'État post-colonial', 'Développement et gouvernance', 'Sénégal et démocratie'], type: 'cours' },
+          { id: 'philo-tl-m5-l5', titre: 'TD — Dissertations sur société et État', duree_heures: 4, objectifs: ['Exercices sur la politique et la justice'], type: 'td' },
+          { id: 'philo-tl-m5-l6', titre: 'DS — La société et l\'État', duree_heures: 2, objectifs: ['Évaluation sur la société et l\'État'], type: 'evaluation' },
+        ],
+      },
+      {
+        id: 'philo-tl-m6', numero: 6, titre: 'La religion et la morale', duree_heures: 22,
+        lecons: [
+          { id: 'philo-tl-m6-l1', titre: 'Religion et philosophie', duree_heures: 6, objectifs: ['Définitions et fonctions de la religion', 'Philosophie et théologie', 'Pluralisme religieux au Sénégal'], type: 'cours' },
+          { id: 'philo-tl-m6-l2', titre: 'Morale et éthique', duree_heures: 5, objectifs: ['Distinction morale/éthique', 'Kant et l\'impératif catégorique', 'Éthique des vertus'], type: 'cours' },
+          { id: 'philo-tl-m6-l3', titre: 'Bonheur et morale', duree_heures: 5, objectifs: ['Hédonisme, eudémonisme, stoïcisme', 'Bonheur et devoir moral', 'Bonheur individuel et collectif'], type: 'cours' },
+          { id: 'philo-tl-m6-l4', titre: 'TD — Dissertations religion et morale', duree_heures: 4, objectifs: ['Exercices sur religion, morale et bonheur'], type: 'td' },
+          { id: 'philo-tl-m6-l5', titre: 'DS — Religion et morale', duree_heures: 2, objectifs: ['Évaluation sur religion et morale'], type: 'evaluation' },
+        ],
+      },
+      {
+        id: 'philo-tl-m7', numero: 7, titre: 'Révisions BAC Philosophie', duree_heures: 22,
+        lecons: [
+          { id: 'philo-tl-m7-l1', titre: 'Méthodologie de la dissertation', duree_heures: 6, objectifs: ['Introduction, développement, conclusion', 'Problématisation et argumentation', 'Exemples et références philosophiques'], type: 'cours' },
+          { id: 'philo-tl-m7-l2', titre: 'Méthodologie du commentaire de texte', duree_heures: 6, objectifs: ['Lecture analytique d\'un texte philosophique', 'Explication et critique', 'Méthode adaptée au BAC sénégalais'], type: 'cours' },
+          { id: 'philo-tl-m7-l3', titre: 'BAC Blancs Philosophie', duree_heures: 10, objectifs: ['Sujets types BAC', 'Entraînement en conditions réelles', 'Correction et analyse des copies'], type: 'evaluation' },
+        ],
+      },
+    ],
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // PHILOSOPHIE — Terminale S (S1 et S2)
+  // ═══════════════════════════════════════════════════════════
+  {
+    matiere_id: 'mat-007-s', matiere: 'Philosophie', niveau: 'Terminale',
+    coefficient: 2, heures_hebdo: 3, heures_annuelles: 90,
+    modules: [
+      {
+        id: 'philo-ts-m1', numero: 1, titre: 'La conscience et la connaissance', duree_heures: 25,
+        lecons: [
+          { id: 'philo-ts-m1-l1', titre: 'La conscience', duree_heures: 5, objectifs: ['Définition et approches de la conscience', 'Conscience de soi et des autres', 'L\'inconscient et Freud'], type: 'cours' },
+          { id: 'philo-ts-m1-l2', titre: 'La connaissance', duree_heures: 5, objectifs: ['Rationalisme et empirisme', 'Les sources du savoir', 'Science et certitude'], type: 'cours' },
+          { id: 'philo-ts-m1-l3', titre: 'La vérité', duree_heures: 5, objectifs: ['Vérité et erreur', 'Vérité scientifique vs vérité philosophique', 'Critique et doute'], type: 'cours' },
+          { id: 'philo-ts-m1-l4', titre: 'TD — Exercices sur conscience et connaissance', duree_heures: 8, objectifs: ['Pratique de la dissertation courte', 'Analyse de textes philosophiques'], type: 'td' },
+          { id: 'philo-ts-m1-l5', titre: 'DS — Conscience et connaissance', duree_heures: 2, objectifs: ['Évaluation écrite sur les deux notions'], type: 'evaluation' },
+        ],
+      },
+      {
+        id: 'philo-ts-m2', numero: 2, titre: 'La liberté et la société', duree_heures: 25,
+        lecons: [
+          { id: 'philo-ts-m2-l1', titre: 'La liberté', duree_heures: 6, objectifs: ['Libre arbitre et déterminisme', 'Liberté et responsabilité', 'Liberté politique'], type: 'cours' },
+          { id: 'philo-ts-m2-l2', titre: 'La morale', duree_heures: 6, objectifs: ['Bien et mal, normes morales', 'Kant : l\'impératif catégorique', 'Morale et société'], type: 'cours' },
+          { id: 'philo-ts-m2-l3', titre: 'L\'État', duree_heures: 5, objectifs: ['Fondements de l\'État', 'Droits et devoirs du citoyen', 'Démocratie et justice'], type: 'cours' },
+          { id: 'philo-ts-m2-l4', titre: 'TD — Exercices sur liberté et société', duree_heures: 6, objectifs: ['Pratique de la dissertation et de l\'explication de texte'], type: 'td' },
+          { id: 'philo-ts-m2-l5', titre: 'DS — Liberté et société', duree_heures: 2, objectifs: ['Évaluation écrite sur la liberté et l\'État'], type: 'evaluation' },
+        ],
+      },
+      {
+        id: 'philo-ts-m3', numero: 3, titre: 'Révisions BAC Philo S', duree_heures: 20,
+        lecons: [
+          { id: 'philo-ts-m3-l1', titre: 'Méthode de la dissertation', duree_heures: 5, objectifs: ['Rédiger une dissertation en séries scientifiques', 'Concision et rigueur argumentative'], type: 'cours' },
+          { id: 'philo-ts-m3-l2', titre: 'Entraînement BAC — Sujets types', duree_heures: 15, objectifs: ['Sujets BAC Philo S des années précédentes', 'Correction détaillée', 'Conseils pour le jour J'], type: 'evaluation' },
+        ],
+      },
+    ],
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // FRANÇAIS — Terminale L
+  // ═══════════════════════════════════════════════════════════
+  {
+    matiere_id: 'mat-002-l', matiere: 'Français', niveau: 'Terminale', serie: 'L',
+    coefficient: 5, heures_hebdo: 5, heures_annuelles: 150,
+    modules: [
+      {
+        id: 'fr-tl-m1', numero: 1, titre: 'Le texte littéraire — Analyse', duree_heures: 35,
+        lecons: [
+          { id: 'fr-tl-m1-l1', titre: 'La poésie — Figures de style et analyse', duree_heures: 8, objectifs: ['Identifier les figures de style', 'Analyser un poème : rythme, sonorités, images', 'Poètes francophones africains'], type: 'cours' },
+          { id: 'fr-tl-m1-l2', titre: 'Le roman — Narration et personnages', duree_heures: 8, objectifs: ['Modes et types de narration', 'Construction des personnages', 'Romans africains et français au programme'], type: 'cours' },
+          { id: 'fr-tl-m1-l3', titre: 'Le théâtre — Structure dramatique', duree_heures: 7, objectifs: ['Structure de la pièce de théâtre', 'Types de comique et de tragique', 'Dramaturgie classique et moderne'], type: 'cours' },
+          { id: 'fr-tl-m1-l4', titre: 'Analyse de textes dirigés', duree_heures: 8, objectifs: ['Exercices d\'analyse de textes variés', 'Commentaire composé guidé'], type: 'td' },
+          { id: 'fr-tl-m1-l5', titre: 'DS — Texte littéraire', duree_heures: 4, objectifs: ['Évaluation : analyse de texte ou commentaire'], type: 'evaluation' },
+        ],
+      },
+      {
+        id: 'fr-tl-m2', numero: 2, titre: 'Expression écrite', duree_heures: 40,
+        lecons: [
+          { id: 'fr-tl-m2-l1', titre: 'La dissertation littéraire — Méthode', duree_heures: 8, objectifs: ['Comprendre le sujet', 'Construire un plan dialectique ou thématique', 'Rédiger introduction et conclusion'], type: 'cours' },
+          { id: 'fr-tl-m2-l2', titre: 'Le commentaire composé — Méthode', duree_heures: 8, objectifs: ['Lecture analytique du texte', 'Axes de lecture et sous-parties', 'Rédaction du commentaire'], type: 'cours' },
+          { id: 'fr-tl-m2-l3', titre: 'La contraction de texte', duree_heures: 6, objectifs: ['Technique de réduction', 'Synthèse fidèle et concise', 'Éviter le plagiat'], type: 'cours' },
+          { id: 'fr-tl-m2-l4', titre: 'Entraînements rédactionnels', duree_heures: 12, objectifs: ['Rédiger des dissertations complètes', 'Pratiquer le commentaire composé'], type: 'td' },
+          { id: 'fr-tl-m2-l5', titre: 'DS — Expression écrite', duree_heures: 6, objectifs: ['Évaluation sur dissertation ou commentaire'], type: 'evaluation' },
+        ],
+      },
+      {
+        id: 'fr-tl-m3', numero: 3, titre: 'Grammaire et lexique', duree_heures: 35,
+        lecons: [
+          { id: 'fr-tl-m3-l1', titre: 'Syntaxe et morphologie avancées', duree_heures: 8, objectifs: ['Propositions subordonnées complexes', 'Valeurs des modes et temps', 'Accords difficiles'], type: 'cours' },
+          { id: 'fr-tl-m3-l2', titre: 'Stylistique', duree_heures: 8, objectifs: ['Registres de langue', 'Figures de style avancées', 'Tonalités et effets stylistiques'], type: 'cours' },
+          { id: 'fr-tl-m3-l3', titre: 'Vocabulaire thématique BAC', duree_heures: 12, objectifs: ['Lexique littéraire et critique', 'Vocabulaire philosophique de base', 'Exercices de vocabulaire en contexte'], type: 'td' },
+          { id: 'fr-tl-m3-l4', titre: 'DS — Grammaire et stylistique', duree_heures: 7, objectifs: ['Évaluation sur grammaire et lexique'], type: 'evaluation' },
+        ],
+      },
+      {
+        id: 'fr-tl-m4', numero: 4, titre: 'Œuvre intégrale', duree_heures: 25,
+        lecons: [
+          { id: 'fr-tl-m4-l1', titre: 'Étude d\'une œuvre au programme', duree_heures: 14, objectifs: ['Lecture intégrale de l\'œuvre', 'Analyse des thèmes, personnages, style', 'Contexte historique et littéraire'], type: 'cours' },
+          { id: 'fr-tl-m4-l2', titre: 'Dissertation sur l\'œuvre', duree_heures: 7, objectifs: ['Exercices de dissertation portant sur l\'œuvre intégrale'], type: 'td' },
+          { id: 'fr-tl-m4-l3', titre: 'DS — Œuvre intégrale', duree_heures: 4, objectifs: ['Évaluation sur l\'œuvre étudiée'], type: 'evaluation' },
+        ],
+      },
+      {
+        id: 'fr-tl-m5', numero: 5, titre: 'Révisions BAC Français', duree_heures: 15,
+        lecons: [
+          { id: 'fr-tl-m5-l1', titre: 'Révisions méthodologie', duree_heures: 5, objectifs: ['Synthèse des méthodes dissertation et commentaire', 'Conseils pratiques BAC'], type: 'revision' },
+          { id: 'fr-tl-m5-l2', titre: 'BAC Blancs Français', duree_heures: 10, objectifs: ['Sujets types BAC Français L', 'Conditions d\'examen réelles', 'Correction et commentaires'], type: 'evaluation' },
+        ],
+      },
+    ],
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // FRANÇAIS — Terminale S (S1 et S2)
+  // ═══════════════════════════════════════════════════════════
+  {
+    matiere_id: 'mat-002-s', matiere: 'Français', niveau: 'Terminale',
+    coefficient: 2, heures_hebdo: 3, heures_annuelles: 90,
+    modules: [
+      {
+        id: 'fr-ts-m1', numero: 1, titre: 'Le texte littéraire — Analyse', duree_heures: 20,
+        lecons: [
+          { id: 'fr-ts-m1-l1', titre: 'La poésie — Figures de style et analyse', duree_heures: 4, objectifs: ['Figures de style essentielles', 'Analyse d\'un poème'], type: 'cours' },
+          { id: 'fr-ts-m1-l2', titre: 'Le roman — Narration et personnages', duree_heures: 4, objectifs: ['Types de narration', 'Analyse des personnages'], type: 'cours' },
+          { id: 'fr-ts-m1-l3', titre: 'Le théâtre — Structure dramatique', duree_heures: 4, objectifs: ['Structure et genres dramatiques'], type: 'cours' },
+          { id: 'fr-ts-m1-l4', titre: 'Analyse de textes dirigés', duree_heures: 5, objectifs: ['Exercices guidés d\'analyse de textes'], type: 'td' },
+          { id: 'fr-ts-m1-l5', titre: 'DS — Texte littéraire', duree_heures: 3, objectifs: ['Évaluation sur l\'analyse de texte'], type: 'evaluation' },
+        ],
+      },
+      {
+        id: 'fr-ts-m2', numero: 2, titre: 'Expression écrite', duree_heures: 25,
+        lecons: [
+          { id: 'fr-ts-m2-l1', titre: 'La dissertation littéraire — Méthode', duree_heures: 5, objectifs: ['Comprendre et problématiser un sujet', 'Rédiger un plan et une dissertation'], type: 'cours' },
+          { id: 'fr-ts-m2-l2', titre: 'Le commentaire composé — Méthode', duree_heures: 5, objectifs: ['Analyser un texte et construire des axes de lecture'], type: 'cours' },
+          { id: 'fr-ts-m2-l3', titre: 'La contraction de texte', duree_heures: 4, objectifs: ['Résumer fidèlement un texte long'], type: 'cours' },
+          { id: 'fr-ts-m2-l4', titre: 'Entraînements rédactionnels', duree_heures: 8, objectifs: ['Exercices pratiques de rédaction'], type: 'td' },
+          { id: 'fr-ts-m2-l5', titre: 'DS — Expression écrite', duree_heures: 3, objectifs: ['Évaluation sur rédaction'], type: 'evaluation' },
+        ],
+      },
+      {
+        id: 'fr-ts-m3', numero: 3, titre: 'Grammaire et lexique', duree_heures: 20,
+        lecons: [
+          { id: 'fr-ts-m3-l1', titre: 'Syntaxe et morphologie avancées', duree_heures: 5, objectifs: ['Propositions complexes et accords difficiles'], type: 'cours' },
+          { id: 'fr-ts-m3-l2', titre: 'Stylistique', duree_heures: 5, objectifs: ['Registres de langue, figures de style'], type: 'cours' },
+          { id: 'fr-ts-m3-l3', titre: 'Vocabulaire thématique BAC', duree_heures: 7, objectifs: ['Lexique utile pour le BAC'], type: 'td' },
+          { id: 'fr-ts-m3-l4', titre: 'DS — Grammaire', duree_heures: 3, objectifs: ['Évaluation grammaire et lexique'], type: 'evaluation' },
+        ],
+      },
+      {
+        id: 'fr-ts-m4', numero: 4, titre: 'Révisions BAC Français', duree_heures: 25,
+        lecons: [
+          { id: 'fr-ts-m4-l1', titre: 'Révisions méthodologie', duree_heures: 5, objectifs: ['Synthèse des méthodes dissertation et commentaire'], type: 'revision' },
+          { id: 'fr-ts-m4-l2', titre: 'BAC Blancs Français', duree_heures: 20, objectifs: ['Sujets types BAC Français S', 'Correction et auto-évaluation'], type: 'evaluation' },
+        ],
+      },
+    ],
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // HISTOIRE-GÉOGRAPHIE — Terminale L
+  // ═══════════════════════════════════════════════════════════
+  {
+    matiere_id: 'mat-005-l', matiere: 'Histoire-Géographie', niveau: 'Terminale', serie: 'L',
+    coefficient: 4, heures_hebdo: 4, heures_annuelles: 120,
+    modules: [
+      {
+        id: 'hg-tl-m1', numero: 1, titre: 'Le monde au XXème siècle — Contexte international', duree_heures: 28,
+        lecons: [
+          { id: 'hg-tl-m1-l1', titre: 'Les grandes guerres mondiales', duree_heures: 6, objectifs: ['Causes et déroulement de la Première Guerre mondiale', 'La Seconde Guerre mondiale : bilan et conséquences', 'Le rôle des colonies africaines dans les deux guerres'], type: 'cours' },
+          { id: 'hg-tl-m1-l2', titre: 'La Guerre Froide', duree_heures: 6, objectifs: ['Origines et phases de la Guerre Froide', 'Blocs antagonistes : USA vs URSS', 'Impact sur l\'Afrique et le Sénégal'], type: 'cours' },
+          { id: 'hg-tl-m1-l3', titre: 'La décolonisation en Afrique', duree_heures: 8, objectifs: ['Processus de décolonisation', 'Indépendances africaines (1960 et après)', 'Sénégal : du territoire colonial à l\'indépendance'], type: 'cours' },
+          { id: 'hg-tl-m1-l4', titre: 'TD — Révisions histoire mondiale', duree_heures: 6, objectifs: ['Exercices de composition et analyse de documents'], type: 'td' },
+          { id: 'hg-tl-m1-l5', titre: 'DS — Histoire mondiale', duree_heures: 2, objectifs: ['Évaluation sur le monde au XXème siècle'], type: 'evaluation' },
+        ],
+      },
+      {
+        id: 'hg-tl-m2', numero: 2, titre: 'L\'Afrique et le Sénégal dans le monde contemporain', duree_heures: 30,
+        lecons: [
+          { id: 'hg-tl-m2-l1', titre: 'L\'Afrique face aux défis du développement', duree_heures: 8, objectifs: ['Indicateurs de développement en Afrique', 'Obstacles au développement : dette, conflits, gouvernance', 'Initiatives africaines de développement (NEPAD, UA)'], type: 'cours' },
+          { id: 'hg-tl-m2-l2', titre: 'Le Sénégal — Histoire et géopolitique', duree_heures: 8, objectifs: ['Histoire du Sénégal depuis l\'indépendance', 'Stabilité politique et démocratie sénégalaise', 'Rôle du Sénégal dans l\'espace CEDEAO'], type: 'cours' },
+          { id: 'hg-tl-m2-l3', titre: 'Les relations Afrique-monde', duree_heures: 6, objectifs: ['Rapports Afrique-Europe (Françafrique, partenariats)', 'Relations Afrique-Chine et Afrique-USA', 'Enjeux de la coopération Sud-Sud'], type: 'cours' },
+          { id: 'hg-tl-m2-l4', titre: 'TD — Composition et analyse', duree_heures: 6, objectifs: ['Exercices de composition historique sur l\'Afrique'], type: 'td' },
+          { id: 'hg-tl-m2-l5', titre: 'DS — Afrique et Sénégal', duree_heures: 2, objectifs: ['Évaluation sur l\'Afrique contemporaine'], type: 'evaluation' },
+        ],
+      },
+      {
+        id: 'hg-tl-m3', numero: 3, titre: 'Géographie — Espaces et territoires', duree_heures: 28,
+        lecons: [
+          { id: 'hg-tl-m3-l1', titre: 'La mondialisation économique', duree_heures: 6, objectifs: ['Définition et mécanismes de la mondialisation', 'Flux commerciaux et financiers mondiaux', 'Gagnants et perdants de la mondialisation'], type: 'cours' },
+          { id: 'hg-tl-m3-l2', titre: 'Les grandes aires de civilisation', duree_heures: 6, objectifs: ['Civilisations occidentale, islamique, asiatique', 'Afrique : diversité culturelle et civilisationnelle', 'Contacts et chocs de civilisations'], type: 'cours' },
+          { id: 'hg-tl-m3-l3', titre: 'Géographie de l\'Afrique', duree_heures: 8, objectifs: ['Milieux naturels africains', 'Population et urbanisation en Afrique', 'Géographie économique de l\'Afrique subsaharienne'], type: 'cours' },
+          { id: 'hg-tl-m3-l4', titre: 'TD — Croquis et cartes géographiques', duree_heures: 6, objectifs: ['Réaliser des croquis géographiques', 'Commenter une carte', 'Exercices de géographie'], type: 'td' },
+          { id: 'hg-tl-m3-l5', titre: 'DS — Géographie', duree_heures: 2, objectifs: ['Évaluation géographie : composition ou croquis'], type: 'evaluation' },
+        ],
+      },
+      {
+        id: 'hg-tl-m4', numero: 4, titre: 'Méthodologie et Révisions BAC HG', duree_heures: 20,
+        lecons: [
+          { id: 'hg-tl-m4-l1', titre: 'Méthode de la composition', duree_heures: 6, objectifs: ['Plan, introduction, développement, conclusion', 'Rédiger une composition en HG', 'Exemples de sujets BAC'], type: 'cours' },
+          { id: 'hg-tl-m4-l2', titre: 'Méthode d\'analyse de document', duree_heures: 4, objectifs: ['Présenter, analyser, critiquer un document', 'Types de documents en HG'], type: 'cours' },
+          { id: 'hg-tl-m4-l3', titre: 'BAC Blancs HG', duree_heures: 10, objectifs: ['Sujets types BAC HG L', 'Entraînement en conditions réelles', 'Correction détaillée'], type: 'evaluation' },
+        ],
+      },
+    ],
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // MATHÉMATIQUES — Terminale S2
+  // ═══════════════════════════════════════════════════════════
+  {
+    matiere_id: 'mat-001-s2', matiere: 'Mathématiques', niveau: 'Terminale', serie: 'S2',
+    coefficient: 6, heures_hebdo: 6, heures_annuelles: 180,
+    modules: [
+      {
+        id: 'math-ts2-m1', numero: 1, titre: 'Suites numériques', duree_heures: 24,
+        lecons: [
+          { id: 'math-ts2-m1-l1', titre: 'Suites arithmétiques et géométriques', duree_heures: 5, objectifs: ['Définitions, termes généraux', 'Sommes de termes consécutifs', 'Applications concrètes'], type: 'cours' },
+          { id: 'math-ts2-m1-l2', titre: 'Suites récurrentes', duree_heures: 4, objectifs: ['Suites définies par récurrence', 'Convergence et limite', 'Points fixes'], type: 'cours' },
+          { id: 'math-ts2-m1-l3', titre: 'Sens de variation d\'une suite', duree_heures: 4, objectifs: ['Monotonie d\'une suite', 'Suite majorée, minorée, bornée'], type: 'cours' },
+          { id: 'math-ts2-m1-l4', titre: 'TD — Exercices sur les suites', duree_heures: 8, objectifs: ['Exercices types BAC S2 sur les suites'], type: 'td' },
+          { id: 'math-ts2-m1-l5', titre: 'DS — Suites numériques', duree_heures: 3, objectifs: ['Évaluation sur les suites'], type: 'evaluation' },
+        ],
+      },
+      {
+        id: 'math-ts2-m2', numero: 2, titre: 'Limites et continuité', duree_heures: 22,
+        lecons: [
+          { id: 'math-ts2-m2-l1', titre: 'Limites de fonctions', duree_heures: 5, objectifs: ['Limite finie et infinie', 'Limites usuelles', 'Opérations sur les limites'], type: 'cours' },
+          { id: 'math-ts2-m2-l2', titre: 'Continuité d\'une fonction', duree_heures: 5, objectifs: ['Définition de la continuité', 'Théorème des valeurs intermédiaires (TVI)', 'Applications du TVI'], type: 'cours' },
+          { id: 'math-ts2-m2-l3', titre: 'Comparaisons asymptotiques', duree_heures: 4, objectifs: ['Asymptotes verticales, horizontales, obliques', 'Branches infinies'], type: 'cours' },
+          { id: 'math-ts2-m2-l4', titre: 'TD — Limites et continuité', duree_heures: 6, objectifs: ['Exercices de calcul de limites'], type: 'td' },
+          { id: 'math-ts2-m2-l5', titre: 'DS — Limites et continuité', duree_heures: 2, objectifs: ['Évaluation sur les limites et la continuité'], type: 'evaluation' },
+        ],
+      },
+      {
+        id: 'math-ts2-m3', numero: 3, titre: 'Dérivation et étude de fonctions', duree_heures: 28,
+        lecons: [
+          { id: 'math-ts2-m3-l1', titre: 'Dérivabilité et calcul de dérivées', duree_heures: 6, objectifs: ['Définition de la dérivée', 'Dérivées des fonctions usuelles', 'Règles de dérivation'], type: 'cours' },
+          { id: 'math-ts2-m3-l2', titre: 'Dérivées successives', duree_heures: 4, objectifs: ['Dérivées d\'ordre 2 et supérieur', 'Convexité et points d\'inflexion'], type: 'cours' },
+          { id: 'math-ts2-m3-l3', titre: 'Étude complète d\'une fonction', duree_heures: 6, objectifs: ['Domaine, parité, limites, dérivée, tableau de variation', 'Tracé de courbe représentative'], type: 'cours' },
+          { id: 'math-ts2-m3-l4', titre: 'Fonctions logarithmes et exponentielles', duree_heures: 6, objectifs: ['Logarithme naturel et exponentielle', 'Propriétés algébriques et graphiques', 'Dérivation et étude'], type: 'cours' },
+          { id: 'math-ts2-m3-l5', titre: 'TD — Étude de fonctions', duree_heures: 4, objectifs: ['Exercices d\'étude de fonctions types BAC'], type: 'td' },
+          { id: 'math-ts2-m3-l6', titre: 'DS — Dérivation et fonctions', duree_heures: 2, objectifs: ['Évaluation sur la dérivation et l\'étude de fonctions'], type: 'evaluation' },
+        ],
+      },
+      {
+        id: 'math-ts2-m4', numero: 4, titre: 'Intégration', duree_heures: 22,
+        lecons: [
+          { id: 'math-ts2-m4-l1', titre: 'Primitives et techniques d\'intégration', duree_heures: 5, objectifs: ['Primitives des fonctions usuelles', 'Intégration par parties', 'Changement de variable'], type: 'cours' },
+          { id: 'math-ts2-m4-l2', titre: 'Intégrale d\'une fonction', duree_heures: 5, objectifs: ['Définition et propriétés de l\'intégrale', 'Calcul d\'aires et de volumes'], type: 'cours' },
+          { id: 'math-ts2-m4-l3', titre: 'Applications de l\'intégration', duree_heures: 5, objectifs: ['Calcul d\'aire entre deux courbes', 'Volume de solides de révolution'], type: 'cours' },
+          { id: 'math-ts2-m4-l4', titre: 'TD — Intégration', duree_heures: 5, objectifs: ['Exercices d\'intégration types BAC S2'], type: 'td' },
+          { id: 'math-ts2-m4-l5', titre: 'DS — Intégration', duree_heures: 2, objectifs: ['Évaluation sur les primitives et intégrales'], type: 'evaluation' },
+        ],
+      },
+      {
+        id: 'math-ts2-m5', numero: 5, titre: 'Probabilités', duree_heures: 18,
+        lecons: [
+          { id: 'math-ts2-m5-l1', titre: 'Probabilités conditionnelles', duree_heures: 4, objectifs: ['Probabilité conditionnelle', 'Formule des probabilités totales', 'Indépendance d\'événements'], type: 'cours' },
+          { id: 'math-ts2-m5-l2', titre: 'Variables aléatoires discrètes', duree_heures: 4, objectifs: ['Loi de probabilité d\'une variable aléatoire', 'Espérance, variance, écart-type'], type: 'cours' },
+          { id: 'math-ts2-m5-l3', titre: 'Loi binomiale', duree_heures: 3, objectifs: ['Schéma de Bernoulli', 'Loi binomiale B(n, p)', 'Calculs et applications'], type: 'cours' },
+          { id: 'math-ts2-m5-l4', titre: 'TD — Probabilités', duree_heures: 5, objectifs: ['Exercices de probabilités types BAC S2'], type: 'td' },
+          { id: 'math-ts2-m5-l5', titre: 'DS — Probabilités', duree_heures: 2, objectifs: ['Évaluation sur les probabilités'], type: 'evaluation' },
+        ],
+      },
+      {
+        id: 'math-ts2-m6', numero: 6, titre: 'Géométrie dans l\'espace', duree_heures: 16,
+        lecons: [
+          { id: 'math-ts2-m6-l1', titre: 'Vecteurs et droites dans l\'espace', duree_heures: 4, objectifs: ['Vecteurs de l\'espace', 'Équations paramétriques de droites'], type: 'cours' },
+          { id: 'math-ts2-m6-l2', titre: 'Plans et positions relatives', duree_heures: 4, objectifs: ['Équation de plan', 'Positions relatives droite/plan, plan/plan'], type: 'cours' },
+          { id: 'math-ts2-m6-l3', titre: 'Produit scalaire dans l\'espace', duree_heures: 3, objectifs: ['Produit scalaire, orthogonalité', 'Distance d\'un point à un plan'], type: 'cours' },
+          { id: 'math-ts2-m6-l4', titre: 'TD — Géométrie dans l\'espace', duree_heures: 3, objectifs: ['Exercices de géométrie dans l\'espace'], type: 'td' },
+          { id: 'math-ts2-m6-l5', titre: 'DS — Géométrie dans l\'espace', duree_heures: 2, objectifs: ['Évaluation sur la géométrie spatiale'], type: 'evaluation' },
+        ],
+      },
+      {
+        id: 'math-ts2-m7', numero: 7, titre: 'Révisions BAC Mathématiques S2', duree_heures: 14,
+        lecons: [
+          { id: 'math-ts2-m7-l1', titre: 'Révisions générales — Tous chapitres', duree_heures: 4, objectifs: ['Bilan de toutes les notions du programme S2'], type: 'revision' },
+          { id: 'math-ts2-m7-l2', titre: 'BAC Blancs Mathématiques S2', duree_heures: 10, objectifs: ['Sujets types BAC Maths S2', 'Entraînement en conditions réelles', 'Correction et analyse des erreurs'], type: 'evaluation' },
+        ],
+      },
+    ],
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  // MATHÉMATIQUES — 3ème (Préparation BFEM)
+  // ═══════════════════════════════════════════════════════════
+  {
+    matiere_id: 'mat-001-3e', matiere: 'Mathématiques', niveau: '3ème',
+    coefficient: 5, heures_hebdo: 5, heures_annuelles: 150,
+    modules: [
+      {
+        id: 'math-3e-m1', numero: 1, titre: 'Algèbre — Calcul et équations', duree_heures: 35,
+        lecons: [
+          { id: 'math-3e-m1-l1', titre: 'Ensembles de nombres', duree_heures: 4, objectifs: ['Naturels, entiers, rationnels, réels', 'Représentation sur la droite numérique', 'Intervalles et encadrements'], type: 'cours' },
+          { id: 'math-3e-m1-l2', titre: 'Fractions et calcul rationnel', duree_heures: 5, objectifs: ['Simplification de fractions', 'Opérations sur les fractions', 'Expressions fractionnaires'], type: 'cours' },
+          { id: 'math-3e-m1-l3', titre: 'Équations et inéquations du 1er degré', duree_heures: 6, objectifs: ['Résoudre une équation du 1er degré', 'Résoudre et représenter une inéquation', 'Problèmes concrets avec équations'], type: 'cours' },
+          { id: 'math-3e-m1-l4', titre: 'Systèmes d\'équations', duree_heures: 5, objectifs: ['Systèmes de deux équations à deux inconnues', 'Méthodes par substitution et combinaison', 'Applications et problèmes'], type: 'cours' },
+          { id: 'math-3e-m1-l5', titre: 'Polynômes — Factorisation', duree_heures: 5, objectifs: ['Développement et factorisation', 'Identités remarquables', 'Équations du 2nd degré — introduction'], type: 'cours' },
+          { id: 'math-3e-m1-l6', titre: 'TD — Algèbre', duree_heures: 8, objectifs: ['Exercices de calcul algébrique types BFEM'], type: 'td' },
+          { id: 'math-3e-m1-l7', titre: 'DS — Algèbre', duree_heures: 2, objectifs: ['Évaluation sur l\'algèbre'], type: 'evaluation' },
+        ],
+      },
+      {
+        id: 'math-3e-m2', numero: 2, titre: 'Géométrie plane', duree_heures: 35,
+        lecons: [
+          { id: 'math-3e-m2-l1', titre: 'Théorème de Thalès et réciproque', duree_heures: 8, objectifs: ['Énoncé et démonstration du théorème', 'Réciproque et applications', 'Calculs de longueurs et de rapports'], type: 'cours' },
+          { id: 'math-3e-m2-l2', titre: 'Trigonométrie dans le triangle rectangle', duree_heures: 6, objectifs: ['Sinus, cosinus, tangente', 'Calculs d\'angles et de longueurs', 'Résolution de triangles'], type: 'cours' },
+          { id: 'math-3e-m2-l3', titre: 'Cercles et angles inscrits', duree_heures: 5, objectifs: ['Propriétés du cercle', 'Angles inscrits et au centre', 'Applications géométriques'], type: 'cours' },
+          { id: 'math-3e-m2-l4', titre: 'Transformations', duree_heures: 5, objectifs: ['Translation, rotation, homothétie', 'Images de figures par une transformation', 'Isométries et similitudes'], type: 'cours' },
+          { id: 'math-3e-m2-l5', titre: 'TD — Géométrie plane', duree_heures: 8, objectifs: ['Exercices de géométrie types BFEM'], type: 'td' },
+          { id: 'math-3e-m2-l6', titre: 'DS — Géométrie plane', duree_heures: 3, objectifs: ['Évaluation sur la géométrie plane'], type: 'evaluation' },
+        ],
+      },
+      {
+        id: 'math-3e-m3', numero: 3, titre: 'Statistiques et probabilités', duree_heures: 20,
+        lecons: [
+          { id: 'math-3e-m3-l1', titre: 'Statistiques — Fréquences, effectifs, médianes', duree_heures: 5, objectifs: ['Tableaux de fréquences et d\'effectifs', 'Moyenne, médiane, mode', 'Diagrammes statistiques'], type: 'cours' },
+          { id: 'math-3e-m3-l2', titre: 'Probabilités — Introduction', duree_heures: 5, objectifs: ['Expérience aléatoire, événements', 'Probabilité d\'un événement', 'Probabilité et fréquences'], type: 'cours' },
+          { id: 'math-3e-m3-l3', titre: 'TD — Statistiques et probabilités', duree_heures: 7, objectifs: ['Exercices appliqués à des données réelles sénégalaises'], type: 'td' },
+          { id: 'math-3e-m3-l4', titre: 'DS — Statistiques et probabilités', duree_heures: 3, objectifs: ['Évaluation sur stats et probabilités'], type: 'evaluation' },
+        ],
+      },
+      {
+        id: 'math-3e-m4', numero: 4, titre: 'Géométrie dans l\'espace', duree_heures: 20,
+        lecons: [
+          { id: 'math-3e-m4-l1', titre: 'Solides de l\'espace', duree_heures: 5, objectifs: ['Cube, pavé, prisme, pyramide, cylindre, cône, sphère', 'Vocabulaire et propriétés des solides'], type: 'cours' },
+          { id: 'math-3e-m4-l2', titre: 'Volumes et surfaces', duree_heures: 5, objectifs: ['Formules de volume et d\'aire latérale', 'Calculs de volumes et de surfaces'], type: 'cours' },
+          { id: 'math-3e-m4-l3', titre: 'Section de solides', duree_heures: 4, objectifs: ['Sections planes de solides', 'Construire et identifier une section'], type: 'cours' },
+          { id: 'math-3e-m4-l4', titre: 'TD — Solides et calculs', duree_heures: 4, objectifs: ['Exercices de géométrie dans l\'espace types BFEM'], type: 'td' },
+          { id: 'math-3e-m4-l5', titre: 'DS — Géométrie dans l\'espace', duree_heures: 2, objectifs: ['Évaluation sur la géométrie spatiale'], type: 'evaluation' },
+        ],
+      },
+      {
+        id: 'math-3e-m5', numero: 5, titre: 'Révisions BFEM', duree_heures: 25,
+        lecons: [
+          { id: 'math-3e-m5-l1', titre: 'Révisions Algèbre et Géométrie', duree_heures: 8, objectifs: ['Bilan de toutes les notions du programme de 3ème', 'Fiches de révision par chapitre'], type: 'revision' },
+          { id: 'math-3e-m5-l2', titre: 'BFEM Blancs Mathématiques', duree_heures: 12, objectifs: ['Sujets types BFEM des années précédentes', 'Entraînement en conditions d\'examen réelles', 'Correction détaillée et commentée'], type: 'evaluation' },
+          { id: 'math-3e-m5-l3', titre: 'Corrections et analyses des erreurs', duree_heures: 5, objectifs: ['Identifier les erreurs fréquentes', 'Consolider les points faibles', 'Conseils pour le jour du BFEM'], type: 'revision' },
+        ],
+      },
+    ],
+  },
 ]
 
 // ── Ressources en Ligne pour Élèves ───────────────────────────────────────────
@@ -873,6 +1275,57 @@ export const RESSOURCES_EN_LIGNE: RessourceEnLigne[] = [
   { id: 'res-503', titre: 'Forum Q&A SVT', type: 'tutorat', matiere: 'SVT', niveau: 'Terminale', description: 'Questions/Réponses en SVT — communauté d\'entraide', source: 'SmartSchool SN Community' },
   { id: 'res-504', titre: 'Forum Q&A Philosophie', type: 'tutorat', matiere: 'Philosophie', niveau: 'Terminale', description: 'Aide en dissertation et commentaire de texte — tuteurs', source: 'SmartSchool SN Community' },
   { id: 'res-505', titre: 'Sessions de tutorat live — Maths', type: 'tutorat', matiere: 'Mathématiques', niveau: 'Terminale', description: 'Sessions vidéo hebdomadaires avec des élèves excellents et des enseignants bénévoles', source: 'SmartSchool SN Live' },
+
+  // ── Annales BAC supplémentaires (2022, 2021, 2020) ──
+  { id: 'res-016', titre: 'Annales BAC Maths S1 — 2022', type: 'annale', matiere: 'Mathématiques', niveau: 'Terminale', serie: 'S1', annee: '2022', description: 'Sujet et corrigé BAC 2022 Mathématiques S1', source: 'Office du BAC Sénégal' },
+  { id: 'res-017', titre: 'Annales BAC Maths S1 — 2021', type: 'annale', matiere: 'Mathématiques', niveau: 'Terminale', serie: 'S1', annee: '2021', description: 'Sujet et corrigé BAC 2021 Mathématiques S1', source: 'Office du BAC Sénégal' },
+  { id: 'res-018', titre: 'Annales BAC Maths S2 — 2022', type: 'annale', matiere: 'Mathématiques', niveau: 'Terminale', serie: 'S2', annee: '2022', description: 'Sujet et corrigé BAC 2022 Mathématiques S2', source: 'Office du BAC Sénégal' },
+  { id: 'res-019', titre: 'Annales BAC Maths S2 — 2021', type: 'annale', matiere: 'Mathématiques', niveau: 'Terminale', serie: 'S2', annee: '2021', description: 'Sujet et corrigé BAC 2021 Mathématiques S2', source: 'Office du BAC Sénégal' },
+  { id: 'res-020', titre: 'Annales BAC Physique-Chimie S1 — 2022', type: 'annale', matiere: 'Sciences Physiques', niveau: 'Terminale', serie: 'S1', annee: '2022', description: 'Sujet et corrigé BAC 2022 Physique-Chimie S1', source: 'Office du BAC Sénégal' },
+  { id: 'res-021', titre: 'Annales BAC Physique-Chimie S1 — 2021', type: 'annale', matiere: 'Sciences Physiques', niveau: 'Terminale', serie: 'S1', annee: '2021', description: 'Sujet et corrigé BAC 2021 Physique-Chimie S1', source: 'Office du BAC Sénégal' },
+  { id: 'res-022', titre: 'Annales BAC Physique-Chimie S2 — 2022', type: 'annale', matiere: 'Sciences Physiques', niveau: 'Terminale', serie: 'S2', annee: '2022', description: 'Sujet et corrigé BAC 2022 Physique-Chimie S2', source: 'Office du BAC Sénégal' },
+  { id: 'res-023', titre: 'Annales BAC Physique-Chimie S2 — 2021', type: 'annale', matiere: 'Sciences Physiques', niveau: 'Terminale', serie: 'S2', annee: '2021', description: 'Sujet et corrigé BAC 2021 Physique-Chimie S2', source: 'Office du BAC Sénégal' },
+  { id: 'res-024', titre: 'Annales BAC SVT S1 — 2022', type: 'annale', matiere: 'SVT', niveau: 'Terminale', serie: 'S1', annee: '2022', description: 'Sujet et corrigé BAC 2022 SVT S1', source: 'Office du BAC Sénégal' },
+  { id: 'res-025', titre: 'Annales BAC SVT S1 — 2021', type: 'annale', matiere: 'SVT', niveau: 'Terminale', serie: 'S1', annee: '2021', description: 'Sujet et corrigé BAC 2021 SVT S1', source: 'Office du BAC Sénégal' },
+
+  // ── Cours Vidéo supplémentaires ──
+  { id: 'res-111', titre: 'Philosophie — La liberté (Terminale L)', type: 'video', matiere: 'Philosophie', niveau: 'Terminale', serie: 'L', description: 'Déterminisme, libre arbitre, responsabilité — cours filmé avec exemples et textes philosophiques', source: 'EduNumérique SN' },
+  { id: 'res-112', titre: 'Philosophie — La société et l\'État', type: 'video', matiere: 'Philosophie', niveau: 'Terminale', serie: 'L', description: 'Contrat social, démocratie, justice sociale — cours complet Terminale L', source: 'EduNumérique SN' },
+  { id: 'res-113', titre: 'Philosophie — La connaissance et la vérité', type: 'video', matiere: 'Philosophie', niveau: 'Terminale', serie: 'L', description: 'Rationalisme, empirisme, vérité scientifique — vidéo cours niveau BAC', source: 'EduNumérique SN' },
+  { id: 'res-114', titre: 'Français — Méthode du commentaire composé', type: 'video', matiere: 'Français', niveau: 'Terminale', description: 'Lecture analytique, axes de lecture, rédaction du commentaire — méthode complète filmée', source: 'EduNumérique SN' },
+  { id: 'res-115', titre: 'Français — Analyse de la poésie africaine', type: 'video', matiere: 'Français', niveau: 'Terminale', description: 'Senghor, Césaire, Diop — analyse stylistique et thématique de la poésie négritudienne', source: 'EduNumérique SN' },
+  { id: 'res-116', titre: 'Français — Le roman africain au BAC', type: 'video', matiere: 'Français', niveau: 'Terminale', description: 'Cheikh Hamidou Kane, Sembène Ousmane — étude des œuvres au programme', source: 'EduNumérique SN' },
+  { id: 'res-117', titre: 'Histoire-Géographie — La décolonisation en Afrique', type: 'video', matiere: 'Histoire-Géographie', niveau: 'Terminale', serie: 'L', description: 'Indépendances africaines, rôle du Sénégal, figures de la décolonisation — cours filmé', source: 'EduNumérique SN' },
+  { id: 'res-118', titre: 'Histoire-Géographie — La Guerre Froide', type: 'video', matiere: 'Histoire-Géographie', niveau: 'Terminale', serie: 'L', description: 'Origines, crises, fin de la Guerre Froide et impact sur l\'Afrique', source: 'EduNumérique SN' },
+  { id: 'res-119', titre: 'Histoire-Géographie — Géographie de l\'Afrique', type: 'video', matiere: 'Histoire-Géographie', niveau: 'Terminale', serie: 'L', description: 'Milieux naturels, population, économie de l\'Afrique subsaharienne', source: 'EduNumérique SN' },
+  { id: 'res-120', titre: 'Mathématiques 3ème — Théorème de Thalès', type: 'video', matiere: 'Mathématiques', niveau: '3ème', description: 'Théorème de Thalès, réciproque et applications — cours filmé niveau BFEM', source: 'EduNumérique SN' },
+
+  // ── Exercices Interactifs supplémentaires ──
+  { id: 'res-311', titre: 'Quiz — Philo L : La liberté (35 questions)', type: 'exercice', matiere: 'Philosophie', niveau: 'Terminale', serie: 'L', description: 'QCM sur déterminisme, libre arbitre et liberté politique — autocorrigé', source: 'SmartSchool SN' },
+  { id: 'res-312', titre: 'Quiz — Philo L : La société et l\'État (30 questions)', type: 'exercice', matiere: 'Philosophie', niveau: 'Terminale', serie: 'L', description: 'Questions sur le contrat social, la démocratie et la justice', source: 'SmartSchool SN' },
+  { id: 'res-313', titre: 'Quiz — HG L : Le XXème siècle (40 questions)', type: 'exercice', matiere: 'Histoire-Géographie', niveau: 'Terminale', serie: 'L', description: 'QCM sur les guerres mondiales, la Guerre Froide et la décolonisation', source: 'SmartSchool SN' },
+  { id: 'res-314', titre: 'Quiz — HG L : L\'Afrique contemporaine (35 questions)', type: 'exercice', matiere: 'Histoire-Géographie', niveau: 'Terminale', serie: 'L', description: 'Questions sur le développement, la géopolitique et le Sénégal', source: 'SmartSchool SN' },
+  { id: 'res-315', titre: 'Quiz — Français : Figures de style (50 questions)', type: 'exercice', matiere: 'Français', niveau: 'Terminale', description: 'Identifier et analyser les figures de style — exercices autocorrigés', source: 'SmartSchool SN' },
+  { id: 'res-316', titre: 'Quiz — Français : Grammaire et syntaxe (45 questions)', type: 'exercice', matiere: 'Français', niveau: 'Terminale', description: 'QCM de grammaire avancée : propositions, accords, modes et temps', source: 'SmartSchool SN' },
+  { id: 'res-317', titre: 'Quiz — Maths 3ème : Algèbre (60 questions)', type: 'exercice', matiere: 'Mathématiques', niveau: '3ème', description: 'Exercices interactifs sur équations, inéquations et factorisation', source: 'SmartSchool SN' },
+  { id: 'res-318', titre: 'Quiz — Maths 3ème : Géométrie (50 questions)', type: 'exercice', matiere: 'Mathématiques', niveau: '3ème', description: 'QCM sur Thalès, trigonométrie et cercles — préparation BFEM', source: 'SmartSchool SN' },
+  { id: 'res-319', titre: 'Quiz — Philo S : La conscience et la liberté (25 questions)', type: 'exercice', matiere: 'Philosophie', niveau: 'Terminale', description: 'Questions de compréhension pour les séries S — niveau adapté', source: 'SmartSchool SN' },
+  { id: 'res-320', titre: 'Quiz — HG S : Révisions géographie (30 questions)', type: 'exercice', matiere: 'Histoire-Géographie', niveau: 'Terminale', description: 'QCM de géographie générale pour les séries S', source: 'SmartSchool SN' },
+
+  // ── Résumés et Fiches de Cours supplémentaires ──
+  { id: 'res-409', titre: 'Fiche — La conscience et l\'inconscient (Philo L)', type: 'resume', matiere: 'Philosophie', niveau: 'Terminale', serie: 'L', description: 'Fiche synthèse : Descartes, Freud, Sartre — notions clés et citations', source: 'SmartSchool SN' },
+  { id: 'res-410', titre: 'Fiche — La liberté (Philo L)', type: 'resume', matiere: 'Philosophie', niveau: 'Terminale', serie: 'L', description: 'Fiche synthèse : déterminisme, libre arbitre, liberté politique', source: 'SmartSchool SN' },
+  { id: 'res-411', titre: 'Fiche — La société et l\'État (Philo L)', type: 'resume', matiere: 'Philosophie', niveau: 'Terminale', serie: 'L', description: 'Fiche synthèse : Hobbes, Locke, Rousseau, démocratie', source: 'SmartSchool SN' },
+  { id: 'res-412', titre: 'Fiche — Le monde au XXème siècle (HG L)', type: 'resume', matiere: 'Histoire-Géographie', niveau: 'Terminale', serie: 'L', description: 'Fiche synthèse : guerres mondiales, Guerre Froide, décolonisation', source: 'SmartSchool SN' },
+  { id: 'res-413', titre: 'Fiche — L\'Afrique et le Sénégal (HG L)', type: 'resume', matiere: 'Histoire-Géographie', niveau: 'Terminale', serie: 'L', description: 'Fiche synthèse : développement, géopolitique, relations Afrique-monde', source: 'SmartSchool SN' },
+  { id: 'res-414', titre: 'Fiche — Géographie de l\'Afrique (HG L)', type: 'resume', matiere: 'Histoire-Géographie', niveau: 'Terminale', serie: 'L', description: 'Fiche synthèse : milieux naturels, population, économie africaine', source: 'SmartSchool SN' },
+  { id: 'res-415', titre: 'Fiche — Méthodes Français BAC (Dissertation et commentaire)', type: 'resume', matiere: 'Français', niveau: 'Terminale', description: 'Fiche méthodes complètes : dissertation littéraire et commentaire composé', source: 'SmartSchool SN' },
+  { id: 'res-416', titre: 'Fiche — Figures de style et stylistique', type: 'resume', matiere: 'Français', niveau: 'Terminale', description: 'Fiche synthèse : toutes les figures de style avec exemples littéraires', source: 'SmartSchool SN' },
+
+  // ── Tutorat supplémentaire ──
+  { id: 'res-506', titre: 'Forum Q&A Français et HG', type: 'tutorat', matiere: 'Français', niveau: 'Terminale', description: 'Aide en dissertation, commentaire composé et composition HG — tuteurs certifiés', source: 'SmartSchool SN Community' },
+  { id: 'res-507', titre: 'Sessions de tutorat live — Philosophie', type: 'tutorat', matiere: 'Philosophie', niveau: 'Terminale', description: 'Sessions vidéo hebdomadaires sur la dissertation et le commentaire de texte philo', source: 'SmartSchool SN Live' },
+  { id: 'res-508', titre: 'Sessions de tutorat live — BFEM Maths 3ème', type: 'tutorat', matiere: 'Mathématiques', niveau: '3ème', description: 'Sessions de préparation au BFEM avec des enseignants expérimentés', source: 'SmartSchool SN Live' },
 ]
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

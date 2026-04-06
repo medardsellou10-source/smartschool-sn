@@ -6,6 +6,7 @@ import { StatCard } from '@/components/dashboard/StatCard'
 import {
   GRILLES_HORAIRES, PROGRAMMES, PLANNING_SEMESTRIEL,
   NIVEAUX_COLLEGE, NIVEAUX_LYCEE, SERIES_LYCEE,
+  getProgressionHebdo,
   type ProgrammeMatiere, type Module, type Lecon, type GrilleHoraire
 } from '@/lib/curriculum-senegal'
 
@@ -34,11 +35,11 @@ const TYPE_COLORS: Record<string, string> = {
   cours: '#00E676', tp: '#00E5FF', td: '#FFD600', revision: '#FF6D00', evaluation: '#FF1744',
 }
 
-type TabId = 'grille' | 'planning' | 'modules' | 'suivi' | 'semestre'
+type TabId = 'grille' | 'planning' | 'modules' | 'suivi' | 'semestre' | 'semaine'
 
 export default function SupportPedagogiquePage() {
   const { user, loading: userLoading } = useUser()
-  const [activeTab, setActiveTab] = useState<TabId>('grille')
+  const [activeTab, setActiveTab] = useState<TabId>('semaine')
   const [selectedNiveau, setSelectedNiveau] = useState('Terminale')
   const [selectedSerie, setSelectedSerie] = useState('S1')
   const [selectedMatiere, setSelectedMatiere] = useState('Mathématiques')
@@ -119,7 +120,23 @@ export default function SupportPedagogiquePage() {
     return { type: 'ok' as const, msg: `En avance ou dans les temps : ${suiviStats.heuresFaites}h effectuées` }
   }, [programme, semaineActuelle, suiviStats])
 
+  // ── Planning de la semaine courante (toutes matières) ──
+  const planningDeLaSemaine = useMemo(() => {
+    return allProgrammes.map(prog => {
+      const progression = getProgressionHebdo(prog, semaineActuelle)
+      const heuresFaites = prog.modules.flatMap(m => m.lecons)
+        .filter(l => leconsValidees.has(l.id))
+        .reduce((s, l) => s + l.duree_heures, 0)
+      const totalHeures = prog.heures_annuelles
+      const pct = totalHeures > 0 ? Math.round((heuresFaites / totalHeures) * 100) : 0
+      const heuresAttendues = semaineActuelle * prog.heures_hebdo
+      const retard = heuresFaites < heuresAttendues * 0.7 ? 'danger' : heuresFaites < heuresAttendues * 0.9 ? 'warning' : 'ok'
+      return { prog, progression, heuresFaites, pct, retard }
+    })
+  }, [allProgrammes, semaineActuelle, leconsValidees])
+
   const tabs: { id: TabId; label: string; icon: string }[] = [
+    { id: 'semaine', label: 'Ma Semaine', icon: '🗓️' },
     { id: 'grille', label: 'Grille Horaire', icon: '📅' },
     { id: 'planning', label: 'Planning Annuel', icon: '📆' },
     { id: 'modules', label: 'Modules & Leçons', icon: '📚' },
@@ -560,6 +577,173 @@ export default function SupportPedagogiquePage() {
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════════════ */}
+      {/* TAB: Ma Semaine — Planning hebdomadaire toutes matières   */}
+      {/* ══════════════════════════════════════════════════════════ */}
+      {activeTab === 'semaine' && (
+        <div className="space-y-4">
+
+          {/* En-tête semaine */}
+          <div className="rounded-2xl p-5" style={{ background: 'linear-gradient(135deg, rgba(0,229,255,0.08) 0%, rgba(0,230,118,0.05) 100%)', border: '1px solid rgba(0,229,255,0.2)' }}>
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <div>
+                <h2 className="text-xl font-black text-white">
+                  Semaine <span style={{ color: '#00E5FF' }}>S{semaineActuelle}</span> — Année 2025-2026
+                </h2>
+                <p className="text-sm mt-1" style={{ color: '#94A3B8' }}>
+                  {selectedNiveau}{selectedSerie && NIVEAUX_LYCEE.includes(selectedNiveau) && selectedNiveau !== 'Seconde' ? ` Série ${selectedSerie}` : ''} · {allProgrammes.length} matière{allProgrammes.length > 1 ? 's' : ''} disponibles
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <div className="px-3 py-1.5 rounded-xl text-xs font-bold" style={{ background: 'rgba(0,229,255,0.12)', color: '#00E5FF', border: '1px solid rgba(0,229,255,0.25)' }}>
+                  Sem {semaineActuelle}/36
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {allProgrammes.length === 0 ? (
+            <div className="rounded-2xl p-10 text-center" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+              <p className="text-[#94A3B8]">Aucun programme disponible pour cette selection.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {planningDeLaSemaine.map(({ prog, progression, heuresFaites, pct, retard }) => {
+                const color = MATIERE_COLORS[prog.matiere] || '#00E5FF'
+                const alertColor = retard === 'danger' ? '#FF1744' : retard === 'warning' ? '#FFD600' : '#00E676'
+                const alertIcon = retard === 'danger' ? '🚨' : retard === 'warning' ? '⚠️' : '✅'
+                return (
+                  <div key={`${prog.matiere}-${prog.serie}`} className="rounded-2xl overflow-hidden"
+                    style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid ${color}18` }}>
+
+                    {/* Header matière */}
+                    <div className="px-4 py-3 flex items-center gap-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', background: `${color}06` }}>
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm shrink-0"
+                        style={{ background: `${color}15`, color, border: `1px solid ${color}30` }}>
+                        {prog.heures_hebdo}h
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-bold text-white text-sm truncate">{prog.matiere}</h3>
+                        <p className="text-[10px]" style={{ color: '#94A3B8' }}>
+                          Coeff {prog.coefficient} · {heuresFaites}h/{prog.heures_annuelles}h · {pct}%
+                        </p>
+                      </div>
+                      <span className="text-base shrink-0">{alertIcon}</span>
+                    </div>
+
+                    {/* Progression bar */}
+                    <div className="px-4 pt-3">
+                      <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                        <div className="h-full rounded-full transition-all duration-500"
+                          style={{ width: `${pct}%`, background: pct >= 90 ? '#00E676' : pct >= 60 ? color : alertColor }} />
+                      </div>
+                    </div>
+
+                    {/* Leçon de la semaine */}
+                    <div className="p-4">
+                      {progression ? (
+                        <div>
+                          <p className="text-[10px] font-bold uppercase tracking-wider mb-2" style={{ color: '#475569' }}>
+                            Leçon prévue cette semaine
+                          </p>
+                          <div className="rounded-xl p-3" style={{ background: `${color}08`, border: `1px solid ${color}20` }}>
+                            <div className="flex items-start gap-2">
+                              <span className="text-lg shrink-0">{TYPE_ICONS[progression.lecon.type] || '📖'}</span>
+                              <div className="min-w-0">
+                                <p className="text-sm font-bold text-white leading-snug">{progression.lecon.titre}</p>
+                                <p className="text-[10px] mt-1" style={{ color }}>
+                                  {progression.module.titre} · Module {progression.module.numero}
+                                </p>
+                                <div className="flex items-center gap-2 mt-1.5">
+                                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full"
+                                    style={{ background: `${TYPE_COLORS[progression.lecon.type] || color}15`, color: TYPE_COLORS[progression.lecon.type] || color }}>
+                                    {progression.lecon.type.toUpperCase()}
+                                  </span>
+                                  <span className="text-[10px]" style={{ color: '#475569' }}>{progression.lecon.duree_heures}h</span>
+                                </div>
+                              </div>
+                            </div>
+                            {/* Objectifs */}
+                            {progression.lecon.objectifs.length > 0 && (
+                              <div className="mt-2 space-y-0.5">
+                                {progression.lecon.objectifs.slice(0, 2).map((obj, i) => (
+                                  <div key={i} className="flex items-start gap-1.5">
+                                    <span className="text-[8px] mt-1 shrink-0" style={{ color }}>▶</span>
+                                    <p className="text-[10px]" style={{ color: '#94A3B8' }}>{obj}</p>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-center py-2">
+                          <p className="text-xs font-bold" style={{ color: '#00E676' }}>
+                            ✅ Programme terminé — Révisions BAC
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Alerte retard */}
+                      {retard !== 'ok' && (
+                        <div className="mt-3 rounded-lg px-3 py-2 flex items-center gap-2"
+                          style={{ background: `${alertColor}08`, border: `1px solid ${alertColor}20` }}>
+                          <span className="text-sm">{alertIcon}</span>
+                          <p className="text-[10px] font-semibold" style={{ color: alertColor }}>
+                            {retard === 'danger' ? 'Retard important — accélérer le rythme' : 'Léger retard — surveiller'}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Bouton marquer fait */}
+                      {progression && (
+                        <button
+                          onClick={() => toggleLecon(progression.lecon.id)}
+                          className="mt-3 w-full py-2 rounded-xl text-xs font-bold transition-all duration-200"
+                          style={leconsValidees.has(progression.lecon.id)
+                            ? { background: `${color}15`, color, border: `1px solid ${color}30` }
+                            : { background: 'rgba(255,255,255,0.04)', color: '#94A3B8', border: '1px solid rgba(255,255,255,0.08)' }}>
+                          {leconsValidees.has(progression.lecon.id) ? '✓ Leçon validée' : 'Cocher comme fait'}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+
+          {/* Résumé pour élèves — à communiquer */}
+          {allProgrammes.length > 0 && (
+            <div className="rounded-2xl p-5" style={{ background: 'rgba(213,0,249,0.04)', border: '1px solid rgba(213,0,249,0.15)' }}>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg"
+                  style={{ background: 'rgba(213,0,249,0.12)', border: '1px solid rgba(213,0,249,0.25)' }}>📋</div>
+                <div>
+                  <h3 className="font-bold text-white text-sm">Résumé hebdomadaire pour les élèves</h3>
+                  <p className="text-xs" style={{ color: '#94A3B8' }}>Partagez ce planning avec vos classes</p>
+                </div>
+              </div>
+              <div className="rounded-xl p-4" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', fontFamily: 'monospace' }}>
+                <p className="text-xs font-bold text-white mb-2">
+                  PLANNING SEMAINE S{semaineActuelle} — {selectedNiveau}{selectedSerie && NIVEAUX_LYCEE.includes(selectedNiveau) && selectedNiveau !== 'Seconde' ? ` Série ${selectedSerie}` : ''}
+                </p>
+                {planningDeLaSemaine.slice(0, 6).map(({ prog, progression }) => (
+                  <div key={prog.matiere} className="flex items-start gap-2 mb-1">
+                    <span className="text-[10px] font-bold w-32 shrink-0" style={{ color: MATIERE_COLORS[prog.matiere] || '#00E5FF' }}>
+                      {prog.matiere.substring(0, 14).padEnd(14)}
+                    </span>
+                    <span className="text-[10px]" style={{ color: '#94A3B8' }}>
+                      {progression ? `→ ${progression.lecon.titre}` : '→ Révisions finales'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
