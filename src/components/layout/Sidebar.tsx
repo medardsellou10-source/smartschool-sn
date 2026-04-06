@@ -76,6 +76,7 @@ const MENUS: Record<string, NavItem[]> = {
     { href: '/professeur/notes', label: 'Notes', icon: Icons.pencil },
     { href: '/professeur/correction-ia', label: 'Correction IA', icon: Icons.robot },
     { href: '/professeur/cahier', label: 'Cahier de texte', icon: Icons.book },
+    { href: '/professeur/support-pedagogique', label: 'Support Pédagogique', icon: Icons.calendar },
     { href: '/professeur/messages', label: 'Messagerie', icon: Icons.message },
     { href: '/professeur/elearning', label: 'E-Learning', icon: Icons.monitor },
   ],
@@ -100,6 +101,7 @@ const MENUS: Record<string, NavItem[]> = {
     { href: '/eleve/bulletins', label: 'Bulletins', icon: Icons.file },
     { href: '/eleve/emploi-temps', label: 'Emploi du temps', icon: Icons.calendar },
     { href: '/eleve/cahier-texte', label: 'Cahier de texte', icon: Icons.book },
+    { href: '/eleve/ressources', label: 'Ressources & Annales', icon: Icons.teacher },
     { href: '/eleve/elearning', label: 'E-Learning', icon: Icons.monitor },
   ],
   secretaire: [

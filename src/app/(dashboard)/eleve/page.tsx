@@ -252,6 +252,7 @@ export default function EleveDashboard() {
             { href: '/eleve/bulletins',    icon: '📊', label: 'Mes Bulletins',     color: '#D500F9' },
             { href: '/eleve/emploi-temps', icon: '📅', label: 'Emploi du temps',   color: '#00E5FF' },
             { href: '/eleve/cahier-texte', icon: '📚', label: 'Cahier de texte',   color: '#FFD600' },
+            { href: '/eleve/ressources',   icon: '📖', label: 'Ressources & Annales', color: '#448AFF' },
             { href: '/eleve/elearning',    icon: '💻', label: 'E-Learning',        color: '#00E676' },
           ].map(a => (
             <Link key={a.href} href={a.href}

@@ -107,6 +107,7 @@ export default function ProfesseurDashboard() {
             { href: '/professeur/appel',    icon: '📋', label: "Faire l'appel",   color: '#00853F' },
             { href: '/professeur/notes',    icon: '📝', label: 'Saisir les notes', color: '#00E5FF' },
             { href: '/professeur/cahier',   icon: '📚', label: 'Cahier de texte',  color: '#FFD600' },
+            { href: '/professeur/support-pedagogique', icon: '📖', label: 'Support Pédagogique', color: '#448AFF' },
             { href: '/professeur/pointage', icon: '📍', label: 'Mon pointage GPS', color: '#D500F9' },
             { href: '/professeur/messages', icon: '💬', label: 'Messagerie',       color: '#FF6D00' },
           ].map(a => (
