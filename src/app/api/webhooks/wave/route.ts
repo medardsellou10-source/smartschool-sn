@@ -18,7 +18,10 @@ export async function POST(req: Request) {
     .update(body)
     .digest('hex')
 
-  if (signature !== expectedSig) {
+  // Wave envoie parfois "sha256=xxxx" ou juste "xxxx" — on normalise
+  const normalizedSig = signature.startsWith('sha256=') ? signature.slice(7) : signature
+
+  if (normalizedSig !== expectedSig) {
     console.error('Wave webhook: signature invalide')
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }

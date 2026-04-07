@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { GoogleGenerativeAI } from '@google/generative-ai'
 
 export const runtime = 'nodejs'
 
@@ -23,7 +24,7 @@ function getMention(note: number): string {
 
 function parseAIResponse(text: string): { note: number; pointsForts: string; pointsFaibles: string; remarques: string } {
   // Essayer de parser un JSON dans la réponse
-  const jsonMatch = text.match(/\{[\s\S]*\}/)
+  const jsonMatch = text.match(/\{[\s\S]*?\}/)
   if (jsonMatch) {
     try {
       const parsed = JSON.parse(jsonMatch[0])
@@ -64,15 +65,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: 'Corrigé et copies manquants' }, { status: 400 })
     }
 
+    const apiKey = process.env.GOOGLE_GEMINI_API_KEY
+    if (!apiKey) {
+      return NextResponse.json({ success: false, error: 'Clé Gemini non configurée (GOOGLE_GEMINI_API_KEY)' }, { status: 503 })
+    }
+
+    const genAI = new GoogleGenerativeAI(apiKey)
+    // Gemini 1.5 Flash — rapide pour la correction en série
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+
     // Convertir le corrigé en base64
     const corrBuffer = await correctionFile.arrayBuffer()
     const corrBase64 = Buffer.from(corrBuffer).toString('base64')
-    const corrType = correctionFile.type || 'image/jpeg'
-    const isCorrectionnPDF = corrType === 'application/pdf'
-
-    // Importer le SDK Anthropic
-    const Anthropic = (await import('@anthropic-ai/sdk')).default
-    const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+    const corrMimeType = (correctionFile.type || 'image/jpeg') as string
 
     const results: CorrectionResult[] = []
 
@@ -82,7 +87,7 @@ export async function POST(req: NextRequest) {
 
       const paperBuffer = await paper.arrayBuffer()
       const paperBase64 = Buffer.from(paperBuffer).toString('base64')
-      const paperType = paper.type || 'image/jpeg'
+      const paperMimeType = (paper.type || 'image/jpeg') as string
 
       const prompt = `Tu es un professeur expérimenté de ${matiere} dans un lycée sénégalais.
 
@@ -90,7 +95,8 @@ Tu disposes :
 1. Du CORRIGÉ OFFICIEL (première image) avec la notation et les points attendus par question.
 2. De la COPIE DE L'ÉLÈVE (deuxième image) : ${studentName}.
 
-Ta mission : noter cette copie sur 20 en te basant STRICTEMENT sur le corrigé.
+Ta mission : noter cette copie sur 20 en te basant STRICTEMENT sur le corrigé officiel.
+Type d'évaluation : ${evalType}.
 
 Réponds UNIQUEMENT en JSON valide, sans aucun texte avant ou après :
 {
@@ -101,43 +107,23 @@ Réponds UNIQUEMENT en JSON valide, sans aucun texte avant ou après :
 }`
 
       try {
-        const messageContent: any[] = [
-          { type: 'text', text: prompt }
-        ]
+        const result = await model.generateContent([
+          { text: prompt },
+          {
+            inlineData: {
+              mimeType: corrMimeType as 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp' | 'application/pdf',
+              data: corrBase64,
+            }
+          },
+          {
+            inlineData: {
+              mimeType: paperMimeType as 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp' | 'application/pdf',
+              data: paperBase64,
+            }
+          },
+        ])
 
-        // Ajouter le corrigé (PDF ou image)
-        if (isCorrectionnPDF) {
-          messageContent.push({
-            type: 'document',
-            source: { type: 'base64', media_type: 'application/pdf', data: corrBase64 }
-          })
-        } else {
-          messageContent.push({
-            type: 'image',
-            source: { type: 'base64', media_type: corrType as 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp', data: corrBase64 }
-          })
-        }
-
-        // Ajouter la copie de l'élève
-        if (paperType === 'application/pdf') {
-          messageContent.push({
-            type: 'document',
-            source: { type: 'base64', media_type: 'application/pdf', data: paperBase64 }
-          })
-        } else {
-          messageContent.push({
-            type: 'image',
-            source: { type: 'base64', media_type: paperType as 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp', data: paperBase64 }
-          })
-        }
-
-        const response = await client.messages.create({
-          model: 'claude-sonnet-4-6',
-          max_tokens: 1024,
-          messages: [{ role: 'user', content: messageContent }],
-        })
-
-        const responseText = response.content[0].type === 'text' ? response.content[0].text : ''
+        const responseText = result.response.text()
         const parsed = parseAIResponse(responseText)
 
         results.push({

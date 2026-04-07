@@ -33,7 +33,7 @@ export async function POST(req: Request) {
       },
       body: JSON.stringify({
         currency: 'XOF',
-        amount: montant,
+        amount: String(montant),  // Wave exige une string, pas un number
         error_url: `${process.env.NEXT_PUBLIC_APP_URL}/parent/paiement?status=error`,
         success_url: `${process.env.NEXT_PUBLIC_APP_URL}/parent/paiement?status=success`,
         client_reference: `SS-${facture_id}`,
