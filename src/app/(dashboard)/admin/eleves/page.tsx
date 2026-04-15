@@ -4,6 +4,8 @@ import { useEffect, useState, useMemo, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { isDemoMode, DEMO_ELEVES, DEMO_CLASSES } from '@/lib/demo-data'
+import { ExcelImport } from '@/components/ui/ExcelImport'
+import { toast } from 'react-hot-toast'
 
 interface Eleve {
   id: string
@@ -29,6 +31,7 @@ export default function ElevesPage() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [classeFilter, setClasseFilter] = useState('')
+  const [showImport, setShowImport] = useState(false)
 
   const ecoleId = user?.ecole_id
 
@@ -104,6 +107,23 @@ export default function ElevesPage() {
     return result
   }, [eleves, classeFilter, search])
 
+  const handleImport = (data: any[]) => {
+    // Map imported data to Eleve format and prepend to existing
+    const mappedEleves = data.map((row, index) => ({
+      id: `imported-${Date.now()}-${index}`,
+      nom: row.Nom || row.nom || '',
+      prenom: row.Prenom || row.prenom || row.Prénom || row.prénom || '',
+      classe_id: classeFilter || classes[0]?.id || '', // Default class if none specified
+      sexe: row.Sexe || row.sexe || 'M',
+      matricule: row.Matricule || row.matricule || `MAT-${Math.floor(Math.random() * 10000)}`,
+      actif: true,
+      classe_nom: classes.find(c => c.id === (classeFilter || classes[0]?.id))?.nom || 'Classe Importée'
+    }))
+
+    setEleves(prev => [...mappedEleves, ...prev])
+    setShowImport(false)
+  }
+
   if (userLoading || loading) {
     return (
       <div>
@@ -121,11 +141,30 @@ export default function ElevesPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-2xl font-bold text-ss-text">Gestion des Eleves</h1>
-        <span className="text-sm text-ss-text-muted">
-          {filtered.length} eleve{filtered.length > 1 ? 's' : ''}
-        </span>
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-ss-text">Gestion des Elèves</h1>
+          <span className="text-sm px-3 py-1 bg-ss-bg-secondary text-ss-text-muted rounded-full">
+            {filtered.length} élève{filtered.length > 1 ? 's' : ''}
+          </span>
+        </div>
+        <button
+          onClick={() => setShowImport(!showImport)}
+          className="bg-ss-green text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-ss-green/90 transition shadow-lg shadow-ss-green/20 flex items-center gap-2"
+        >
+          <span>📊</span>
+          {showImport ? 'Fermer l\'import' : 'Import Excel'}
+        </button>
       </div>
+
+      {showImport && (
+        <div className="animate-in slide-in-from-top-4 duration-300">
+          <ExcelImport 
+            onImport={handleImport} 
+            expectedColumns={['Nom', 'Prenom', 'Sexe', 'Matricule']} 
+            templateUrl="/templates/modele_eleves.xlsx"
+          />
+        </div>
+      )}
 
       {/* Filtres */}
       <div className="flex flex-col sm:flex-row gap-3">

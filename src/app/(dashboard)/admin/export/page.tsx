@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { toast } from 'react-hot-toast'
 
 interface ExportLog {
   id: string
@@ -83,7 +84,7 @@ export default function ExportMinistrePage() {
       setPreview(data)
       setPreviewType(type)
     } catch {
-      alert('Erreur lors du chargement de l\'aperçu')
+      toast.error('Erreur lors du chargement de l\'aperçu')
     } finally {
       setLoading(null)
     }

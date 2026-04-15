@@ -153,7 +153,10 @@ export default function AdminDashboard() {
               {new Date().toLocaleDateString('fr-SN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
             </p>
           </div>
-           {/* ── Navigation Onglets ── */}
+        </div>
+      </div>
+
+      {/* ── Navigation Onglets ── */}
       <div className="flex overflow-x-auto scrollbar-hide gap-2 border-b border-white/5 pb-2">
         {[
           { id: 'ecole', label: 'Mon École', icon: '🏫' },

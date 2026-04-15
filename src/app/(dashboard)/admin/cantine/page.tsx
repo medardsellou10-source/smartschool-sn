@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
+import { toast } from 'react-hot-toast'
 
 // ── Types ───────────────────────────────────────────────────────
 type TabKey = 'menu' | 'abonnements' | 'pointage'
@@ -298,6 +299,7 @@ export default function CantinePage() {
     if (!confirm('Supprimer ce menu ?')) return
     const supabase = createClient()
     await (supabase.from('menus_cantine') as any).delete().eq('id', id)
+    toast.success('Le menu a été supprimé')
     await loadMenus()
   }
 
@@ -305,6 +307,7 @@ export default function CantinePage() {
     if (!confirm('Supprimer cet abonnement ?')) return
     const supabase = createClient()
     await (supabase.from('abonnements_cantine') as any).delete().eq('id', id)
+    toast.success("L'abonnement a été supprimé")
     await loadAbonnements()
   }
 
@@ -354,6 +357,7 @@ export default function CantinePage() {
             .insert(payload)
           if (err) throw err
         }
+        toast.success(editId ? 'Menu mis à jour' : 'Menu ajouté')
         await loadMenus()
       }
 
@@ -380,6 +384,7 @@ export default function CantinePage() {
             .insert(payload)
           if (err) throw err
         }
+        toast.success(editId ? 'Abonnement mis à jour' : 'Élève inscrit(e)')
         await loadAbonnements()
       }
 
@@ -440,9 +445,9 @@ export default function CantinePage() {
             })
         }
       }
-      alert('Pointage validé avec succès !')
+      toast.success('Pointage validé avec succès !')
     } catch {
-      alert('Erreur lors de la validation du pointage.')
+      toast.error('Erreur lors de la validation du pointage.')
     } finally {
       setSaving(false)
     }

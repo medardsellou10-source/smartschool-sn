@@ -2,6 +2,9 @@ import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { OfflineIndicator } from '@/components/ui/OfflineIndicator'
+import { Toaster } from 'react-hot-toast'
+import { CookieConsentBanner } from '@/components/ui/CookieConsentBanner'
+import { OfflineSynchronizer } from '@/components/OfflineSynchronizer'
 
 const inter = Inter({
   subsets: ['latin', 'latin-ext'],
@@ -9,6 +12,7 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://smartschool-sn.vercel.app'),
   title: 'SmartSchool SN - Gestion Scolaire Sénégal',
   description: 'SmartSchool SN — N°1 de la gestion scolaire au Sénégal. Bulletins IA, notes, paiements Wave/OM, alertes WhatsApp, correction Gemini Vision. 14 jours gratuits.',
   manifest: '/manifest.json',
@@ -51,8 +55,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       </head>
       <body className={inter.className}>
+        <Toaster position="top-center" toastOptions={{ style: { background: '#020617', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' } }} />
         <OfflineIndicator />
         {children}
+        <CookieConsentBanner />
+        <OfflineSynchronizer />
         {/* Bouton WhatsApp flottant global */}
         <a
           href="https://wa.me/212610249872?text=Bonjour%2C%20je%20souhaite%20en%20savoir%20plus%20sur%20SmartSchool%20SN."

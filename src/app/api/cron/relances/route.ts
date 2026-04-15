@@ -1,4 +1,4 @@
-// Cron job : relances automatiques des factures impayées
+// Cron job : relances automatiques des factures en attente
 // Appelé par Vercel Cron chaque lundi à 8h (heure Dakar)
 // vercel.json: { "crons": [{ "path": "/api/cron/relances", "schedule": "0 8 * * 1" }] }
 
@@ -28,7 +28,7 @@ export async function GET(request: Request) {
   const supabase = createClient(supabaseUrl, serviceRoleKey)
 
   try {
-    // 1. Récupérer les factures impayées avec date_limite dépassée
+    // 1. Récupérer les factures en attente avec date_limite dépassée
     const today = new Date().toISOString().split('T')[0]
 
     const { data: facturesImpayees, error: fetchErr } = await supabase
@@ -126,7 +126,7 @@ export async function GET(request: Request) {
       if (isUrgent) {
         message = `🔴 *URGENT — SmartSchool SN*\n\n` +
           `Bonjour ${parent.prenom} ${parent.nom},\n\n` +
-          `Malgré nos rappels précédents, un montant de *${montantFormate} FCFA* reste impayé pour ${enfants.join(', ')}.\n\n` +
+          `Malgré nos rappels précédents, un montant de *${montantFormate} FCFA* reste en attente pour ${enfants.join(', ')}.\n\n` +
           `⚠️ Merci de régulariser dans les plus brefs délais pour éviter toute suspension.\n\n` +
           `💳 Payez via Wave ou Orange Money dans l'application SmartSchool.\n\n` +
           `_${ecole?.nom || 'Votre école'}_`

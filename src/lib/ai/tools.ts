@@ -67,7 +67,7 @@ export const AI_TOOLS: AITool[] = [
   },
   {
     name: 'get_finances_ecole',
-    description: "Récupère un résumé financier de l'école (recouvrements, impayés)",
+    description: "Récupère un résumé financier de l'école (recouvrements, paiements en attente)",
     input_schema: {
       type: 'object',
       properties: {

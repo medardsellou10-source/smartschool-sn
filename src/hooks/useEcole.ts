@@ -74,7 +74,7 @@ export function useEcole() {
       setEcole(branding)
     }
     setLoading(false)
-  }, [user?.ecole_id])
+  }, [user])
 
   useEffect(() => {
     if (!userLoading) fetchEcole()

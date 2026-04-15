@@ -355,7 +355,7 @@ export default function BulletinsPage() {
   }, [selectedClasse, selectedTrimestre])
 
   const filteredBulletins = useMemo(() => {
-    let list = bulletins.filter(b =>
+    const list = bulletins.filter(b =>
       `${b.prenom} ${b.nom}`.toLowerCase().includes(searchTerm.toLowerCase())
     )
     if (sortBy === 'rang') return [...list].sort((a, b) => a.rang - b.rang)

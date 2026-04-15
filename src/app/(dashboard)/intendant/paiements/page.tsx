@@ -537,7 +537,7 @@ export default function PaiementsPage() {
                   ) : (
                     <button onClick={async () => {
                       const supabase = createClient()
-                      await supabase.from('eleves').update({
+                      await (supabase.from('eleves') as any).update({
                         pause_empathique: false,
                         pause_empathique_motif: null,
                         pause_empathique_duree: null,
@@ -861,7 +861,7 @@ export default function PaiementsPage() {
                   const datePause = new Date().toISOString()
                   
                   const supabase = createClient()
-                  await supabase.from('eleves').update({
+                  await (supabase.from('eleves') as any).update({
                     pause_empathique: true,
                     pause_empathique_motif: motifFinal,
                     pause_empathique_duree: dureeLabel,

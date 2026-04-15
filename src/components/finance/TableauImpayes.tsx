@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+import { toast } from 'react-hot-toast'
 import { formatFCFA } from '@/lib/utils'
 import { envoyerRelanceSMS, marquerPayeEspeces, envoyerRelanceWhatsApp } from '@/app/actions/finances'
 
@@ -60,7 +61,7 @@ export function TableauImpayes({ impayes, onRefresh }: TableauImpayesProps) {
     setSendingWhatsApp(factureId)
     const result = await envoyerRelanceWhatsApp(factureId)
     if (!result.success) {
-      alert('Erreur: ' + (result.error || 'Envoi impossible'))
+      toast.error('Erreur: ' + (result.error || 'Envoi impossible'))
     }
     setSendingWhatsApp(null)
   }

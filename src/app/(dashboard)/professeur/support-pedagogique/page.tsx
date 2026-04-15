@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import { useUser } from '@/hooks/useUser'
+import { toast } from 'react-hot-toast'
 import { StatCard } from '@/components/dashboard/StatCard'
 import {
   GRILLES_HORAIRES, PROGRAMMES, PLANNING_SEMESTRIEL,
@@ -258,7 +259,7 @@ export default function SupportPedagogiquePage() {
 </div>
 </body></html>`
     const win = window.open('', '_blank', 'width=900,height=720')
-    if (!win) { alert('Autorisez les popups pour afficher la fiche.'); return }
+    if (!win) { toast.error('Autorisez les popups pour afficher la fiche.'); return }
     win.document.write(html)
     win.document.close()
   }
@@ -373,7 +374,7 @@ function answer(qi,ci){
 }
 </script></body></html>`
     const win = window.open('', '_blank', 'width=740,height=700')
-    if (!win) { alert('Autorisez les popups pour afficher le quiz.'); return }
+    if (!win) { toast.error('Autorisez les popups pour afficher le quiz.'); return }
     win.document.write(html)
     win.document.close()
   }
@@ -452,7 +453,7 @@ function toggleCorr(){
 }
 </script></body></html>`
     const win = window.open('', '_blank', 'width=960,height=750')
-    if (!win) { alert('Autorisez les popups pour afficher l\'annale.'); return }
+    if (!win) { toast.error('Autorisez les popups pour afficher l\'annale.'); return }
     win.document.write(html)
     win.document.close()
   }
@@ -461,7 +462,7 @@ function toggleCorr(){
     const contenu = CONTENU_NATIF[res.id]
     if (!contenu) return false
     const win = window.open('', '_blank', 'width=960,height=800')
-    if (!win) { alert('Autorisez les popups pour afficher le cours.'); return true }
+    if (!win) { toast.error('Autorisez les popups pour afficher le cours.'); return true }
     win.document.write(contenu.html)
     win.document.close()
     return true
@@ -474,7 +475,7 @@ function toggleCorr(){
     if (res.type === 'annale') { ouvrirAnnale(res); return }
     const url = getResourceUrl(res)
     if (url) window.open(url, '_blank', 'noopener,noreferrer')
-    else alert('Cette ressource sera disponible très prochainement.')
+    else toast.error('Cette ressource sera disponible très prochainement.')
   }
 
   function handleApercu(res: RessourceEnLigne) {
@@ -484,7 +485,7 @@ function toggleCorr(){
     if (res.type === 'annale') { ouvrirAnnale(res); return }
     const url = getResourceUrl(res)
     if (url) window.open(url, '_blank', 'noopener,noreferrer')
-    else alert('Aperçu non disponible pour cette ressource.')
+    else toast.error('Aperçu non disponible pour cette ressource.')
   }
 
   if (userLoading) {

@@ -1,13 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { TopNav } from '@/components/layout/TopNav'
-import { Footer } from '@/components/layout/Footer'
 
 export default function CharteGPSPage() {
   return (
     <main className="bg-[#020617] text-white min-h-screen flex flex-col">
-      <TopNav />
       {/* Spacer for fixed nav */}
       <div className="h-16 sm:h-20" />
 
@@ -122,7 +119,6 @@ export default function CharteGPSPage() {
           </div>
         </div>
       </div>
-      <Footer />
     </main>
   )
 }

@@ -78,6 +78,11 @@ function LoginContent() {
   const [otpCode, setOtpCode] = useState('')
   const [otpStep, setOtpStep] = useState<OtpStep>('phone')
 
+  // 2FA state for Admin
+  const [show2FA, setShow2FA] = useState(false)
+  const [twoFACode, setTwoFACode] = useState('')
+  const [pendingRoute, setPendingRoute] = useState<{ role: string, route: string } | null>(null)
+  
   const supabase = createClient()
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
@@ -96,10 +101,33 @@ function LoginContent() {
   // Mode démo : login par sélection de rôle
   // On utilise un cookie (lisible par le middleware) + localStorage (lisible côté client)
   const handleDemoLogin = (role: string, route: string) => {
+    if (role === 'admin_global') {
+      import('react-hot-toast').then(({ toast }) => {
+        toast.success('Code 2FA envoyé (Simulation)', { icon: '🔐' })
+      })
+      setPendingRoute({ role, route })
+      setShow2FA(true)
+      return
+    }
+
     const maxAge = 60 * 60 * 8 // 8 heures
     document.cookie = `ss_demo_role=${role}; path=/; max-age=${maxAge}; SameSite=Lax`
     localStorage.setItem('ss_demo_role', role)
     router.push(route)
+  }
+
+  const handleVerify2FA = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (twoFACode.length === 6 && pendingRoute) {
+      const maxAge = 60 * 60 * 8 // 8 heures
+      document.cookie = `ss_demo_role=${pendingRoute.role}; path=/; max-age=${maxAge}; SameSite=Lax`
+      localStorage.setItem('ss_demo_role', pendingRoute.role)
+      router.push(pendingRoute.route)
+    } else {
+      import('react-hot-toast').then(({ toast }) => {
+        toast.error('Code invalide')
+      })
+    }
   }
 
   // Après auth réussie, récupérer le rôle et rediriger
@@ -630,6 +658,50 @@ function LoginContent() {
           SmartSchool SN v2.0 &copy; 2025-2026
         </p>
       </div>
+
+      {/* MODAL 2FA SIMULATION */}
+      {show2FA && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-[#141833] border border-slate-700/50 rounded-2xl w-full max-w-sm p-6 shadow-2xl">
+            <div className="w-12 h-12 bg-ss-green/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-2xl">🔐</span>
+            </div>
+            <h3 className="text-white text-lg font-bold text-center mb-2">Authentification à deux facteurs</h3>
+            <p className="text-slate-400 text-sm text-center mb-6">
+              Veuillez saisir le code à 6 chiffres envoyé sur votre application d'authentification ou par SMS.
+            </p>
+            <form onSubmit={handleVerify2FA}>
+              <div className="mb-6">
+                <input
+                  type="text"
+                  value={twoFACode}
+                  onChange={e => setTwoFACode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  required
+                  placeholder="000000"
+                  maxLength={6}
+                  className="w-full bg-[#0A0E27] border border-slate-600 text-white rounded-lg px-4 py-3 text-sm text-center tracking-[0.75em] font-mono text-xl focus:outline-none focus:ring-2 focus:ring-ss-green placeholder:text-slate-500 placeholder:tracking-[0.5em]"
+                />
+              </div>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShow2FA(false)}
+                  className="flex-1 px-4 py-2.5 rounded-xl border border-slate-700 text-slate-300 hover:bg-slate-800 transition"
+                >
+                  Annuler
+                </button>
+                <button
+                  type="submit"
+                  disabled={twoFACode.length < 6}
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-ss-green text-white font-bold hover:opacity-90 disabled:opacity-50 transition"
+                >
+                  Vérifier
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
     </>
   )

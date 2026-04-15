@@ -58,8 +58,8 @@ const translations: Record<Locale, TranslationDict> = {
       present: 'Présents',
       late: 'En retard',
       paid: 'Payé',
-      unpaid: 'Impayé',
-      due: 'Dû',
+      unpaid: 'En attente',
+      partially_paid: 'Partiellement payé',
     },
     transport: {
       bus: 'Bus',

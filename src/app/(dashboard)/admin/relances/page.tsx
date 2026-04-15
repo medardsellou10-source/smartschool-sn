@@ -49,7 +49,7 @@ export default function RelancesPage() {
     setLoading(true)
     const today = new Date().toISOString().split('T')[0]
 
-    // Factures impayées avec date dépassée
+    // Factures en attente avec date dépassée
     const { data: facturesData } = await (supabase.from('factures') as any)
       .select('id, montant_total, montant_paye, type_frais, echeance, nb_relances, statut, eleves(nom, prenom, classes(nom))')
       .neq('statut', 'payee')
@@ -127,7 +127,7 @@ export default function RelancesPage() {
         <div>
           <h1 className="text-2xl font-bold text-ss-text">📨 Relances automatiques</h1>
           <p className="text-ss-text-secondary text-sm mt-1">
-            Relances WhatsApp hebdomadaires pour les factures impayées
+            Relances WhatsApp hebdomadaires pour les factures en attente
           </p>
         </div>
         <button
@@ -178,7 +178,7 @@ export default function RelancesPage() {
         </div>
       </div>
 
-      {/* Tableau des factures impayées */}
+      {/* Tableau des factures en attente */}
       <div className="bg-ss-bg-secondary rounded-xl overflow-hidden">
         <div className="p-4 border-b border-ss-border">
           <h2 className="text-lg font-semibold text-ss-text">Factures en retard de paiement</h2>

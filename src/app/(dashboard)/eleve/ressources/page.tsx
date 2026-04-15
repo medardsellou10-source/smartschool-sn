@@ -10,6 +10,7 @@ import {
 } from '@/lib/curriculum-senegal'
 import { ANNALES, type AnnaleDoc } from '@/lib/annales-sn'
 import { CONTENU_NATIF } from '@/lib/contenu-pedagogique'
+import { toast } from 'react-hot-toast'
 
 const TYPE_META: Record<RessourceEnLigne['type'], { icon: string; label: string; color: string; description: string }> = {
   annale:      { icon: '📝', label: 'Annales BAC',          color: '#3B82F6', description: 'Sujets corriges de 2010 a 2024 par serie et matiere' },
@@ -144,7 +145,7 @@ export default function RessourcesElevePage() {
 </div>
 </body></html>`
     const win = window.open('', '_blank', 'width=900,height=720')
-    if (!win) { alert('Autorisez les popups pour afficher la fiche.'); return }
+    if (!win) { toast.error('Autorisez les popups pour afficher la fiche.'); return }
     win.document.write(html)
     win.document.close()
   }
@@ -237,7 +238,7 @@ function answer(qi,ci){
 }
 </script></body></html>`
     const win = window.open('', '_blank', 'width=740,height=700')
-    if (!win) { alert('Autorisez les popups pour afficher le quiz.'); return }
+    if (!win) { toast.error('Autorisez les popups pour afficher le quiz.'); return }
     win.document.write(html)
     win.document.close()
   }
@@ -295,7 +296,7 @@ function answer(qi,ci){
 <script>function toggleCorr(){const d=document.getElementById('corrDiv');const b=document.getElementById('btnCorr');d.classList.toggle('visible');b.textContent=d.classList.contains('visible')?'🚫 Cacher':'✅ Voir le corrigé';}</script>
 </body></html>`
     const win = window.open('', '_blank', 'width=960,height=750')
-    if (!win) { alert('Autorisez les popups pour afficher l\'annale.'); return }
+    if (!win) { toast.error('Autorisez les popups pour afficher l\'annale.'); return }
     win.document.write(html)
     win.document.close()
   }
@@ -304,7 +305,7 @@ function answer(qi,ci){
     const contenu = CONTENU_NATIF[res.id]
     if (!contenu) return false
     const win = window.open('', '_blank', 'width=960,height=800')
-    if (!win) { alert('Autorisez les popups pour afficher le cours.'); return true }
+    if (!win) { toast.error('Autorisez les popups pour afficher le cours.'); return true }
     win.document.write(contenu.html)
     win.document.close()
     return true
@@ -319,7 +320,7 @@ function answer(qi,ci){
     if (res.type === 'annale') { ouvrirAnnale(res); return }
     const url = getResourceUrl(res)
     if (url) window.open(url, '_blank', 'noopener,noreferrer')
-    else alert('Cette ressource sera disponible très prochainement.')
+    else toast.error('Cette ressource sera disponible très prochainement.')
   }
 
   if (userLoading) {

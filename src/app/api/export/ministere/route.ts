@@ -244,7 +244,7 @@ export async function GET(request: Request) {
               ['Total factures', String(bilan.total_factures)],
               ['Montant total facturé (FCFA)', String(bilan.montant_total_facture)],
               ['Montant total payé (FCFA)', String(bilan.montant_total_paye)],
-              ['Montant total impayé (FCFA)', String(bilan.montant_total_impaye)],
+              ['Montant total en attente (FCFA)', String(bilan.montant_total_impaye)],
               ['Taux de recouvrement', bilan.taux_recouvrement],
             ]
           )

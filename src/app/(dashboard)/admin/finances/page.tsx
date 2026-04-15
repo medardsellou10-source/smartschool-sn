@@ -89,7 +89,7 @@ export default function FinancesPage() {
       const moisKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
       setEvolution([{ mois: new Date(moisKey + '-01').toLocaleDateString('fr-SN', { month: 'short' }), encaisse: encaisseMois, attendu: attenduMois }])
 
-      // Impayés
+      // En attente
       const impayesFacts = DEMO_FACTURES.filter(f => ['en_attente', 'en_retard', 'partiellement_paye'].includes(f.statut))
       setImpayes(impayesFacts.map(f => {
         const eleve = DEMO_ELEVES.find(e => e.id === f.eleve_id)
@@ -126,7 +126,7 @@ export default function FinancesPage() {
         .select('statut, montant_total, solde_restant')
         .eq('ecole_id', ecoleId),
 
-      // Top impayés
+      // Top en attente
       (supabase.from('factures') as any)
         .select('*, eleves(nom, prenom, classe_id, classes(nom), parent_principal_id)')
         .eq('ecole_id', ecoleId)
@@ -202,7 +202,7 @@ export default function FinancesPage() {
       ...data,
     })))
 
-    // Impayés
+    // En attente
     const rawImpayes = (impayesRes.data || []) as any[]
     setImpayes(rawImpayes.map(f => ({
       id: f.id,
@@ -306,7 +306,7 @@ export default function FinancesPage() {
         tauxRecouvrement={kpis?.tauxRecouvrement || 0}
       />
 
-      {/* Tableau impayés */}
+      {/* Tableau en attente */}
       <TableauImpayes impayes={impayes} onRefresh={loadData} />
     </div>
   )
@@ -364,7 +364,7 @@ function ExportButton({ ecoleId }: { ecoleId: string }) {
         'Statut': p.statut_confirmation,
       }))
 
-      // Feuille 3: Impayés
+      // Feuille 3: En attente
       const impayesData = factures
         .filter((f: any) => ['en_attente', 'en_retard', 'partiellement_paye'].includes(f.statut))
         .map((f: any) => ({
@@ -381,7 +381,7 @@ function ExportButton({ ecoleId }: { ecoleId: string }) {
       const wb = XLSX.utils.book_new()
       XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(recapData), 'Récapitulatif')
       XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(paiementsData), 'Paiements')
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(impayesData), 'Impayés')
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(impayesData), 'En attente')
 
       const dateStr = new Date().toISOString().split('T')[0]
       XLSX.writeFile(wb, `SmartSchool_Finances_${dateStr}.xlsx`)

@@ -70,6 +70,7 @@ const PLANS_DEMO: Plan[] = [
       'Alertes WhatsApp & SMS parents',
       'Comptabilité & relances scolarité',
       'Export IMEN / Ministère',
+      'Paiements Wave/OM intégrés (3% frais)',
       'Support prioritaire 48h',
     ],
   },
@@ -89,7 +90,7 @@ const PLANS_DEMO: Plan[] = [
       '🏫 Support pédagogique complet (CI → Tle)',
       '🔬 TP virtuels PhET en français',
       '📊 Quiz interactifs + fiches de révision',
-      'Wave / Orange Money intégrés',
+      'Paiements Wave/OM exclusifs (1.5% frais)',
       'API REST documentée',
       'Tableau de bord analytique avancé',
       'Support 24h/24 + formation incluse',
@@ -113,8 +114,8 @@ const NOUVELLES_FONCTIONNALITES = [
   { icon: '🎓', titre: 'Ressources Élève Complètes', desc: 'Annales BAC/BFEM corrigées, TP virtuels PhET en français, quiz interactifs, fiches de révision — tout accessible depuis le dashboard élève.', plan: 'Standard' },
   { icon: '📊', titre: 'Notes temps réel + Classements', desc: 'Les élèves voient leurs notes publiées en direct avec rang dans la classe, badges et graphiques d\'évolution.', plan: 'Standard' },
   { icon: '📋', titre: 'Bulletins automatiques', desc: 'Le censeur génère les bulletins en un clic à partir des notes saisies — moyenne pondérée, mention officielle, impression PDF.', plan: 'Standard' },
-  { icon: '💳', titre: 'Comptabilité scolarité', desc: 'Suivi complet : total attendu, encaissé, solde impayé par élève, taux de recouvrement par trimestre, liste des débiteurs.', plan: 'Standard' },
-  { icon: '📱', titre: 'Relances parents (WhatsApp)', desc: 'Envoi automatique de rappels de paiement aux parents via WhatsApp et SMS avec le montant impayé.', plan: 'Standard' },
+  { icon: '💳', titre: 'Comptabilité scolarité', desc: 'Suivi complet : total attendu, encaissé, solde en attente par élève, taux de recouvrement par trimestre, liste des débiteurs.', plan: 'Standard' },
+  { icon: '📱', titre: 'Relances parents (WhatsApp)', desc: 'Envoi automatique de rappels de paiement aux parents via WhatsApp et SMS avec le montant en attente.', plan: 'Standard' },
   { icon: '🏫', titre: 'Support pédagogique professeur', desc: 'Le professeur accède au programme officiel MEN, aux ressources par matière/niveau, et peut préparer ses cours avec les mêmes ressources que les élèves.', plan: 'Établissement' },
 ]
 
