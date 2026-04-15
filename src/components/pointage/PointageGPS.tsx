@@ -208,6 +208,18 @@ export function PointageGPS({ userId, ecoleId, userName }: PointageGPSProps) {
 
   return (
     <div className="space-y-4">
+      {/* Marketing & Éthique */}
+      <div className="bg-blue-50/50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-900/40 rounded-xl p-4 text-center">
+        <p className="font-medium text-blue-800 dark:text-blue-300 text-sm">
+          "SmartSchool GPS : Présence vérifiée, dignité respectée."
+        </p>
+        <div className="flex justify-center mt-2">
+          <a href="/charte-gps" className="text-xs text-blue-600 dark:text-blue-400 underline hover:text-blue-800 dark:hover:text-blue-200 transition-colors">
+            Lire la Charte de Transparence GPS complète
+          </a>
+        </div>
+      </div>
+
       {/* Bouton pointage / État */}
       <div className="bg-ss-bg-secondary rounded-xl border border-ss-border p-5">
         {/* Déjà pointé */}
@@ -319,9 +331,9 @@ export function PointageGPS({ userId, ecoleId, userName }: PointageGPSProps) {
             <button
               onClick={handlePointage}
               disabled={state !== 'idle'}
-              className="w-full bg-ss-green text-white py-4 rounded-xl font-semibold text-base min-h-[56px] transition-colors hover:bg-ss-green/90 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-ss-green text-white py-4 rounded-xl font-semibold text-base min-h-[56px] transition-colors hover:bg-ss-green/90 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_4px_20px_rgba(0,133,63,0.3)]"
             >
-              {state === 'idle' ? 'Pointer mon arrivée' : 'Pointage en cours...'}
+              {state === 'idle' ? '📍 Signaler ma présence à l\'école' : 'Pointage en cours...'}
             </button>
 
             {ecole && (
@@ -362,27 +374,37 @@ export function PointageGPS({ userId, ecoleId, userName }: PointageGPSProps) {
             {historique.map((p) => {
               const statut = STATUT_LABELS[p.statut]
               return (
-                <div key={p.id} className="flex items-center justify-between p-3 bg-ss-bg-card rounded-lg">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <span className="text-ss-text-secondary text-sm font-medium shrink-0">
-                      {formatDate(p.date_pointage)}
-                    </span>
-                    <span className="text-ss-text text-sm">
-                      {formatHeure(p.heure_arrivee)}
-                    </span>
+                <div key={p.id} className="flex flex-col p-3 bg-ss-bg-card rounded-lg gap-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="text-ss-text-secondary text-sm font-medium shrink-0">
+                        {formatDate(p.date_pointage)}
+                      </span>
+                      <span className="text-ss-text text-sm">
+                        {formatHeure(p.heure_arrivee)}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      {p.minutes_retard > 0 && (
+                        <span className="text-xs text-ss-red">+{p.minutes_retard}min</span>
+                      )}
+                      <span className={`text-xs font-medium px-2 py-1 rounded-md ${statut?.color || 'bg-ss-bg text-ss-text-muted'}`}>
+                        {statut?.label || p.statut}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    {p.minutes_retard > 0 && (
-                      <span className="text-xs text-ss-red">+{p.minutes_retard}min</span>
-                    )}
-                    <span className={`text-xs font-medium px-2 py-1 rounded-md ${statut?.color || 'bg-ss-bg text-ss-text-muted'}`}>
-                      {statut?.label || p.statut}
-                    </span>
+                  <div className="flex justify-end border-t border-ss-border/50 pt-2">
+                    <button className="text-xs text-ss-text-muted hover:text-[#E31B23] transition-colors flex items-center gap-1">
+                      <span>⚠️</span> Contester ce pointage
+                    </button>
                   </div>
                 </div>
               )
             })}
           </div>
+          <p className="text-xs text-ss-text-muted mt-3 text-center italic">
+            Vos données de localisation ne sont conservées que pendant 30 jours, puis supprimées.
+          </p>
         </div>
       )}
     </div>
