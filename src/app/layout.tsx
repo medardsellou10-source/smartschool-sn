@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import { OfflineIndicator } from '@/components/ui/OfflineIndicator'
 
 const inter = Inter({
   subsets: ['latin', 'latin-ext'],
@@ -50,6 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       </head>
       <body className={inter.className}>
+        <OfflineIndicator />
         {children}
         {/* Bouton WhatsApp flottant global */}
         <a
