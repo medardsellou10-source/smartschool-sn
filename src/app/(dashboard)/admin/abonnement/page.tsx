@@ -108,7 +108,7 @@ const ABO_DEMO: Abonnement = {
 }
 
 const NOUVELLES_FONCTIONNALITES = [
-  { icon: '🤖', titre: 'Correction IA (Vision)', desc: 'Le professeur upload le corrigé + les copies scannées → Claude note automatiquement chaque copie avec points forts/faibles.', plan: 'Standard' },
+  { icon: '🤖', titre: 'Correction IA (Vision)', desc: 'Le professeur upload le corrigé + les copies scannées → Gemini Vision note automatiquement chaque copie avec points forts/faibles.', plan: 'Standard' },
   { icon: '📚', titre: 'Cours Natifs Intégrés', desc: '19 cours complets (Maths S1/S2, Physique, SVT, Philo, Français, HG) s\'ouvrent directement dans SmartSchool — sans redirection externe.', plan: 'Standard' },
   { icon: '🎓', titre: 'Ressources Élève Complètes', desc: 'Annales BAC/BFEM corrigées, TP virtuels PhET en français, quiz interactifs, fiches de révision — tout accessible depuis le dashboard élève.', plan: 'Standard' },
   { icon: '📊', titre: 'Notes temps réel + Classements', desc: 'Les élèves voient leurs notes publiées en direct avec rang dans la classe, badges et graphiques d\'évolution.', plan: 'Standard' },

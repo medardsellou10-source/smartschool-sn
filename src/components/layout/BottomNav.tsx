@@ -42,11 +42,11 @@ const BOTTOM_MENUS: Record<string, BottomItem[]> = {
     { href: '/admin/parametres', label: 'Config', icon: SettingsIcon },
   ],
   professeur: [
-    { href: '/professeur',                      label: 'Accueil',  icon: HomeIcon },
-    { href: '/professeur/appel',                label: 'Appel',    icon: ClipIcon },
-    { href: '/professeur/notes',                label: 'Notes',    icon: PencilIcon },
-    { href: '/professeur/support-pedagogique',  label: 'Support',  icon: SupportIcon },
-    { href: '/professeur/cahier',               label: 'Cahier',   icon: BookIcon },
+    { href: '/professeur',                label: 'Accueil',  icon: HomeIcon },
+    { href: '/professeur/appel',          label: 'Appel',    icon: ClipIcon },
+    { href: '/professeur/notes',          label: 'Notes',    icon: PencilIcon },
+    { href: '/professeur/correction-ia',  label: 'Pré-analyse', icon: RobotIcon },
+    { href: '/professeur/cahier',         label: 'Cahier',   icon: BookIcon },
   ],
   surveillant: [
     { href: '/surveillant', label: 'Accueil', icon: HomeIcon },
@@ -62,9 +62,9 @@ const BOTTOM_MENUS: Record<string, BottomItem[]> = {
   eleve: [
     { href: '/eleve',               label: 'Accueil',   icon: HomeIcon },
     { href: '/eleve/notes',         label: 'Notes',     icon: ChartIcon },
-    { href: '/eleve/emploi-temps',  label: 'Planning',  icon: ClipIcon },
+    { href: '/eleve/correction',    label: 'Correction',icon: RobotIcon },
     { href: '/eleve/elearning',     label: 'Cours',     icon: MonitorIcon },
-    { href: '/eleve/ressources',    label: 'Ressources',icon: StarIcon },
+    { href: '/eleve/emploi-temps',  label: 'Planning',  icon: ClipIcon },
   ],
   secretaire: [
     { href: '/secretaire',              label: 'Accueil',  icon: HomeIcon },

@@ -564,6 +564,9 @@ export default function ParametresPage() {
         )}
       </div>
 
+      {/* ── ALERTES & NOTIFICATIONS — DÉLAI HUMAIN ── */}
+      <AlertesDelaiHumain demo={demo} showStatus={showStatus} />
+
       {/* ── Application ── */}
       <div className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
         <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: '#94A3B8' }}>Application</h2>
@@ -571,6 +574,262 @@ export default function ParametresPage() {
           <InfoField label="Version" value="2.0.0" />
           <InfoField label="Mode" value={demo ? 'Démonstration' : 'Production'}
             valueColor={demo ? '#FFD600' : '#00E676'} />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ══════════════════════════════════════════════════════════════
+// ── Alertes & Notifications — Système "Délai Humain" ─────────
+// ══════════════════════════════════════════════════════════════
+
+interface AlertConfig {
+  id: string
+  label: string
+  icon: string
+  description: string
+  category: 'security' | 'pedagogy' | 'finance'
+  options: { value: string; label: string }[]
+  defaultValue: string
+}
+
+const ALERT_CONFIGS: AlertConfig[] = [
+  {
+    id: 'absence',
+    label: 'Absence',
+    icon: '🚨',
+    description: 'L\'enfant est signalé absent en classe',
+    category: 'security',
+    options: [
+      { value: 'immediate', label: 'Immédiat' },
+      { value: '2h', label: 'Après 2 heures' },
+    ],
+    defaultValue: 'immediate',
+  },
+  {
+    id: 'bus_scolaire',
+    label: 'Bus scolaire',
+    icon: '🚌',
+    description: 'Approche de l\'arrêt, retard du bus',
+    category: 'security',
+    options: [
+      { value: 'realtime', label: 'Temps réel' },
+    ],
+    defaultValue: 'realtime',
+  },
+  {
+    id: 'mauvaise_note',
+    label: 'Mauvaise note',
+    icon: '📉',
+    description: 'Note en dessous de la moyenne',
+    category: 'pedagogy',
+    options: [
+      { value: 'immediate', label: 'Immédiat' },
+      { value: 'fin_journee', label: 'Fin de journée' },
+      { value: 'fin_semaine', label: 'Fin de semaine' },
+    ],
+    defaultValue: 'fin_journee',
+  },
+  {
+    id: 'note_excellente',
+    label: 'Note excellente',
+    icon: '🌟',
+    description: 'Note ≥ 16/20 — renforcement positif',
+    category: 'pedagogy',
+    options: [
+      { value: 'immediate', label: 'Immédiat' },
+      { value: 'fin_journee', label: 'Fin de journée' },
+    ],
+    defaultValue: 'immediate',
+  },
+  {
+    id: 'bulletin',
+    label: 'Bulletin disponible',
+    icon: '📋',
+    description: 'Le bulletin trimestriel est prêt',
+    category: 'pedagogy',
+    options: [
+      { value: 'immediate', label: 'Immédiat' },
+    ],
+    defaultValue: 'immediate',
+  },
+  {
+    id: 'retard_paiement',
+    label: 'Retard de paiement',
+    icon: '💰',
+    description: 'Scolarité en attente de règlement',
+    category: 'finance',
+    options: [
+      { value: 'hebdomadaire', label: 'Hebdomadaire' },
+      { value: 'bimensuel', label: 'Bimensuel' },
+      { value: 'mensuel', label: 'Mensuel' },
+    ],
+    defaultValue: 'bimensuel',
+  },
+]
+
+const CATEGORY_LABELS: Record<string, { label: string; color: string; desc: string }> = {
+  security: { label: '🔒 Sécurité', color: '#FF1744', desc: 'Alertes instantanées — la sécurité prime' },
+  pedagogy: { label: '🎓 Pédagogique', color: '#00E5FF', desc: 'Respectent le temps de l\'apprentissage' },
+  finance:  { label: '💰 Finance', color: '#00E676', desc: 'Relances éthiques avec Pause Empathique' },
+}
+
+function AlertesDelaiHumain({ demo, showStatus }: { demo: boolean; showStatus: (t: 'success' | 'error', m: string) => void }) {
+  const [alertTimings, setAlertTimings] = useState<Record<string, string>>(() => {
+    const defaults: Record<string, string> = {}
+    ALERT_CONFIGS.forEach(a => { defaults[a.id] = a.defaultValue })
+    return defaults
+  })
+  const [profPublie, setProfPublie] = useState(true)
+  const [saving, setSaving] = useState(false)
+
+  function handleTimingChange(id: string, value: string) {
+    setAlertTimings(prev => ({ ...prev, [id]: value }))
+  }
+
+  async function handleSave() {
+    setSaving(true)
+    // Simuler une sauvegarde (en production → update supabase)
+    await new Promise(r => setTimeout(r, 600))
+    setSaving(false)
+    showStatus('success', demo
+      ? 'Configuration des alertes sauvegardée (mode démo)'
+      : 'Configuration des alertes mise à jour')
+  }
+
+  const grouped = {
+    security: ALERT_CONFIGS.filter(a => a.category === 'security'),
+    pedagogy: ALERT_CONFIGS.filter(a => a.category === 'pedagogy'),
+    finance:  ALERT_CONFIGS.filter(a => a.category === 'finance'),
+  }
+
+  return (
+    <div className="rounded-2xl overflow-hidden"
+      style={{ background: 'rgba(0,229,255,0.03)', border: '1px solid rgba(0,229,255,0.12)' }}>
+
+      {/* Header */}
+      <div className="p-5" style={{ borderBottom: '1px solid rgba(0,229,255,0.1)' }}>
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-lg">🔔</span>
+              <h2 className="text-base font-bold text-white">Alertes & Notifications</h2>
+              <span className="text-[9px] font-bold px-2 py-0.5 rounded-full"
+                style={{ background: 'rgba(0,229,255,0.15)', color: '#00E5FF', border: '1px solid rgba(0,229,255,0.3)' }}>
+                DÉLAI HUMAIN
+              </span>
+            </div>
+            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
+              Configurez quand les parents reçoivent chaque type de notification
+            </p>
+          </div>
+          <button onClick={handleSave} disabled={saving}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all hover:opacity-90 disabled:opacity-50"
+            style={{ background: '#00E5FF', color: '#020617' }}>
+            {saving ? (
+              <><span className="w-3.5 h-3.5 border-2 border-[#020617]/30 border-t-[#020617] rounded-full animate-spin" />Sauvegarde…</>
+            ) : (
+              <>💾 Appliquer</>
+            )}
+          </button>
+        </div>
+
+        {/* Principe directeur */}
+        <div className="mt-4 flex items-start gap-3 p-3 rounded-xl"
+          style={{ background: 'rgba(124,77,255,0.08)', border: '1px solid rgba(124,77,255,0.2)' }}>
+          <span className="text-lg shrink-0">💡</span>
+          <div>
+            <p className="text-xs font-bold mb-0.5" style={{ color: '#7C4DFF' }}>Principe directeur</p>
+            <p className="text-xs italic leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
+              &ldquo;Les alertes de sécurité sont instantanées. Les alertes pédagogiques respectent le temps de l&apos;apprentissage.&rdquo;
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Alert Groups */}
+      <div className="p-5 space-y-5">
+        {(['security', 'pedagogy', 'finance'] as const).map(cat => {
+          const meta = CATEGORY_LABELS[cat]
+          const alerts = grouped[cat]
+          return (
+            <div key={cat}>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-2 h-2 rounded-full" style={{ background: meta.color }} />
+                <p className="text-xs font-bold uppercase tracking-wider" style={{ color: meta.color }}>
+                  {meta.label}
+                </p>
+                <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.3)' }}>— {meta.desc}</span>
+              </div>
+              <div className="space-y-2">
+                {alerts.map(alert => (
+                  <div key={alert.id} className="flex items-center gap-3 p-3 rounded-xl group transition-all"
+                    style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                    <span className="text-lg shrink-0">{alert.icon}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-white">{alert.label}</p>
+                      <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.35)' }}>{alert.description}</p>
+                    </div>
+                    {alert.options.length === 1 ? (
+                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-lg shrink-0"
+                        style={{ background: `${meta.color}18`, color: meta.color, border: `1px solid ${meta.color}30` }}>
+                        {alert.options[0].label}
+                      </span>
+                    ) : (
+                      <select
+                        value={alertTimings[alert.id]}
+                        onChange={e => handleTimingChange(alert.id, e.target.value)}
+                        className="text-xs font-semibold rounded-lg px-3 py-2 outline-none cursor-pointer shrink-0 transition-all"
+                        style={{
+                          background: 'rgba(255,255,255,0.06)',
+                          color: meta.color,
+                          border: `1px solid ${meta.color}30`,
+                        }}>
+                        {alert.options.map(opt => (
+                          <option key={opt.value} value={opt.value} style={{ background: '#0B1120', color: '#fff' }}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                    {alertTimings[alert.id] === alert.defaultValue && (
+                      <span className="text-[9px] font-medium px-1.5 py-0.5 rounded"
+                        style={{ background: 'rgba(0,230,118,0.1)', color: '#00E676' }}>
+                        recommandé
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )
+        })}
+
+        {/* Toggle: Le prof choisit quand publier */}
+        <div className="rounded-xl p-4" style={{ background: 'rgba(124,77,255,0.06)', border: '1px solid rgba(124,77,255,0.15)' }}>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setProfPublie(v => !v)}
+              className="relative w-11 h-6 rounded-full transition-all shrink-0"
+              style={{ background: profPublie ? '#7C4DFF' : 'rgba(255,255,255,0.1)' }}>
+              <span className="absolute w-4 h-4 rounded-full bg-white top-1 transition-all"
+                style={{ left: profPublie ? '26px' : '4px' }} />
+            </button>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-white">Le prof choisit quand publier la note</p>
+              <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                La note est saisie mais pas envoyée au parent tant que le professeur n&apos;a pas validé la publication.
+              </p>
+            </div>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded shrink-0"
+              style={profPublie
+                ? { background: 'rgba(124,77,255,0.15)', color: '#7C4DFF', border: '1px solid rgba(124,77,255,0.3)' }
+                : { background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.3)', border: '1px solid rgba(255,255,255,0.1)' }
+              }>
+              {profPublie ? 'Activé' : 'Désactivé'}
+            </span>
+          </div>
         </div>
       </div>
     </div>

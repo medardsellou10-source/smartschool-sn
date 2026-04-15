@@ -501,6 +501,50 @@ video {
   -webkit-media-controls: none;
 }
 
+/* ═══════════════════════════════════════
+   LANDING PAGE — Pilier sections
+   ═══════════════════════════════════════ */
+
+@keyframes pilier-reveal {
+  from { opacity: 0; transform: translateY(32px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes accent-pulse {
+  0%, 100% { opacity: 0.15; transform: scale(1); }
+  50%       { opacity: 0.25; transform: scale(1.1); }
+}
+
+@keyframes gradient-shift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-pilier-reveal {
+  animation: pilier-reveal 0.7s ease-out forwards;
+}
+
+.animate-accent-pulse {
+  animation: accent-pulse 6s ease-in-out infinite;
+}
+
+/* Pilier cards — glassmorphism upgrade */
+.pilier-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pilier-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
 /* Préférences de mouvement réduit */
 @media (prefers-reduced-motion: reduce) {
   .ss-shimmer,
@@ -508,5 +552,7 @@ video {
   .ss-toast-out,
   .animate-float,
   .aurora-bg,
-  .aurora-border::before { animation: none; }
+  .aurora-border::before,
+  .animate-pilier-reveal,
+  .animate-accent-pulse { animation: none; }
 }

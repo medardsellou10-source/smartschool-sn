@@ -607,7 +607,14 @@ export default function InscriptionPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center" style={{ background: '#020617' }}>
-        <span className="text-white text-sm">Chargement...</span>
+        <div className="text-center">
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4"
+            style={{ background: 'linear-gradient(135deg, #00853F, #FDEF42, #E31B23)' }}>
+            <span className="text-white font-black text-sm">SS</span>
+          </div>
+          <div className="w-8 h-8 border-2 border-[#00E676] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-white/50 text-sm">Chargement du formulaire...</p>
+        </div>
       </div>
     }>
       <InscriptionForm />

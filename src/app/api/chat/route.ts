@@ -201,7 +201,7 @@ async function getSmartDemoResponse(message: string, fullContext: string, role: 
         content: `💰 **Rapport financier de l'école**\n\n` +
           `📈 **Total facturé** : ${parsed.total_facture}\n` +
           `✅ **Total recouvré** : ${parsed.total_recouvre}\n` +
-          `❌ **Impayés** : ${parsed.total_impaye}\n` +
+          `⏳ **En attente** : ${parsed.total_impaye}\n` +
           `📊 **Taux de recouvrement** : ${parsed.taux_recouvrement}\n\n` +
           `⚠️ ${parsed.factures_en_retard} facture(s) en retard\n` +
           `💳 ${parsed.nb_paiements} paiement(s) confirmé(s)\n\n` +

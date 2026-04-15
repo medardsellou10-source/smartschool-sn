@@ -38,8 +38,14 @@ const DEMO_ROLES = [
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[#0A0E27] flex items-center justify-center">
-        <div className="text-slate-400">Chargement...</div>
+      <div className="min-h-screen bg-[#020617] flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-[#00853F] rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <span className="text-white text-2xl font-bold">SS</span>
+          </div>
+          <div className="w-8 h-8 border-2 border-[#00E676] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-slate-400 text-sm">Chargement...</p>
+        </div>
       </div>
     }>
       <LoginContent />
@@ -438,6 +444,11 @@ function LoginContent() {
                         placeholder="Votre mot de passe"
                         className="w-full bg-[#0A0E27] border border-slate-600 text-white rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ss-green focus:border-transparent placeholder:text-slate-500"
                       />
+                    </div>
+                    <div className="flex justify-end">
+                      <a href="/reset-password" className="text-xs text-[#00E676] hover:underline">
+                        Mot de passe oublié ?
+                      </a>
                     </div>
                     <button
                       type="submit"

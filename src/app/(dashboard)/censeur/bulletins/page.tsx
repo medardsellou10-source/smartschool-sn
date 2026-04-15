@@ -299,6 +299,52 @@ export default function BulletinsPage() {
   const [validated, setValidated] = useState(false)
   const [validating, setValidating] = useState(false)
 
+  // ── Notes soumises par les profs ──────────────────────────
+  const [notesEnAttente, setNotesEnAttente] = useState([
+    {
+      id: 'ns-001', reference: 'NOTES-CL001-1744200001',
+      profNom: 'M. Fallou Ndiaye', matiere: 'Mathématiques',
+      classeNom: 'Terminale S — A', evalType: 'Devoir',
+      dateEval: '07/04/2026', dateSubmission: '09/04/2026',
+      nbEleves: 32, moyenneClasse: 12.4,
+      statut: 'en_attente' as 'en_attente' | 'valide' | 'rejete',
+      commentaire: '',
+      notes: [
+        { nomEleve: 'Awa Diallo', note: 16.5, mention: 'Très Bien' },
+        { nomEleve: 'Moussa Ndiaye', note: 11.0, mention: 'Passable' },
+        { nomEleve: 'Ibrahima Sow', note: 19.5, mention: 'Excellent' },
+      ],
+    },
+    {
+      id: 'ns-002', reference: 'NOTES-CL002-1744200002',
+      profNom: 'Mme Aïda Sarr', matiere: 'Physique-Chimie',
+      classeNom: 'Première S — B', evalType: 'Composition',
+      dateEval: '06/04/2026', dateSubmission: '08/04/2026',
+      nbEleves: 28, moyenneClasse: 9.8,
+      statut: 'en_attente' as 'en_attente' | 'valide' | 'rejete',
+      commentaire: '',
+      notes: [
+        { nomEleve: 'Fatou Fall', note: 8.5, mention: 'Insuffisant' },
+        { nomEleve: 'Oumar Diop', note: 11.0, mention: 'Passable' },
+      ],
+    },
+  ])
+  const [expandedNote, setExpandedNote] = useState<string | null>(null)
+  const [validatingNote, setValidatingNote] = useState<string | null>(null)
+
+  async function handleValiderNotes(id: string) {
+    setValidatingNote(id)
+    await new Promise(r => setTimeout(r, 900))
+    setNotesEnAttente(prev => prev.map(n => n.id === id ? { ...n, statut: 'valide' } : n))
+    setValidatingNote(null)
+  }
+
+  function handleRejeterNotes(id: string) {
+    setNotesEnAttente(prev => prev.map(n => n.id === id ? { ...n, statut: 'rejete' } : n))
+  }
+
+  const nbEnAttente = notesEnAttente.filter(n => n.statut === 'en_attente').length
+
   const ANNEE = '2025–2026'
   const classeObj = DEMO_CLASSES.find(c => c.id === selectedClasse)
   const classeLabel = classeObj ? `${classeObj.niveau} ${classeObj.nom}` : ''
@@ -350,6 +396,141 @@ export default function BulletinsPage() {
 
   return (
     <>
+      {/* ══════════════════════════════════════════════════════════
+          SECTION : Notes soumises par les professeurs (workflow SN)
+          Flux : Prof → Censeur validation → Bulletins → Parents
+          ══════════════════════════════════════════════════════════ */}
+      {notesEnAttente.length > 0 && (
+        <div className="print:hidden mb-6">
+          <div className="flex items-center gap-3 mb-3">
+            <h2 className="text-lg font-bold text-ss-text">Notes soumises par les professeurs</h2>
+            {nbEnAttente > 0 && (
+              <span className="text-xs font-bold px-2.5 py-1 rounded-full animate-pulse"
+                style={{ background: 'rgba(61,90,254,0.15)', color: '#3D5AFE', border: '1px solid rgba(61,90,254,0.3)' }}>
+                {nbEnAttente} en attente
+              </span>
+            )}
+          </div>
+          <p className="text-xs text-ss-text-muted mb-4">
+            Après la correction IA, le professeur soumet ses notes ici. Le Censeur valide pour officialiser et déclencher la génération des bulletins.
+          </p>
+
+          <div className="space-y-3">
+            {notesEnAttente.map(n => (
+              <div key={n.id} className="rounded-xl border overflow-hidden transition-all"
+                style={{
+                  borderColor: n.statut === 'valide' ? 'rgba(0,230,118,0.3)' : n.statut === 'rejete' ? 'rgba(255,23,68,0.3)' : 'rgba(61,90,254,0.3)',
+                  background: n.statut === 'valide' ? 'rgba(0,230,118,0.04)' : n.statut === 'rejete' ? 'rgba(255,23,68,0.04)' : 'rgba(61,90,254,0.04)',
+                }}>
+                {/* Header */}
+                <div className="flex items-center gap-3 px-4 py-3 flex-wrap">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="text-sm font-bold text-ss-text">{n.matiere}</p>
+                      <span className="text-[10px] px-2 py-0.5 rounded font-semibold"
+                        style={{ background: 'rgba(61,90,254,0.12)', color: '#3D5AFE', border: '1px solid rgba(61,90,254,0.25)' }}>
+                        {n.evalType}
+                      </span>
+                    </div>
+                    <p className="text-xs text-ss-text-muted mt-0.5">
+                      {n.profNom} • {n.classeNom} • Éval. du {n.dateEval} • Soumis le {n.dateSubmission}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <div className="text-right">
+                      <p className="text-lg font-black tabular-nums text-ss-cyan">{n.moyenneClasse.toFixed(1)}</p>
+                      <p className="text-[10px] text-ss-text-muted">Moy. / 20</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-lg font-black tabular-nums text-ss-text">{n.nbEleves}</p>
+                      <p className="text-[10px] text-ss-text-muted">élèves</p>
+                    </div>
+                    {/* Statut badge */}
+                    <span className="text-xs font-bold px-2.5 py-1 rounded-full"
+                      style={{
+                        background: n.statut === 'valide' ? 'rgba(0,230,118,0.15)' : n.statut === 'rejete' ? 'rgba(255,23,68,0.15)' : 'rgba(255,214,0,0.15)',
+                        color: n.statut === 'valide' ? '#00E676' : n.statut === 'rejete' ? '#FF1744' : '#FFD600',
+                        border: `1px solid ${n.statut === 'valide' ? 'rgba(0,230,118,0.3)' : n.statut === 'rejete' ? 'rgba(255,23,68,0.3)' : 'rgba(255,214,0,0.3)'}`,
+                      }}>
+                      {n.statut === 'valide' ? '✅ Validé' : n.statut === 'rejete' ? '✕ Rejeté' : '⏳ En attente'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Aperçu notes + actions */}
+                <div className="border-t px-4 py-3 flex flex-wrap items-center gap-3"
+                  style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+                  {/* Mini liste notes */}
+                  <button onClick={() => setExpandedNote(expandedNote === n.id ? null : n.id)}
+                    className="text-xs text-ss-text-muted hover:text-ss-text transition-all flex items-center gap-1">
+                    {expandedNote === n.id ? '▲' : '▼'} Voir les {n.nbEleves} notes
+                  </button>
+
+                  <span className="text-ss-text-muted/30 text-xs">|</span>
+                  <span className="text-xs text-ss-text-muted font-mono">Réf: {n.reference}</span>
+
+                  {n.statut === 'en_attente' && (
+                    <div className="ml-auto flex gap-2">
+                      <button onClick={() => handleRejeterNotes(n.id)}
+                        className="text-xs px-3 py-1.5 rounded-lg font-semibold transition-all"
+                        style={{ background: 'rgba(255,23,68,0.1)', color: '#FF1744', border: '1px solid rgba(255,23,68,0.25)' }}>
+                        ✕ Rejeter
+                      </button>
+                      <button onClick={() => handleValiderNotes(n.id)} disabled={validatingNote === n.id}
+                        className="text-xs px-4 py-1.5 rounded-lg font-bold transition-all disabled:opacity-60"
+                        style={{ background: 'rgba(0,230,118,0.15)', color: '#00E676', border: '1px solid rgba(0,230,118,0.3)' }}>
+                        {validatingNote === n.id ? (
+                          <><span className="inline-block w-3 h-3 border border-current/30 border-t-current rounded-full animate-spin mr-1" />Validation...</>
+                        ) : '✓ Valider les notes'}
+                      </button>
+                    </div>
+                  )}
+                  {n.statut === 'valide' && (
+                    <span className="ml-auto text-xs text-ss-green font-semibold">
+                      Notes officielles — Bulletins débloqués
+                    </span>
+                  )}
+                  {n.statut === 'rejete' && (
+                    <span className="ml-auto text-xs text-red-400 font-semibold">
+                      Retourné au professeur pour correction
+                    </span>
+                  )}
+                </div>
+
+                {/* Table des notes (dépliable) */}
+                {expandedNote === n.id && (
+                  <div className="border-t px-4 pb-4 pt-3" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+                    <div className="grid grid-cols-3 gap-x-2 gap-y-1">
+                      {/* Header */}
+                      <div className="text-[10px] font-bold text-ss-text-muted pb-1">ÉLÈVE</div>
+                      <div className="text-[10px] font-bold text-ss-text-muted pb-1 text-center">NOTE / 20</div>
+                      <div className="text-[10px] font-bold text-ss-text-muted pb-1 text-right">MENTION</div>
+                      {n.notes.map((note, i) => {
+                        const noteColor = note.note >= 16 ? '#00E676' : note.note >= 10 ? '#00E5FF' : '#FF1744'
+                        return (
+                          <>
+                            <div key={`name-${i}`} className="text-sm text-ss-text py-0.5">{note.nomEleve}</div>
+                            <div key={`note-${i}`} className="text-sm font-bold tabular-nums py-0.5 text-center" style={{ color: noteColor }}>{note.note.toFixed(1)}</div>
+                            <div key={`mention-${i}`} className="text-xs font-semibold py-0.5 text-right" style={{ color: noteColor }}>{note.mention}</div>
+                          </>
+                        )
+                      })}
+                      {n.notes.length < n.nbEleves && (
+                        <div className="col-span-3 text-xs text-ss-text-muted text-center pt-2">
+                          + {n.nbEleves - n.notes.length} autres élèves...
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <div className="my-6 border-t border-ss-border/50" />
+        </div>
+      )}
+
       {/* ── Vue écran ─────────────────────────────────────────── */}
       <div className="print:hidden space-y-5 max-w-6xl mx-auto">
         <div className="flex items-center justify-between gap-3 flex-wrap">

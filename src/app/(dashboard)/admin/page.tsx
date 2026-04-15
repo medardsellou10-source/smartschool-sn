@@ -160,7 +160,7 @@ export default function AdminDashboard() {
         <StatCard title="Élèves inscrits" value={data.totalEleves.toLocaleString('fr-FR')} subtitle="actifs" icon="👥" trend="up" trendValue="+12" color="cyan" />
         <StatCard title="Professeurs" value={data.totalProfs} subtitle={`${profsPointes} pointés auj.`} icon="👨‍🏫" color="green" />
         <StatCard title="Absences auj." value={data.absencesAujourdhui} subtitle={`${data.absencesNonJustifiees} non justifiées`} icon="⚠️" color={data.absencesAujourdhui > 5 ? 'red' : 'gold'} />
-        <StatCard title="Impayés" value={formatFCFA(data.totalImpayes)} subtitle={`${data.facturesEnAttente} facture(s)`} icon="💰" color="red" />
+        <StatCard title="En attente" value={formatFCFA(data.totalImpayes)} subtitle={`${data.facturesEnAttente} facture(s)`} icon="💰" color="red" />
       </div>
 
       {/* ── Présence profs + Feed ── */}
@@ -312,6 +312,7 @@ export default function AdminDashboard() {
             { href: '/admin/eleves',              icon: '👥', label: 'Élèves',          color: '#00E5FF' },
             { href: '/admin/finances',            icon: '💳', label: 'Finance',         color: '#00E676' },
             { href: '/admin/bulletins',           icon: '📄', label: 'Bulletins',       color: '#FFD600' },
+            { href: '/admin/export',              icon: '🏛️', label: 'Export IMEN',     color: '#E31B23' },
             { href: '/admin/analytique',          icon: '📊', label: 'Analytique',      color: '#D500F9' },
             { href: '/admin/pointage-historique', icon: '🕐', label: 'Pointages',       color: '#FF1744' },
             { href: '/admin/parametres',          icon: '⚙️', label: 'Parametres',      color: '#94A3B8' },

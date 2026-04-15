@@ -299,7 +299,7 @@ export default function ParentDashboard() {
             ) : (
               <>
                 <p className="text-xl font-black text-white">À jour ✓</p>
-                <p className="text-xs mt-1" style={{ color: '#475569' }}>Aucun impayé</p>
+                <p className="text-xs mt-1" style={{ color: '#475569' }}>Tout est à jour</p>
               </>
             )}
           </Link>

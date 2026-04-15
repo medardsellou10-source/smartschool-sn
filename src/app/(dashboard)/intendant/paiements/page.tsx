@@ -14,11 +14,14 @@ const GOLD   = '#FFD600'
 function fmt(v: number) { return new Intl.NumberFormat('fr-FR').format(v) + ' FCFA' }
 function pct(a: number, b: number) { return b === 0 ? 0 : Math.round((a / b) * 100) }
 
+const PURPLE = '#7C4DFF'
+
 const STATUT_MAP: Record<string, { bg: string; color: string; label: string }> = {
-  solde:          { bg: 'rgba(0,230,118,0.15)',  color: GREEN,  label: 'Soldé' },
-  partiel_avance: { bg: 'rgba(0,188,212,0.15)',  color: ACCENT, label: 'Partiel avancé' },
-  partiel_retard: { bg: 'rgba(255,109,0,0.15)',  color: ORANGE, label: 'Partiel retard' },
-  impaye:         { bg: 'rgba(255,23,68,0.15)',  color: RED,    label: 'Impayé' },
+  solde:           { bg: 'rgba(0,230,118,0.15)',  color: GREEN,  label: 'Soldé' },
+  partiel_avance:  { bg: 'rgba(0,188,212,0.15)',  color: ACCENT, label: 'Partiel avancé' },
+  partiel_retard:  { bg: 'rgba(255,109,0,0.15)',  color: ORANGE, label: 'Partiel retard' },
+  impaye:          { bg: 'rgba(255,23,68,0.15)',  color: RED,    label: 'En attente' },
+  pause_empathique: { bg: 'rgba(124,77,255,0.15)', color: PURPLE, label: '💚 Pause Empathique' },
 }
 
 // Type unifié pour les deux sources (démo + Supabase)
@@ -40,6 +43,10 @@ interface PaiementRow {
   activitesPayees: boolean
   lignes: Array<{ type: string; montant: number; date: string; reference: string; methode: string }>
   methode: string
+  // Pause Empathique
+  pauseMotif?: string
+  pauseDuree?: string
+  pauseDate?: string
 }
 
 interface Tarifs {
@@ -89,6 +96,13 @@ export default function PaiementsPage() {
   const [detailRow, setDetailRow] = useState<PaiementRow | null>(null)
   const [classesSupabase, setClassesSupabase] = useState<{ id: string; label: string }[]>([])
   const [saving, setSaving] = useState(false)
+
+  // Pause Empathique
+  const [pauseModal, setPauseModal] = useState<PaiementRow | null>(null)
+  const [pauseMotif, setPauseMotif] = useState('')
+  const [pauseDuree, setPauseDuree] = useState('1_mois')
+  const [pauseAutreMotif, setPauseAutreMotif] = useState('')
+  const [savingPause, setSavingPause] = useState(false)
 
   function showToast(msg: string, duration = 3500) {
     setToast(msg)
@@ -314,7 +328,7 @@ export default function PaiementsPage() {
         {[
           { label: 'Total attendu',     val: fmt(kpis.totalAttendu),  color: ACCENT, icon: '📋' },
           { label: 'Total encaissé',    val: fmt(kpis.totalEncaisse), color: GREEN,  icon: '✅' },
-          { label: 'Solde impayé',      val: fmt(kpis.soldeGlobal),   color: RED,    icon: '⚠️' },
+          { label: 'En attente',        val: fmt(kpis.soldeGlobal),   color: ORANGE, icon: '⏳' },
           { label: 'Taux recouvrement', val: kpis.taux + '%',         color: kpis.taux >= 80 ? GREEN : kpis.taux >= 50 ? GOLD : RED, icon: '📊' },
         ].map(({ label, val, color, icon }) => (
           <div key={label} className="rounded-2xl p-5" style={{ ...glassStyle, border: `1px solid ${color}25` }}>
@@ -365,7 +379,7 @@ export default function PaiementsPage() {
           { k: 'solde',          n: kpis.nbSolde,                                                    label: 'Soldés', icon: '✅' },
           { k: 'partiel_avance', n: data.filter(d => d.statut === 'partiel_avance').length,           label: 'Partiel avancé', icon: '⏳' },
           { k: 'partiel_retard', n: kpis.nbPartielRetard,                                             label: 'Partiel retard', icon: '⚠️' },
-          { k: 'impaye',         n: kpis.nbImpaye,                                                    label: 'Impayés totaux', icon: '🚨' },
+          { k: 'impaye',         n: kpis.nbImpaye,                                                    label: 'En attente', icon: '🤝' },
         ] as const).map(({ k, n, label, icon }) => {
           const s = STATUT_MAP[k]
           return (
@@ -387,7 +401,7 @@ export default function PaiementsPage() {
             style={vue === v
               ? { background: ACCENT, color: '#020617' }
               : { background: 'rgba(255,255,255,0.06)', color: '#94A3B8', border: '1px solid rgba(255,255,255,0.1)' }}>
-            {v === 'tableau' ? '📋 Tableau' : v === 'debiteurs' ? `⚠️ Débiteurs (${debiteurs.length})` : '📊 Rapport'}
+            {v === 'tableau' ? '📋 Tableau' : v === 'debiteurs' ? `🤝 Familles à accompagner (${debiteurs.length})` : '📊 Rapport'}
           </button>
         ))}
       </div>
@@ -465,38 +479,79 @@ export default function PaiementsPage() {
       {/* ── VUE DÉBITEURS ── */}
       {vue === 'debiteurs' && (
         <div className="space-y-3">
-          <div className="rounded-2xl p-4" style={{ ...glassStyle, border: `1px solid ${RED}30` }}>
-            <p className="text-sm font-semibold text-white mb-1">
-              🚨 {debiteurs.length} débiteurs — Solde total : <span style={{ color: RED }}>{fmt(debiteurs.reduce((s, d) => s + d.solde, 0))}</span>
-            </p>
-            <p className="text-xs text-slate-400">Triés par montant impayé décroissant</p>
+          {/* Header empathique */}
+          <div className="rounded-2xl p-4" style={{ ...glassStyle, border: `1px solid ${PURPLE}30` }}>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-lg">🤝</span>
+              <p className="text-sm font-semibold text-white">
+                {debiteurs.length} familles à accompagner — Solde en attente : <span style={{ color: ORANGE }}>{fmt(debiteurs.reduce((s, d) => s + d.solde, 0))}</span>
+              </p>
+            </div>
+            <p className="text-xs text-slate-400">Triés par montant en attente · La Pause Empathique suspend les relances temporairement</p>
+            {data.filter(d => d.statut === 'pause_empathique').length > 0 && (
+              <p className="text-xs font-semibold mt-2" style={{ color: PURPLE }}>
+                💚 {data.filter(d => d.statut === 'pause_empathique').length} famille(s) accompagnée(s) ce trimestre
+              </p>
+            )}
           </div>
           {debiteurs.map((row, i) => {
             const s = STATUT_MAP[row.statut] ?? STATUT_MAP.impaye
+            const isPaused = row.statut === 'pause_empathique'
             return (
-              <div key={i} className="rounded-2xl p-4 flex items-center gap-4 flex-wrap" style={glassStyle}>
+              <div key={i} className="rounded-2xl p-4 flex items-center gap-4 flex-wrap transition-all" style={{ ...glassStyle, border: isPaused ? `1px solid ${PURPLE}40` : undefined }}>
                 <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black text-white"
                   style={{ background: `${s.color}30` }}>#{i + 1}</div>
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-white">{row.prenom} {row.nom}</p>
                   <p className="text-xs text-slate-400">{classeNom(row)} · {row.matricule}</p>
+                  {isPaused && row.pauseMotif && (
+                    <p className="text-[10px] mt-1 font-medium" style={{ color: PURPLE }}>
+                      💚 Pause : {row.pauseMotif}{row.pauseDuree ? ` · ${row.pauseDuree}` : ''}
+                    </p>
+                  )}
                 </div>
                 <div className="text-right">
-                  <p className="text-lg font-black" style={{ color: RED }}>−{fmt(row.solde)}</p>
+                  <p className="text-lg font-black" style={{ color: isPaused ? PURPLE : ORANGE }}>−{fmt(row.solde)}</p>
                   <p className="text-xs text-slate-400">{fmt(row.totalPaye)} payé / {fmt(row.totalDu)}</p>
                 </div>
                 <span className="px-2 py-1 rounded-lg text-xs font-semibold" style={{ background: s.bg, color: s.color }}>{s.label}</span>
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                   <button onClick={() => loadDetailLines(row)}
-                    className="text-xs px-3 py-1 rounded-lg"
+                    className="text-xs px-3 py-1.5 rounded-lg"
                     style={{ background: `${ACCENT}20`, color: ACCENT, border: `1px solid ${ACCENT}40` }}>
                     Détails
                   </button>
-                  <button onClick={() => showToast(`Relance WhatsApp envoyée au parent de ${row.prenom} ${row.nom} ✓`)}
-                    className="text-xs px-3 py-1 rounded-lg"
-                    style={{ background: 'rgba(37,211,102,0.15)', color: '#25D366', border: '1px solid rgba(37,211,102,0.3)' }}>
-                    WhatsApp
-                  </button>
+                  {!isPaused ? (
+                    <>
+                      <button onClick={() => { setPauseModal(row); setPauseMotif(''); setPauseAutreMotif(''); setPauseDuree('1_mois') }}
+                        className="text-xs px-3 py-1.5 rounded-lg font-semibold"
+                        style={{ background: `${PURPLE}15`, color: PURPLE, border: `1px solid ${PURPLE}35` }}>
+                        💚 Pause Empathique
+                      </button>
+                      <button onClick={() => showToast(`Relance WhatsApp envoyée au parent de ${row.prenom} ${row.nom} ✓`)}
+                        className="text-xs px-3 py-1.5 rounded-lg"
+                        style={{ background: 'rgba(37,211,102,0.15)', color: '#25D366', border: '1px solid rgba(37,211,102,0.3)' }}>
+                        WhatsApp
+                      </button>
+                    </>
+                  ) : (
+                    <button onClick={async () => {
+                      const supabase = createClient()
+                      await supabase.from('eleves').update({
+                        pause_empathique: false,
+                        pause_empathique_motif: null,
+                        pause_empathique_duree: null,
+                        pause_empathique_date: null
+                      }).eq('id', row.eleveId)
+
+                      setData(prev => prev.map(d => d.eleveId === row.eleveId ? { ...d, statut: 'en_attente', pauseMotif: undefined, pauseDuree: undefined } : d))
+                      showToast(`Relances réactivées pour ${row.prenom} ${row.nom}`)
+                    }}
+                      className="text-xs px-3 py-1.5 rounded-lg font-semibold"
+                      style={{ background: 'rgba(255,23,68,0.1)', color: RED, border: `1px solid ${RED}30` }}>
+                      Réactiver les relances
+                    </button>
+                  )}
                 </div>
               </div>
             )
@@ -643,8 +698,8 @@ export default function PaiementsPage() {
                   <span className="text-sm text-slate-300">{label}</span>
                   <div className="flex items-center gap-3">
                     <span className="text-sm text-slate-400">{fmt(montant)}</span>
-                    <span className="text-sm font-bold" style={{ color: paid ? GREEN : RED }}>
-                      {paid ? '✓ Payé' : '✗ Impayé'}
+                    <span className="text-sm font-bold" style={{ color: paid ? GREEN : ORANGE }}>
+                      {paid ? '✓ Payé' : '⏳ En attente'}
                     </span>
                   </div>
                 </div>
@@ -670,13 +725,164 @@ export default function PaiementsPage() {
 
             {/* Actions */}
             {detailRow.solde > 0 && (
-              <button
-                onClick={() => showToast(`Relance WhatsApp envoyée au parent de ${detailRow.prenom} ${detailRow.nom} ✓`)}
-                className="w-full py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all hover:opacity-90"
-                style={{ background: 'rgba(37,211,102,0.2)', color: '#25D366', border: '1px solid rgba(37,211,102,0.4)' }}>
-                📱 Envoyer relance WhatsApp au parent
-              </button>
+              <div className="space-y-2">
+                {detailRow.statut !== 'pause_empathique' ? (
+                  <>
+                    <button
+                      onClick={() => { setPauseModal(detailRow); setPauseMotif(''); setPauseAutreMotif(''); setPauseDuree('1_mois'); setDetailRow(null) }}
+                      className="w-full py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all hover:opacity-90"
+                      style={{ background: `${PURPLE}15`, color: PURPLE, border: `1px solid ${PURPLE}35` }}>
+                      💚 Activer la Pause Empathique
+                    </button>
+                    <button
+                      onClick={() => showToast(`Relance WhatsApp envoyée au parent de ${detailRow.prenom} ${detailRow.nom} ✓`)}
+                      className="w-full py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all hover:opacity-90"
+                      style={{ background: 'rgba(37,211,102,0.2)', color: '#25D366', border: '1px solid rgba(37,211,102,0.4)' }}>
+                      📱 Envoyer relance WhatsApp au parent
+                    </button>
+                  </>
+                ) : (
+                  <div className="rounded-xl p-3 text-center" style={{ background: `${PURPLE}10`, border: `1px solid ${PURPLE}25` }}>
+                    <p className="text-xs font-bold" style={{ color: PURPLE }}>💚 Pause Empathique active</p>
+                    {detailRow.pauseMotif && <p className="text-[10px] text-slate-400 mt-0.5">{detailRow.pauseMotif}{detailRow.pauseDuree ? ` · ${detailRow.pauseDuree}` : ''}</p>}
+                  </div>
+                )}
+              </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* ── MODAL PAUSE EMPATHIQUE ── */}
+      {pauseModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: 'rgba(2,6,23,0.92)', backdropFilter: 'blur(12px)' }}
+          onClick={e => e.target === e.currentTarget && setPauseModal(null)}>
+          <div className="w-full max-w-md rounded-2xl p-6 space-y-5 max-h-[90vh] overflow-y-auto"
+            style={{ background: 'rgba(15,23,42,0.99)', border: `1px solid ${PURPLE}30` }}>
+
+            {/* Header */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center"
+                  style={{ background: `${PURPLE}20` }}>
+                  <span className="text-lg">💚</span>
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-white">Pause Empathique</h3>
+                  <p className="text-xs text-slate-400">Suspendre les relances avec bienveillance</p>
+                </div>
+              </div>
+              <button onClick={() => setPauseModal(null)} className="text-slate-400 hover:text-white text-xl">✕</button>
+            </div>
+
+            {/* Famille concernée */}
+            <div className="rounded-xl p-3 flex items-center gap-3" style={{ background: 'rgba(255,255,255,0.04)' }}>
+              <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black text-white"
+                style={{ background: `${ORANGE}30`, color: ORANGE }}>
+                {pauseModal.prenom[0]}
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-white">{pauseModal.prenom} {pauseModal.nom}</p>
+                <p className="text-xs text-slate-400">{classeNom(pauseModal)} · Solde : <span style={{ color: ORANGE }}>−{fmt(pauseModal.solde)}</span></p>
+              </div>
+            </div>
+
+            {/* Principe */}
+            <div className="rounded-xl p-3 text-xs" style={{ background: `${PURPLE}08`, border: `1px solid ${PURPLE}20` }}>
+              <p style={{ color: PURPLE }} className="font-semibold mb-1">💡 Principe</p>
+              <p className="text-slate-400 leading-relaxed">
+                L&apos;enfant <strong className="text-white">reste en classe normalement</strong>. Les relances automatiques (SMS, WhatsApp) sont suspendues pendant la durée choisie. Le discernement humain prime sur l&apos;automatisme.
+              </p>
+            </div>
+
+            {/* Motif obligatoire */}
+            <div>
+              <label className="block text-sm font-semibold text-white mb-2">Motif <span className="text-red-400">*</span></label>
+              <select
+                value={pauseMotif}
+                onChange={e => setPauseMotif(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl text-sm text-white outline-none"
+                style={{ background: 'rgba(255,255,255,0.06)', border: `1px solid ${pauseMotif ? `${PURPLE}40` : 'rgba(255,255,255,0.12)'}` }}>
+                <option value="">— Choisir un motif —</option>
+                <option value="Difficulté financière temporaire">💰 Difficulté financière temporaire</option>
+                <option value="Décès dans la famille">🕊️ Décès dans la famille</option>
+                <option value="Maladie">🏥 Maladie</option>
+                <option value="Négociation en cours">🤝 Négociation en cours</option>
+                <option value="Autre">✏️ Autre (préciser)</option>
+              </select>
+              {pauseMotif === 'Autre' && (
+                <input
+                  type="text"
+                  placeholder="Précisez le motif..."
+                  value={pauseAutreMotif}
+                  onChange={e => setPauseAutreMotif(e.target.value)}
+                  className="w-full mt-2 px-4 py-3 rounded-xl text-sm text-white outline-none placeholder-slate-500"
+                  style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)' }} />
+              )}
+            </div>
+
+            {/* Durée */}
+            <div>
+              <label className="block text-sm font-semibold text-white mb-2">Durée de la pause</label>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { value: '2_semaines', label: '2 semaines', icon: '📅' },
+                  { value: '1_mois', label: '1 mois', icon: '📆' },
+                  { value: '2_mois', label: '2 mois', icon: '🗓️' },
+                  { value: 'indefini', label: 'Jusqu\'à nouvel ordre', icon: '♾️' },
+                ].map(d => (
+                  <button
+                    key={d.value}
+                    onClick={() => setPauseDuree(d.value)}
+                    className="px-3 py-2.5 rounded-xl text-xs font-semibold transition-all text-left flex items-center gap-2"
+                    style={pauseDuree === d.value
+                      ? { background: `${PURPLE}20`, color: PURPLE, border: `1px solid ${PURPLE}50` }
+                      : { background: 'rgba(255,255,255,0.04)', color: '#94A3B8', border: '1px solid rgba(255,255,255,0.08)' }}>
+                    <span>{d.icon}</span> {d.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-3 pt-1">
+              <button onClick={() => setPauseModal(null)}
+                className="flex-1 py-3 rounded-xl text-sm font-semibold text-slate-400 transition-all"
+                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                Annuler
+              </button>
+              <button
+                disabled={!pauseMotif || (pauseMotif === 'Autre' && !pauseAutreMotif.trim()) || savingPause}
+                onClick={async () => {
+                  setSavingPause(true)
+                  const motifFinal = pauseMotif === 'Autre' ? pauseAutreMotif.trim() : pauseMotif
+                  const dureeLabel = { '2_semaines': '2 semaines', '1_mois': '1 mois', '2_mois': '2 mois', 'indefini': 'Jusqu\'à nouvel ordre' }[pauseDuree] || pauseDuree
+                  const datePause = new Date().toISOString()
+                  
+                  const supabase = createClient()
+                  await supabase.from('eleves').update({
+                    pause_empathique: true,
+                    pause_empathique_motif: motifFinal,
+                    pause_empathique_duree: dureeLabel,
+                    pause_empathique_date: datePause
+                  }).eq('id', pauseModal.eleveId)
+
+                  setData(prev => prev.map(d => d.eleveId === pauseModal.eleveId
+                    ? { ...d, statut: 'pause_empathique', pauseMotif: motifFinal, pauseDuree: dureeLabel, pauseDate: datePause }
+                    : d
+                  ))
+                  setSavingPause(false)
+                  setPauseModal(null)
+                  showToast(`💚 Pause Empathique activée pour ${pauseModal.prenom} ${pauseModal.nom} — L'enfant reste en classe`)
+                }}
+                className="flex-1 py-3 rounded-xl text-sm font-bold transition-all disabled:opacity-40 flex items-center justify-center gap-2"
+                style={{ background: PURPLE, color: '#fff', border: `1px solid ${PURPLE}` }}>
+                {savingPause ? (
+                  <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : '💚 Activer la pause'}
+              </button>
+            </div>
           </div>
         </div>
       )}

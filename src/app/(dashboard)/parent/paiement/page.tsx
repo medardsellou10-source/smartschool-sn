@@ -167,7 +167,7 @@ export default function PaiementPage() {
             filter === 'unpaid' ? 'bg-ss-cyan text-white' : 'bg-ss-bg-secondary text-ss-text-secondary border border-ss-border'
           }`}
         >
-          Impayés
+          En attente
         </button>
         <button
           onClick={() => setFilter('all')}
@@ -189,7 +189,7 @@ export default function PaiementPage() {
       ) : factures.length === 0 ? (
         <div className="bg-ss-bg-secondary rounded-xl border border-ss-border p-8 text-center">
           <span className="text-3xl block mb-2">🎉</span>
-          <p className="text-ss-text font-semibold">Aucune facture {filter === 'unpaid' ? 'impayée' : ''}</p>
+          <p className="text-ss-text font-semibold">Aucune facture {filter === 'unpaid' ? 'en attente' : ''}</p>
         </div>
       ) : (
         <div className="space-y-3">

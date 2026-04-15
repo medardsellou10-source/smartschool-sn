@@ -89,7 +89,7 @@ export function TableauImpayes({ impayes, onRefresh }: TableauImpayesProps) {
     return (
       <div className="bg-ss-bg-secondary rounded-xl border border-ss-border p-8 text-center">
         <span className="text-3xl block mb-2">🎉</span>
-        <p className="text-ss-text font-semibold">Aucun impayé en retard</p>
+        <p className="text-ss-text font-semibold">Aucun solde en attente</p>
         <p className="text-ss-text-muted text-sm mt-1">Toutes les factures sont à jour.</p>
       </div>
     )
@@ -99,7 +99,7 @@ export function TableauImpayes({ impayes, onRefresh }: TableauImpayesProps) {
     <>
       <div className="bg-ss-bg-secondary rounded-xl border border-ss-border overflow-hidden">
         <div className="p-4 border-b border-ss-border flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-ss-text">Top impayés ({impayes.length})</h3>
+          <h3 className="text-sm font-semibold text-ss-text">Soldes en attente ({impayes.length})</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[700px]">

@@ -283,7 +283,7 @@ export default function FinancesPage() {
             trendValue={`${kpis.tauxRecouvrement}%`}
           />
           <StatCard
-            title="Impayés en retard"
+            title="Soldes en attente"
             value={kpis.impayesRetard.toString()}
             subtitle="Nécessitent une relance"
             icon="⚠️"

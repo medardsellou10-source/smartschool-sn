@@ -308,7 +308,7 @@ export default function GroupeDashboard() {
           color="cyan"
         />
         <StatCard
-          title="Impayes totaux"
+          title="En attente"
           value={formatFCFA(groupe.totalImpayes)}
           subtitle={`Taux recouvrement: ${tauxRecouvrementGlobal}%`}
           icon="💰"
@@ -374,7 +374,7 @@ export default function GroupeDashboard() {
                 </div>
 
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-ss-text-muted">Impayes</span>
+                  <span className="text-ss-text-muted">En attente</span>
                   <span className={`font-semibold ${ecole.montantImpaye > 0 ? 'text-ss-red' : 'text-ss-green'}`}>
                     {formatFCFA(ecole.montantImpaye)}
                   </span>
@@ -398,7 +398,7 @@ export default function GroupeDashboard() {
                 <th className="text-right p-3 text-ss-text-muted font-medium">Eleves</th>
                 <th className="text-right p-3 text-ss-text-muted font-medium">Factures totales</th>
                 <th className="text-right p-3 text-ss-text-muted font-medium">Paye</th>
-                <th className="text-right p-3 text-ss-text-muted font-medium">Impaye</th>
+                <th className="text-right p-3 text-ss-text-muted font-medium">En attente</th>
                 <th className="text-right p-3 text-ss-text-muted font-medium">Recouvrement</th>
                 <th className="p-3 text-ss-text-muted font-medium w-32"></th>
               </tr>
@@ -490,7 +490,7 @@ export default function GroupeDashboard() {
                       style={{ width: `${barWidth * (ecole.montantImpaye / ecole.facturesTotales || 0)}%` }}
                     >
                       {barWidth * (ecole.montantImpaye / ecole.facturesTotales || 0) > 15 && (
-                        <span className="text-[9px] text-white font-medium">Impaye</span>
+                        <span className="text-[9px] text-white font-medium">En attente</span>
                       )}
                     </div>
                   </div>
@@ -508,7 +508,7 @@ export default function GroupeDashboard() {
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-3 h-3 rounded bg-[#E31B23]" />
-              <span className="text-[10px] text-ss-text-muted">Impaye</span>
+              <span className="text-[10px] text-ss-text-muted">En attente</span>
             </div>
           </div>
         </div>

@@ -74,7 +74,7 @@ const MENUS: Record<string, NavItem[]> = {
     { href: '/professeur/appel', label: "Faire l'appel", icon: Icons.clipboard },
     { href: '/professeur/pointage', label: 'Mon pointage', icon: Icons.mappin },
     { href: '/professeur/notes', label: 'Notes', icon: Icons.pencil },
-    { href: '/professeur/correction-ia', label: 'Correction IA', icon: Icons.robot },
+    { href: '/professeur/correction-ia', label: 'Pré-analyse IA', icon: Icons.robot },
     { href: '/professeur/cahier', label: 'Cahier de texte', icon: Icons.book },
     { href: '/professeur/support-pedagogique', label: 'Support Pédagogique', icon: Icons.calendar },
     { href: '/professeur/messages', label: 'Messagerie', icon: Icons.message },
