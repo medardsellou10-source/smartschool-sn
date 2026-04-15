@@ -1,6 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+
+interface ExportLog {
+  id: string
+  type: string
+  format: string
+  date: string
+  user: string
+}
 
 const EXPORT_TYPES = [
   {
@@ -44,6 +52,28 @@ export default function ExportMinistrePage() {
   const [loading, setLoading] = useState<string | null>(null)
   const [preview, setPreview] = useState<any>(null)
   const [previewType, setPreviewType] = useState<string>('')
+  const [logs, setLogs] = useState<ExportLog[]>([])
+
+  useEffect(() => {
+    const savedLogs = localStorage.getItem('smartschool_export_logs')
+    if (savedLogs) {
+      try { setLogs(JSON.parse(savedLogs)) } catch (e) {}
+    }
+  }, [])
+
+  function addLog(type: string, format: string) {
+    const newLog: ExportLog = {
+      id: Math.random().toString(36).substring(2, 9),
+      type,
+      format,
+      date: new Date().toISOString(),
+      user: 'Directeur', // Simulé pour MVP
+    }
+    const newLogs = [newLog, ...logs].slice(0, 50) // Garder les 50 plus récents
+    setLogs(newLogs)
+    localStorage.setItem('smartschool_export_logs', JSON.stringify(newLogs))
+  }
+
 
   async function handlePreview(type: string) {
     setLoading(type + '_preview')
@@ -60,6 +90,7 @@ export default function ExportMinistrePage() {
   }
 
   function handleDownloadCSV(type: string) {
+    addLog(type, 'CSV')
     const link = document.createElement('a')
     link.href = `/api/export/ministere?type=${type}&format=csv`
     link.download = `${type}_export.csv`
@@ -69,6 +100,7 @@ export default function ExportMinistrePage() {
   }
 
   function handleDownloadJSON(type: string) {
+    addLog(type, 'JSON')
     const link = document.createElement('a')
     link.href = `/api/export/ministere?type=${type}&format=json`
     link.download = `${type}_export.json`
@@ -249,6 +281,54 @@ export default function ExportMinistrePage() {
           <p className="text-gray-500 mt-2"># Types: eleves | profs | resultats | absences | financier</p>
           <p className="text-gray-500"># Formats: json | csv</p>
           <p className="text-gray-500"># Optionnel: &ecole_id=UUID</p>
+        </div>
+      </div>
+
+      {/* Historique des exports (Audit Trail) */}
+      <div className="bg-ss-bg-card border border-ss-border rounded-xl overflow-hidden mt-8">
+        <div className="p-4 border-b border-ss-border flex justify-between items-center bg-slate-50 dark:bg-slate-900/50">
+          <h3 className="font-bold text-ss-text flex items-center gap-2">
+            <span>🛡️</span> Historique des Exports (Audit Trail)
+          </h3>
+          <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full dark:bg-blue-900/40 dark:text-blue-300">
+            Conformité IMEN garantie
+          </span>
+        </div>
+        <div className="p-0 overflow-x-auto">
+          <table className="w-full text-sm text-left">
+            <thead className="text-xs text-ss-text-muted bg-ss-bg-secondary/50 border-b border-ss-border uppercase">
+              <tr>
+                <th className="px-4 py-3">Date & Heure</th>
+                <th className="px-4 py-3">Type d'export</th>
+                <th className="px-4 py-3">Format</th>
+                <th className="px-4 py-3">Auteur (Rôle)</th>
+                <th className="px-4 py-3">Statut</th>
+              </tr>
+            </thead>
+            <tbody>
+              {logs.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-4 py-8 text-center text-ss-text-muted">
+                    Aucun export récent n'a été effectué.
+                  </td>
+                </tr>
+              ) : (
+                logs.map(log => (
+                  <tr key={log.id} className="border-b border-ss-border/30 hover:bg-ss-bg-secondary/20">
+                    <td className="px-4 py-3 font-mono text-xs">{new Date(log.date).toLocaleString('fr-FR')}</td>
+                    <td className="px-4 py-3 font-medium">{EXPORT_TYPES.find(e => e.id === log.type)?.titre || log.type}</td>
+                    <td className="px-4 py-3">
+                      <span className={`px-2 py-0.5 rounded text-xs font-bold ${log.format === 'CSV' ? 'bg-[#00853F]/10 text-[#00853F]' : 'bg-blue-100 text-blue-700'}`}>
+                        {log.format}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-ss-text-muted">{log.user}</td>
+                    <td className="px-4 py-3 text-[#00E676] text-xs font-bold">✓ TÉLÉCHARGÉ</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

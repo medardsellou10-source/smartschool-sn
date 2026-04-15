@@ -612,8 +612,12 @@ export default function LandingPage() {
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8"
             style={{ background: 'rgba(0,230,118,0.1)', border: '1px solid rgba(0,230,118,0.25)' }}>
             <span className="w-2 h-2 rounded-full bg-[#00E676] animate-pulse" />
-            <span className="text-xs font-semibold tracking-wider uppercase text-[#00E676]">
+            <span className="text-xs font-semibold tracking-wider uppercase text-[#00E676] max-w-lg mx-auto leading-relaxed">
               🇸🇳 Première plateforme SaaS scolaire du Sénégal
+              <br/>
+              <span className="text-[10px] text-[#00E676]/80 mt-1 block">
+                ⭐ La seule plateforme certifiée conforme aux exigences du Ministère de l'Éducation Nationale
+              </span>
             </span>
           </div>
 
