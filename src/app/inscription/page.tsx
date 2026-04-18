@@ -5,11 +5,12 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Suspense } from 'react'
 import { getRolesForType, type TypeEtablissement } from '@/lib/school-roles'
+import { Building, Book, Landmark, Baby, GraduationCap, MapPin, Trophy, Shield, Rocket, Check, Lock, ShieldCheck, Eye, EyeOff, Smartphone, CreditCard, ChevronDown, CheckCircle2 } from 'lucide-react'
 
 const PLANS = [
-  { id: 'basique', nom: 'Basique', emoji: '🥉', couleur: '#00E676', prix: 25000, desc: "Jusqu'à 200 élèves, 5 classes" },
-  { id: 'standard', nom: 'Standard', emoji: '🥈', couleur: '#00E5FF', prix: 50000, desc: "Jusqu'à 600 élèves, 15 classes", populaire: true },
-  { id: 'etablissement', nom: 'Établissement', emoji: '🥇', couleur: '#FFD600', prix: 100000, desc: "Jusqu'à 1 500 élèves, illimité" },
+  { id: 'basique', nom: 'Basique', icon: <Shield className="w-5 h-5" />, couleur: '#22C55E', prix: 25000, desc: "Jusqu'à 200 élèves, 5 classes" },
+  { id: 'standard', nom: 'Standard', icon: <Trophy className="w-5 h-5" />, couleur: '#38BDF8', prix: 50000, desc: "Jusqu'à 600 élèves, 15 classes", populaire: true },
+  { id: 'etablissement', nom: 'Établissement', icon: <GraduationCap className="w-5 h-5" />, couleur: '#FBBF24', prix: 100000, desc: "Jusqu'à 1 500 élèves, illimité" },
 ]
 
 const REGIONS = [
@@ -18,13 +19,13 @@ const REGIONS = [
   'Tambacounda', 'Ziguinchor', 'Kaffrine', 'Kédougou',
 ]
 const TYPES = [
-  { v: 'prive',        l: 'École privée laïque',          badge: '🏫' },
-  { v: 'franco_arabe', l: 'Franco-arabe / Islamique',     badge: '🕌' },
-  { v: 'public',       l: 'École publique',               badge: '🇸🇳' },
-  { v: 'maternelle',   l: "Maternelle / Préscolaire",     badge: '🧸' },
-  { v: 'primaire',     l: 'École primaire',               badge: '📚' },
-  { v: 'college',      l: 'Collège (CEM)',                badge: '🏛️' },
-  { v: 'lycee',        l: 'Lycée',                        badge: '🎓' },
+  { v: 'prive',        l: 'École privée laïque',          badge: <Building className="w-4 h-4" /> },
+  { v: 'franco_arabe', l: 'Franco-arabe / Islamique',     badge: <Landmark className="w-4 h-4" /> },
+  { v: 'public',       l: 'École publique',               badge: <MapPin className="w-4 h-4" /> },
+  { v: 'maternelle',   l: "Maternelle / Préscolaire",     badge: <Baby className="w-4 h-4" /> },
+  { v: 'primaire',     l: 'École primaire',               badge: <Book className="w-4 h-4" /> },
+  { v: 'college',      l: 'Collège (CEM)',                badge: <Landmark className="w-4 h-4" /> },
+  { v: 'lycee',        l: 'Lycée',                        badge: <GraduationCap className="w-4 h-4" /> },
 ]
 
 /* ── Composant Dropdown custom (thème sombre) ── */
@@ -33,7 +34,7 @@ function Dropdown({
 }: {
   value: string
   onChange: (v: string) => void
-  options: { v: string; l: string; badge?: string }[]
+  options: { v: string; l: string; badge?: React.ReactNode }[]
   label: string
 }) {
   const [open, setOpen] = useState(false)
@@ -65,10 +66,7 @@ function Dropdown({
           {current && 'badge' in current && <span>{current.badge}</span>}
           {current?.l ?? value}
         </span>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-          style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', opacity: 0.5, flexShrink: 0 }}>
-          <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+        <ChevronDown className="w-4 h-4 shrink-0 transition-transform duration-200 opacity-50" style={{ transform: open ? 'rotate(180deg)' : 'none' }} />
       </button>
 
       {open && (
@@ -86,14 +84,14 @@ function Dropdown({
               onClick={() => { onChange(opt.v); setOpen(false) }}
               className="w-full text-left px-4 py-2.5 text-sm transition-colors flex items-center gap-2"
               style={{
-                color: opt.v === value ? '#00E676' : 'rgba(255,255,255,0.8)',
+                color: opt.v === value ? '#22C55E' : 'rgba(255,255,255,0.8)',
                 background: opt.v === value ? 'rgba(0,230,118,0.08)' : 'transparent',
               }}
               onMouseEnter={e => { if (opt.v !== value) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.05)' }}
               onMouseLeave={e => { if (opt.v !== value) (e.currentTarget as HTMLElement).style.background = 'transparent' }}
             >
               {'badge' in opt && <span>{opt.badge}</span>}
-              {opt.v === value && <span style={{ color: '#00E676' }}>✓</span>}
+              {opt.v === value && <Check className="w-4 h-4 text-ss-green" />}
               {opt.l}
             </button>
           ))}
@@ -243,7 +241,7 @@ function InscriptionForm() {
               <div className="h-full rounded-full transition-all duration-500"
                 style={{
                   width: step > i ? '100%' : '0%',
-                  background: 'linear-gradient(90deg, #00E676, #00BCD4)',
+                  background: 'linear-gradient(90deg, #22C55E, #16A34A)',
                 }} />
             </div>
           ))}
@@ -300,8 +298,8 @@ function InscriptionForm() {
                     <div className="flex flex-wrap gap-1.5">
                       {/* Admin toujours en premier */}
                       <span className="flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full"
-                        style={{ background: 'rgba(0,229,255,0.1)', color: '#00E5FF', border: '1px solid rgba(0,229,255,0.2)' }}>
-                        🏫 {getRolesForType(typeEtab as TypeEtablissement).find(r => r.key === 'admin_global')?.label ?? 'Directeur'}
+                        style={{ background: 'rgba(0,229,255,0.1)', color: '#38BDF8', border: '1px solid rgba(0,229,255,0.2)' }}>
+                        {getRolesForType(typeEtab as TypeEtablissement).find(r => r.key === 'admin_global')?.label ?? 'Directeur'}
                       </span>
                       {roles.map(r => (
                         <span key={r.key}
@@ -387,7 +385,7 @@ function InscriptionForm() {
                   <button type="button" onClick={() => setShowMdp(v => !v)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-xs"
                     style={{ color: 'rgba(255,255,255,0.4)' }}>
-                    {showMdp ? '🙈' : '👁️'}
+                    {showMdp ? '<EyeOff className="w-4 h-4" />' : '<Eye className="w-4 h-4" />'}
                   </button>
                 </div>
               </div>
@@ -413,7 +411,7 @@ function InscriptionForm() {
                 {(['mensuel', 'annuel'] as const).map(f => (
                   <button key={f} type="button" onClick={() => setFacturation(f)}
                     className="flex-1 py-2 rounded-lg text-sm font-semibold transition-all"
-                    style={facturation === f ? { background: '#00E676', color: '#020617' } : { color: 'rgba(255,255,255,0.4)' }}>
+                    style={facturation === f ? { background: '#22C55E', color: '#020617' } : { color: 'rgba(255,255,255,0.4)' }}>
                     {f === 'mensuel' ? 'Mensuel' : 'Annuel (-20%)'}
                   </button>
                 ))}
@@ -435,7 +433,7 @@ function InscriptionForm() {
                       }}>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <span className="text-xl">{isEssai ? '🆓' : plan?.emoji}</span>
+                          <span className="text-xl">{isEssai ? '🆓' : plan?.icon}</span>
                           <div>
                             <div className="flex items-center gap-2">
                               <span className="font-bold text-white text-sm">{isEssai ? 'Essai gratuit 14 jours' : plan?.nom}</span>
@@ -451,7 +449,7 @@ function InscriptionForm() {
                         </div>
                         <div className="text-right shrink-0">
                           {isEssai ? (
-                            <span className="font-black text-sm" style={{ color: '#00E676' }}>Gratuit</span>
+                            <span className="font-black text-sm" style={{ color: '#22C55E' }}>Gratuit</span>
                           ) : (
                             <>
                               <div className="font-black text-sm" style={{ color: couleur }}>
@@ -489,11 +487,11 @@ function InscriptionForm() {
                 {[
                   ['École', nomEcole],
                   ['Administrateur', `${adminPrenom} ${adminNom}`],
-                  ['Plan', planChoisi === 'essai' ? '🆓 Essai Gratuit 14j' : `${planInfo.emoji} ${planInfo.nom}`],
+                  ['Plan', planChoisi === 'essai' ? <span><Rocket className="w-4 h-4 inline-block mr-1"/> Essai Gratuit 14j</span> : <span className="flex items-center gap-1">{planInfo.icon} {planInfo.nom}</span>],
                 ].map(([k, v]) => (
-                  <div key={k} className="flex justify-between text-sm">
-                    <span style={{ color: 'rgba(255,255,255,0.5)' }}>{k}</span>
-                    <span className="font-semibold text-white">{v}</span>
+                  <div key={k as string} className="flex justify-between text-sm">
+                    <span style={{ color: 'rgba(255,255,255,0.5)' }}>{k as string}</span>
+                    <span className="font-semibold text-white">{v as React.ReactNode}</span>
                   </div>
                 ))}
                 {planChoisi !== 'essai' && (
@@ -512,7 +510,7 @@ function InscriptionForm() {
               {planChoisi === 'essai' ? (
                 <div className="rounded-xl p-5 text-center"
                   style={{ background: 'rgba(0,230,118,0.07)', border: '1px solid rgba(0,230,118,0.2)' }}>
-                  <div className="text-3xl mb-2">🎉</div>
+                  <div className="text-3xl mb-2"><CheckCircle2 className="w-12 h-12 text-ss-green mx-auto mb-4" /></div>
                   <div className="font-bold text-white mb-1">Aucune carte bancaire requise</div>
                   <div className="text-sm" style={{ color: 'rgba(255,255,255,0.45)' }}>
                     Votre école sera active immédiatement. Upgradez quand vous voulez.
@@ -524,9 +522,9 @@ function InscriptionForm() {
                     Méthode de paiement
                   </p>
                   {[
-                    { id: 'wave', icon: '🌊', label: 'Wave', desc: 'Paiement instantané Wave Sénégal' },
-                    { id: 'orange_money', icon: '🟠', label: 'Orange Money', desc: 'Paiement Orange Money' },
-                    { id: 'essai', icon: '🆓', label: 'Démarrer en essai gratuit', desc: 'Commencer avec 14 jours gratuits' },
+                    { id: 'wave', icon: <Smartphone className="w-5 h-5 text-blue-400" />, label: 'Wave', desc: 'Paiement instantané Wave Sénégal' },
+                    { id: 'orange_money', icon: <Smartphone className="w-5 h-5 text-orange-500" />, label: 'Orange Money', desc: 'Paiement Orange Money' },
+                    { id: 'essai', icon: <Rocket className="w-5 h-5 text-slate-400" />, label: 'Démarrer en essai gratuit', desc: 'Commencer avec 14 jours gratuits' },
                   ].map(m => (
                     <button key={m.id} type="button"
                       onClick={() => setMethodePaiement(m.id as typeof methodePaiement)}
@@ -576,7 +574,7 @@ function InscriptionForm() {
             )}
             <button type="button" onClick={nextStep} disabled={loading}
               className="flex-1 py-3 rounded-xl font-bold text-sm text-[#020617] transition-all hover:opacity-90 disabled:opacity-50"
-              style={{ background: 'linear-gradient(135deg, #00E676, #00BCD4)' }}>
+              style={{ background: 'linear-gradient(135deg, #22C55E, #16A34A)' }}>
               {loading ? 'Création en cours...'
                 : step === 4
                   ? (planChoisi === 'essai' || methodePaiement === 'essai' ? '🚀 Créer mon école' : '💳 Confirmer et payer')
@@ -586,17 +584,17 @@ function InscriptionForm() {
 
           <p className="text-center text-xs mt-5" style={{ color: 'rgba(255,255,255,0.25)' }}>
             Déjà inscrit ?{' '}
-            <Link href="/login" className="hover:underline" style={{ color: '#00E676' }}>Se connecter</Link>
+            <Link href="/login" className="hover:underline" style={{ color: '#22C55E' }}>Se connecter</Link>
           </p>
         </div>
 
         {/* Badges sécurité */}
         <div className="flex items-center justify-center gap-4 mt-5 text-xs" style={{ color: 'rgba(255,255,255,0.2)' }}>
-          <span>🔒 Données chiffrées</span>
+          <span><Lock className="w-3 h-3 inline-block mr-1" /> Données chiffrées</span>
           <span>•</span>
-          <span>🇸🇳 Hébergement EU</span>
+          <span><ShieldCheck className="w-3 h-3 inline-block mr-1" /> Hébergement sécurisé</span>
           <span>•</span>
-          <span>📵 Sans engagement</span>
+          <span><Smartphone className="w-3 h-3 inline-block mr-1" /> Sans engagement</span>
         </div>
       </div>
     </main>
@@ -612,7 +610,7 @@ export default function InscriptionPage() {
             style={{ background: 'linear-gradient(135deg, #00853F, #FDEF42, #E31B23)' }}>
             <span className="text-white font-black text-sm">SS</span>
           </div>
-          <div className="w-8 h-8 border-2 border-[#00E676] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          <div className="w-8 h-8 border-2 border-[#22C55E] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
           <p className="text-white/50 text-sm">Chargement du formulaire...</p>
         </div>
       </div>
@@ -621,3 +619,4 @@ export default function InscriptionPage() {
     </Suspense>
   )
 }
+

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * school-roles.ts — Configuration des rôles par type d'établissement
  * Adapté à la réalité des écoles sénégalaises (MENA / IDEN)
  */
@@ -56,13 +56,13 @@ export const ROLES_BY_TYPE: Record<TypeEtablissement, UserRoleKey[]> = {
 
 // ── Labels par défaut ─────────────────────────────────────────────────────────
 const DEFAULT_INFOS: Record<UserRoleKey, Omit<RoleInfo, 'key'>> = {
-  admin_global: { label: 'Directeur / Admin',    icon: '🏫', description: 'Gère l\'ensemble de l\'école',    color: '#00E5FF' },
-  professeur:   { label: 'Professeur',            icon: '👨‍🏫', description: 'Enseigne, note, suit les élèves', color: '#00E676' },
+  admin_global: { label: 'Directeur / Admin',    icon: '🏫', description: 'Gère l\'ensemble de l\'école',    color: '#38BDF8' },
+  professeur:   { label: 'Professeur',            icon: '👨‍🏫', description: 'Enseigne, note, suit les élèves', color: '#22C55E' },
   surveillant:  { label: 'Surveillant Général',   icon: '👁️',  description: 'Discipline et présence',         color: '#7C4DFF' },
-  parent:       { label: 'Parent / Tuteur',       icon: '👨‍👩‍👧', description: 'Suit son enfant à distance',     color: '#FFD600' },
+  parent:       { label: 'Parent / Tuteur',       icon: '👨‍👩‍👧', description: 'Suit son enfant à distance',     color: '#FBBF24' },
   eleve:        { label: 'Élève',                 icon: '🎒',  description: 'Notes, bulletins, emploi du temps', color: '#FF6D00' },
   secretaire:   { label: 'Secrétaire Général',    icon: '📋',  description: 'Inscriptions, certificats, courrier', color: '#FF6D00' },
-  intendant:    { label: 'Intendant / Économe',   icon: '🏦',  description: 'Budget, paiements, cantine',     color: '#00BCD4' },
+  intendant:    { label: 'Intendant / Économe',   icon: '🏦',  description: 'Budget, paiements, cantine',     color: '#16A34A' },
   censeur:      { label: 'Censeur',               icon: '🎓',  description: 'Direction des études, examens, bulletins', color: '#3D5AFE' },
 }
 
@@ -148,3 +148,4 @@ export const TYPE_LABELS: Record<TypeEtablissement, { label: string; description
   college:      { label: 'Collège (CEM)',               description: '6ème à 3ème, BFEM',                        badge: '🏛️' },
   lycee:        { label: 'Lycée',                       description: '2nde, 1ère, Terminale, BAC',               badge: '🎓' },
 }
+

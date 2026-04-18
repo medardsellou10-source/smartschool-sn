@@ -1,16 +1,18 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { isDemoMode, DEMO_PROFESSEURS, DEMO_POINTAGES } from '@/lib/demo-data'
+import { PageHeader } from '@/components/dashboard/PageHeader'
+import { GraduationCap } from 'lucide-react'
 
 const ACCENT = '#3D5AFE'
 
 const STATUT_STYLE: Record<string, { bg: string; color: string; label: string }> = {
-  a_heure:      { bg: 'rgba(0,230,118,0.15)',  color: '#00E676', label: 'À l\'heure' },
-  retard_leger: { bg: 'rgba(255,214,0,0.15)',  color: '#FFD600', label: 'Léger retard' },
-  retard_grave: { bg: 'rgba(255,23,68,0.15)',  color: '#FF1744', label: 'Retard grave' },
+  a_heure:      { bg: 'rgba(0,230,118,0.15)',  color: '#22C55E', label: 'À l\'heure' },
+  retard_leger: { bg: 'rgba(255,214,0,0.15)',  color: '#FBBF24', label: 'Léger retard' },
+  retard_grave: { bg: 'rgba(255,23,68,0.15)',  color: '#F87171', label: 'Retard grave' },
   absent:       { bg: 'rgba(100,116,139,0.15)', color: '#64748B', label: 'Absent' },
 }
 
@@ -68,14 +70,12 @@ export default function ProfesseursCenseurPage() {
 
   return (
     <div className="space-y-6 pb-24 lg:pb-6 animate-fade-in">
-      <div>
-        <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-          <span style={{ color: ACCENT }}>👨‍🏫</span> Pointage Professeurs
-        </h1>
-        <p className="text-sm text-slate-400 mt-1">
-          {presents}/{profsData.length} professeurs présents · {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
-        </p>
-      </div>
+      <PageHeader
+        title="Pointage Professeurs"
+        description={`${presents}/${profsData.length} professeurs présents · ${new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}`}
+        icon={GraduationCap}
+        accent="purple"
+      />
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -123,3 +123,4 @@ export default function ProfesseursCenseurPage() {
     </div>
   )
 }
+

@@ -1,16 +1,18 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { isDemoMode, DEMO_EXAMENS } from '@/lib/demo-data'
+import { PageHeader } from '@/components/dashboard/PageHeader'
+import { FileCheck2, Plus, Info } from 'lucide-react'
 
 const ACCENT = '#3D5AFE'
 
 type Examen = typeof DEMO_EXAMENS[0]
 
 const STATUT_STYLE: Record<string, { bg: string; color: string; label: string }> = {
-  en_cours:  { bg: 'rgba(0,230,118,0.15)',   color: '#00E676', label: 'En cours' },
+  en_cours:  { bg: 'rgba(0,230,118,0.15)',   color: '#22C55E', label: 'En cours' },
   planifie:  { bg: `rgba(61,90,254,0.15)`,    color: ACCENT,    label: 'Planifié' },
   termine:   { bg: 'rgba(100,116,139,0.15)',  color: '#64748B', label: 'Terminé' },
 }
@@ -53,25 +55,24 @@ export default function ExamensPage() {
   return (
     <div className="space-y-6 pb-24 lg:pb-6 animate-fade-in">
       {toast && (
-        <div className="fixed top-4 right-4 z-50 px-5 py-3 rounded-2xl text-sm font-semibold text-white shadow-xl"
+        <div className="fixed top-4 right-4 z-50 px-5 py-3 rounded-2xl text-sm font-semibold text-white shadow-xl flex items-center gap-2"
           style={{ background: 'rgba(2,6,23,0.96)', border: `1px solid ${ACCENT}60`, backdropFilter: 'blur(24px)', maxWidth: '340px' }}>
-          <span style={{ color: ACCENT }}>ℹ️</span> {toast}
+          <Info size={16} style={{ color: ACCENT }} aria-hidden="true" /> {toast}
         </div>
       )}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-            <span style={{ color: ACCENT }}>📝</span> Examens & Épreuves
-          </h1>
-          <p className="text-sm text-slate-400 mt-1">
-            {examens.filter(e => e.statut === 'en_cours').length} en cours · {examens.filter(e => e.statut === 'planifie').length} planifiés
-          </p>
-        </div>
-        <button className="px-4 py-2 rounded-xl text-sm font-semibold text-white" style={{ background: ACCENT }}
-          onClick={() => showToast('Mode démo — Planification d\'examen disponible avec la base de données.')}>
-          + Planifier examen
-        </button>
-      </div>
+      <PageHeader
+        title="Examens & Épreuves"
+        description={`${examens.filter(e => e.statut === 'en_cours').length} en cours · ${examens.filter(e => e.statut === 'planifie').length} planifiés`}
+        icon={FileCheck2}
+        accent="purple"
+        actions={
+          <button className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white min-h-[40px]"
+            style={{ background: ACCENT }}
+            onClick={() => showToast('Mode démo — Planification d\'examen disponible avec la base de données.')}>
+            <Plus size={16} /> Planifier examen
+          </button>
+        }
+      />
 
       {/* Filtres */}
       <div className="flex gap-2 flex-wrap">
@@ -123,3 +124,4 @@ export default function ExamensPage() {
     </div>
   )
 }
+

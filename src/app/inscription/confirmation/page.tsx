@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
@@ -14,10 +14,10 @@ function ConfirmationContent() {
   const isPaymentError = status === 'error'
 
   const planLabels: Record<string, { nom: string; couleur: string; emoji: string }> = {
-    essai: { nom: 'Essai Gratuit 14 jours', couleur: '#00E676', emoji: '🆓' },
-    basique: { nom: 'Basique', couleur: '#00E676', emoji: '🥉' },
-    standard: { nom: 'Standard', couleur: '#00E5FF', emoji: '🥈' },
-    etablissement: { nom: 'Établissement', couleur: '#FFD600', emoji: '🥇' },
+    essai: { nom: 'Essai Gratuit 14 jours', couleur: '#22C55E', emoji: '🆓' },
+    basique: { nom: 'Basique', couleur: '#22C55E', emoji: '🥉' },
+    standard: { nom: 'Standard', couleur: '#38BDF8', emoji: '🥈' },
+    etablissement: { nom: 'Établissement', couleur: '#FBBF24', emoji: '🥇' },
   }
   const planInfo = planLabels[plan] || planLabels.essai
 
@@ -25,7 +25,7 @@ function ConfirmationContent() {
     <main className="min-h-screen bg-[#020617] flex items-center justify-center px-4">
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full opacity-10"
-          style={{ background: `radial-gradient(circle, ${isPaymentError ? '#EF4444' : '#00E676'}, transparent 70%)`, filter: 'blur(80px)' }} />
+          style={{ background: `radial-gradient(circle, ${isPaymentError ? '#EF4444' : '#22C55E'}, transparent 70%)`, filter: 'blur(80px)' }} />
       </div>
 
       <div className="relative w-full max-w-md text-center">
@@ -51,7 +51,7 @@ function ConfirmationContent() {
           style={{
             background: isPaymentError
               ? 'linear-gradient(135deg, #EF4444, #F97316)'
-              : 'linear-gradient(135deg, #00E676, #00BCD4)',
+              : 'linear-gradient(135deg, #22C55E, #16A34A)',
             boxShadow: isPaymentError
               ? '0 0 60px rgba(239,68,68,0.4)'
               : '0 0 60px rgba(0,230,118,0.4)',
@@ -100,7 +100,7 @@ function ConfirmationContent() {
             ].map(step => (
               <div key={step.n} className="flex items-start gap-3">
                 <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-black shrink-0 mt-0.5"
-                  style={{ background: 'linear-gradient(135deg, #00E676, #00BCD4)', color: '#020617' }}>
+                  style={{ background: 'linear-gradient(135deg, #22C55E, #16A34A)', color: '#020617' }}>
                   {step.n}
                 </div>
                 <div>
@@ -117,13 +117,13 @@ function ConfirmationContent() {
 
         <Link href="/login"
           className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-[#020617] hover:scale-105 transition-transform"
-          style={{ background: 'linear-gradient(135deg, #00E676, #00BCD4)', boxShadow: '0 0 40px rgba(0,230,118,0.3)' }}>
+          style={{ background: 'linear-gradient(135deg, #22C55E, #16A34A)', boxShadow: '0 0 40px rgba(0,230,118,0.3)' }}>
           🚀 Accéder à mon dashboard
         </Link>
 
         <p className="text-xs text-white/30 mt-5">
           Besoin d'aide ?{' '}
-          <a href="mailto:support@smartschool.sn" className="text-[#00E676] hover:underline">
+          <a href="mailto:support@smartschool.sn" className="text-[#22C55E] hover:underline">
             support@smartschool.sn
           </a>
         </p>
@@ -139,3 +139,4 @@ export default function ConfirmationPage() {
     </Suspense>
   )
 }
+

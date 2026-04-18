@@ -1,10 +1,11 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { StatCard } from '@/components/dashboard/StatCard'
 import { envoyerAlerteRetard } from '@/app/actions/alertes'
+import { toastSuccess } from '@/lib/toast-helpers'
 import Link from 'next/link'
 import { isDemoMode, DEMO_POINTAGES, DEMO_ABSENCES, DEMO_PROFESSEURS, DEMO_ELEVES, DEMO_CLASSES } from '@/lib/demo-data'
 
@@ -15,9 +16,9 @@ interface AbsenceEleve { id: string; eleve_id: string; date_absence: string; ses
 interface HeatmapCell { prof_id: string; prof_nom: string; jour: string; statut: string | null }
 
 const STATUT_PALETTE: Record<string, { bg: string; color: string }> = {
-  a_heure:     { bg: 'rgba(0,230,118,0.25)',  color: '#00E676' },
-  retard_leger:{ bg: 'rgba(255,214,0,0.25)',  color: '#FFD600' },
-  retard_grave:{ bg: 'rgba(255,23,68,0.25)',  color: '#FF1744' },
+  a_heure:     { bg: 'rgba(0,230,118,0.25)',  color: '#22C55E' },
+  retard_leger:{ bg: 'rgba(255,214,0,0.25)',  color: '#FBBF24' },
+  retard_grave:{ bg: 'rgba(255,23,68,0.25)',  color: '#F87171' },
   absent:      { bg: 'rgba(100,116,139,0.25)', color: '#64748B' },
 }
 const JOUR_LABELS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam']
@@ -101,7 +102,7 @@ export default function SurveillantDashboard() {
         <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, rgba(2,6,23,0.95) 0%, rgba(2,6,23,0.6) 100%)' }} />
         <div className="relative px-6 py-5">
           <div className="flex items-center gap-2 mb-1">
-            <span className="w-2 h-2 rounded-full bg-[#FFD600] animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-[#FBBF24] animate-pulse" />
             <span className="text-xs font-semibold tracking-wider uppercase text-[#94A3B8]">Espace Surveillant</span>
           </div>
           <h1 className="text-2xl font-black text-white">Surveillance & Discipline</h1>
@@ -112,7 +113,7 @@ export default function SurveillantDashboard() {
       <div className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-bold text-[#94A3B8] uppercase tracking-wider">Appels reçus</h2>
-          <span className="text-xs font-bold px-2 py-1 rounded-full" style={{ background: 'rgba(0,229,255,0.12)', color: '#00E5FF', border: '1px solid rgba(0,229,255,0.2)' }}>
+          <span className="text-xs font-bold px-2 py-1 rounded-full" style={{ background: 'rgba(0,229,255,0.12)', color: '#38BDF8', border: '1px solid rgba(0,229,255,0.2)' }}>
             {appelsRecents.filter(a => !a.lu_le).length} nouveau(x)
           </span>
         </div>
@@ -144,9 +145,9 @@ export default function SurveillantDashboard() {
       {/* Actions rapides */}
       <div className="grid grid-cols-3 sm:grid-cols-3 gap-3">
         {[
-          { href: '/surveillant/absences',      icon: '📋', label: 'Gérer absences',  color: '#FFD600' },
-          { href: '/surveillant/statistiques',  icon: '📊', label: 'Statistiques',    color: '#00E5FF' },
-          { href: '/surveillant/export',        icon: '📥', label: 'Export rapports',  color: '#00E676' },
+          { href: '/surveillant/absences',      icon: '📋', label: 'Gérer absences',  color: '#FBBF24' },
+          { href: '/surveillant/statistiques',  icon: '📊', label: 'Statistiques',    color: '#38BDF8' },
+          { href: '/surveillant/export',        icon: '📥', label: 'Export rapports',  color: '#22C55E' },
         ].map(a => (
           <Link key={a.href} href={a.href}
             className="flex flex-col items-center gap-2 p-4 rounded-xl text-center transition-all duration-200 hover:scale-105 active:scale-95"
@@ -159,17 +160,17 @@ export default function SurveillantDashboard() {
 
       {/* KPI */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <StatCard title="Présents" value={stats.presents} subtitle={`sur ${stats.total}`} icon="🟢" color="green" loading={statsLoading} />
-        <StatCard title="Retards légers" value={stats.retards} subtitle="< 20 min" icon="🟡" color="gold" loading={statsLoading} />
-        <StatCard title="Retards graves" value={stats.graves} subtitle="≥ 20 min" icon="🔴" color="red" loading={statsLoading} />
-        <StatCard title="Non pointés" value={stats.absents} subtitle="Absence probable" icon="⚫" color="cyan" loading={statsLoading} />
+        <StatCard title="Présents" value={stats.presents} subtitle={`sur ${stats.total}`} icon="🟢" color="green" loading={statsLoading} delay={0} />
+        <StatCard title="Retards légers" value={stats.retards} subtitle="< 20 min" icon="🟡" color="gold" loading={statsLoading} delay={80} />
+        <StatCard title="Retards graves" value={stats.graves} subtitle="≥ 20 min" icon="🔴" color="red" loading={statsLoading} delay={160} />
+        <StatCard title="Non pointés" value={stats.absents} subtitle="Absence probable" icon="⚫" color="cyan" loading={statsLoading} delay={240} />
       </div>
 
       {/* Retards graves live */}
       <div className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-bold text-[#94A3B8] uppercase tracking-wider flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#FF1744] animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-[#F87171] animate-pulse" />
             Retards graves — Temps réel
           </h2>
           <span className="text-xs" style={{ color: '#475569' }}>{retardsGraves.length} alerte(s)</span>
@@ -184,7 +185,7 @@ export default function SurveillantDashboard() {
             {retardsGraves.map(r => (
               <div key={r.id} className="flex items-center gap-3 p-3 rounded-xl" style={{ background: 'rgba(255,23,68,0.07)', border: '1px solid rgba(255,23,68,0.2)' }}>
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm shrink-0 overflow-hidden"
-                  style={{ background: 'rgba(255,23,68,0.2)', color: '#FF1744', border: '1px solid rgba(255,23,68,0.3)' }}>
+                  style={{ background: 'rgba(255,23,68,0.2)', color: '#F87171', border: '1px solid rgba(255,23,68,0.3)' }}>
                   {r.prof?.photo_url ? <img src={r.prof.photo_url} alt="" className="w-full h-full object-cover" /> : r.prof ? `${r.prof.prenom[0]}${r.prof.nom[0]}` : '?'}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -214,10 +215,10 @@ export default function SurveillantDashboard() {
           </div>
         ) : (
           <div className="space-y-2">
-            {absences.slice(0, 10).map(a => (
+            {absences.slice(0, 20).map(a => (
               <div key={a.id} className="flex items-center gap-3 p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
                 <div className="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold shrink-0"
-                  style={{ background: 'rgba(255,214,0,0.1)', border: '1px solid rgba(255,214,0,0.2)', color: '#FFD600' }}>
+                  style={{ background: 'rgba(255,214,0,0.1)', border: '1px solid rgba(255,214,0,0.2)', color: '#FBBF24' }}>
                   {a.eleve ? `${a.eleve.prenom[0]}${a.eleve.nom[0]}` : '?'}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -225,13 +226,16 @@ export default function SurveillantDashboard() {
                   <p className="text-xs" style={{ color: '#94A3B8' }}>{new Date(a.date_absence).toLocaleDateString('fr-SN', { day: '2-digit', month: 'short' })}{a.motif && ` · ${a.motif}`}</p>
                 </div>
                 <button
-                  className="text-xs font-bold px-3 py-2 rounded-lg shrink-0 min-h-[36px] transition-all"
-                  style={{ background: 'rgba(0,229,255,0.1)', border: '1px solid rgba(0,229,255,0.2)', color: '#00E5FF' }}
+                  className="text-xs font-bold px-3 py-2 rounded-lg shrink-0 min-h-[44px] transition-all"
+                  style={{ background: 'rgba(0,229,255,0.1)', border: '1px solid rgba(0,229,255,0.2)', color: '#38BDF8' }}
                   onClick={async () => {
                     if (!user) return
                     const { validerAbsence } = await import('@/app/actions/alertes')
                     const result = await validerAbsence(a.id, user.id)
-                    if (result.success) setAbsences(prev => prev.filter(x => x.id !== a.id))
+                    if (result.success) {
+                      setAbsences(prev => prev.filter(x => x.id !== a.id))
+                      toastSuccess('Absence validée')
+                    }
                   }}>
                   Valider
                 </button>
@@ -278,3 +282,4 @@ export default function SurveillantDashboard() {
     </div>
   )
 }
+

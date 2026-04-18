@@ -1,12 +1,14 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState } from 'react'
 import { useUser } from '@/hooks/useUser'
 import { isDemoMode, DEMO_EMPLOIS_TEMPS, DEMO_MATIERES, DEMO_CLASSES } from '@/lib/demo-data'
+import { PageHeader } from '@/components/dashboard/PageHeader'
+import { CalendarDays } from 'lucide-react'
 
 const ACCENT = '#3D5AFE'
 const JOURS = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi']
-const COLORS = ['#00E676','#00E5FF','#FFD600','#D500F9','#FF6D00','#FF1744','#448AFF','#00BCD4']
+const COLORS = ['#22C55E','#38BDF8','#FBBF24','#A78BFA','#FF6D00','#F87171','#448AFF','#16A34A']
 
 export default function EmploisTempsPage() {
   const { user, loading: userLoading } = useUser()
@@ -33,12 +35,12 @@ export default function EmploisTempsPage() {
 
   return (
     <div className="space-y-6 pb-24 lg:pb-6 animate-fade-in">
-      <div>
-        <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-          <span style={{ color: ACCENT }}>📅</span> Emplois du Temps
-        </h1>
-        <p className="text-sm text-slate-400 mt-1">Vue par classe — supervision et validation</p>
-      </div>
+      <PageHeader
+        title="Emplois du Temps"
+        description="Vue par classe — supervision et validation."
+        icon={CalendarDays}
+        accent="purple"
+      />
 
       {/* Sélecteur de classe */}
       <div className="flex gap-2 flex-wrap">
@@ -94,3 +96,4 @@ export default function EmploisTempsPage() {
     </div>
   )
 }
+

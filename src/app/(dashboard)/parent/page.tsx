@@ -1,10 +1,11 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { useOffline } from '@/hooks/useOffline'
 import { formatFCFA } from '@/lib/utils'
+import { formatCFA, relativeTime, getInitials } from '@/lib/format'
 import Link from 'next/link'
 import { isDemoMode, DEMO_ELEVES, DEMO_FACTURES, DEMO_NOTIFICATIONS, DEMO_NOTES, DEMO_ABSENCES, DEMO_CLASSES } from '@/lib/demo-data'
 
@@ -126,25 +127,32 @@ export default function ParentDashboard() {
   }
 
   return (
-    <div className="max-w-lg mx-auto space-y-4 pb-28 lg:pb-8 animate-fade-in">
+    <div className="space-y-4 pb-28 lg:pb-8 animate-fade-in">
 
       {/* Toast nouvelle note en temps réel */}
       {gradeAlert && (
         <div
-          className="fixed top-4 right-4 z-50 max-w-sm rounded-2xl p-4 border backdrop-blur-sm cursor-pointer"
+          className="fixed top-4 right-4 z-50 max-w-sm rounded-2xl p-4 border backdrop-blur-sm"
           style={{ background: 'rgba(0,230,118,0.1)', borderColor: 'rgba(0,230,118,0.3)' }}
-          onClick={() => setGradeAlert(null)}
         >
           <div className="flex items-start gap-3">
             <span className="text-2xl animate-bounce">🔔</span>
-            <div>
-              <p className="text-sm font-bold" style={{ color: '#00E676' }}>Nouvelle note disponible !</p>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold" style={{ color: '#22C55E' }}>Nouvelle note disponible !</p>
               <p className="text-xs text-ss-text mt-0.5">{gradeAlert.matiereNom} — {gradeAlert.evaluationTitre}</p>
               <p className="text-[11px] text-ss-text-muted mt-0.5">Par {gradeAlert.profNom} · Classe {gradeAlert.classeNom}</p>
-              <Link href="/parent/bulletins" className="text-[11px] underline mt-1 block" style={{ color: '#00E676' }}>
+              <Link href="/parent/bulletins" className="text-[11px] underline mt-1 block" style={{ color: '#22C55E' }}>
                 Voir les résultats →
               </Link>
             </div>
+            <button
+              onClick={() => setGradeAlert(null)}
+              aria-label="Fermer la notification"
+              className="shrink-0 w-7 h-7 flex items-center justify-center rounded-full text-sm font-bold transition-colors hover:bg-white/10"
+              style={{ color: '#22C55E' }}
+            >
+              ×
+            </button>
           </div>
         </div>
       )}
@@ -155,9 +163,9 @@ export default function ParentDashboard() {
           style={{ background: 'rgba(255,214,0,0.08)', border: '1px solid rgba(255,214,0,0.2)' }}>
           <span className="text-xl">📵</span>
           <div>
-            <p className="text-sm font-bold" style={{ color: '#FFD600' }}>Mode hors-ligne</p>
+            <p className="text-sm font-bold" style={{ color: '#FBBF24' }}>Mode hors-ligne</p>
             <p className="text-xs" style={{ color: '#475569' }}>
-              Données du {lastSync ? lastSync.toLocaleDateString('fr-SN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '—'}
+              Données {lastSync ? relativeTime(lastSync) : 'jamais synchronisé'}
             </p>
           </div>
         </div>
@@ -174,7 +182,7 @@ export default function ParentDashboard() {
         }}>
         {/* Lueur cyan en haut à droite */}
         <div className="absolute top-0 right-0 w-32 h-32 rounded-full opacity-20 pointer-events-none"
-          style={{ background: 'radial-gradient(circle, #00E5FF 0%, transparent 70%)', filter: 'blur(20px)' }} />
+          style={{ background: 'radial-gradient(circle, #38BDF8 0%, transparent 70%)', filter: 'blur(20px)' }} />
         <span className="text-xs font-bold tracking-widest uppercase text-[#94A3B8]">
           ✦ Espace Parent
         </span>
@@ -196,10 +204,10 @@ export default function ParentDashboard() {
               style={{
                 background: selectedEnfant === e.id ? 'rgba(0,229,255,0.12)' : 'rgba(255,255,255,0.04)',
                 border: `1px solid ${selectedEnfant === e.id ? 'rgba(0,229,255,0.4)' : 'rgba(255,255,255,0.08)'}`,
-                color: selectedEnfant === e.id ? '#00E5FF' : '#94A3B8',
+                color: selectedEnfant === e.id ? '#38BDF8' : '#94A3B8',
               }}>
               <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
-                style={{ background: 'rgba(0,229,255,0.2)', color: '#00E5FF' }}>
+                style={{ background: 'rgba(0,229,255,0.2)', color: '#38BDF8' }}>
                 {e.prenom[0]}
               </div>
               {e.prenom}
@@ -219,8 +227,8 @@ export default function ParentDashboard() {
             boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
           }}>
           <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-xl font-black shrink-0"
-            style={{ background: 'linear-gradient(135deg, rgba(0,229,255,0.2), rgba(0,229,255,0.1))', border: '1.5px solid rgba(0,229,255,0.3)', color: '#00E5FF' }}>
-            {enfantActuel.prenom[0]}{enfantActuel.nom[0]}
+            style={{ background: 'linear-gradient(135deg, rgba(0,229,255,0.2), rgba(0,229,255,0.1))', border: '1.5px solid rgba(0,229,255,0.3)', color: '#38BDF8' }}>
+            {getInitials(enfantActuel.prenom, enfantActuel.nom)}
           </div>
           <div className="flex-1 min-w-0">
             <h2 className="text-base font-black text-white truncate">{enfantActuel.prenom} {enfantActuel.nom}</h2>
@@ -230,10 +238,10 @@ export default function ParentDashboard() {
             <div className="shrink-0 flex flex-col items-center gap-1">
               <div className={`w-3 h-3 rounded-full`}
                 style={{
-                  background: data?.presenceAujourdhui ? '#00E676' : '#FF1744',
-                  boxShadow: `0 0 8px ${data?.presenceAujourdhui ? '#00E676' : '#FF1744'}`,
+                  background: data?.presenceAujourdhui ? '#22C55E' : '#F87171',
+                  boxShadow: `0 0 8px ${data?.presenceAujourdhui ? '#22C55E' : '#F87171'}`,
                 }} />
-              <span className="text-[10px]" style={{ color: data?.presenceAujourdhui ? '#00E676' : '#FF1744' }}>
+              <span className="text-[10px]" style={{ color: data?.presenceAujourdhui ? '#22C55E' : '#F87171' }}>
                 {data?.presenceAujourdhui ? 'Présent' : 'Absent'}
               </span>
             </div>
@@ -308,18 +316,18 @@ export default function ParentDashboard() {
           <Link href="/parent/messages"
             className="relative flex flex-col p-4 rounded-2xl transition-all duration-300 hover:scale-[1.03] hover:shadow-lg"
             style={{
-              background: 'rgba(213,0,249,0.10)',
+              background: 'rgba(167,139,250,0.10)',
               backdropFilter: 'blur(14px)',
               WebkitBackdropFilter: 'blur(14px)',
-              border: '1px solid rgba(213,0,249,0.25)',
-              boxShadow: '0 4px 20px rgba(213,0,249,0.08)',
+              border: '1px solid rgba(167,139,250,0.25)',
+              boxShadow: '0 4px 20px rgba(167,139,250,0.08)',
             }}>
             <span className="text-2xl mb-2">💬</span>
             <p className="text-2xl font-black text-white">{data.messagesNonLus}</p>
             <p className="text-xs mt-1" style={{ color: '#475569' }}>Messages non lus</p>
             {data.messagesNonLus > 0 && (
               <span className="absolute top-3 right-3 w-5 h-5 text-white text-[9px] font-black rounded-full flex items-center justify-center"
-                style={{ background: '#FF1744', boxShadow: '0 0 8px rgba(255,23,68,0.8)' }}>
+                style={{ background: '#F87171', boxShadow: '0 0 8px rgba(255,23,68,0.8)' }}>
                 {data.messagesNonLus > 9 ? '9+' : data.messagesNonLus}
               </span>
             )}
@@ -342,7 +350,7 @@ export default function ParentDashboard() {
           </h3>
           <div className="space-y-3">
             {data.activites.map(a => {
-              const typeColors: Record<string, string> = { note: '#00E5FF', absence: '#FF1744', paiement: '#00E676', message: '#D500F9' }
+              const typeColors: Record<string, string> = { note: '#38BDF8', absence: '#F87171', paiement: '#22C55E', message: '#A78BFA' }
               const typeIcons: Record<string, string> = { note: '📝', absence: '🔴', paiement: '💳', message: '💬' }
               const color = typeColors[a.type] || '#94A3B8'
               return (
@@ -365,3 +373,4 @@ export default function ParentDashboard() {
     </div>
   )
 }
+

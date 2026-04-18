@@ -3,6 +3,8 @@
 import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
+import { PageHeader } from '@/components/dashboard/PageHeader'
+import { Bus, Plus } from 'lucide-react'
 
 // ── Types ───────────────────────────────────────────────────────
 type TabKey = 'vehicules' | 'trajets' | 'arrets' | 'abonnements'
@@ -522,37 +524,36 @@ export default function TransportPage() {
   // ── Render ────────────────────────────────────────────────────
   return (
     <div className="space-y-6">
-      {/* En-tete */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-ss-text">Gestion du Transport</h1>
-          <div className="flex h-1 rounded-full overflow-hidden mt-2 w-24">
-            <div className="flex-1 bg-[#00853F]" />
-            <div className="flex-1 bg-[#FDEF42]" />
-            <div className="flex-1 bg-[#E31B23]" />
-          </div>
-        </div>
-        {onglet === 'vehicules' && (
-          <button onClick={openAddVehicule} className="flex items-center gap-2 bg-[#00853F] text-white font-medium text-sm px-4 py-2.5 rounded-xl hover:opacity-90 transition-opacity">
-            <span className="text-lg leading-none">+</span> Ajouter un vehicule
-          </button>
-        )}
-        {onglet === 'trajets' && (
-          <button onClick={openAddTrajet} className="flex items-center gap-2 bg-[#00853F] text-white font-medium text-sm px-4 py-2.5 rounded-xl hover:opacity-90 transition-opacity">
-            <span className="text-lg leading-none">+</span> Ajouter un trajet
-          </button>
-        )}
-        {onglet === 'arrets' && selectedTrajetId && (
-          <button onClick={openAddArret} className="flex items-center gap-2 bg-[#00853F] text-white font-medium text-sm px-4 py-2.5 rounded-xl hover:opacity-90 transition-opacity">
-            <span className="text-lg leading-none">+</span> Ajouter un arret
-          </button>
-        )}
-        {onglet === 'abonnements' && (
-          <button onClick={openAddAbonnement} className="flex items-center gap-2 bg-[#00853F] text-white font-medium text-sm px-4 py-2.5 rounded-xl hover:opacity-90 transition-opacity">
-            <span className="text-lg leading-none">+</span> Inscrire un eleve
-          </button>
-        )}
-      </div>
+      <PageHeader
+        title="Gestion du Transport"
+        description="Véhicules, trajets, arrêts et abonnements élèves."
+        icon={Bus}
+        accent="green"
+        actions={
+          <>
+            {onglet === 'vehicules' && (
+              <button onClick={openAddVehicule} className="flex items-center gap-2 bg-ss-green text-[#020617] font-semibold text-sm px-4 py-2.5 rounded-xl hover:opacity-90 transition-opacity cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ss-green focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617]">
+                <Plus size={16} /> Ajouter un véhicule
+              </button>
+            )}
+            {onglet === 'trajets' && (
+              <button onClick={openAddTrajet} className="flex items-center gap-2 bg-ss-green text-[#020617] font-semibold text-sm px-4 py-2.5 rounded-xl hover:opacity-90 transition-opacity cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ss-green focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617]">
+                <Plus size={16} /> Ajouter un trajet
+              </button>
+            )}
+            {onglet === 'arrets' && selectedTrajetId && (
+              <button onClick={openAddArret} className="flex items-center gap-2 bg-ss-green text-[#020617] font-semibold text-sm px-4 py-2.5 rounded-xl hover:opacity-90 transition-opacity cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ss-green focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617]">
+                <Plus size={16} /> Ajouter un arrêt
+              </button>
+            )}
+            {onglet === 'abonnements' && (
+              <button onClick={openAddAbonnement} className="flex items-center gap-2 bg-ss-green text-[#020617] font-semibold text-sm px-4 py-2.5 rounded-xl hover:opacity-90 transition-opacity cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ss-green focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617]">
+                <Plus size={16} /> Inscrire un élève
+              </button>
+            )}
+          </>
+        }
+      />
 
       {/* Onglets */}
       <div className="flex gap-1 border-b border-ss-border overflow-x-auto">

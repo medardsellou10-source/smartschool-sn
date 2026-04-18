@@ -4,6 +4,8 @@ import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { isDemoMode, DEMO_CLASSES, DEMO_PROFESSEURS, DEMO_ELEVES } from '@/lib/demo-data'
+import { PageHeader } from '@/components/dashboard/PageHeader'
+import { BookMarked, Plus } from 'lucide-react'
 
 interface ClasseRow {
   id: string
@@ -222,17 +224,21 @@ export default function ClassesPage() {
 
   return (
     <div className="space-y-6">
-      {/* En-tête */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-2xl font-bold text-ss-text">Gestion des Classes</h1>
-        <button
-          onClick={openAdd}
-          className="flex items-center gap-2 bg-ss-cyan text-white font-medium text-sm px-4 py-2.5 rounded-xl hover:opacity-90 transition-opacity"
-        >
-          <span className="text-lg leading-none">+</span>
-          Nouvelle classe
-        </button>
-      </div>
+      <PageHeader
+        title="Gestion des Classes"
+        description="Création, affectation professeur et organisation des classes."
+        icon={BookMarked}
+        accent="info"
+        actions={
+          <button
+            onClick={openAdd}
+            className="flex items-center gap-2 bg-ss-info text-[#020617] font-semibold text-sm px-4 py-2.5 rounded-xl hover:opacity-90 transition-opacity cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ss-info focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617]"
+          >
+            <Plus size={16} />
+            Nouvelle classe
+          </button>
+        }
+      />
 
       {/* Tableau */}
       {loading ? (

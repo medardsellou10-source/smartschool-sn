@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import Link from 'next/link'
@@ -10,13 +10,13 @@ import { ROLE_LABELS } from '@/lib/constants'
 import type { Role } from '@/lib/constants'
 
 const ROLE_COLORS: Record<string, string> = {
-  admin_global: '#FF1744',
-  professeur: '#00E676',
-  surveillant: '#FFD600',
-  parent: '#00E5FF',
-  eleve: '#D500F9',
+  admin_global: '#F87171',
+  professeur: '#22C55E',
+  surveillant: '#FBBF24',
+  parent: '#38BDF8',
+  eleve: '#A78BFA',
   secretaire: '#FF6D00',
-  intendant: '#00BCD4',
+  intendant: '#16A34A',
   censeur: '#3D5AFE',
 }
 
@@ -110,7 +110,7 @@ export function Navbar() {
 
   const role = user?.role || roleFromPath(pathname)
   const roleLabel = ROLE_LABELS[role as Role] ?? role
-  const accentColor = ecole?.couleur_primaire || ROLE_COLORS[role] || '#00E676'
+  const accentColor = ecole?.couleur_primaire || ROLE_COLORS[role] || '#22C55E'
   const ecoleNom = ecole?.nom || 'SmartSchool SN'
   const ecoleInitiales = ecole?.nom
     ? ecole.nom.split(' ').slice(0, 2).map((w: string) => w[0]).join('').toUpperCase()
@@ -179,7 +179,7 @@ export function Navbar() {
             <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
           <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full"
-            style={{ background: '#FF1744', boxShadow: '0 0 6px rgba(255,23,68,0.8)' }} />
+            style={{ background: '#F87171', boxShadow: '0 0 6px rgba(255,23,68,0.8)' }} />
         </button>
 
         {/* Avatar */}
@@ -308,7 +308,7 @@ export function Navbar() {
               <button
                 onClick={() => { logout(); setMobileMenuOpen(false) }}
                 className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium min-h-[48px]"
-                style={{ background: 'rgba(255,23,68,0.1)', border: '1px solid rgba(255,23,68,0.2)', color: '#FF1744' }}
+                style={{ background: 'rgba(255,23,68,0.1)', border: '1px solid rgba(255,23,68,0.2)', color: '#F87171' }}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" strokeLinecap="round" strokeLinejoin="round"/>
@@ -322,3 +322,4 @@ export function Navbar() {
     </header>
   )
 }
+

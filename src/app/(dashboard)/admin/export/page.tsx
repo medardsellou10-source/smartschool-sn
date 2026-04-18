@@ -1,7 +1,9 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect } from 'react'
 import { toast } from 'react-hot-toast'
+import { PageHeader } from '@/components/dashboard/PageHeader'
+import { Landmark } from 'lucide-react'
 
 interface ExportLog {
   id: string
@@ -112,18 +114,12 @@ export default function ExportMinistrePage() {
 
   return (
     <div className="p-6 space-y-6">
-      {/* En-tête */}
-      <div className="flex items-center gap-4">
-        <div className="w-12 h-12 bg-gradient-to-br from-[#00853F] via-[#FDEF42] to-[#E31B23] rounded-xl flex items-center justify-center">
-          <span className="text-2xl">🏛️</span>
-        </div>
-        <div>
-          <h1 className="text-2xl font-bold text-ss-text">Export Ministère</h1>
-          <p className="text-ss-text-muted text-sm">
-            Format compatible PLANETE 3 — Ministère de l&apos;Éducation Nationale du Sénégal
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        title="Export Ministère"
+        description="Format compatible PLANETE 3 — Ministère de l'Éducation Nationale du Sénégal."
+        icon={Landmark}
+        accent="danger"
+      />
 
       {/* Bande drapeau */}
       <div className="flex h-1 rounded-full overflow-hidden">
@@ -324,7 +320,7 @@ export default function ExportMinistrePage() {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-ss-text-muted">{log.user}</td>
-                    <td className="px-4 py-3 text-[#00E676] text-xs font-bold">✓ TÉLÉCHARGÉ</td>
+                    <td className="px-4 py-3 text-[#22C55E] text-xs font-bold">✓ TÉLÉCHARGÉ</td>
                   </tr>
                 ))
               )}
@@ -335,3 +331,4 @@ export default function ExportMinistrePage() {
     </div>
   )
 }
+

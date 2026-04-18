@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -25,7 +25,7 @@ const DEMO_BRANDING: EcoleBranding = {
   ville: DEMO_ECOLE.ville,
   logo_url: DEMO_ECOLE.logo_url,
   slogan: 'Excellence, Discipline, Réussite',
-  couleur_primaire: '#00E676',
+  couleur_primaire: '#22C55E',
   image_hero_url: null,
   plan_type: DEMO_ECOLE.plan_type,
   actif: DEMO_ECOLE.actif,
@@ -67,7 +67,7 @@ export function useEcole() {
     if (data) {
       const branding: EcoleBranding = {
         ...data,
-        couleur_primaire: data.couleur_primaire || '#00E676',
+        couleur_primaire: data.couleur_primaire || '#22C55E',
       }
       cachedBranding = branding
       cachedEcoleId = user.ecole_id
@@ -89,3 +89,4 @@ export function useEcole() {
 
   return { ecole, loading, refetch }
 }
+

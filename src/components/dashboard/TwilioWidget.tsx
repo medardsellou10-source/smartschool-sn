@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect } from 'react'
 
@@ -64,7 +64,7 @@ export function TwilioWidget() {
         <div className="ml-auto flex items-center gap-1.5 px-2.5 py-1 rounded-full"
           style={{ background: status?.configured ? 'rgba(0,230,118,0.1)' : 'rgba(255,23,68,0.1)', border: `1px solid ${status?.configured ? 'rgba(0,230,118,0.3)' : 'rgba(255,23,68,0.3)'}` }}>
           <div className={`w-1.5 h-1.5 rounded-full ${status?.configured ? 'bg-green-400 animate-pulse' : 'bg-red-400'}`} />
-          <span className="text-[11px] font-semibold" style={{ color: status?.configured ? '#00E676' : '#FF1744' }}>
+          <span className="text-[11px] font-semibold" style={{ color: status?.configured ? '#22C55E' : '#F87171' }}>
             {status === null ? '…' : status.configured ? 'Connecté' : 'Non configuré'}
           </span>
         </div>
@@ -102,7 +102,7 @@ export function TwilioWidget() {
               <p className="text-sm text-white">{status.accountName}</p>
             </div>
             <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold capitalize"
-              style={{ background: 'rgba(0,229,255,0.1)', color: '#00E5FF', border: '1px solid rgba(0,229,255,0.2)' }}>
+              style={{ background: 'rgba(0,229,255,0.1)', color: '#38BDF8', border: '1px solid rgba(0,229,255,0.2)' }}>
               {status.accountStatus}
             </span>
           </div>
@@ -125,7 +125,7 @@ export function TwilioWidget() {
             onClick={handleTest}
             disabled={testing || !testTo || !status?.configured}
             className="px-4 py-2 rounded-xl text-sm font-bold text-white transition-all hover:opacity-85 disabled:opacity-40"
-            style={{ background: '#FF1744', boxShadow: '0 4px 16px rgba(255,23,68,0.35)' }}
+            style={{ background: '#F87171', boxShadow: '0 4px 16px rgba(255,23,68,0.35)' }}
           >
             {testing ? '…' : 'Envoyer'}
           </button>
@@ -154,3 +154,4 @@ export function TwilioWidget() {
     </div>
   )
 }
+

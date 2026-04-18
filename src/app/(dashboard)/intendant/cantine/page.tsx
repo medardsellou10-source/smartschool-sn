@@ -1,10 +1,10 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState } from 'react'
 import { useUser } from '@/hooks/useUser'
 import { isDemoMode } from '@/lib/demo-data'
 
-const ACCENT = '#00BCD4'
+const ACCENT = '#16A34A'
 
 const MENU_SEMAINE = [
   { jour: 'Lundi',    plat: 'Thiébou Dieun (riz au poisson)', prix: 800, abonnes: 180 },
@@ -46,8 +46,8 @@ export default function CantinePage() {
       <div className="grid grid-cols-3 gap-4">
         {[
           { label: 'Abonnés cantine', value: totalAbonnes, icon: '👥', color: ACCENT },
-          { label: 'Recette moy./jour', value: new Intl.NumberFormat('fr-FR').format(Math.round(recettesJour)) + ' FCFA', icon: '💰', color: '#00E676' },
-          { label: 'Repas cette semaine', value: MENU_SEMAINE.length * Math.round(totalAbonnes * 0.55), icon: '🍱', color: '#FFD600' },
+          { label: 'Recette moy./jour', value: new Intl.NumberFormat('fr-FR').format(Math.round(recettesJour)) + ' FCFA', icon: '💰', color: '#22C55E' },
+          { label: 'Repas cette semaine', value: MENU_SEMAINE.length * Math.round(totalAbonnes * 0.55), icon: '🍱', color: '#FBBF24' },
         ].map(s => (
           <div key={s.label} className="rounded-2xl p-4"
             style={{ background: `${s.color}08`, border: `1px solid ${s.color}25` }}>
@@ -93,3 +93,4 @@ export default function CantinePage() {
     </div>
   )
 }
+

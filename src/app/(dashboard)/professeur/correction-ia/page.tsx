@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { isDemoMode, DEMO_ELEVES, DEMO_CLASSES, DEMO_MATIERES } from '@/lib/demo-data'
@@ -9,6 +9,8 @@ import type {
   StatutReponse,
 } from '@/lib/types/correction.types'
 import { generateCorrectionPDF, downloadAllCorrectionsPDF } from '@/lib/pdf/correction-pdf'
+import { PageHeader } from '@/components/dashboard/PageHeader'
+import { Bot } from 'lucide-react'
 
 // ── Types locaux ──────────────────────────────────────────────
 interface StudentFile {
@@ -22,18 +24,18 @@ interface StudentFile {
 
 // ── Couleurs statut ───────────────────────────────────────────
 const STATUT_STYLE: Record<StatutReponse, { bg: string; border: string; color: string; label: string }> = {
-  CORRECT:      { bg: 'rgba(0,230,118,0.12)',  border: 'rgba(0,230,118,0.35)',  color: '#00E676', label: 'Correct' },
-  PARTIEL:      { bg: 'rgba(255,214,0,0.12)',   border: 'rgba(255,214,0,0.35)',   color: '#FFD600', label: 'Partiel' },
-  INCORRECT:    { bg: 'rgba(255,23,68,0.12)',   border: 'rgba(255,23,68,0.35)',   color: '#FF1744', label: 'Incorrect' },
+  CORRECT:      { bg: 'rgba(0,230,118,0.12)',  border: 'rgba(0,230,118,0.35)',  color: '#22C55E', label: 'Correct' },
+  PARTIEL:      { bg: 'rgba(255,214,0,0.12)',   border: 'rgba(255,214,0,0.35)',   color: '#FBBF24', label: 'Partiel' },
+  INCORRECT:    { bg: 'rgba(255,23,68,0.12)',   border: 'rgba(255,23,68,0.35)',   color: '#F87171', label: 'Incorrect' },
   NON_REPONDU:  { bg: 'rgba(120,120,120,0.12)', border: 'rgba(120,120,120,0.3)',  color: '#888',    label: 'Non répondu' },
 }
 
 function getMentionColor(note: number): string {
-  if (note >= 16) return '#00E676'
-  if (note >= 14) return '#00E5FF'
+  if (note >= 16) return '#22C55E'
+  if (note >= 14) return '#38BDF8'
   if (note >= 12) return '#7C4DFF'
   if (note >= 10) return '#FF6D00'
-  return '#FF1744'
+  return '#F87171'
 }
 
 // ── Données démo riches ────────────────────────────────────────
@@ -321,7 +323,7 @@ function ScannerModal({
         <div className="flex-1 flex flex-col items-center justify-center gap-4 px-8 text-center">
           <span className="text-5xl">📵</span>
           <p className="text-white/70 text-sm">{cameraError}</p>
-          <button onClick={() => startCamera(facingMode)} className="px-6 py-2.5 rounded-xl text-sm font-bold text-black" style={{ background: '#00E676' }}>Réessayer</button>
+          <button onClick={() => startCamera(facingMode)} className="px-6 py-2.5 rounded-xl text-sm font-bold text-black" style={{ background: '#22C55E' }}>Réessayer</button>
         </div>
       ) : (
         <div className="relative flex-1 overflow-hidden">
@@ -337,10 +339,10 @@ function ScannerModal({
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="relative" style={{ width: '85%', maxWidth: 520, aspectRatio: '1/1.41' }}>
                 {['top-0 left-0 border-t-2 border-l-2 rounded-tl-sm', 'top-0 right-0 border-t-2 border-r-2 rounded-tr-sm', 'bottom-0 left-0 border-b-2 border-l-2 rounded-bl-sm', 'bottom-0 right-0 border-b-2 border-r-2 rounded-br-sm'].map((cls, i) => (
-                  <div key={i} className={`absolute w-8 h-8 ${cls}`} style={{ borderColor: '#00E676' }} />
+                  <div key={i} className={`absolute w-8 h-8 ${cls}`} style={{ borderColor: '#22C55E' }} />
                 ))}
                 <div className="absolute inset-0 rounded" style={{ boxShadow: '0 0 0 9999px rgba(0,0,0,0.45)' }} />
-                <p className="absolute -bottom-7 left-0 right-0 text-center text-xs font-medium" style={{ color: '#00E676' }}>Alignez la copie sur le cadre</p>
+                <p className="absolute -bottom-7 left-0 right-0 text-center text-xs font-medium" style={{ color: '#22C55E' }}>Alignez la copie sur le cadre</p>
               </div>
             </div>
           )}
@@ -353,12 +355,12 @@ function ScannerModal({
           <div className="flex items-center justify-between gap-4">
             <button onClick={() => setFilterOn(v => !v)}
               className="flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all text-xs font-medium"
-              style={filterOn ? { background: 'rgba(0,229,255,0.15)', color: '#00E5FF', border: '1px solid rgba(0,229,255,0.3)' } : { background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.5)', border: '1px solid transparent' }}>
+              style={filterOn ? { background: 'rgba(0,229,255,0.15)', color: '#38BDF8', border: '1px solid rgba(0,229,255,0.3)' } : { background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.5)', border: '1px solid transparent' }}>
               <span className="text-lg">📄</span>Filtre doc
             </button>
             <button onClick={handleCapture} disabled={!cameraReady}
               className="w-20 h-20 rounded-full border-4 border-white flex items-center justify-center transition-all active:scale-95 disabled:opacity-40"
-              style={{ background: '#00E676', boxShadow: '0 0 30px rgba(0,230,118,0.5)' }}>
+              style={{ background: '#22C55E', boxShadow: '0 0 30px rgba(0,230,118,0.5)' }}>
               <span className="text-2xl">📸</span>
             </button>
             <button onClick={() => setFacingMode(m => m === 'environment' ? 'user' : 'environment')}
@@ -381,7 +383,7 @@ function ScannerModal({
               <button onClick={handleRetake} className="flex-1 py-3 rounded-xl text-sm font-semibold transition-all"
                 style={{ background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.12)' }}>↩ Reprendre</button>
               <button onClick={handleConfirm} className="flex-1 py-3 rounded-xl text-sm font-bold transition-all active:scale-95"
-                style={{ background: 'linear-gradient(135deg, #00E676, #00BCD4)', color: '#020617' }}>✓ Valider · Suivant</button>
+                style={{ background: 'linear-gradient(135deg, #22C55E, #16A34A)', color: '#020617' }}>✓ Valider · Suivant</button>
             </div>
             <button onClick={onClose} className="w-full py-2.5 rounded-xl text-xs text-white/40 hover:text-white/60 transition-all">Terminer le scan ({title})</button>
           </div>
@@ -459,7 +461,7 @@ function QuestionCard({ q }: { q: CorrectionQuestion }) {
 function ExerciceAccordion({ ex }: { ex: ResultatParExercice }) {
   const [open, setOpen] = useState(false)
   const pct = ex.pourcentage
-  const barColor = pct >= 75 ? '#00E676' : pct >= 50 ? '#FFD600' : '#FF1744'
+  const barColor = pct >= 75 ? '#22C55E' : pct >= 50 ? '#FBBF24' : '#F87171'
 
   return (
     <div className="rounded-xl border overflow-hidden" style={{ borderColor: 'rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)' }}>
@@ -521,7 +523,7 @@ function StudentResultCard({ r, saved, onSave, onDownloadPDF, pdfLoading }: {
 
         {/* Note */}
         <div className="text-right shrink-0 mr-1">
-          <p className="text-3xl font-black tabular-nums leading-none" style={{ color: r.note_finale >= 10 ? '#00E676' : '#FF1744' }}>
+          <p className="text-3xl font-black tabular-nums leading-none" style={{ color: r.note_finale >= 10 ? '#22C55E' : '#F87171' }}>
             {r.note_finale.toFixed(1)}
           </p>
           <p className="text-[10px] text-ss-text-muted">/20</p>
@@ -530,7 +532,7 @@ function StudentResultCard({ r, saved, onSave, onDownloadPDF, pdfLoading }: {
         {/* Confiance IA */}
         <div className="text-right shrink-0">
           <p className="text-sm font-bold tabular-nums"
-            style={{ color: r.fiabilite_correction >= 90 ? '#00E5FF' : r.fiabilite_correction >= 70 ? '#FFD600' : '#FF6D00' }}>
+            style={{ color: r.fiabilite_correction >= 90 ? '#38BDF8' : r.fiabilite_correction >= 70 ? '#FBBF24' : '#FF6D00' }}>
             {r.fiabilite_correction}%
           </p>
           <p className="text-[10px] text-ss-text-muted">confiance IA</p>
@@ -544,17 +546,17 @@ function StudentResultCard({ r, saved, onSave, onDownloadPDF, pdfLoading }: {
       {totalQ > 0 && (
         <div className="px-4 pb-3 flex gap-1">
           {r.questions_correctes > 0 && (
-            <div className="flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded" style={{ background: 'rgba(0,230,118,0.1)', color: '#00E676' }}>
+            <div className="flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded" style={{ background: 'rgba(0,230,118,0.1)', color: '#22C55E' }}>
               ✓ {r.questions_correctes}
             </div>
           )}
           {r.questions_partielles > 0 && (
-            <div className="flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded" style={{ background: 'rgba(255,214,0,0.1)', color: '#FFD600' }}>
+            <div className="flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded" style={{ background: 'rgba(255,214,0,0.1)', color: '#FBBF24' }}>
               ~ {r.questions_partielles}
             </div>
           )}
           {r.questions_incorrectes > 0 && (
-            <div className="flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded" style={{ background: 'rgba(255,23,68,0.1)', color: '#FF1744' }}>
+            <div className="flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded" style={{ background: 'rgba(255,23,68,0.1)', color: '#F87171' }}>
               ✕ {r.questions_incorrectes}
             </div>
           )}
@@ -581,7 +583,7 @@ function StudentResultCard({ r, saved, onSave, onDownloadPDF, pdfLoading }: {
         {onDownloadPDF && (
           <button onClick={onDownloadPDF} disabled={pdfLoading}
             className="px-3 py-2 rounded-lg text-xs font-bold transition-all disabled:opacity-50"
-            style={{ background: 'rgba(0,229,255,0.1)', color: '#00E5FF', border: '1px solid rgba(0,229,255,0.25)' }}>
+            style={{ background: 'rgba(0,229,255,0.1)', color: '#38BDF8', border: '1px solid rgba(0,229,255,0.25)' }}>
             📄 PDF
           </button>
         )}
@@ -901,17 +903,12 @@ export default function CorrectionIAPage() {
       )}
 
       <div className="max-w-4xl mx-auto space-y-5">
-        {/* En-tête repositionné */}
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-lg">🤖</span>
-            <h1 className="text-2xl font-bold text-ss-text">Assistant de Pré-analyse IA</h1>
-          </div>
-          <p className="text-ss-text-muted text-sm">
-            <span className="text-ss-cyan font-semibold">L&apos;IA détecte, le prof décide.</span>{' '}
-            Scannez 60 copies. Recevez une analyse en 5 minutes. Validez en toute liberté.
-          </p>
-        </div>
+        <PageHeader
+          title="Assistant de Pré-analyse IA"
+          description="L'IA détecte, le prof décide. Scannez 60 copies. Analyse en 5 minutes. Validation libre."
+          icon={Bot}
+          accent="info"
+        />
 
         {/* Workflow 4 étapes */}
         <div className="rounded-xl border p-4" style={{ background: 'rgba(0,229,255,0.04)', borderColor: 'rgba(0,229,255,0.15)' }}>
@@ -959,7 +956,7 @@ export default function CorrectionIAPage() {
               <div className="flex gap-2">
                 <button onClick={() => setScannerOpen('correction')}
                   className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all"
-                  style={{ background: 'rgba(0,230,118,0.12)', border: '1px solid rgba(0,230,118,0.3)', color: '#00E676' }}>
+                  style={{ background: 'rgba(0,230,118,0.12)', border: '1px solid rgba(0,230,118,0.3)', color: '#22C55E' }}>
                   📷 Scanner
                 </button>
                 <button onClick={() => corrInputRef.current?.click()}
@@ -1000,18 +997,18 @@ export default function CorrectionIAPage() {
                   {isDemoMode() && (
                     <button onClick={handleAddDemoStudents}
                       className="text-xs px-3 py-1.5 rounded-lg hover:opacity-80 transition-all font-semibold"
-                      style={{ background: 'rgba(255,214,0,0.12)', border: '1px solid rgba(255,214,0,0.3)', color: '#FFD600' }}>
+                      style={{ background: 'rgba(255,214,0,0.12)', border: '1px solid rgba(255,214,0,0.3)', color: '#FBBF24' }}>
                       + Démo
                     </button>
                   )}
                   <button onClick={() => setScannerOpen('student')}
                     className="text-xs flex items-center gap-1 px-3 py-1.5 rounded-lg transition-all font-semibold"
-                    style={{ background: 'rgba(0,230,118,0.12)', border: '1px solid rgba(0,230,118,0.3)', color: '#00E676' }}>
+                    style={{ background: 'rgba(0,230,118,0.12)', border: '1px solid rgba(0,230,118,0.3)', color: '#22C55E' }}>
                     📷 Scanner
                   </button>
                   <button onClick={() => papersInputRef.current?.click()}
                     className="text-xs flex items-center gap-1 px-3 py-1.5 rounded-lg transition-all font-semibold"
-                    style={{ background: 'rgba(0,229,255,0.1)', border: '1px solid rgba(0,229,255,0.25)', color: '#00E5FF' }}>
+                    style={{ background: 'rgba(0,229,255,0.1)', border: '1px solid rgba(0,229,255,0.25)', color: '#38BDF8' }}>
                     📁 Upload
                   </button>
                 </div>
@@ -1163,12 +1160,12 @@ export default function CorrectionIAPage() {
                         <p className="text-[10px] text-ss-text-muted">Admis</p>
                       </div>
                       <div className="text-center">
-                        <p className="text-xl font-bold tabular-nums" style={{ color: '#FFD600' }}>{results.filter(r => r.note_finale < 10).length}</p>
+                        <p className="text-xl font-bold tabular-nums" style={{ color: '#FBBF24' }}>{results.filter(r => r.note_finale < 10).length}</p>
                         <p className="text-[10px] text-ss-text-muted">En difficulté</p>
                       </div>
                       <button onClick={handleSaveAll}
                         className="text-sm px-3 py-2 rounded-xl font-semibold hover:opacity-80 transition-all"
-                        style={{ background: 'rgba(0,230,118,0.15)', border: '1px solid rgba(0,230,118,0.3)', color: '#00E676' }}>
+                        style={{ background: 'rgba(0,230,118,0.15)', border: '1px solid rgba(0,230,118,0.3)', color: '#22C55E' }}>
                         💾 Tout enregistrer
                       </button>
                     </div>
@@ -1179,7 +1176,7 @@ export default function CorrectionIAPage() {
                     {/* PDF */}
                     <button onClick={handleDownloadAllPDFs} disabled={pdfLoading}
                       className="flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all disabled:opacity-50"
-                      style={{ background: 'rgba(0,229,255,0.12)', border: '1px solid rgba(0,229,255,0.3)', color: '#00E5FF' }}>
+                      style={{ background: 'rgba(0,229,255,0.12)', border: '1px solid rgba(0,229,255,0.3)', color: '#38BDF8' }}>
                       {pdfLoading ? (
                         <><span className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" /> Génération...</>
                       ) : (
@@ -1191,7 +1188,7 @@ export default function CorrectionIAPage() {
                     <button onClick={handleDistribute} disabled={distributing || distribDone}
                       className="flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all disabled:opacity-60"
                       style={distribDone
-                        ? { background: 'rgba(0,230,118,0.15)', border: '1px solid rgba(0,230,118,0.4)', color: '#00E676' }
+                        ? { background: 'rgba(0,230,118,0.15)', border: '1px solid rgba(0,230,118,0.4)', color: '#22C55E' }
                         : { background: 'rgba(124,77,255,0.12)', border: '1px solid rgba(124,77,255,0.3)', color: '#7C4DFF' }}>
                       {distributing ? (
                         <><span className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" /> Envoi...</>
@@ -1206,7 +1203,7 @@ export default function CorrectionIAPage() {
                     <button onClick={handleSubmitToCenseur} disabled={submitting || submitDone}
                       className="flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all disabled:opacity-60"
                       style={submitDone
-                        ? { background: 'rgba(0,230,118,0.15)', border: '1px solid rgba(0,230,118,0.4)', color: '#00E676' }
+                        ? { background: 'rgba(0,230,118,0.15)', border: '1px solid rgba(0,230,118,0.4)', color: '#22C55E' }
                         : { background: 'rgba(61,90,254,0.12)', border: '1px solid rgba(61,90,254,0.3)', color: '#3D5AFE' }}>
                       {submitting ? (
                         <><span className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" /> Soumission...</>
@@ -1222,8 +1219,8 @@ export default function CorrectionIAPage() {
                   {actionMsg && (
                     <div className="rounded-lg px-4 py-2.5 text-sm font-medium"
                       style={actionMsg.startsWith('Erreur')
-                        ? { background: 'rgba(255,23,68,0.1)', color: '#FF1744', border: '1px solid rgba(255,23,68,0.25)' }
-                        : { background: 'rgba(0,230,118,0.1)', color: '#00E676', border: '1px solid rgba(0,230,118,0.25)' }}>
+                        ? { background: 'rgba(255,23,68,0.1)', color: '#F87171', border: '1px solid rgba(255,23,68,0.25)' }
+                        : { background: 'rgba(0,230,118,0.1)', color: '#22C55E', border: '1px solid rgba(0,230,118,0.25)' }}>
                       {actionMsg}
                       {submitRef && <span className="ml-2 text-xs opacity-70">Réf: {submitRef}</span>}
                     </div>
@@ -1257,3 +1254,4 @@ export default function CorrectionIAPage() {
     </>
   )
 }
+

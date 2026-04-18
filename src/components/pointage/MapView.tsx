@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useRef } from 'react'
 
@@ -76,7 +76,7 @@ export function MapView({
       // Marqueur professeur
       if (profLat !== undefined && profLng !== undefined) {
         const profIcon = L.divIcon({
-          html: '<div style="background:#00BCD4;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;border:3px solid #0A0E27;">👨‍🏫</div>',
+          html: '<div style="background:#16A34A;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;border:3px solid #0A0E27;">👨‍🏫</div>',
           iconSize: [28, 28],
           iconAnchor: [14, 14],
           className: '',
@@ -109,3 +109,4 @@ export function MapView({
     </>
   )
 }
+

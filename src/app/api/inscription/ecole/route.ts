@@ -72,6 +72,7 @@ export async function POST(req: Request) {
         telephone: ecole.telephone?.trim() || null,
         site_web: ecole.site_web?.trim() || null,
         plan_id: isTrial ? 'essai' : planId,
+        plan_type: isTrial ? 'starter' : planId,    // colonne legacy
         abonnement_statut: 'trial',
         trial_fin: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
         latitude: 14.6937,

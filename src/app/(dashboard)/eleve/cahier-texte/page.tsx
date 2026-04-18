@@ -1,9 +1,11 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { isDemoMode, DEMO_ELEVES, DEMO_CLASSES } from '@/lib/demo-data'
+import { PageHeader } from '@/components/dashboard/PageHeader'
+import { BookOpen } from 'lucide-react'
 
 interface CahierItem {
   id: string
@@ -109,11 +111,12 @@ export default function EleveCahierTextePage() {
 
   return (
     <div className="space-y-5 pb-6 animate-fade-in">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-black text-white">Cahier de Texte</h1>
-        <p className="text-sm mt-1" style={{ color: '#94A3B8' }}>{items.length} entrees</p>
-      </div>
+      <PageHeader
+        title="Cahier de Texte"
+        description={`${items.length} entrées`}
+        icon={BookOpen}
+        accent="gold"
+      />
 
       {/* Filter pills */}
       <div className="flex gap-2">
@@ -126,13 +129,13 @@ export default function EleveCahierTextePage() {
             className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all"
             style={{
               background: filtre === f.key ? 'rgba(213,0,249,0.12)' : 'rgba(255,255,255,0.04)',
-              color: filtre === f.key ? '#D500F9' : '#94A3B8',
+              color: filtre === f.key ? '#A78BFA' : '#94A3B8',
               border: `1px solid ${filtre === f.key ? 'rgba(213,0,249,0.3)' : 'rgba(255,255,255,0.08)'}`,
             }}>
             {f.label}
             <span className="text-[10px] px-1.5 py-0.5 rounded-full" style={{
               background: filtre === f.key ? 'rgba(213,0,249,0.2)' : 'rgba(255,255,255,0.06)',
-              color: filtre === f.key ? '#D500F9' : '#475569',
+              color: filtre === f.key ? '#A78BFA' : '#475569',
             }}>{f.count}</span>
           </button>
         ))}
@@ -163,7 +166,7 @@ export default function EleveCahierTextePage() {
               <div className="space-y-2">
                 {grouped[date].map(item => {
                   const isDevoir = item.type === 'devoir'
-                  const color = isDevoir ? '#FF1744' : '#00853F'
+                  const color = isDevoir ? '#F87171' : '#00853F'
                   return (
                     <div key={item.id} className="p-4 rounded-xl" style={{ background: `${color}06`, border: `1px solid ${color}15` }}>
                       <div className="flex items-center gap-2 mb-2">
@@ -184,3 +187,4 @@ export default function EleveCahierTextePage() {
     </div>
   )
 }
+

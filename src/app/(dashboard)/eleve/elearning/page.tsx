@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
+import { PageHeader } from '@/components/dashboard/PageHeader'
+import { Laptop, BookOpen, PenSquare, Video } from 'lucide-react'
 
 interface Cours {
   id: string
@@ -140,15 +142,15 @@ export default function EleveElearningPage() {
   }
 
   const tabs = [
-    { key: 'cours' as const, label: '📚 Cours', count: cours.length },
-    { key: 'devoirs' as const, label: '📝 Devoirs', count: devoirs.length },
-    { key: 'classes' as const, label: '🎥 Classes virtuelles', count: classesVirt.length },
+    { key: 'cours' as const, label: 'Cours', Icon: BookOpen, count: cours.length },
+    { key: 'devoirs' as const, label: 'Devoirs', Icon: PenSquare, count: devoirs.length },
+    { key: 'classes' as const, label: 'Classes virtuelles', Icon: Video, count: classesVirt.length },
   ]
 
   if (loading) {
     return (
       <div className="p-6 space-y-4">
-        <h1 className="text-2xl font-bold text-ss-text">💻 E-Learning</h1>
+        <PageHeader title="E-Learning" icon={Laptop} accent="info" />
         {[1, 2, 3].map(i => <div key={i} className="bg-ss-bg-secondary rounded-xl h-32 ss-shimmer" />)}
       </div>
     )
@@ -156,20 +158,19 @@ export default function EleveElearningPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-ss-text">💻 E-Learning</h1>
-        <p className="text-ss-text-secondary text-sm">Cours, devoirs et classes virtuelles</p>
-        <div className="flex h-1 rounded-full overflow-hidden mt-3 max-w-xs">
-          <div className="flex-1 bg-[#00853F]" /><div className="flex-1 bg-[#FDEF42]" /><div className="flex-1 bg-[#E31B23]" />
-        </div>
-      </div>
+      <PageHeader
+        title="E-Learning"
+        description="Cours, devoirs et classes virtuelles."
+        icon={Laptop}
+        accent="info"
+      />
 
       {/* Tabs */}
       <div className="flex gap-1 bg-ss-bg-secondary rounded-lg p-1">
         {tabs.map(t => (
           <button key={t.key} onClick={() => setTab(t.key)}
-            className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${tab === t.key ? 'bg-[#00853F] text-white' : 'text-ss-text-secondary hover:text-ss-text'}`}>
-            {t.label} ({t.count})
+            className={`flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${tab === t.key ? 'bg-[#00853F] text-white' : 'text-ss-text-secondary hover:text-ss-text'}`}>
+            <t.Icon size={14} aria-hidden="true" /> {t.label} ({t.count})
           </button>
         ))}
       </div>

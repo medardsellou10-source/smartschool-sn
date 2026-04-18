@@ -1,9 +1,11 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { isDemoMode, DEMO_ELEVES, DEMO_CLASSES } from '@/lib/demo-data'
+import { PageHeader } from '@/components/dashboard/PageHeader'
+import { ClipboardList } from 'lucide-react'
 
 type PresenceStatut = 'present' | 'absent' | 'retard'
 
@@ -273,7 +275,7 @@ export default function AppelPage() {
           envoyeSurveillant ? (
             <div className="rounded-xl px-5 py-4 text-center"
               style={{ background: 'rgba(0,188,212,0.1)', border: '1px solid rgba(0,188,212,0.3)' }}>
-              <p className="text-sm font-bold" style={{ color: '#00BCD4' }}>
+              <p className="text-sm font-bold" style={{ color: '#16A34A' }}>
                 ✓ Transmis au Surveillant Général
               </p>
               <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.45)' }}>
@@ -284,7 +286,7 @@ export default function AppelPage() {
             <button
               onClick={handleEnvoyerAuSurveillant}
               className="w-full py-4 rounded-xl font-bold text-sm flex items-center justify-center gap-3 transition-all active:scale-[0.98]"
-              style={{ background: 'linear-gradient(135deg, #00BCD4, #7C4DFF)', color: 'white', boxShadow: '0 0 25px rgba(0,188,212,0.3)' }}>
+              style={{ background: 'linear-gradient(135deg, #16A34A, #7C4DFF)', color: 'white', boxShadow: '0 0 25px rgba(0,188,212,0.3)' }}>
               <span className="text-xl">📤</span>
               <div className="text-left">
                 <p>Envoyer au Surveillant Général</p>
@@ -320,10 +322,12 @@ export default function AppelPage() {
   // ── Formulaire d'appel ────────────────────────────────────────
   return (
     <div className="space-y-4 pb-28">
-      <div>
-        <h1 className="text-2xl font-bold text-ss-text">Appel de classe</h1>
-        <p className="text-sm text-ss-text-muted mt-0.5">{dateLabel}</p>
-      </div>
+      <PageHeader
+        title="Appel de classe"
+        description={dateLabel}
+        icon={ClipboardList}
+        accent="green"
+      />
 
       {/* Sélecteur de classe */}
       <div className="bg-ss-bg-secondary rounded-xl border border-ss-border p-4">
@@ -423,3 +427,4 @@ export default function AppelPage() {
     </div>
   )
 }
+

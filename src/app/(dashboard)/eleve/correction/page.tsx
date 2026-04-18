@@ -1,24 +1,27 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import { isDemoMode } from '@/lib/demo-data'
 import { generateCorrectionPDF } from '@/lib/pdf/correction-pdf'
 import type { CorrectionComplete, StatutReponse } from '@/lib/types/correction.types'
+import { PageHeader } from '@/components/dashboard/PageHeader'
+import { EmptyState } from '@/components/dashboard/EmptyState'
+import { CheckCircle2, Inbox } from 'lucide-react'
 
 // ── Couleurs statut ────────────────────────────────────────────────────────
 const STATUT_STYLE: Record<StatutReponse, { bg: string; border: string; color: string; label: string; icon: string }> = {
-  CORRECT:     { bg: 'rgba(0,230,118,0.1)',  border: 'rgba(0,230,118,0.3)',  color: '#00E676', label: 'Correct',      icon: '✓' },
-  PARTIEL:     { bg: 'rgba(255,214,0,0.1)',   border: 'rgba(255,214,0,0.3)',   color: '#FFD600', label: 'Partiel',      icon: '~' },
-  INCORRECT:   { bg: 'rgba(255,23,68,0.1)',   border: 'rgba(255,23,68,0.3)',   color: '#FF1744', label: 'Incorrect',    icon: '✕' },
+  CORRECT:     { bg: 'rgba(0,230,118,0.1)',  border: 'rgba(0,230,118,0.3)',  color: '#22C55E', label: 'Correct',      icon: '✓' },
+  PARTIEL:     { bg: 'rgba(255,214,0,0.1)',   border: 'rgba(255,214,0,0.3)',   color: '#FBBF24', label: 'Partiel',      icon: '~' },
+  INCORRECT:   { bg: 'rgba(255,23,68,0.1)',   border: 'rgba(255,23,68,0.3)',   color: '#F87171', label: 'Incorrect',    icon: '✕' },
   NON_REPONDU: { bg: 'rgba(120,120,120,0.1)', border: 'rgba(120,120,120,0.3)', color: '#888',    label: 'Non répondu', icon: '—' },
 }
 
 function mentionColor(note: number): string {
-  if (note >= 16) return '#00E676'
-  if (note >= 14) return '#00E5FF'
+  if (note >= 16) return '#22C55E'
+  if (note >= 14) return '#38BDF8'
   if (note >= 12) return '#7C4DFF'
   if (note >= 10) return '#FF6D00'
-  return '#FF1744'
+  return '#F87171'
 }
 
 // ── Données démo élève (Awa Diallo, Terminale S) ──────────────────────────
@@ -153,12 +156,12 @@ export default function EleveCorrectionPage() {
   if (!correction) {
     return (
       <div className="max-w-2xl mx-auto space-y-5">
-        <h1 className="text-2xl font-bold text-ss-text">Mes Corrections</h1>
-        <div className="bg-ss-bg-secondary rounded-xl border border-ss-border p-12 text-center">
-          <p className="text-4xl mb-3">📭</p>
-          <p className="text-ss-text-secondary text-sm">Aucune correction reçue pour l&apos;instant.</p>
-          <p className="text-ss-text-muted text-xs mt-1">Ton professeur enverra les corrections après les avoir validées.</p>
-        </div>
+        <PageHeader title="Mes Corrections" icon={CheckCircle2} accent="info" />
+        <EmptyState
+          icon={Inbox}
+          title="Aucune correction reçue"
+          message="Ton professeur enverra les corrections après les avoir validées."
+        />
       </div>
     )
   }
@@ -178,12 +181,12 @@ export default function EleveCorrectionPage() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-5 pb-8">
-      <div>
-        <h1 className="text-2xl font-bold text-ss-text">Ma Correction</h1>
-        <p className="text-ss-text-muted text-sm mt-1">
-          {correction.structure_corrige.matiere} — {correction.structure_corrige.titre_examen}
-        </p>
-      </div>
+      <PageHeader
+        title="Ma Correction"
+        description={`${correction.structure_corrige.matiere} — ${correction.structure_corrige.titre_examen}`}
+        icon={CheckCircle2}
+        accent="info"
+      />
 
       {/* Carte note principale */}
       <div className="rounded-2xl p-6 text-center relative overflow-hidden"
@@ -211,17 +214,17 @@ export default function EleveCorrectionPage() {
         {totalQ > 0 && (
           <div className="mt-4 flex justify-center gap-2 flex-wrap">
             {correction.questions_correctes > 0 && (
-              <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{ background: 'rgba(0,230,118,0.15)', color: '#00E676' }}>
+              <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{ background: 'rgba(0,230,118,0.15)', color: '#22C55E' }}>
                 ✓ {correction.questions_correctes} correct{correction.questions_correctes > 1 ? 'es' : ''}
               </span>
             )}
             {correction.questions_partielles > 0 && (
-              <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{ background: 'rgba(255,214,0,0.15)', color: '#FFD600' }}>
+              <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{ background: 'rgba(255,214,0,0.15)', color: '#FBBF24' }}>
                 ~ {correction.questions_partielles} partielle{correction.questions_partielles > 1 ? 's' : ''}
               </span>
             )}
             {correction.questions_incorrectes > 0 && (
-              <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{ background: 'rgba(255,23,68,0.15)', color: '#FF1744' }}>
+              <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{ background: 'rgba(255,23,68,0.15)', color: '#F87171' }}>
                 ✕ {correction.questions_incorrectes} incorrecte{correction.questions_incorrectes > 1 ? 's' : ''}
               </span>
             )}
@@ -236,7 +239,7 @@ export default function EleveCorrectionPage() {
         {/* Bouton PDF */}
         <button onClick={handleDownloadPDF} disabled={pdfLoading}
           className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all active:scale-95 disabled:opacity-50"
-          style={{ background: 'rgba(0,229,255,0.15)', border: '1px solid rgba(0,229,255,0.3)', color: '#00E5FF' }}>
+          style={{ background: 'rgba(0,229,255,0.15)', border: '1px solid rgba(0,229,255,0.3)', color: '#38BDF8' }}>
           {pdfLoading ? (
             <><span className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" /> Génération...</>
           ) : <>📄 Télécharger ma correction en PDF</>}
@@ -247,7 +250,7 @@ export default function EleveCorrectionPage() {
       <div className="space-y-3">
         {correction.resultats_par_exercice.map(ex => {
           const pct = ex.pourcentage
-          const barColor = pct >= 75 ? '#00E676' : pct >= 50 ? '#FFD600' : '#FF1744'
+          const barColor = pct >= 75 ? '#22C55E' : pct >= 50 ? '#FBBF24' : '#F87171'
           const isOpen = openExercice === ex.exercice_numero
 
           return (
@@ -339,3 +342,4 @@ export default function EleveCorrectionPage() {
     </div>
   )
 }
+

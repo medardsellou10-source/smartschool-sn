@@ -1,7 +1,8 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState } from 'react'
 import { useUser } from '@/hooks/useUser'
+import { useEcole } from '@/hooks/useEcole'
 import { StatCard } from '@/components/dashboard/StatCard'
 import Link from 'next/link'
 import { isDemoMode, DEMO_INSCRIPTIONS, DEMO_CERTIFICATS, DEMO_COURRIERS } from '@/lib/demo-data'
@@ -11,6 +12,7 @@ const CARD = { background: 'rgba(2,6,23,0.80)', backdropFilter: 'blur(24px)', We
 
 export default function SecretaireDashboard() {
   const { user, loading: userLoading } = useUser()
+  const { ecole } = useEcole()
   const [stats, setStats] = useState({ inscriptions: 0, certificats: 0, dossiers: 0, courrier: 0 })
   const [activite, setActivite] = useState<{ text: string; time: string; type: string }[]>([])
   const [loading, setLoading] = useState(true)
@@ -50,7 +52,7 @@ export default function SecretaireDashboard() {
   }
 
   const activityIcon: Record<string, string> = { cert: '📜', insc: '✅', courr: '📬', warn: '⚠️' }
-  const activityColor: Record<string, string> = { cert: ACCENT, insc: '#00E676', courr: '#00BCD4', warn: '#FFD600' }
+  const activityColor: Record<string, string> = { cert: ACCENT, insc: '#22C55E', courr: '#16A34A', warn: '#FBBF24' }
 
   return (
     <div className="space-y-6 animate-fade-in pb-24 lg:pb-6">
@@ -72,7 +74,7 @@ export default function SecretaireDashboard() {
                   Bonjour, {user?.prenom} {user?.nom}
                 </h1>
                 <p className="text-base font-semibold mt-0.5" style={{ color: ACCENT }}>
-                  Secrétaire Général — Lycée Cheikh Anta Diop
+                  Secrétaire Général — {ecole?.nom ?? 'École'}
                 </p>
               </div>
             </div>
@@ -80,14 +82,15 @@ export default function SecretaireDashboard() {
               {new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
             </p>
           </div>
-          <div className="hidden lg:flex gap-2">
+          <div className="flex gap-2 shrink-0">
             <Link href="/secretaire/inscriptions"
-              className="px-5 py-2.5 rounded-xl text-sm font-bold transition-all hover:opacity-85"
+              className="px-3 py-2 lg:px-5 lg:py-2.5 rounded-xl text-xs lg:text-sm font-bold transition-all hover:opacity-85 min-h-[44px] flex items-center"
               style={{ background: `${ACCENT}22`, border: `1px solid ${ACCENT}45`, color: ACCENT }}>
-              + Inscription
+              <span className="hidden sm:inline">+ Inscription</span>
+              <span className="sm:hidden">+</span>
             </Link>
             <Link href="/secretaire/certificats"
-              className="px-5 py-2.5 rounded-xl text-sm font-bold text-white transition-all hover:opacity-85"
+              className="hidden lg:inline-flex px-5 py-2.5 rounded-xl text-sm font-bold text-white transition-all hover:opacity-85"
               style={{ background: ACCENT, boxShadow: `0 4px 20px ${ACCENT}50` }}>
               Émettre certificat
             </Link>
@@ -97,10 +100,10 @@ export default function SecretaireDashboard() {
 
       {/* StatCards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <StatCard title="Inscriptions" value={stats.inscriptions} subtitle="total année" icon="📝" color="orange" />
-        <StatCard title="Certificats émis" value={stats.certificats} subtitle="cette année" icon="📜" color="teal" />
-        <StatCard title="Dossiers incomplets" value={stats.dossiers} subtitle="à compléter" icon="⚠️" color="gold" trend={stats.dossiers > 0 ? 'up' : undefined} />
-        <StatCard title="Courrier en attente" value={stats.courrier} subtitle="à traiter" icon="📬" color="red" />
+        <StatCard title="Inscriptions" value={stats.inscriptions} subtitle="total année" icon="📝" color="orange" href="/secretaire/inscriptions" delay={0} />
+        <StatCard title="Certificats émis" value={stats.certificats} subtitle="cette année" icon="📜" color="teal" href="/secretaire/certificats" delay={80} />
+        <StatCard title="Dossiers incomplets" value={stats.dossiers} subtitle="à compléter" icon="⚠️" color="gold" trend={stats.dossiers > 0 ? 'up' : undefined} href="/secretaire/dossiers" delay={160} />
+        <StatCard title="Courrier en attente" value={stats.courrier} subtitle="à traiter" icon="📬" color="red" href="/secretaire/courrier" delay={240} />
       </div>
 
       {/* Grille principale */}
@@ -135,9 +138,9 @@ export default function SecretaireDashboard() {
           <div className="space-y-3">
             {[
               { href: '/secretaire/inscriptions', label: 'Gérer les inscriptions', icon: '📝', color: ACCENT },
-              { href: '/secretaire/certificats',  label: 'Émettre un certificat',  icon: '📜', color: '#00BCD4' },
-              { href: '/secretaire/dossiers',     label: 'Dossiers administratifs', icon: '🗂', color: '#FFD600' },
-              { href: '/secretaire/courrier',     label: 'Registre du courrier',   icon: '📬', color: '#00E676' },
+              { href: '/secretaire/certificats',  label: 'Émettre un certificat',  icon: '📜', color: '#16A34A' },
+              { href: '/secretaire/dossiers',     label: 'Dossiers administratifs', icon: '🗂', color: '#FBBF24' },
+              { href: '/secretaire/courrier',     label: 'Registre du courrier',   icon: '📬', color: '#22C55E' },
             ].map((action, i) => (
               <Link key={i} href={action.href}
                 className="flex items-center gap-3 p-4 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
@@ -153,3 +156,4 @@ export default function SecretaireDashboard() {
     </div>
   )
 }
+

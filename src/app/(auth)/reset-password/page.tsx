@@ -3,6 +3,7 @@
 import { useState, FormEvent } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { Mail } from 'lucide-react'
 
 export default function ResetPasswordPage() {
   const [email, setEmail] = useState('')
@@ -32,7 +33,7 @@ export default function ResetPasswordPage() {
   return (
     <>
       <div className="fixed top-0 left-0 right-0 h-1 flex z-50">
-        <div className="flex-1 bg-[#00853F]" />
+        <div className="flex-1 bg-gradient-to-br from-[#00853F] via-[#FDEF42] to-[#E31B23]" />
         <div className="flex-1 bg-[#FDEF42]" />
         <div className="flex-1 bg-[#E31B23]" />
       </div>
@@ -45,21 +46,21 @@ export default function ResetPasswordPage() {
               </div>
             </Link>
             <h1 className="text-2xl font-bold text-white">Mot de passe oublié</h1>
-            <p className="text-slate-400 text-sm mt-1">Entrez votre email pour recevoir un lien de réinitialisation</p>
+            <p className="text-white/50 text-sm mt-1">Entrez votre email pour recevoir un lien de réinitialisation</p>
           </div>
 
-          <div className="rounded-2xl p-6" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+          <div className="glass rounded-3xl p-6">
             {sent ? (
               <div className="text-center py-4">
-                <div className="text-4xl mb-4">📧</div>
-                <h3 className="text-lg font-bold text-[#00E676] mb-2">Email envoyé !</h3>
+                <div className="text-4xl mb-4"><Mail className="w-12 h-12 text-ss-green mx-auto mb-4" /></div>
+                <h3 className="text-lg font-bold text-[#22C55E] mb-2">Email envoyé !</h3>
                 <p className="text-white/50 text-sm mb-6">
                   Si un compte existe avec l'adresse <span className="text-white font-medium">{email}</span>,
                   vous recevrez un lien de réinitialisation.
                 </p>
                 <Link href="/login"
                   className="inline-flex px-6 py-3 rounded-xl font-bold text-sm text-[#020617] hover:scale-105 transition-transform"
-                  style={{ background: 'linear-gradient(135deg, #00E676, #00BCD4)' }}>
+                  style={{ background: 'linear-gradient(135deg, #22C55E, #16A34A)' }}>
                   Retour à la connexion
                 </Link>
               </div>
@@ -72,19 +73,19 @@ export default function ResetPasswordPage() {
                   </div>
                 )}
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1.5">Adresse email</label>
+                  <label className="block text-sm font-medium text-white/80 mb-1.5">Adresse email</label>
                   <input
                     type="email"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                     required
                     placeholder="admin@ecole.sn"
-                    className="w-full bg-[#0A0E27] border border-slate-600 text-white rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#00E676] focus:border-transparent placeholder:text-slate-500"
+                    className="w-full px-4 py-3 rounded-xl text-sm text-white bg-white/5 border border-white/10 placeholder:text-white/30 focus:outline-none focus:border-ss-green/50 focus:bg-white/10 transition-all"
                   />
                 </div>
                 <button type="submit" disabled={loading}
                   className="w-full py-3 rounded-xl font-bold text-sm text-[#020617] transition-all hover:opacity-90 disabled:opacity-50"
-                  style={{ background: 'linear-gradient(135deg, #00E676, #00BCD4)' }}>
+                  style={{ background: 'linear-gradient(135deg, #22C55E, #16A34A)' }}>
                   {loading ? 'Envoi en cours...' : 'Envoyer le lien de réinitialisation'}
                 </button>
               </form>
@@ -99,3 +100,4 @@ export default function ResetPasswordPage() {
     </>
   )
 }
+

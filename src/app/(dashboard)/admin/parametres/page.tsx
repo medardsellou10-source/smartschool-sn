@@ -1,10 +1,12 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { useEcole } from '@/hooks/useEcole'
 import { isDemoMode, DEMO_ECOLE } from '@/lib/demo-data'
+import { PageHeader } from '@/components/dashboard/PageHeader'
+import { Settings as SettingsIcon, CheckCircle2, XCircle } from 'lucide-react'
 
 interface Ecole {
   id: string
@@ -24,14 +26,14 @@ interface Ecole {
 }
 
 const COULEURS_PRESET = [
-  { label: 'Émeraude', value: '#00E676' },
-  { label: 'Rouge vif', value: '#FF1744' },
-  { label: 'Cyan', value: '#00E5FF' },
-  { label: 'Violet', value: '#D500F9' },
+  { label: 'Émeraude', value: '#22C55E' },
+  { label: 'Rouge vif', value: '#F87171' },
+  { label: 'Cyan', value: '#38BDF8' },
+  { label: 'Violet', value: '#A78BFA' },
   { label: 'Orange', value: '#FF6D00' },
-  { label: 'Teal', value: '#00BCD4' },
+  { label: 'Teal', value: '#16A34A' },
   { label: 'Indigo', value: '#3D5AFE' },
-  { label: 'Ambre', value: '#FFD600' },
+  { label: 'Ambre', value: '#FBBF24' },
   { label: 'Rose', value: '#F50057' },
   { label: 'Vert forêt', value: '#00853F' },
 ]
@@ -53,7 +55,7 @@ export default function ParametresPage() {
   const [brandingForm, setBrandingForm] = useState({
     logo_url: '',
     slogan: '',
-    couleur_primaire: '#00E676',
+    couleur_primaire: '#22C55E',
     image_hero_url: '',
   })
   const [savingBranding, setSavingBranding] = useState(false)
@@ -84,7 +86,7 @@ export default function ParametresPage() {
         actif: DEMO_ECOLE.actif,
         logo_url: DEMO_ECOLE.logo_url,
         slogan: 'Excellence, Discipline, Réussite',
-        couleur_primaire: '#00E676',
+        couleur_primaire: '#22C55E',
         image_hero_url: null,
       }
       setEcole(e)
@@ -105,7 +107,7 @@ export default function ParametresPage() {
       .single()
 
     if (data) {
-      const e = { ...data, couleur_primaire: data.couleur_primaire || '#00E676' } as Ecole
+      const e = { ...data, couleur_primaire: data.couleur_primaire || '#22C55E' } as Ecole
       setEcole(e)
       setEcoleForm({ nom: e.nom, region: e.region, ville: e.ville, rayon_pointage_m: e.rayon_pointage_m })
       setBrandingForm({
@@ -244,25 +246,25 @@ export default function ParametresPage() {
 
   return (
     <div className="space-y-6 animate-fade-in pb-6">
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-2xl font-black text-white">Paramètres</h1>
-        {demo && (
-          <span className="text-xs font-bold px-3 py-1.5 rounded-lg"
-            style={{ background: 'rgba(255,214,0,0.1)', color: '#FFD600', border: '1px solid rgba(255,214,0,0.2)' }}>
-            Mode démo
-          </span>
-        )}
-      </div>
+      <PageHeader
+        title="Paramètres"
+        description="Configurez votre école, branding et préférences."
+        icon={SettingsIcon}
+        accent="neutral"
+        badge={demo ? 'Mode démo' : undefined}
+      />
 
       {/* Status banner */}
       {saveStatus && (
         <div className="flex items-center gap-3 p-4 rounded-xl animate-fade-in"
           style={{
-            background: saveStatus.type === 'success' ? 'rgba(0,230,118,0.08)' : 'rgba(255,23,68,0.08)',
-            border: `1px solid ${saveStatus.type === 'success' ? 'rgba(0,230,118,0.2)' : 'rgba(255,23,68,0.2)'}`,
+            background: saveStatus.type === 'success' ? 'rgba(34,197,94,0.08)' : 'rgba(248,113,113,0.08)',
+            border: `1px solid ${saveStatus.type === 'success' ? 'rgba(34,197,94,0.2)' : 'rgba(248,113,113,0.2)'}`,
           }}>
-          <span className="text-lg">{saveStatus.type === 'success' ? '✅' : '❌'}</span>
-          <p className="text-sm font-semibold" style={{ color: saveStatus.type === 'success' ? '#00E676' : '#FF1744' }}>
+          {saveStatus.type === 'success'
+            ? <CheckCircle2 size={18} className="text-ss-green shrink-0" />
+            : <XCircle size={18} className="text-ss-danger shrink-0" />}
+          <p className="text-sm font-semibold" style={{ color: saveStatus.type === 'success' ? '#22C55E' : '#F87171' }}>
             {saveStatus.message}
           </p>
         </div>
@@ -479,7 +481,7 @@ export default function ParametresPage() {
           {!editingEcole ? (
             <button onClick={() => setEditingEcole(true)}
               className="text-xs font-bold px-3 py-1.5 rounded-lg transition-all hover:opacity-90"
-              style={{ background: 'rgba(255,23,68,0.1)', color: '#FF1744', border: '1px solid rgba(255,23,68,0.2)' }}>
+              style={{ background: 'rgba(255,23,68,0.1)', color: '#F87171', border: '1px solid rgba(255,23,68,0.2)' }}>
               Modifier
             </button>
           ) : (
@@ -491,7 +493,7 @@ export default function ParametresPage() {
               </button>
               <button onClick={handleSaveEcole}
                 className="text-xs font-bold px-4 py-1.5 rounded-lg transition-all hover:opacity-90"
-                style={{ background: '#FF1744', color: '#fff' }}>
+                style={{ background: '#F87171', color: '#fff' }}>
                 Enregistrer
               </button>
             </div>
@@ -513,7 +515,7 @@ export default function ParametresPage() {
             <InfoField label="Expiration du plan"
               value={new Date(ecole.date_expiration).toLocaleDateString('fr-SN', { day: 'numeric', month: 'long', year: 'numeric' })} />
             <InfoField label="Statut" value={ecole.actif ? 'Actif' : 'Inactif'}
-              valueColor={ecole.actif ? '#00E676' : '#FF1744'} />
+              valueColor={ecole.actif ? '#22C55E' : '#F87171'} />
           </div>
         ) : (
           <p className="text-sm" style={{ color: '#94A3B8' }}>Aucune information disponible</p>
@@ -527,7 +529,7 @@ export default function ParametresPage() {
           {!editingUser ? (
             <button onClick={() => setEditingUser(true)}
               className="text-xs font-bold px-3 py-1.5 rounded-lg transition-all hover:opacity-90"
-              style={{ background: 'rgba(255,23,68,0.1)', color: '#FF1744', border: '1px solid rgba(255,23,68,0.2)' }}>
+              style={{ background: 'rgba(255,23,68,0.1)', color: '#F87171', border: '1px solid rgba(255,23,68,0.2)' }}>
               Modifier
             </button>
           ) : (
@@ -539,7 +541,7 @@ export default function ParametresPage() {
               </button>
               <button onClick={handleSaveUser}
                 className="text-xs font-bold px-4 py-1.5 rounded-lg transition-all hover:opacity-90"
-                style={{ background: '#FF1744', color: '#fff' }}>
+                style={{ background: '#F87171', color: '#fff' }}>
                 Enregistrer
               </button>
             </div>
@@ -555,7 +557,7 @@ export default function ParametresPage() {
               editing={editingUser} onChange={v => setUserForm(f => ({ ...f, telephone: v }))} />
             <InfoField label="Rôle" value={formatRole(user.role)} />
             <InfoField label="Statut du compte" value={user.actif ? 'Actif' : 'Inactif'}
-              valueColor={user.actif ? '#00E676' : '#FF1744'} />
+              valueColor={user.actif ? '#22C55E' : '#F87171'} />
             <InfoField label="Membre depuis"
               value={new Date(user.created_at).toLocaleDateString('fr-SN', { day: 'numeric', month: 'long', year: 'numeric' })} />
           </div>
@@ -573,7 +575,7 @@ export default function ParametresPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <InfoField label="Version" value="2.0.0" />
           <InfoField label="Mode" value={demo ? 'Démonstration' : 'Production'}
-            valueColor={demo ? '#FFD600' : '#00E676'} />
+            valueColor={demo ? '#FBBF24' : '#22C55E'} />
         </div>
       </div>
     </div>
@@ -670,9 +672,9 @@ const ALERT_CONFIGS: AlertConfig[] = [
 ]
 
 const CATEGORY_LABELS: Record<string, { label: string; color: string; desc: string }> = {
-  security: { label: '🔒 Sécurité', color: '#FF1744', desc: 'Alertes instantanées — la sécurité prime' },
-  pedagogy: { label: '🎓 Pédagogique', color: '#00E5FF', desc: 'Respectent le temps de l\'apprentissage' },
-  finance:  { label: '💰 Finance', color: '#00E676', desc: 'Relances éthiques avec Pause Empathique' },
+  security: { label: '🔒 Sécurité', color: '#F87171', desc: 'Alertes instantanées — la sécurité prime' },
+  pedagogy: { label: '🎓 Pédagogique', color: '#38BDF8', desc: 'Respectent le temps de l\'apprentissage' },
+  finance:  { label: '💰 Finance', color: '#22C55E', desc: 'Relances éthiques avec Pause Empathique' },
 }
 
 function AlertesDelaiHumain({ demo, showStatus }: { demo: boolean; showStatus: (t: 'success' | 'error', m: string) => void }) {
@@ -716,7 +718,7 @@ function AlertesDelaiHumain({ demo, showStatus }: { demo: boolean; showStatus: (
               <span className="text-lg">🔔</span>
               <h2 className="text-base font-bold text-white">Alertes & Notifications</h2>
               <span className="text-[9px] font-bold px-2 py-0.5 rounded-full"
-                style={{ background: 'rgba(0,229,255,0.15)', color: '#00E5FF', border: '1px solid rgba(0,229,255,0.3)' }}>
+                style={{ background: 'rgba(0,229,255,0.15)', color: '#38BDF8', border: '1px solid rgba(0,229,255,0.3)' }}>
                 DÉLAI HUMAIN
               </span>
             </div>
@@ -726,7 +728,7 @@ function AlertesDelaiHumain({ demo, showStatus }: { demo: boolean; showStatus: (
           </div>
           <button onClick={handleSave} disabled={saving}
             className="flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all hover:opacity-90 disabled:opacity-50"
-            style={{ background: '#00E5FF', color: '#020617' }}>
+            style={{ background: '#38BDF8', color: '#020617' }}>
             {saving ? (
               <><span className="w-3.5 h-3.5 border-2 border-[#020617]/30 border-t-[#020617] rounded-full animate-spin" />Sauvegarde…</>
             ) : (
@@ -795,7 +797,7 @@ function AlertesDelaiHumain({ demo, showStatus }: { demo: boolean; showStatus: (
                     )}
                     {alertTimings[alert.id] === alert.defaultValue && (
                       <span className="text-[9px] font-medium px-1.5 py-0.5 rounded"
-                        style={{ background: 'rgba(0,230,118,0.1)', color: '#00E676' }}>
+                        style={{ background: 'rgba(0,230,118,0.1)', color: '#22C55E' }}>
                         recommandé
                       </span>
                     )}
@@ -844,7 +846,7 @@ function EditableField({ label, value, editing, onChange, type = 'text' }: {
     <div className="space-y-1">
       <p className="text-xs uppercase tracking-wider" style={{ color: '#94A3B8' }}>{label}</p>
       <input type={type} value={value} onChange={e => onChange(e.target.value)}
-        className="w-full px-3 py-2 rounded-lg text-sm font-medium text-white outline-none transition-all focus:border-[#FF1744]"
+        className="w-full px-3 py-2 rounded-lg text-sm font-medium text-white outline-none transition-all focus:border-[#F87171]"
         style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }} />
     </div>
   )
@@ -872,3 +874,4 @@ function formatRole(role: string): string {
   }
   return roles[role] || role
 }
+

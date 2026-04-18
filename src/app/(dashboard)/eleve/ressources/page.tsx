@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useMemo } from 'react'
 import { useUser } from '@/hooks/useUser'
@@ -10,6 +10,7 @@ import {
 } from '@/lib/curriculum-senegal'
 import { ANNALES, type AnnaleDoc } from '@/lib/annales-sn'
 import { CONTENU_NATIF } from '@/lib/contenu-pedagogique'
+import { PHET_SIMULATIONS, type PhetSimulation, PHET_STATS } from '@/lib/phet-simulations'
 import { toast } from 'react-hot-toast'
 
 const TYPE_META: Record<RessourceEnLigne['type'], { icon: string; label: string; color: string; description: string }> = {
@@ -30,7 +31,13 @@ export default function RessourcesElevePage() {
   const [selectedNiveau, setSelectedNiveau] = useState<string>('Terminale')
   const [selectedSerie, setSelectedSerie] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState('')
-  const [activeSection, setActiveSection] = useState<'catalogue' | 'programme'>('catalogue')
+  const [activeSection, setActiveSection] = useState<'catalogue' | 'phet' | 'programme'>('catalogue')
+
+  // ── Filtres PhET ──
+  const [phetNiveau, setPhetNiveau] = useState<string>('Terminale')
+  const [phetMatiere, setPhetMatiere] = useState<string>('all')
+  const [phetSearch, setPhetSearch] = useState('')
+  const [phetDifficulte, setPhetDifficulte] = useState<string>('all')
 
   const filteredRessources = useMemo(() => {
     return RESSOURCES_EN_LIGNE.filter(r => {
@@ -101,7 +108,7 @@ export default function RessourcesElevePage() {
 
   function ouvrirFiche(res: RessourceEnLigne) {
     const meta = TYPE_META[res.type]
-    const color = meta?.color || '#D500F9'
+    const color = meta?.color || '#A78BFA'
     const pts = res.description.split(' — ').map((s: string) => `<li>${s.trim()}</li>`).join('')
     const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">
 <title>${res.titre}</title>
@@ -181,22 +188,22 @@ export default function RessourcesElevePage() {
 <title>Quiz — ${res.titre}</title>
 <style>
   *{box-sizing:border-box}body{font-family:'Segoe UI',Arial,sans-serif;max-width:700px;margin:0 auto;padding:24px;color:#1a1a2e;background:#f8f9ff}
-  h1{font-size:1.2em;color:#1a3a5c;border-bottom:3px solid #D500F9;padding-bottom:8px}
+  h1{font-size:1.2em;color:#1a3a5c;border-bottom:3px solid #A78BFA;padding-bottom:8px}
   .badge{display:inline-block;padding:3px 10px;border-radius:10px;font-size:0.78em;font-weight:700;background:#ede7f6;color:#512da8;margin-right:8px}
   .question{background:#fff;border-radius:12px;padding:16px 20px;margin:16px 0;box-shadow:0 2px 8px rgba(0,0,0,0.07);border:2px solid transparent}
   .q-num{font-size:0.78em;color:#9575cd;font-weight:700;margin-bottom:6px}
   .q-text{font-weight:600;margin-bottom:12px;font-size:0.95em;line-height:1.5}
   .choices{display:grid;grid-template-columns:1fr 1fr;gap:8px}
   .choice{padding:8px 12px;border-radius:8px;border:1.5px solid #e0e0e0;cursor:pointer;font-size:0.88em;background:#f9f9f9;transition:all .15s;text-align:left}
-  .choice:hover:not(:disabled){border-color:#D500F9;background:#fce4ec}
+  .choice:hover:not(:disabled){border-color:#A78BFA;background:#fce4ec}
   .selected-correct{background:#c8e6c9!important;border-color:#43a047!important;color:#1b5e20;font-weight:700}
   .selected-wrong{background:#ffcdd2!important;border-color:#e53935!important;color:#b71c1c;font-weight:700}
   .reveal-correct{background:#c8e6c9!important;border-color:#43a047!important}
   .feedback{font-size:0.82em;margin-top:8px;font-weight:600}
   .feedback.ok{color:#2e7d32}.feedback.ko{color:#c62828}
   #score-box{display:none;text-align:center;background:#fff;border-radius:16px;padding:24px;margin-top:20px;box-shadow:0 4px 16px rgba(0,0,0,0.1)}
-  .score-big{font-size:3em;font-weight:700;color:#D500F9}
-  .btn{background:#D500F9;color:#fff;border:none;padding:10px 24px;border-radius:8px;cursor:pointer;font-size:0.92em;font-weight:700;margin-top:16px}
+  .score-big{font-size:3em;font-weight:700;color:#A78BFA}
+  .btn{background:#A78BFA;color:#fff;border:none;padding:10px 24px;border-radius:8px;cursor:pointer;font-size:0.92em;font-weight:700;margin-top:16px}
 </style></head><body>
 <h1>📊 ${res.titre}</h1>
 <p style="font-size:0.85em;color:#666"><span class="badge">${res.matiere}</span><span class="badge">${res.niveau}${res.serie ? ' ' + res.serie : ''}</span>${questions.length} questions — cliquez sur la bonne réponse</p>
@@ -323,6 +330,54 @@ function answer(qi,ci){
     else toast.error('Cette ressource sera disponible très prochainement.')
   }
 
+  // ── Simulations PhET filtrées ──
+  const filteredPhet = useMemo(() => {
+    return PHET_SIMULATIONS.filter(s => {
+      if (phetNiveau !== 'all' && !s.niveaux.some(n => n.includes(phetNiveau))) return false
+      if (phetMatiere !== 'all' && s.matiere !== phetMatiere) return false
+      if (phetDifficulte !== 'all' && s.difficulte !== phetDifficulte) return false
+      if (phetSearch) {
+        const q = phetSearch.toLowerCase()
+        return s.titre.toLowerCase().includes(q) || s.description.toLowerCase().includes(q) || s.themes.some(t => t.toLowerCase().includes(q))
+      }
+      return true
+    })
+  }, [phetNiveau, phetMatiere, phetSearch, phetDifficulte])
+
+  function ouvrirPhet(sim: PhetSimulation) {
+    const DIFF_LABEL: Record<string, string> = { decouverte: 'Découverte', intermediaire: 'Intermédiaire', avance: 'Avancé' }
+    const DIFF_COLOR: Record<string, string> = { decouverte: '#22C55E', intermediaire: '#FBBF24', avance: '#F87171' }
+    const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">
+<title>TP Virtuel — ${sim.titre}</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#020617;font-family:'Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+  .topbar{display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(2,6,23,0.95);border-bottom:1px solid rgba(255,255,255,0.1);flex-shrink:0}
+  .title{color:#fff;font-size:0.95em;font-weight:700;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .badge{padding:3px 10px;border-radius:10px;font-size:0.75em;font-weight:700;background:rgba(255,255,255,0.08);color:#94A3B8;white-space:nowrap}
+  .badge-diff{padding:3px 10px;border-radius:10px;font-size:0.75em;font-weight:700;background:${DIFF_COLOR[sim.difficulte]}20;color:${DIFF_COLOR[sim.difficulte]};white-space:nowrap}
+  .btn{padding:6px 14px;border-radius:8px;font-size:0.8em;font-weight:700;border:none;cursor:pointer;background:rgba(255,255,255,0.08);color:#CBD5E1;transition:background .15s;white-space:nowrap}
+  .btn:hover{background:rgba(255,255,255,0.15)}
+  iframe{flex:1;border:none;width:100%;display:block}
+  .themes{display:flex;gap:6px;flex-wrap:wrap;padding:8px 16px;background:rgba(2,6,23,0.9);border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0}
+  .theme-tag{padding:2px 8px;border-radius:6px;font-size:0.7em;font-weight:600;background:rgba(167,139,250,0.1);color:#A78BFA}
+</style></head><body>
+<div class="topbar">
+  <div class="title">🔬 ${sim.titre}</div>
+  <span class="badge">${sim.matiere}</span>
+  <span class="badge-diff">${DIFF_LABEL[sim.difficulte]}</span>
+  <button class="btn" onclick="window.open('${sim.embedUrl}','_blank')">↗ Plein écran</button>
+  <button class="btn" onclick="window.open('https://phet.colorado.edu/fr/simulations','_blank')">Tous les TP</button>
+</div>
+<div class="themes">${sim.themes.map(t => `<span class="theme-tag">${t}</span>`).join('')}</div>
+<iframe src="${sim.embedUrl}" title="${sim.titre}" allow="fullscreen" loading="lazy"></iframe>
+</body></html>`
+    const win = window.open('', '_blank', 'width=1100,height=740')
+    if (!win) { toast.error('Autorisez les popups pour lancer le TP.'); return }
+    win.document.write(html)
+    win.document.close()
+  }
+
   if (userLoading) {
     return <div className="space-y-4">{[...Array(4)].map((_, i) => <div key={i} className="h-28 rounded-2xl ss-shimmer" style={{ background: 'rgba(255,255,255,0.03)' }} />)}</div>
   }
@@ -336,7 +391,7 @@ function answer(qi,ci){
         <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(213,0,249,0.3) 0%, transparent 50%), radial-gradient(circle at 80% 50%, rgba(0,229,255,0.3) 0%, transparent 50%)' }} />
         <div className="relative px-6 py-6">
           <div className="flex items-center gap-2 mb-1">
-            <div className="w-2 h-2 rounded-full bg-[#D500F9] animate-pulse" />
+            <div className="w-2 h-2 rounded-full bg-[#A78BFA] animate-pulse" />
             <span className="text-[#94A3B8] text-xs font-semibold tracking-wider uppercase">Espace Ressources</span>
           </div>
           <h1 className="text-2xl font-black text-white">Ressources en Ligne</h1>
@@ -369,14 +424,15 @@ function answer(qi,ci){
         </div>
       </div>
 
-      {/* ── Toggle Catalogue / Programme ── */}
-      <div className="flex gap-2 p-1 rounded-xl" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+      {/* ── Toggle Catalogue / TP PhET / Programme ── */}
+      <div className="flex gap-1 p-1 rounded-xl" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
         {[
           { key: 'catalogue', label: '📚 Ressources' },
-          { key: 'programme', label: '📖 Mon Programme' },
+          { key: 'phet',      label: `🔬 TP Virtuels (${PHET_STATS.total})` },
+          { key: 'programme', label: '📖 Programme' },
         ].map(tab => (
           <button key={tab.key} onClick={() => setActiveSection(tab.key as any)}
-            className="flex-1 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200"
+            className="flex-1 px-3 py-2 rounded-lg text-xs font-semibold transition-all duration-200 whitespace-nowrap"
             style={activeSection === tab.key
               ? { background: '#3B82F6', color: '#fff' }
               : { color: '#94A3B8' }}>
@@ -419,7 +475,7 @@ function answer(qi,ci){
               {filteredRessources.length} ressource{filteredRessources.length > 1 ? 's' : ''} trouvee{filteredRessources.length > 1 ? 's' : ''}
             </p>
             {selectedType !== 'all' && (
-              <button onClick={() => setSelectedType('all')} className="text-xs font-bold text-[#D500F9] hover:underline">
+              <button onClick={() => setSelectedType('all')} className="text-xs font-bold text-[#A78BFA] hover:underline">
                 Effacer les filtres
               </button>
             )}
@@ -499,6 +555,158 @@ function answer(qi,ci){
               <p className="text-[#94A3B8] text-sm font-semibold">Aucune ressource trouvee</p>
               <p className="text-[#475569] text-xs mt-1">Essayez de modifier vos filtres ou votre recherche.</p>
             </div>
+          )}
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════════════ */}
+      {/* SECTION: TP Virtuels PhET — simulations interactives     */}
+      {/* ══════════════════════════════════════════════════════════ */}
+      {activeSection === 'phet' && (
+        <div className="space-y-4">
+          {/* Bannière PhET */}
+          <div className="rounded-2xl p-5 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(61,90,254,0.15) 0%, rgba(0,229,255,0.08) 100%)', border: '1px solid rgba(61,90,254,0.3)' }}>
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0" style={{ background: 'rgba(61,90,254,0.2)', border: '1px solid rgba(61,90,254,0.4)' }}>🔬</div>
+              <div>
+                <h2 className="text-base font-bold text-white">PhET Interactive Simulations</h2>
+                <p className="text-sm mt-0.5" style={{ color: '#94A3B8' }}>
+                  {PHET_STATS.total} simulations scientifiques — University of Colorado · Licence CC BY 4.0
+                </p>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {Object.entries(PHET_STATS.parMatiere).map(([m, n]) => (
+                    <span key={m} className="text-[11px] px-2 py-0.5 rounded-full font-semibold" style={{ background: 'rgba(255,255,255,0.07)', color: '#CBD5E1' }}>
+                      {m} ({n})
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Filtres PhET */}
+          <div className="flex flex-wrap gap-2">
+            <input type="text" placeholder="Rechercher une simulation..."
+              value={phetSearch} onChange={e => setPhetSearch(e.target.value)}
+              className="flex-1 min-w-[180px] px-4 py-2.5 rounded-xl text-sm text-white placeholder-[#475569]"
+              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', outline: 'none' }} />
+            {/* Niveau */}
+            <select value={phetNiveau} onChange={e => setPhetNiveau(e.target.value)}
+              className="px-3 py-2.5 rounded-xl text-sm text-[#CBD5E1]"
+              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', outline: 'none' }}>
+              <option value="all">Tous niveaux</option>
+              <option value="3e">Classe de 3e</option>
+              <option value="2nde">2nde</option>
+              <option value="1ère">1ère</option>
+              <option value="Terminale">Terminale (S1/S2/L1/L2)</option>
+            </select>
+            {/* Matière */}
+            <select value={phetMatiere} onChange={e => setPhetMatiere(e.target.value)}
+              className="px-3 py-2.5 rounded-xl text-sm text-[#CBD5E1]"
+              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', outline: 'none' }}>
+              <option value="all">Toutes matières</option>
+              <option value="Mathématiques">Mathématiques</option>
+              <option value="Physique">Physique</option>
+              <option value="Chimie">Chimie</option>
+              <option value="SVT">SVT / Biologie</option>
+            </select>
+            {/* Difficulté */}
+            <select value={phetDifficulte} onChange={e => setPhetDifficulte(e.target.value)}
+              className="px-3 py-2.5 rounded-xl text-sm text-[#CBD5E1]"
+              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', outline: 'none' }}>
+              <option value="all">Toutes difficultés</option>
+              <option value="decouverte">Découverte</option>
+              <option value="intermediaire">Intermédiaire</option>
+              <option value="avance">Avancé</option>
+            </select>
+          </div>
+
+          {/* Résultat count */}
+          <p className="text-sm font-semibold text-[#94A3B8] px-1">
+            {filteredPhet.length} simulation{filteredPhet.length > 1 ? 's' : ''} trouvée{filteredPhet.length > 1 ? 's' : ''}
+          </p>
+
+          {/* Grille simulations */}
+          {filteredPhet.length === 0 ? (
+            <div className="rounded-2xl p-12 text-center" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+              <p className="text-[#94A3B8] text-sm font-semibold">Aucune simulation pour ces filtres</p>
+              <button onClick={() => { setPhetNiveau('all'); setPhetMatiere('all'); setPhetSearch('') }}
+                className="text-xs font-bold text-[#A78BFA] hover:underline mt-2">
+                Réinitialiser
+              </button>
+            </div>
+          ) : (
+            (() => {
+              // Grouper par matière
+              const matieres = ['Mathématiques', 'Physique', 'Chimie', 'SVT'] as const
+              const MATIERE_COLOR: Record<string, string> = {
+                Mathématiques: '#3D5AFE', Physique: '#00BCD4', Chimie: '#FF6D00', SVT: '#22C55E'
+              }
+              const DIFF_LABEL: Record<string, string> = { decouverte: 'Découverte', intermediaire: 'Intermédiaire', avance: 'Avancé' }
+              const DIFF_COLOR: Record<string, string> = { decouverte: '#22C55E', intermediaire: '#FBBF24', avance: '#F87171' }
+              return matieres.map(mat => {
+                const sims = filteredPhet.filter(s => s.matiere === mat)
+                if (sims.length === 0) return null
+                const mc = MATIERE_COLOR[mat]
+                return (
+                  <div key={mat} className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid ${mc}25` }}>
+                    <div className="flex items-center gap-3 mb-4 pb-3" style={{ borderBottom: `1px solid ${mc}20` }}>
+                      <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm shrink-0" style={{ background: `${mc}20`, color: mc, fontWeight: 700 }}>
+                        {mat === 'Mathématiques' ? 'π' : mat === 'Physique' ? '⚡' : mat === 'Chimie' ? '⚗' : '🌿'}
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-bold text-white">{mat}</h3>
+                        <p className="text-xs" style={{ color: '#64748B' }}>{sims.length} simulation{sims.length > 1 ? 's' : ''}</p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {sims.map(sim => (
+                        <div key={sim.id} className="rounded-xl p-4 flex flex-col gap-3 transition-all duration-200"
+                          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                          <div>
+                            <div className="flex items-start justify-between gap-2 mb-1">
+                              <h4 className="text-sm font-semibold text-white leading-snug">{sim.titre}</h4>
+                              <span className="text-[10px] px-2 py-0.5 rounded-full font-bold shrink-0"
+                                style={{ background: `${DIFF_COLOR[sim.difficulte]}15`, color: DIFF_COLOR[sim.difficulte] }}>
+                                {DIFF_LABEL[sim.difficulte]}
+                              </span>
+                            </div>
+                            <p className="text-xs text-[#94A3B8] line-clamp-2 mt-1">{sim.description}</p>
+                            <div className="flex flex-wrap gap-1 mt-2">
+                              {sim.themes.slice(0, 3).map(t => (
+                                <span key={t} className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: `${mc}10`, color: mc }}>
+                                  {t}
+                                </span>
+                              ))}
+                            </div>
+                            <div className="flex flex-wrap gap-1 mt-1.5">
+                              {sim.niveaux.slice(0, 3).map(n => (
+                                <span key={n} className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-[#64748B]">{n}</span>
+                              ))}
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => ouvrirPhet(sim)}
+                              className="flex-1 py-2 rounded-lg text-xs font-bold transition-all hover:opacity-90 active:scale-95 text-white"
+                              style={{ background: mc }}>
+                              ▶ Lancer le TP
+                            </button>
+                            <button
+                              onClick={() => window.open(sim.embedUrl, '_blank', 'noopener,noreferrer')}
+                              className="px-3 py-2 rounded-lg text-xs font-bold hover:opacity-90 active:scale-95"
+                              style={{ background: 'rgba(255,255,255,0.06)', color: '#94A3B8', border: '1px solid rgba(255,255,255,0.1)' }}
+                              title="Ouvrir en plein écran">
+                              ↗
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })
+            })()
           )}
         </div>
       )}
@@ -607,3 +815,4 @@ function answer(qi,ci){
     </div>
   )
 }
+

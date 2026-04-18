@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useMemo, useCallback, useEffect } from 'react'
 import { useUser } from '@/hooks/useUser'
@@ -381,7 +381,7 @@ export default function AbsencesPage() {
                           <button
                             onClick={() => handleNotifierTous(appel)}
                             className="w-full py-3 rounded-xl font-bold text-sm min-h-[48px] text-white transition-all"
-                            style={{ background: 'linear-gradient(135deg, #7C4DFF, #00BCD4)' }}
+                            style={{ background: 'linear-gradient(135deg, #7C4DFF, #16A34A)' }}
                           >
                             Notifier tous les parents ({nonNotifies.length})
                           </button>
@@ -512,3 +512,4 @@ export default function AbsencesPage() {
     </div>
   )
 }
+

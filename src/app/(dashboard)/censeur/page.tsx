@@ -1,16 +1,29 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState } from 'react'
 import { useUser } from '@/hooks/useUser'
+import { useEcole } from '@/hooks/useEcole'
 import { StatCard } from '@/components/dashboard/StatCard'
 import Link from 'next/link'
 import { isDemoMode, DEMO_PROFESSEURS, DEMO_POINTAGES, DEMO_EXAMENS, DEMO_BULLETINS_CENSEUR } from '@/lib/demo-data'
+import { GraduationCap, BookOpen, FileCheck2, CheckCircle2, ClipboardList, CalendarDays, Zap, Award, Trophy, ChevronRight } from 'lucide-react'
 
-const ACCENT = '#3D5AFE'
+// Accent indigo clair (contraste renforcé WCAG AA)
+const ACCENT = '#818CF8'
 const CARD = { background: 'rgba(2,6,23,0.80)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.10)' }
+
+// Détermination dynamique du trimestre courant (approximation)
+function getTrimestreActuel(): 'T1' | 'T2' | 'T3' {
+  const m = new Date().getMonth() + 1 // 1-12
+  if (m >= 10 || m <= 12) return 'T1' // oct-déc
+  if (m >= 1 && m <= 3) return 'T2'   // jan-mars
+  return 'T3'                          // avr-juin
+}
 
 export default function CenseurDashboard() {
   const { user, loading: userLoading } = useUser()
+  const { ecole } = useEcole()
+  const trimestre = getTrimestreActuel()
   const [stats, setStats] = useState({ profsPresents: 0, coursEnCours: 0, examens: 0, bulletins: 0 })
   const [loading, setLoading] = useState(true)
 
@@ -57,16 +70,17 @@ export default function CenseurDashboard() {
         <div className="relative z-10 p-6 lg:p-8 flex items-center justify-between">
           <div>
             <div className="flex items-center gap-4 mb-3">
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl"
-                style={{ background: `${ACCENT}25`, border: `1.5px solid ${ACCENT}50` }}>
-                📚
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center"
+                style={{ background: `${ACCENT}25`, border: `1.5px solid ${ACCENT}50` }}
+                aria-hidden="true">
+                <GraduationCap size={28} style={{ color: ACCENT }} />
               </div>
               <div>
                 <h1 className="text-xl sm:text-2xl font-extrabold text-white">
                   Bonjour, {user?.prenom} {user?.nom}
                 </h1>
                 <p className="text-base font-semibold mt-0.5" style={{ color: ACCENT }}>
-                  Censeur — Lycée Cheikh Anta Diop
+                  Censeur — {ecole?.nom ?? 'École'}
                 </p>
               </div>
             </div>
@@ -91,10 +105,10 @@ export default function CenseurDashboard() {
 
       {/* StatCards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <StatCard title="Profs présents" value={`${stats.profsPresents}/${DEMO_PROFESSEURS.length}`} subtitle="aujourd'hui" icon="👨‍🏫" color="indigo" />
-        <StatCard title="Cours en cours" value={stats.coursEnCours} subtitle="en ce moment" icon="📖" color="green" />
-        <StatCard title="Examens prévus" value={stats.examens} subtitle="à venir / en cours" icon="📝" color="gold" />
-        <StatCard title="Bulletins validés" value={`${stats.bulletins}%`} subtitle="taux de validation T2" icon="✅" color="cyan" />
+        <StatCard title="Profs présents" value={`${stats.profsPresents}/${DEMO_PROFESSEURS.length}`} subtitle="aujourd'hui" icon={GraduationCap} color="indigo" href="/censeur/professeurs" delay={0} />
+        <StatCard title="Cours en cours" value={stats.coursEnCours} subtitle="en ce moment" icon={BookOpen} color="green" href="/censeur/emplois-temps" delay={80} />
+        <StatCard title="Examens prévus" value={stats.examens} subtitle="à venir / en cours" icon={FileCheck2} color="gold" href="/censeur/examens" delay={160} />
+        <StatCard title="Bulletins validés" value={`${stats.bulletins}%`} subtitle={`taux de validation ${trimestre}`} icon={CheckCircle2} color="cyan" href="/censeur/bulletins" delay={240} />
       </div>
 
       {/* Grille */}
@@ -103,21 +117,23 @@ export default function CenseurDashboard() {
         {/* Examens */}
         <div className="xl:col-span-2 rounded-2xl p-6" style={CARD}>
           <h2 className="text-lg font-bold text-white mb-5 flex items-center gap-2">
-            <span style={{ color: ACCENT }}>📝</span> Examens & Épreuves
+            <FileCheck2 size={18} style={{ color: ACCENT }} aria-hidden="true" /> Examens & Épreuves
           </h2>
           <div className="space-y-3">
             {DEMO_EXAMENS.map(exam => {
               const statusStyle = exam.statut === 'en_cours'
-                ? { bg: 'rgba(0,230,118,0.15)', color: '#00E676', label: 'En cours' }
+                ? { bg: 'rgba(34,197,94,0.15)', color: '#22C55E', label: 'En cours' }
                 : exam.statut === 'planifie'
-                ? { bg: `rgba(61,90,254,0.18)`, color: ACCENT, label: 'Planifié' }
+                ? { bg: `rgba(129,140,248,0.18)`, color: ACCENT, label: 'Planifié' }
                 : { bg: 'rgba(100,116,139,0.15)', color: '#94A3B8', label: 'Terminé' }
               return (
-                <div key={exam.id} className="flex items-start gap-3 p-4 rounded-xl"
+                <Link key={exam.id} href="/censeur/examens"
+                  className="flex items-start gap-3 p-4 rounded-xl transition-all hover:-translate-y-0.5 hover:shadow-md"
                   style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
-                  <div className="w-11 h-11 rounded-xl flex items-center justify-center text-xl shrink-0"
-                    style={{ background: `${statusStyle.color}18` }}>
-                    {exam.type === 'bfem' ? '🎓' : exam.type === 'bac' ? '🏆' : '📋'}
+                  <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
+                    style={{ background: `${statusStyle.color}18` }}
+                    aria-hidden="true">
+                    {exam.type === 'bfem' ? <Award size={20} style={{ color: statusStyle.color }} /> : exam.type === 'bac' ? <Trophy size={20} style={{ color: statusStyle.color }} /> : <ClipboardList size={20} style={{ color: statusStyle.color }} />}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
@@ -129,7 +145,7 @@ export default function CenseurDashboard() {
                       {exam.salle} · {new Date(exam.date_debut).toLocaleDateString('fr-FR')} → {new Date(exam.date_fin).toLocaleDateString('fr-FR')}
                     </p>
                   </div>
-                </div>
+                </Link>
               )
             })}
           </div>
@@ -138,41 +154,56 @@ export default function CenseurDashboard() {
         {/* Navigation rapide */}
         <div className="rounded-2xl p-6" style={CARD}>
           <h2 className="text-lg font-bold text-white mb-5 flex items-center gap-2">
-            <span style={{ color: ACCENT }}>⚡</span> Navigation rapide
+            <Zap size={18} style={{ color: ACCENT }} aria-hidden="true" /> Navigation rapide
           </h2>
           <div className="space-y-3">
             {[
-              { href: '/censeur/professeurs',   label: 'Pointage professeurs', icon: '👨‍🏫', color: ACCENT },
-              { href: '/censeur/emplois-temps', label: 'Emplois du temps',     icon: '📅', color: '#00E676' },
-              { href: '/censeur/examens',       label: 'Planning examens',     icon: '📝', color: '#FFD600' },
-              { href: '/censeur/bulletins',     label: 'Bulletins à valider',  icon: '✅', color: '#00E5FF' },
+              { href: '/censeur/professeurs',   label: 'Pointage professeurs', Icon: GraduationCap, color: ACCENT },
+              { href: '/censeur/emplois-temps', label: 'Emplois du temps',     Icon: CalendarDays,  color: '#22C55E' },
+              { href: '/censeur/examens',       label: 'Planning examens',     Icon: FileCheck2,    color: '#FBBF24' },
+              { href: '/censeur/bulletins',     label: 'Bulletins à valider',  Icon: CheckCircle2,  color: '#38BDF8' },
             ].map((a, i) => (
               <Link key={i} href={a.href}
-                className="flex items-center gap-3 p-4 rounded-xl transition-all hover:scale-[1.02]"
+                className="group flex items-center gap-3 p-4 rounded-xl transition-all hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617]"
                 style={{ background: `${a.color}12`, border: `1px solid ${a.color}35` }}>
-                <span className="text-2xl">{a.icon}</span>
+                <span
+                  className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                  style={{ background: `${a.color}1f`, border: `1px solid ${a.color}40` }}
+                  aria-hidden="true"
+                >
+                  <a.Icon size={18} style={{ color: a.color }} />
+                </span>
                 <span className="text-sm font-semibold text-white">{a.label}</span>
-                <span className="ml-auto text-slate-400 text-lg">›</span>
+                <ChevronRight size={16} className="ml-auto text-slate-400 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
               </Link>
             ))}
           </div>
 
           {/* Bulletins résumé */}
           <div className="mt-5 pt-5" style={{ borderTop: '1px solid rgba(255,255,255,0.09)' }}>
-            <p className="text-sm text-slate-300 font-semibold mb-3">Bulletins T2 par classe</p>
+            <p className="text-sm text-slate-300 font-semibold mb-3">Bulletins {trimestre} par classe</p>
             <div className="space-y-2.5">
-              {DEMO_BULLETINS_CENSEUR.slice(0, 3).map(b => (
-                <div key={b.id} className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-slate-300 w-24 truncate">{b.classe}</span>
-                  <div className="flex-1 h-2 rounded-full bg-white/10 overflow-hidden">
-                    <div className="h-full rounded-full"
-                      style={{ width: `${Math.round((b.valides / b.nb_bulletins) * 100)}%`, background: b.statut === 'valide' ? '#00E676' : ACCENT, boxShadow: `0 0 6px ${b.statut === 'valide' ? '#00E676' : ACCENT}60` }} />
+              {DEMO_BULLETINS_CENSEUR.slice(0, 3).map(b => {
+                const pct = Math.round((b.valides / b.nb_bulletins) * 100)
+                const col = b.statut === 'valide' ? '#22C55E' : ACCENT
+                return (
+                  <div key={b.id} className="flex items-center gap-2">
+                    <span className="text-xs font-semibold text-slate-300 w-24 truncate">{b.classe}</span>
+                    <div className="flex-1 h-2 rounded-full bg-white/10 overflow-hidden"
+                      role="progressbar"
+                      aria-valuenow={pct}
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                      aria-label={`Bulletins ${b.classe} : ${b.valides} sur ${b.nb_bulletins} validés`}>
+                      <div className="h-full rounded-full"
+                        style={{ width: `${pct}%`, background: col, boxShadow: `0 0 6px ${col}60` }} />
+                    </div>
+                    <span className="text-xs font-bold" style={{ color: col }}>
+                      {b.valides}/{b.nb_bulletins}
+                    </span>
                   </div>
-                  <span className="text-xs font-bold" style={{ color: b.statut === 'valide' ? '#00E676' : ACCENT }}>
-                    {b.valides}/{b.nb_bulletins}
-                  </span>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
         </div>
@@ -180,3 +211,4 @@ export default function CenseurDashboard() {
     </div>
   )
 }
+

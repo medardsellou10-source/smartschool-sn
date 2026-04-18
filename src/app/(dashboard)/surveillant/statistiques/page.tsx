@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -126,7 +126,7 @@ export default function SurveillantStatistiquesPage() {
               className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
               style={{
                 background: periode === p.key ? 'rgba(255,214,0,0.15)' : 'transparent',
-                color: periode === p.key ? '#FFD600' : '#94A3B8',
+                color: periode === p.key ? '#FBBF24' : '#94A3B8',
                 border: periode === p.key ? '1px solid rgba(255,214,0,0.3)' : '1px solid transparent',
               }}>
               {p.label}
@@ -177,7 +177,7 @@ export default function SurveillantStatistiquesPage() {
           <h2 className="text-sm font-bold text-[#94A3B8] uppercase tracking-wider mb-4">Ponctualite professeurs</h2>
           <div className="space-y-2">
             {profPonctualite.map((p, idx) => {
-              const color = p.taux >= 90 ? '#00E676' : p.taux >= 70 ? '#FFD600' : '#FF1744'
+              const color = p.taux >= 90 ? '#22C55E' : p.taux >= 70 ? '#FBBF24' : '#F87171'
               return (
                 <div key={idx} className="flex items-center gap-3 p-3 rounded-xl"
                   style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
@@ -205,7 +205,7 @@ export default function SurveillantStatistiquesPage() {
                 <div key={idx} className="flex items-center gap-3 p-3 rounded-xl"
                   style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold shrink-0"
-                    style={{ background: 'rgba(255,23,68,0.1)', border: '1px solid rgba(255,23,68,0.2)', color: '#FF1744' }}>
+                    style={{ background: 'rgba(255,23,68,0.1)', border: '1px solid rgba(255,23,68,0.2)', color: '#F87171' }}>
                     {e.count}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -221,3 +221,4 @@ export default function SurveillantStatistiquesPage() {
     </div>
   )
 }
+

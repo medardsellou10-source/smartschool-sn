@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -335,8 +335,8 @@ export default function BulletinsPage() {
                     <Radar
                       name={enfantActuel?.prenom || 'Élève'}
                       dataKey="note"
-                      stroke="#00BCD4"
-                      fill="#00BCD4"
+                      stroke="#16A34A"
+                      fill="#16A34A"
                       fillOpacity={0.25}
                       strokeWidth={2}
                     />
@@ -380,3 +380,4 @@ export default function BulletinsPage() {
     </div>
   )
 }
+

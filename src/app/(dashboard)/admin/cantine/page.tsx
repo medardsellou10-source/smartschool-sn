@@ -4,6 +4,8 @@ import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { toast } from 'react-hot-toast'
+import { PageHeader } from '@/components/dashboard/PageHeader'
+import { UtensilsCrossed, Plus } from 'lucide-react'
 
 // ── Types ───────────────────────────────────────────────────────
 type TabKey = 'menu' | 'abonnements' | 'pointage'
@@ -498,27 +500,26 @@ export default function CantinePage() {
   // ── Render ────────────────────────────────────────────────────
   return (
     <div className="space-y-6">
-      {/* En-tête */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-ss-text">🍽️ Gestion de la Cantine</h1>
-          <div className="flex h-1 rounded-full overflow-hidden mt-2 w-24">
-            <div className="flex-1 bg-[#00853F]" />
-            <div className="flex-1 bg-[#FDEF42]" />
-            <div className="flex-1 bg-[#E31B23]" />
-          </div>
-        </div>
-        {onglet === 'menu' && (
-          <button onClick={openAddMenu} className="flex items-center gap-2 bg-[#00853F] text-white font-medium text-sm px-4 py-2.5 rounded-xl hover:opacity-90 transition-opacity">
-            <span className="text-lg leading-none">+</span> Ajouter/Modifier le menu
-          </button>
-        )}
-        {onglet === 'abonnements' && (
-          <button onClick={openAddAbonnement} className="flex items-center gap-2 bg-[#00853F] text-white font-medium text-sm px-4 py-2.5 rounded-xl hover:opacity-90 transition-opacity">
-            <span className="text-lg leading-none">+</span> Inscrire un élève
-          </button>
-        )}
-      </div>
+      <PageHeader
+        title="Gestion de la Cantine"
+        description="Menus, abonnements et pointage des repas."
+        icon={UtensilsCrossed}
+        accent="warn"
+        actions={
+          <>
+            {onglet === 'menu' && (
+              <button onClick={openAddMenu} className="flex items-center gap-2 bg-ss-green text-[#020617] font-semibold text-sm px-4 py-2.5 rounded-xl hover:opacity-90 transition-opacity cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ss-green focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617]">
+                <Plus size={16} /> Ajouter / Modifier le menu
+              </button>
+            )}
+            {onglet === 'abonnements' && (
+              <button onClick={openAddAbonnement} className="flex items-center gap-2 bg-ss-green text-[#020617] font-semibold text-sm px-4 py-2.5 rounded-xl hover:opacity-90 transition-opacity cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ss-green focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617]">
+                <Plus size={16} /> Inscrire un élève
+              </button>
+            )}
+          </>
+        }
+      />
 
       {/* Onglets */}
       <div className="flex gap-1 border-b border-ss-border overflow-x-auto">

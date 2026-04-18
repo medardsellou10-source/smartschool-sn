@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -109,7 +109,7 @@ export default function CertificatsPage() {
                   <td className="px-4 py-3 text-xs font-mono" style={{ color: ACCENT }}>{cert.reference || '—'}</td>
                   <td className="px-4 py-3">
                     <span className="px-2 py-1 rounded-lg text-xs font-semibold"
-                      style={cert.statut === 'emis' ? { background: 'rgba(0,230,118,0.15)', color: '#00E676' } : { background: 'rgba(255,214,0,0.15)', color: '#FFD600' }}>
+                      style={cert.statut === 'emis' ? { background: 'rgba(0,230,118,0.15)', color: '#22C55E' } : { background: 'rgba(255,214,0,0.15)', color: '#FBBF24' }}>
                       {cert.statut === 'emis' ? 'Émis' : 'En attente'}
                     </span>
                   </td>
@@ -122,3 +122,4 @@ export default function CertificatsPage() {
     </div>
   )
 }
+

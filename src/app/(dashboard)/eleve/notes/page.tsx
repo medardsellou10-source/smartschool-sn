@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -8,6 +8,8 @@ import {
   isDemoMode, DEMO_ELEVES, DEMO_NOTES, DEMO_EVALUATIONS,
   DEMO_MATIERES, DEMO_CLASSES, DEMO_USERS
 } from '@/lib/demo-data'
+import { PageHeader } from '@/components/dashboard/PageHeader'
+import { PenSquare, FileText, Bell } from 'lucide-react'
 
 // ── Types ──────────────────────────────────────────────────────
 interface NoteEval {
@@ -52,7 +54,7 @@ function calcBadges(notes: NoteEval[]): Badge[] {
 
   // Premier de la classe
   if (notesValides.some(n => n.rang === 1)) {
-    badges.push({ id: 'top1', emoji: '👑', titre: 'Premier de la classe', description: 'Meilleure note sur une évaluation', color: '#FFD600' })
+    badges.push({ id: 'top1', emoji: '👑', titre: 'Premier de la classe', description: 'Meilleure note sur une évaluation', color: '#FBBF24' })
   }
   // Top 3
   else if (notesValides.some(n => n.rang <= 3)) {
@@ -62,9 +64,9 @@ function calcBadges(notes: NoteEval[]): Badge[] {
   // Excellence (≥15)
   const nbExcellent = notesValides.filter(n => (n.note || 0) >= 15).length
   if (nbExcellent >= 3) {
-    badges.push({ id: 'excel', emoji: '⭐', titre: 'Excellence', description: `${nbExcellent} notes ≥ 15/20`, color: '#FFD600' })
+    badges.push({ id: 'excel', emoji: '⭐', titre: 'Excellence', description: `${nbExcellent} notes ≥ 15/20`, color: '#FBBF24' })
   } else if (nbExcellent >= 1) {
-    badges.push({ id: 'star', emoji: '✨', titre: 'Brillant(e)', description: `Note ≥ 15/20 obtenue`, color: '#00E5FF' })
+    badges.push({ id: 'star', emoji: '✨', titre: 'Brillant(e)', description: `Note ≥ 15/20 obtenue`, color: '#38BDF8' })
   }
 
   // Progression (3 notes en hausse consécutives)
@@ -82,18 +84,18 @@ function calcBadges(notes: NoteEval[]): Badge[] {
   if (maxStreak >= 3) {
     badges.push({ id: 'fire', emoji: '🔥', titre: 'En Feu !', description: '3 évals en progression', color: '#FF6D00' })
   } else if (maxStreak >= 2) {
-    badges.push({ id: 'up', emoji: '📈', titre: 'En Progression', description: '2 évals consécutives en hausse', color: '#00E676' })
+    badges.push({ id: 'up', emoji: '📈', titre: 'En Progression', description: '2 évals consécutives en hausse', color: '#22C55E' })
   }
 
   // Régularité (toutes notes ≥10)
   if (notesValides.length >= 4 && notesValides.every(n => (n.note || 0) >= 10)) {
-    badges.push({ id: 'solid', emoji: '💪', titre: 'Solide', description: 'Toutes notes au-dessus de la moyenne', color: '#00E676' })
+    badges.push({ id: 'solid', emoji: '💪', titre: 'Solide', description: 'Toutes notes au-dessus de la moyenne', color: '#22C55E' })
   }
 
   // Batteur de classe (note > moy classe sur ≥3 évals)
   const beatsClass = notesValides.filter(n => (n.note || 0) > n.classeMoyenne).length
   if (beatsClass >= notesValides.length * 0.75 && notesValides.length >= 3) {
-    badges.push({ id: 'above', emoji: '🚀', titre: 'Au-dessus de la moyenne', description: '75% des notes > moy. classe', color: '#D500F9' })
+    badges.push({ id: 'above', emoji: '🚀', titre: 'Au-dessus de la moyenne', description: '75% des notes > moy. classe', color: '#A78BFA' })
   }
 
   return badges
@@ -102,11 +104,11 @@ function calcBadges(notes: NoteEval[]): Badge[] {
 // ── Couleur par note ───────────────────────────────────────────
 function noteColor(note: number | null): string {
   if (note === null) return '#94A3B8'
-  if (note >= 16) return '#FFD600'
-  if (note >= 14) return '#00E676'
-  if (note >= 10) return '#00E5FF'
+  if (note >= 16) return '#FBBF24'
+  if (note >= 14) return '#22C55E'
+  if (note >= 10) return '#38BDF8'
   if (note >= 8) return '#FF6D00'
-  return '#FF1744'
+  return '#F87171'
 }
 
 function rangEmoji(rang: number): string {
@@ -393,7 +395,7 @@ export default function EleveNotesPage() {
         coefficient: eval_.coefficient_eval,
         matiereId: matiere.id,
         matiereNom: matiere.nom,
-        matiereCouleur: (matiere as any).couleur || '#00E5FF',
+        matiereCouleur: (matiere as any).couleur || '#38BDF8',
         note: n.note,
         absent: false,
         observation: null,
@@ -484,7 +486,7 @@ export default function EleveNotesPage() {
       {newGradeToast && (
         <div className="fixed top-4 right-4 z-50 bg-ss-green/10 border border-ss-green/40 rounded-2xl p-4 max-w-sm backdrop-blur-sm animate-in slide-in-from-top-2">
           <div className="flex items-start gap-3">
-            <span className="text-2xl">🔔</span>
+            <Bell size={20} className="text-ss-green shrink-0 mt-0.5" />
             <div>
               <p className="text-sm font-bold text-ss-green">Nouvelle note disponible !</p>
               <p className="text-xs text-ss-text-muted">{newGradeToast.matiere} — {newGradeToast.titre}</p>
@@ -493,19 +495,20 @@ export default function EleveNotesPage() {
         </div>
       )}
 
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-black text-ss-text">Mes Notes</h1>
-          <p className="text-xs text-ss-text-muted mt-0.5">Trimestre {trimestre} · {notes.length} évaluation(s)</p>
-        </div>
-        <Link
-          href="/eleve/bulletins"
-          className="text-xs bg-ss-cyan/10 text-ss-cyan border border-ss-cyan/20 px-4 py-2 rounded-xl hover:bg-ss-cyan/20 transition-colors"
-        >
-          📄 Bulletins
-        </Link>
-      </div>
+      <PageHeader
+        title="Mes Notes"
+        description={`Trimestre ${trimestre} · ${notes.length} évaluation(s)`}
+        icon={PenSquare}
+        accent="info"
+        actions={
+          <Link
+            href="/eleve/bulletins"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-ss-cyan/10 text-ss-cyan border border-ss-cyan/20 hover:bg-ss-cyan/20 transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617] focus-visible:ring-ss-cyan"
+          >
+            <FileText size={14} /> Bulletins
+          </Link>
+        }
+      />
 
       {/* Récap global */}
       {valides.length > 0 && (
@@ -605,3 +608,4 @@ export default function EleveNotesPage() {
     </div>
   )
 }
+

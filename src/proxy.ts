@@ -12,7 +12,17 @@ const ROLE_ROUTES: Record<string, string[]> = {
   censeur:      ['/censeur'],
 }
 
-const PUBLIC_PATHS = ['/login', '/', '/api/webhooks', '/role-selector']
+const PUBLIC_PATHS = [
+  '/login',
+  '/',
+  '/inscription',
+  '/reset-password',
+  '/role-selector',
+  '/charte-gps',
+  '/mentions-legales',
+  '/contact',
+  '/api/webhooks',
+]
 
 const PROTECTED_PREFIXES = ['/admin', '/professeur', '/surveillant', '/parent', '/eleve', '/secretaire', '/intendant', '/censeur']
 
@@ -92,6 +102,7 @@ export async function proxy(request: NextRequest) {
   if (!user) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
+    url.searchParams.set('redirect', pathname)
     return NextResponse.redirect(url)
   }
 

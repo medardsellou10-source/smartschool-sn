@@ -5,6 +5,8 @@ import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { isDemoMode, DEMO_ELEVES, DEMO_CLASSES } from '@/lib/demo-data'
 import { ExcelImport } from '@/components/ui/ExcelImport'
+import { PageHeader } from '@/components/dashboard/PageHeader'
+import { Users, FileSpreadsheet, Search } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 
 interface Eleve {
@@ -140,21 +142,22 @@ export default function ElevesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-bold text-ss-text">Gestion des Elèves</h1>
-          <span className="text-sm px-3 py-1 bg-ss-bg-secondary text-ss-text-muted rounded-full">
-            {filtered.length} élève{filtered.length > 1 ? 's' : ''}
-          </span>
-        </div>
-        <button
-          onClick={() => setShowImport(!showImport)}
-          className="bg-ss-green text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-ss-green/90 transition shadow-lg shadow-ss-green/20 flex items-center gap-2"
-        >
-          <span>📊</span>
-          {showImport ? 'Fermer l\'import' : 'Import Excel'}
-        </button>
-      </div>
+      <PageHeader
+        title="Gestion des élèves"
+        description="Consultez, recherchez et importez les élèves de l'école."
+        icon={Users}
+        accent="info"
+        badge={`${filtered.length} élève${filtered.length > 1 ? 's' : ''}`}
+        actions={
+          <button
+            onClick={() => setShowImport(!showImport)}
+            className="bg-ss-green text-[#020617] px-4 py-2 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity shadow-lg shadow-ss-green/20 flex items-center gap-2 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ss-green focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617]"
+          >
+            <FileSpreadsheet size={16} />
+            {showImport ? "Fermer l'import" : 'Import Excel'}
+          </button>
+        }
+      />
 
       {showImport && (
         <div className="animate-in slide-in-from-top-4 duration-300">
@@ -169,7 +172,7 @@ export default function ElevesPage() {
       {/* Filtres */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-ss-text-muted text-lg">🔍</span>
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-ss-text-muted pointer-events-none" aria-hidden="true" />
           <input
             type="text"
             placeholder="Rechercher par nom, prenom ou matricule..."

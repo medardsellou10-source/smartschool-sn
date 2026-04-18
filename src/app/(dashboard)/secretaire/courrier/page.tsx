@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -69,8 +69,8 @@ export default function CourrierPage() {
       <div className="grid grid-cols-3 gap-4">
         {[
           { label: 'Total', value: courriers.length, color: ACCENT },
-          { label: 'Entrants', value: courriers.filter(c => c.type === 'entrant').length, color: '#00E5FF' },
-          { label: 'Sortants', value: courriers.filter(c => c.type === 'sortant').length, color: '#00E676' },
+          { label: 'Entrants', value: courriers.filter(c => c.type === 'entrant').length, color: '#38BDF8' },
+          { label: 'Sortants', value: courriers.filter(c => c.type === 'sortant').length, color: '#22C55E' },
         ].map(s => (
           <div key={s.label} className="rounded-2xl p-4 text-center"
             style={{ background: `${s.color}10`, border: `1px solid ${s.color}25` }}>
@@ -103,7 +103,7 @@ export default function CourrierPage() {
               <div className="flex items-start justify-between gap-2">
                 <p className="text-sm font-semibold text-white leading-snug">{c.sujet}</p>
                 <span className="px-2 py-0.5 rounded-lg text-xs font-semibold shrink-0"
-                  style={c.statut === 'en_attente' ? { background: `${ACCENT}20`, color: ACCENT } : { background: 'rgba(0,230,118,0.15)', color: '#00E676' }}>
+                  style={c.statut === 'en_attente' ? { background: `${ACCENT}20`, color: ACCENT } : { background: 'rgba(0,230,118,0.15)', color: '#22C55E' }}>
                   {c.statut === 'en_attente' ? 'En attente' : c.statut === 'traite' ? 'Traité' : 'Envoyé'}
                 </span>
               </div>
@@ -122,3 +122,4 @@ export default function CourrierPage() {
     </div>
   )
 }
+

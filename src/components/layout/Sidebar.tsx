@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import Link from 'next/link'
 import Image from 'next/image'
@@ -6,6 +6,8 @@ import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { useUser } from '@/hooks/useUser'
 import { useEcole } from '@/hooks/useEcole'
+import { ROLE_ACCENTS, roleFromPathname } from '@/lib/role-colors'
+import { getInitials } from '@/lib/format'
 import type { UserRole } from '@/lib/types/database.types'
 import type { ReactElement } from 'react'
 
@@ -127,38 +129,16 @@ const MENUS: Record<string, NavItem[]> = {
   ],
 }
 
-const ROLE_COLORS: Record<string, string> = {
-  admin_global: '#FF1744',
-  professeur: '#00E676',
-  surveillant: '#FFD600',
-  parent: '#00E5FF',
-  eleve: '#D500F9',
-  secretaire: '#FF6D00',
-  intendant: '#00BCD4',
-  censeur: '#3D5AFE',
-}
-
-function roleFromPath(pathname: string): string {
-  if (pathname.startsWith('/professeur')) return 'professeur'
-  if (pathname.startsWith('/surveillant')) return 'surveillant'
-  if (pathname.startsWith('/parent')) return 'parent'
-  if (pathname.startsWith('/eleve')) return 'eleve'
-  if (pathname.startsWith('/secretaire')) return 'secretaire'
-  if (pathname.startsWith('/intendant')) return 'intendant'
-  if (pathname.startsWith('/censeur')) return 'censeur'
-  return 'admin_global'
-}
-
 export function Sidebar() {
   const pathname = usePathname()
   const { user, logout } = useUser()
   const { ecole } = useEcole()
 
-  const role = (user?.role || roleFromPath(pathname)) as UserRole
+  const role = (user?.role || roleFromPathname(pathname)) as UserRole
   const items = MENUS[role] || MENUS.admin_global
-  // Utiliser la couleur de l'école si disponible, sinon la couleur du rôle
+  // Utiliser la couleur de l'école si disponible, sinon la couleur du rôle (source unique : role-colors.ts)
   const ecoleColor = ecole?.couleur_primaire
-  const accentColor = ecoleColor || ROLE_COLORS[role] || '#00E676'
+  const accentColor = ecoleColor || ROLE_ACCENTS[role as keyof typeof ROLE_ACCENTS] || '#22C55E'
 
   // Initiales de l'école pour le fallback logo
   const ecoleInitiales = ecole?.nom
@@ -239,7 +219,7 @@ export function Sidebar() {
               <span className="truncate">{item.label}</span>
               {item.badge && item.badge > 0 && (
                 <span className="ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-full text-white"
-                  style={{ background: '#FF1744' }}>
+                  style={{ background: '#F87171' }}>
                   {item.badge}
                 </span>
               )}
@@ -256,9 +236,9 @@ export function Sidebar() {
             style={{ background: `linear-gradient(135deg, ${accentColor}40, ${accentColor}20)`, border: `1.5px solid ${accentColor}50` }}>
             {user?.photo_url
               ? <img src={user.photo_url} alt="" className="w-full h-full object-cover" />
-              : <span style={{ color: accentColor }}>{user ? `${user.prenom?.[0] ?? ''}${user.nom?.[0] ?? ''}` : 'SS'}</span>
+              : <span style={{ color: accentColor }}>{user ? getInitials(user.prenom, user.nom) : 'SS'}</span>
             }
-            <div className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-[#00E676] border-2"
+            <div className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-[#22C55E] border-2"
               style={{ borderColor: '#0B1120' }} />
           </div>
           <div className="min-w-0 flex-1">
@@ -272,14 +252,7 @@ export function Sidebar() {
         </div>
         <button
           onClick={logout}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 min-h-[40px] group"
-          style={{ background: 'rgba(255,23,68,0.08)', border: '1px solid rgba(255,23,68,0.15)', color: '#FF1744' }}
-          onMouseEnter={e => {
-            (e.currentTarget as HTMLElement).style.background = 'rgba(255,23,68,0.15)'
-          }}
-          onMouseLeave={e => {
-            (e.currentTarget as HTMLElement).style.background = 'rgba(255,23,68,0.08)'
-          }}
+          className="ss-sidebar-logout w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 min-h-[44px]"
         >
           {Icons.logout}
           Déconnexion
@@ -288,3 +261,4 @@ export function Sidebar() {
     </aside>
   )
 }
+

@@ -1,11 +1,11 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { isDemoMode, DEMO_BUDGET } from '@/lib/demo-data'
 
-const ACCENT = '#00BCD4'
+const ACCENT = '#16A34A'
 function fmt(val: number) { return new Intl.NumberFormat('fr-FR').format(val) + ' FCFA' }
 
 export default function BudgetPage() {
@@ -64,7 +64,7 @@ export default function BudgetPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
             { label: 'Budget total', value: fmt(budget.total_budget), color: ACCENT, icon: '🏦' },
-            { label: 'Recettes encaissées', value: fmt(budget.recettes_encaissees), color: '#00E676', icon: '💰' },
+            { label: 'Recettes encaissées', value: fmt(budget.recettes_encaissees), color: '#22C55E', icon: '💰' },
             { label: 'Dépenses engagées', value: fmt(budget.depenses_engagees), color: '#FF6D00', icon: '📉' },
           ].map(s => (
             <div key={s.label} className="rounded-2xl p-5"
@@ -103,13 +103,13 @@ export default function BudgetPage() {
                       style={i < budget.lignes.length - 1 ? { borderBottom: '1px solid rgba(255,255,255,0.04)' } : {}}>
                       <td className="px-5 py-4 text-sm font-semibold text-white">{lig.categorie}</td>
                       <td className="px-5 py-4 text-sm text-slate-300">{fmt(lig.budget)}</td>
-                      <td className="px-5 py-4 text-sm" style={{ color: pct > 80 ? '#FF1744' : '#94A3B8' }}>{fmt(lig.depense)}</td>
+                      <td className="px-5 py-4 text-sm" style={{ color: pct > 80 ? '#F87171' : '#94A3B8' }}>{fmt(lig.depense)}</td>
                       <td className="px-5 py-4 text-sm font-semibold" style={{ color: ACCENT }}>{fmt(lig.reste)}</td>
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-2">
                           <div className="w-20 h-2 rounded-full bg-white/10 overflow-hidden">
                             <div className="h-full rounded-full"
-                              style={{ width: `${pct}%`, background: pct > 80 ? '#FF1744' : pct > 50 ? '#FFD600' : ACCENT }} />
+                              style={{ width: `${pct}%`, background: pct > 80 ? '#F87171' : pct > 50 ? '#FBBF24' : ACCENT }} />
                           </div>
                           <span className="text-xs font-semibold text-slate-300">{pct}%</span>
                         </div>
@@ -125,3 +125,4 @@ export default function BudgetPage() {
     </div>
   )
 }
+

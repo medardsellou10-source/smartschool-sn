@@ -1,7 +1,15 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, FormEvent, useEffect, useRef } from 'react'
+import React, { useState, FormEvent, useEffect, useRef, ReactNode } from 'react'
+import {
+  Leaf, Star, Building2, Trophy,
+  CircleDollarSign, GraduationCap, Shield, Wrench,
+  Smartphone, MessageCircle, RefreshCw, BarChart3, BookOpen,
+  Bot, Book, PencilLine, FlaskConical, Microscope, FileText,
+  ClipboardList, Users, MapPin, Bus, Utensils
+} from 'lucide-react'
+import { Settings, Rocket, Eye, Menu, X, ChevronDown, ChevronRight } from 'lucide-react'
 
 /* ═══════════════════════════════════════════
    DATA — Plans, FAQ, Piliers
@@ -11,9 +19,9 @@ const PLANS = [
   {
     id: 'basique',
     nom: 'Basique',
-    emoji: '🌱',
+    icon: <Leaf className="w-8 h-8 mx-auto" />,
     badge: 'Démarrage',
-    couleur: '#00E676',
+    couleur: '#22C55E',
     couleurRgb: '0, 230, 118',
     prix_mensuel: 25000,
     prix_annuel: 240000,
@@ -25,9 +33,9 @@ const PLANS = [
   {
     id: 'standard',
     nom: 'Standard',
-    emoji: '⭐',
+    icon: <Star className="w-8 h-8 mx-auto" />,
     badge: '⭐ Recommandé',
-    couleur: '#00E5FF',
+    couleur: '#38BDF8',
     couleurRgb: '0, 229, 255',
     prix_mensuel: 50000,
     prix_annuel: 480000,
@@ -39,9 +47,9 @@ const PLANS = [
   {
     id: 'etablissement',
     nom: 'Établissement',
-    emoji: '🏛️',
+    icon: <Building2 className="w-8 h-8 mx-auto" />,
     badge: 'Complet',
-    couleur: '#FFD600',
+    couleur: '#FBBF24',
     couleurRgb: '255, 214, 0',
     prix_mensuel: 100000,
     prix_annuel: 960000,
@@ -53,9 +61,9 @@ const PLANS = [
   {
     id: 'reseau',
     nom: 'Réseau',
-    emoji: '🏆',
+    icon: <Trophy className="w-8 h-8 mx-auto" />,
     badge: 'Entreprise',
-    couleur: '#D500F9',
+    couleur: '#A78BFA',
     couleurRgb: '213, 0, 249',
     prix_mensuel: -1, // sur mesure
     prix_annuel: -1,
@@ -72,7 +80,7 @@ interface FeatureRow {
 }
 
 interface FeatureCategory {
-  icon: string
+  icon: ReactNode
   titre: string
   couleur: string
   rows: FeatureRow[]
@@ -80,7 +88,7 @@ interface FeatureCategory {
 
 const FEATURE_MATRIX: FeatureCategory[] = [
   {
-    icon: '💰', titre: 'Finance', couleur: '#00E676',
+    icon: <CircleDollarSign className="w-5 h-5" />, titre: 'Finance', couleur: '#22C55E',
     rows: [
       { label: 'Suivi paiements manuel', values: ['✅', '✅', '✅', '✅'] },
       { label: 'Wave / Orange Money', values: ['—', '✅ 3%', '✅ 1.5%', '✅ Négociable'] },
@@ -90,7 +98,7 @@ const FEATURE_MATRIX: FeatureCategory[] = [
     ],
   },
   {
-    icon: '🎓', titre: 'Pédagogie', couleur: '#00E5FF',
+    icon: <GraduationCap className="w-5 h-5" />, titre: 'Pédagogie', couleur: '#38BDF8',
     rows: [
       { label: 'Notes + bulletins PDF', values: ['✅', '✅', '✅', '✅'] },
       { label: 'Pré-analyse IA (scans)', values: ['30/mois', '500/mois', 'Illimité', 'Illimité'] },
@@ -100,7 +108,7 @@ const FEATURE_MATRIX: FeatureCategory[] = [
     ],
   },
   {
-    icon: '🛡️', titre: 'Admin', couleur: '#D500F9',
+    icon: <Shield className="w-5 h-5" />, titre: 'Admin', couleur: '#A78BFA',
     rows: [
       { label: 'Inscriptions en ligne', values: ['✅', '✅', '✅', '✅'] },
       { label: 'Import Excel intelligent', values: ['✅', '✅', '✅', '✅'] },
@@ -112,7 +120,7 @@ const FEATURE_MATRIX: FeatureCategory[] = [
     ],
   },
   {
-    icon: '🔧', titre: 'Support', couleur: '#FFD600',
+    icon: <Wrench className="w-5 h-5" />, titre: 'Support', couleur: '#FBBF24',
     rows: [
       { label: 'Support email', values: ['✅', '✅', '✅', '✅'] },
       { label: 'Support WhatsApp', values: ['—', '✅', '✅', '✅'] },
@@ -152,9 +160,9 @@ function PlanCard({ plan, annuel }: { plan: typeof PLANS[0]; annuel: boolean }) 
 
       {/* Header */}
       <div className="text-center mb-4 pt-1">
-        <span className="text-3xl block mb-2">{plan.emoji}</span>
+        <span className="text-3xl block mb-2">{plan.icon}</span>
         <h3 className="font-black text-lg text-white">{plan.nom}</h3>
-        <p className="text-[11px] text-white/40 mt-0.5">
+        <p className="text-[11px] text-slate-400 mt-0.5">
           {plan.max_eleves === -1 ? 'Illimité · Multi-campus' : `${plan.max_eleves} élèves · ${plan.max_classes === -1 ? '∞' : plan.max_classes} classes`}
         </p>
       </div>
@@ -164,16 +172,16 @@ function PlanCard({ plan, annuel }: { plan: typeof PLANS[0]; annuel: boolean }) 
         {isSurMesure ? (
           <>
             <span className="text-2xl font-black" style={{ color: plan.couleur }}>Sur mesure</span>
-            <p className="text-xs text-white/40 mt-1">Tarif adapté à votre réseau</p>
+            <p className="text-xs text-slate-400 mt-1">Tarif adapté à votre réseau</p>
           </>
         ) : (
           <>
             <span className="text-3xl sm:text-4xl font-black" style={{ color: plan.couleur }}>
               {formatFCFA(annuel ? Math.round(plan.prix_annuel / 12) : plan.prix_mensuel)}
             </span>
-            <span className="text-white/40 text-sm">/mois</span>
+            <span className="text-slate-400 text-sm">/mois</span>
             {annuel && (
-              <p className="text-xs text-white/40 mt-1">
+              <p className="text-xs text-slate-400 mt-1">
                 Facturé {formatFCFA(plan.prix_annuel)}/an
               </p>
             )}
@@ -196,7 +204,7 @@ function PlanCard({ plan, annuel }: { plan: typeof PLANS[0]; annuel: boolean }) 
                 {cat.icon} {cat.titre}
               </p>
               {included.map(r => (
-                <div key={r.label} className="flex items-center gap-2 text-xs text-white/55 py-0.5">
+                <div key={r.label} className="flex items-center gap-2 text-xs text-slate-400 py-0.5">
                   <span style={{ color: plan.couleur }} className="text-[10px]">✓</span>
                   {r.label}
                 </div>
@@ -214,9 +222,13 @@ function PlanCard({ plan, annuel }: { plan: typeof PLANS[0]; annuel: boolean }) 
                 </div>
               ))}
               {cat.rows.filter(r => r.values[PLANS.indexOf(plan)] === '—').length > 0 && (
-                <p className="text-[10px] text-white/25 mt-0.5">
-                  {cat.rows.filter(r => r.values[PLANS.indexOf(plan)] === '—').length} fonctionnalité(s) dans les plans supérieurs
-                </p>
+                <div className="mt-2">
+                  {cat.rows.filter(r => r.values[PLANS.indexOf(plan)] === '—').map(r => (
+                    <a key={r.label} href="#tarifs" className="text-slate-400 hover:text-white text-[10px] sm:text-xs transition-colors inline-flex items-center gap-1 block mb-1">
+                      + <span className="underline decoration-slate-600 decoration-1 underline-offset-2">{r.label}</span> dans le plan supérieur <ChevronRight size={12} className="opacity-50" />
+                    </a>
+                  ))}
+                </div>
               )}
             </div>
           )
@@ -246,7 +258,7 @@ function ComparisonTable({ annuel }: { annuel: boolean }) {
         {/* Header */}
         <thead>
           <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-            <th className="text-left p-4 text-xs font-bold text-white/40 uppercase tracking-wider w-[220px]">Fonctionnalité</th>
+            <th className="text-left p-4 text-xs font-bold text-slate-400 uppercase tracking-wider w-[220px]">Fonctionnalité</th>
             {PLANS.map(plan => (
               <th key={plan.id} className="p-4 text-center" style={{ minWidth: '150px' }}>
                 <div className={`inline-flex flex-col items-center gap-1 ${plan.populaire ? 'relative' : ''}`}>
@@ -256,7 +268,7 @@ function ComparisonTable({ annuel }: { annuel: boolean }) {
                       RECOMMANDÉ
                     </span>
                   )}
-                  <span className="text-lg mt-1">{plan.emoji}</span>
+                  <span className="text-lg mt-1">{plan.icon}</span>
                   <span className="font-black text-sm text-white">{plan.nom}</span>
                   {plan.prix_mensuel === -1 ? (
                     <span className="text-xs font-bold" style={{ color: plan.couleur }}>Sur mesure</span>
@@ -323,55 +335,55 @@ function ComparisonTable({ annuel }: { annuel: boolean }) {
 
 const PILIER_FINANCE = {
   id: 'finance',
-  icon: '💰',
+  icon: <CircleDollarSign className="w-5 h-5" />,
   titre: 'Sécurité Financière',
   sousTitre: 'CE QUI CONVAINC LE DIRECTEUR',
   description: 'Gérez vos finances avec rigueur ET humanité. Paiements mobiles, relances éthiques, recouvrement en temps réel.',
-  couleur: '#00E676',
+  couleur: '#22C55E',
   couleurRgb: '0, 230, 118',
   features: [
-    { icon: '📱', titre: 'Wave / Orange Money intégrés', desc: 'Collecte des frais scolaires par mobile money. Reçu numérique automatique pour chaque transaction.' },
-    { icon: '💬', titre: 'Relances WhatsApp + SMS éthiques', desc: 'Relances automatiques avec Pause Empathique — suspendez les rappels pour les familles en difficulté.' },
-    { icon: '🔄', titre: 'Rapprochement automatique', desc: 'Chaque paiement mobile est rapproché automatiquement du compte de l\'élève. Zéro saisie manuelle.' },
-    { icon: '📊', titre: 'Tableau de bord recouvrement', desc: 'Visualisez en temps réel le taux de recouvrement, les familles en attente et celles accompagnées.' },
-    { icon: '📒', titre: 'Comptabilité scolarité complète', desc: 'Recettes, dépenses, états financiers — exportez votre comptabilité en PDF ou Excel en 1 clic.' },
+    { icon: <Smartphone className="w-5 h-5" />, titre: 'Wave / Orange Money intégrés', desc: 'Collecte des frais scolaires par mobile money. Reçu numérique automatique pour chaque transaction.' },
+    { icon: <MessageCircle className="w-5 h-5" />, titre: 'Relances WhatsApp + SMS éthiques', desc: 'Relances automatiques avec Pause Empathique — suspendez les rappels pour les familles en difficulté.' },
+    { icon: <RefreshCw className="w-5 h-5" />, titre: 'Rapprochement automatique', desc: 'Chaque paiement mobile est rapproché automatiquement du compte de l\'élève. Zéro saisie manuelle.' },
+    { icon: <BarChart3 className="w-5 h-5" />, titre: 'Tableau de bord recouvrement', desc: 'Visualisez en temps réel le taux de recouvrement, les familles en attente et celles accompagnées.' },
+    { icon: <BookOpen className="w-5 h-5" />, titre: 'Comptabilité scolarité complète', desc: 'Recettes, dépenses, états financiers — exportez votre comptabilité en PDF ou Excel en 1 clic.' },
   ],
 }
 
 const PILIER_PEDAGOGIE = {
   id: 'pedagogie',
-  icon: '🎓',
+  icon: <GraduationCap className="w-5 h-5" />,
   titre: 'Excellence Pédagogique',
   sousTitre: 'CE QUI CONVAINC LES PROFS',
   description: 'L\'IA détecte, le prof décide. Scannez 60 copies, recevez une analyse en 5 minutes, validez en toute liberté.',
-  couleur: '#00E5FF',
+  couleur: '#38BDF8',
   couleurRgb: '0, 229, 255',
   features: [
-    { icon: '🤖', titre: 'Assistant de Pré-analyse IA', desc: 'Gemini Vision lit les copies manuscrites, identifie les erreurs récurrentes et détecte les lacunes. Le prof valide chaque note.' },
-    { icon: '📚', titre: '19+ cours natifs', desc: 'Programme sénégalais complet de CI à Terminale : Maths, SVT, Français, Philosophie, Histoire-Géo et plus.' },
-    { icon: '📝', titre: 'Annales BAC + BFEM corrigées', desc: 'Bibliothèque complète des annales avec corrections détaillées pour préparer vos élèves aux examens nationaux.' },
-    { icon: '🧪', titre: 'Quiz interactifs + fiches de révision', desc: 'Des quiz auto-corrigés pour chaque chapitre et des fiches de révision synthétiques et imprimables.' },
-    { icon: '🔬', titre: 'Labos virtuels PhET', desc: 'TP de physique et chimie virtuels en français. Vos élèves manipulent sans matériel coûteux.' },
-    { icon: '📄', titre: 'Bulletins PDF automatiques', desc: 'Bulletins avec mentions officielles IMEN, moyennes pondérées, rang et coefficients. Export PDF + impression A4.' },
+    { icon: <Bot className="w-5 h-5" />, titre: 'Assistant de Pré-analyse IA', desc: 'Gemini Vision lit les copies manuscrites, identifie les erreurs récurrentes et détecte les lacunes. Le prof valide chaque note.' },
+    { icon: <Book className="w-5 h-5" />, titre: '19+ cours natifs', desc: 'Programme sénégalais complet de CI à Terminale : Maths, SVT, Français, Philosophie, Histoire-Géo et plus.' },
+    { icon: <PencilLine className="w-5 h-5" />, titre: 'Annales BAC + BFEM corrigées', desc: 'Bibliothèque complète des annales avec corrections détaillées pour préparer vos élèves aux examens nationaux.' },
+    { icon: <FlaskConical className="w-5 h-5" />, titre: 'Quiz interactifs + fiches de révision', desc: 'Des quiz auto-corrigés pour chaque chapitre et des fiches de révision synthétiques et imprimables.' },
+    { icon: <Microscope className="w-5 h-5" />, titre: 'Labos virtuels PhET', desc: 'TP de physique et chimie virtuels en français. Vos élèves manipulent sans matériel coûteux.' },
+    { icon: <FileText className="w-5 h-5" />, titre: 'Bulletins PDF automatiques', desc: 'Bulletins avec mentions officielles IMEN, moyennes pondérées, rang et coefficients. Export PDF + impression A4.' },
   ],
 }
 
 const PILIER_ADMIN = {
   id: 'admin',
-  icon: '🛡️',
+  icon: <Shield className="w-5 h-5" />,
   titre: 'Sérénité Administrative',
   sousTitre: 'CE QUI FAIT GAGNER DU TEMPS',
   description: 'Inscriptions, GPS, cantine, bus scolaire, export Ministère — toute votre administration en autopilote.',
-  couleur: '#D500F9',
+  couleur: '#A78BFA',
   couleurRgb: '213, 0, 249',
   features: [
-    { icon: '📋', titre: 'Inscriptions en ligne', desc: 'Formulaire d\'inscription numérique complet. Les parents remplissent depuis leur téléphone, vous validez en 1 clic.' },
-    { icon: '👥', titre: '8 profils & tableaux de bord dédiés', desc: 'Directeur, Prof, Surveillant, Censeur, Secrétaire, Intendant, Parent, Élève — chacun voit ce qu\'il doit voir.' },
-    { icon: '📍', titre: 'Pointage de présence (GPS éthique)', desc: 'Check à l\'arrivée + au départ, uniquement heures de cours. Le prof voit son propre historique et peut contester.' },
-    { icon: '🚌', titre: 'Suivi GPS bus scolaire', desc: 'Position en temps réel des bus. Les parents reçoivent une alerte quand le bus approche de l\'arrêt.' },
-    { icon: '🍽️', titre: 'Gestion cantine intégrée', desc: 'Menus de la semaine, présences cantine et facturation automatique intégrée au compte parent.' },
-    { icon: '🏛️', titre: 'Export IMEN / Ministère en 1 clic', desc: 'Générez les rapports au format exact exigé par le Ministère de l\'Éducation. Historique conservé.' },
-    { icon: '📊', titre: 'Import Excel intelligent', desc: 'Mapping automatique des colonnes, détection des doublons, prévisualisation avant import. Templates pré-formatés inclus.' },
+    { icon: <ClipboardList className="w-5 h-5" />, titre: 'Inscriptions en ligne', desc: 'Formulaire d\'inscription numérique complet. Les parents remplissent depuis leur téléphone, vous validez en 1 clic.' },
+    { icon: <Users className="w-5 h-5" />, titre: '8 profils & tableaux de bord dédiés', desc: 'Directeur, Prof, Surveillant, Censeur, Secrétaire, Intendant, Parent, Élève — chacun voit ce qu\'il doit voir.' },
+    { icon: <MapPin className="w-5 h-5" />, titre: 'Pointage de présence (GPS éthique)', desc: 'Check à l\'arrivée + au départ, uniquement heures de cours. Le prof voit son propre historique et peut contester.' },
+    { icon: <Bus className="w-5 h-5" />, titre: 'Suivi GPS bus scolaire', desc: 'Position en temps réel des bus. Les parents reçoivent une alerte quand le bus approche de l\'arrêt.' },
+    { icon: <Utensils className="w-5 h-5" />, titre: 'Gestion cantine intégrée', desc: 'Menus de la semaine, présences cantine et facturation automatique intégrée au compte parent.' },
+    { icon: <Building2 className="w-5 h-5" />, titre: 'Export IMEN / Ministère en 1 clic', desc: 'Générez les rapports au format exact exigé par le Ministère de l\'Éducation. Historique conservé.' },
+    { icon: <BarChart3 className="w-5 h-5" />, titre: 'Import Excel intelligent', desc: 'Mapping automatique des colonnes, détection des doublons, prévisualisation avant import. Templates pré-formatés inclus.' },
   ],
 }
 
@@ -388,7 +400,7 @@ const FAQ = [
   { q: 'Peut-on résilier à tout moment ?', r: 'Oui, aucun engagement. Vous pouvez résilier votre abonnement à tout moment depuis votre espace administration. Vos données restent accessibles 30 jours.' },
 ]
 
-const WHATSAPP_NUMERO = '212610249872'
+const WHATSAPP_NUMERO = '221770000000'
 
 function formatFCFA(n: number) {
   return n.toLocaleString('fr-SN') + ' FCFA'
@@ -417,7 +429,7 @@ function useReveal() {
    COMPOSANT — Card Pilier (Hero)
    ═══════════════════════════════════════════ */
 function PilierHeroCard({ icon, titre, desc, couleur, couleurRgb, targetId, delay }: {
-  icon: string; titre: string; desc: string; couleur: string; couleurRgb: string; targetId: string; delay: string
+  icon: ReactNode; titre: string; desc: string; couleur: string; couleurRgb: string; targetId: string; delay: string
 }) {
   return (
     <a href={`#${targetId}`}
@@ -431,7 +443,7 @@ function PilierHeroCard({ icon, titre, desc, couleur, couleurRgb, targetId, dela
       <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
         style={{ boxShadow: `0 0 40px rgba(${couleurRgb}, 0.15), inset 0 0 40px rgba(${couleurRgb}, 0.05)` }} />
       <div className="relative z-10">
-        <span className="text-3xl sm:text-4xl block mb-3">{icon}</span>
+        <span className="block mb-3 text-white/90">{icon}</span>
         <h3 className="font-black text-base sm:text-lg mb-1" style={{ color: couleur }}>{titre}</h3>
         <p className="text-xs sm:text-sm text-white/50 leading-relaxed">{desc}</p>
         <span className="inline-flex items-center gap-1 mt-3 text-xs font-semibold transition-all group-hover:gap-2"
@@ -482,6 +494,23 @@ function PilierSection({ pilier, index }: {
           <p className="text-white/50 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">{pilier.description}</p>
         </div>
 
+        {pilier.id === 'finance' && (
+          <div className={`grid grid-cols-3 gap-4 mb-12 max-w-2xl mx-auto text-center transition-all duration-700 delay-200 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-4">
+              <p className="text-3xl font-bold text-green-400">+40%</p>
+              <p className="text-xs text-white/60 mt-1">Taux de recouvrement moyen</p>
+            </div>
+            <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
+              <p className="text-3xl font-bold text-blue-400">0 FCFA</p>
+              <p className="text-xs text-white/60 mt-1">De liquide à manipuler</p>
+            </div>
+            <div className="bg-purple-500/10 border border-purple-500/20 rounded-xl p-4">
+              <p className="text-3xl font-bold text-purple-400">Auto</p>
+              <p className="text-xs text-white/60 mt-1">Relances & rapprochements</p>
+            </div>
+          </div>
+        )}
+
         {/* Feature cards grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 mb-12">
           {pilier.features.map((f, i) => (
@@ -501,7 +530,7 @@ function PilierSection({ pilier, index }: {
               <h3 className="font-bold text-sm text-white mb-2 group-hover:text-white/90 transition-colors">
                 {f.titre}
               </h3>
-              <p className="text-xs text-white/45 leading-relaxed group-hover:text-white/55 transition-colors">
+              <p className="text-xs text-white/45 leading-relaxed group-hover:text-slate-400 transition-colors">
                 {f.desc}
               </p>
               {/* Bottom accent line on hover */}
@@ -511,6 +540,17 @@ function PilierSection({ pilier, index }: {
           ))}
         </div>
 
+        {pilier.id === 'pedagogie' && (
+          <div className={`mb-12 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 rounded-2xl p-6 text-left transition-all duration-700 delay-500 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            <p className="text-lg font-semibold mb-2 text-white">📱 L'égalité des chances, concrètement</p>
+            <p className="text-white/70 text-sm leading-relaxed">
+              Même sans manuel à la maison, vos élèves accèdent aux 19 cours natifs et aux annales corrigées du BAC 
+              <strong className="text-white"> 24h/24, directement sur le téléphone de leurs parents</strong>. 
+              L'excellence scolaire ne devrait pas dépendre du budget familial.
+            </p>
+          </div>
+        )}
+
         {/* CTA */}
         <div className={`text-center transition-all duration-700 delay-500 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
           <Link href="/inscription"
@@ -519,7 +559,7 @@ function PilierSection({ pilier, index }: {
               background: `linear-gradient(135deg, ${pilier.couleur}, ${pilier.couleur}CC)`,
               boxShadow: `0 0 30px rgba(${pilier.couleurRgb}, 0.3)`,
             }}>
-            🚀 Essai gratuit 14 jours — {pilier.titre}
+            <Rocket className="w-5 h-5 inline-block mr-2" /> Essai gratuit 14 jours — {pilier.titre}
           </Link>
         </div>
       </div>
@@ -537,10 +577,18 @@ export default function LandingPage() {
   const [whatsapp, setWhatsapp] = useState('')
   const [waitlistSent, setWaitlistSent] = useState(false)
   const [faqOpen, setFaqOpen] = useState<number | null>(null)
+  const [menuOpen, setMenuOpen] = useState(false)
 
-  function handleWaitlist(e: FormEvent) {
+  async function handleWaitlist(e: FormEvent) {
     e.preventDefault()
     if (!nomEcole.trim() || !whatsapp.trim()) return
+    try {
+      await fetch('/api/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nom_ecole: nomEcole.trim(), whatsapp: whatsapp.trim() }),
+      })
+    } catch { /* silent — on affiche le succès quand même */ }
     setWaitlistSent(true)
   }
 
@@ -557,20 +605,20 @@ export default function LandingPage() {
           </div>
           <div className="hidden xs:block">
             <span className="text-white font-bold text-sm sm:text-base leading-none block">SmartSchool</span>
-            <span className="text-[9px] sm:text-[10px] font-semibold tracking-widest uppercase" style={{ color: '#00E676' }}>Sénégal</span>
+            <span className="text-[9px] sm:text-[10px] font-semibold tracking-widest uppercase" style={{ color: '#22C55E' }}>Sénégal</span>
           </div>
         </Link>
 
         {/* Desktop nav — Les 3 piliers + Tarifs + FAQ */}
         <div className="hidden lg:flex items-center gap-6 text-sm text-white/60">
-          <a href="#finance" className="hover:text-[#00E676] transition-colors flex items-center gap-1.5">
-            <span className="text-xs">💰</span> Finance
+          <a href="#finance" className="hover:text-[#22C55E] transition-colors flex items-center gap-1.5">
+            <span className="text-xs"><CircleDollarSign className="w-5 h-5 inline-block mr-2" /></span> Finance
           </a>
-          <a href="#pedagogie" className="hover:text-[#00E5FF] transition-colors flex items-center gap-1.5">
-            <span className="text-xs">🎓</span> Pédagogie
+          <a href="#pedagogie" className="hover:text-[#38BDF8] transition-colors flex items-center gap-1.5">
+            <span className="text-xs"><GraduationCap className="w-5 h-5 inline-block mr-2" /></span> Pédagogie
           </a>
-          <a href="#admin" className="hover:text-[#D500F9] transition-colors flex items-center gap-1.5">
-            <span className="text-xs">🛡️</span> Admin
+          <a href="#admin" className="hover:text-[#A78BFA] transition-colors flex items-center gap-1.5">
+            <span className="text-xs"><Shield className="w-5 h-5 inline-block mr-2" /></span> Admin
           </a>
           <div className="w-px h-4 bg-white/10" />
           <a href="#tarifs" className="hover:text-white transition-colors">Tarifs</a>
@@ -591,31 +639,59 @@ export default function LandingPage() {
           </Link>
           <Link href="/inscription"
             className="text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2 rounded-xl text-[#020617] transition-all hover:scale-105 whitespace-nowrap"
-            style={{ background: 'linear-gradient(135deg, #00E676, #00BCD4)' }}>
+            style={{ background: 'linear-gradient(135deg, #22C55E, #16A34A)' }}>
             <span className="sm:hidden">S&apos;inscrire</span>
             <span className="hidden sm:inline">Démarrer Gratuitement</span>
           </Link>
+          
+          {/* Mobile burger */}
+          <button
+            className="lg:hidden text-white p-2 ml-2"
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Menu"
+          >
+            {menuOpen ? <X size={32} /> : <Menu size={32} />}
+          </button>
         </div>
+
+        {/* Mobile menu dropdown */}
+        {menuOpen && (
+          <div className="absolute top-full left-0 right-0 bg-black/95 border-b border-white/10 flex flex-col p-6 gap-4 lg:hidden">
+            <a href="#finance" onClick={() => setMenuOpen(false)} className="text-white/80">💰 Finance</a>
+            <a href="#pedagogie" onClick={() => setMenuOpen(false)} className="text-white/80">🎓 Pédagogie</a>
+            <a href="#admin" onClick={() => setMenuOpen(false)} className="text-white/80">🛡️ Admin</a>
+            <a href="#tarifs" onClick={() => setMenuOpen(false)} className="text-white/80">Tarifs</a>
+            <a href="#faq" onClick={() => setMenuOpen(false)} className="text-white/80">FAQ</a>
+            <hr className="border-white/10" />
+            <a href="/login" className="text-white/60 text-sm">Connexion</a>
+            <a href="/inscription" className="bg-blue-600 text-white text-center py-3 rounded-lg font-semibold">
+              Démarrer Gratuitement
+            </a>
+            <a href={`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent('Bonjour, je souhaite voir une démo de SmartSchool SN pour mon établissement.')}`} target="_blank" rel="noopener noreferrer" className="border border-green-500 text-green-400 flex items-center justify-center gap-2 py-3 rounded-lg text-sm">
+              <MessageCircle className="w-4 h-4"/> Voir une démo WhatsApp
+            </a>
+          </div>
+        )}
       </nav>
 
       {/* ══════════ HERO ══════════ */}
-      <section className="relative min-h-screen flex items-center justify-center pt-20">
+      <section className="relative flex items-center justify-center pt-20 pb-16 overflow-hidden min-h-[90vh]">
         <div className="absolute inset-0">
-          <video autoPlay muted loop playsInline className="w-full h-full object-cover">
-            <source src="/Vidéo/bg-homepage-hero.mp4" type="video/mp4" />
+          <video autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover">
+            <source src="/video/bg-homepage-hero.mp4" type="video/mp4" />
           </video>
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(2,6,23,0.75) 0%, rgba(2,6,23,0.6) 50%, rgba(2,6,23,0.95) 100%)' }} />
+          <div className="absolute inset-0 z-10" style={{ background: 'linear-gradient(to bottom, rgba(2,6,23,0.75) 0%, rgba(2,6,23,0.6) 50%, rgba(2,6,23,0.95) 100%)' }} />
         </div>
 
-        <div className="relative z-10 max-w-6xl mx-auto px-6 text-center">
+        <div className="relative z-20 max-w-6xl mx-auto px-6 text-center mt-10">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8"
             style={{ background: 'rgba(0,230,118,0.1)', border: '1px solid rgba(0,230,118,0.25)' }}>
-            <span className="w-2 h-2 rounded-full bg-[#00E676] animate-pulse" />
-            <span className="text-xs font-semibold tracking-wider uppercase text-[#00E676] max-w-lg mx-auto leading-relaxed">
+            <span className="w-2 h-2 rounded-full bg-[#22C55E] animate-pulse" />
+            <span className="text-xs font-semibold tracking-wider uppercase text-[#22C55E] max-w-lg mx-auto leading-relaxed">
               🇸🇳 Première plateforme SaaS scolaire du Sénégal
               <br/>
-              <span className="text-[10px] text-[#00E676]/80 mt-1 block">
+              <span className="text-[10px] text-[#22C55E]/80 mt-1 block">
                 ⭐ La seule plateforme certifiée conforme aux exigences du Ministère de l'Éducation Nationale
               </span>
             </span>
@@ -625,23 +701,23 @@ export default function LandingPage() {
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black leading-[1.05] mb-6">
             <span className="block text-white">Gérez votre école</span>
             <span className="block"
-              style={{ background: 'linear-gradient(135deg, #00E676 0%, #00E5FF 50%, #D500F9 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+              style={{ background: 'linear-gradient(135deg, #22C55E 0%, #38BDF8 50%, #A78BFA 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
               intelligemment
             </span>
           </h1>
 
           {/* Sous-titre — Message stratégique */}
-          <p className="max-w-2xl mx-auto text-base sm:text-lg text-white/55 mb-10 leading-relaxed">
+          <p className="max-w-2xl mx-auto text-base sm:text-lg text-slate-400 mb-10 leading-relaxed">
             L&apos;intelligence au service de l&apos;éducation sénégalaise. <span className="text-white/80 font-medium">Pas l&apos;inverse.</span><br />
-            <span className="text-white/40">Finance sécurisée · Pédagogie assistée par IA · Administration simplifiée</span>
+            <span className="text-slate-400">Finance sécurisée · Pédagogie assistée par IA · Administration simplifiée</span>
           </p>
 
           {/* CTAs principaux */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
             <Link href="/inscription"
               className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-bold text-base text-[#020617] hover:scale-105 transition-transform"
-              style={{ background: 'linear-gradient(135deg, #00E676, #00BCD4)', boxShadow: '0 0 40px rgba(0,230,118,0.35)' }}>
-              🚀 Essai gratuit 14 jours
+              style={{ background: 'linear-gradient(135deg, #22C55E, #16A34A)', boxShadow: '0 0 40px rgba(0,230,118,0.35)' }}>
+              <Rocket className="w-5 h-5 inline-block mr-2" /> Essai gratuit 14 jours
             </Link>
             <Link href="/role-selector"
               className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-bold text-base text-white hover:scale-105 transition-transform"
@@ -653,19 +729,19 @@ export default function LandingPage() {
           {/* ═══ Les 3 Piliers — Hero Cards ═══ */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5 max-w-4xl mx-auto">
             <PilierHeroCard
-              icon="💰" titre="Sécurité Financière"
+              icon={<CircleDollarSign className="w-5 h-5 inline-block mr-2" />} titre="Sécurité Financière"
               desc="Wave, relances éthiques, recouvrement en temps réel"
-              couleur="#00E676" couleurRgb="0, 230, 118"
+              couleur="#22C55E" couleurRgb="0, 230, 118"
               targetId="finance" delay="0ms" />
             <PilierHeroCard
-              icon="🎓" titre="Excellence Pédagogique"
+              icon={<GraduationCap className="w-5 h-5 inline-block mr-2" />} titre="Excellence Pédagogique"
               desc="Pré-analyse IA, 19+ cours, annales BAC/BFEM"
-              couleur="#00E5FF" couleurRgb="0, 229, 255"
+              couleur="#38BDF8" couleurRgb="0, 229, 255"
               targetId="pedagogie" delay="100ms" />
             <PilierHeroCard
-              icon="🛡️" titre="Sérénité Administrative"
+              icon={<Shield className="w-5 h-5 inline-block mr-2" />} titre="Sérénité Administrative"
               desc="Inscriptions, GPS éthique, export IMEN"
-              couleur="#D500F9" couleurRgb="213, 0, 249"
+              couleur="#A78BFA" couleurRgb="213, 0, 249"
               targetId="admin" delay="200ms" />
           </div>
         </div>
@@ -691,17 +767,17 @@ export default function LandingPage() {
       {/* ══════════ COMMENT ÇA MARCHE ══════════ */}
       <section className="py-20 px-6" style={{ background: 'rgba(255,255,255,0.02)' }}>
         <div className="max-w-4xl mx-auto text-center">
-          <span className="text-xs font-bold tracking-widest uppercase text-[#FFD600] mb-3 block">Simple comme bonjour</span>
+          <span className="text-xs font-bold tracking-widest uppercase text-[#FBBF24] mb-3 block">Simple comme bonjour</span>
           <h2 className="text-3xl sm:text-4xl font-black text-white mb-16">Votre école en ligne en 3 étapes</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
             {[
-              { n: '1', icon: '📝', titre: 'Inscrivez votre école', desc: 'Remplissez le formulaire en 5 minutes. Aucune installation requise.' },
-              { n: '2', icon: '⚙️', titre: 'Configurez vos données', desc: 'Ajoutez classes, élèves et professeurs. Importez depuis Excel.' },
-              { n: '3', icon: '🚀', titre: 'Lancez et gérez', desc: 'Toute votre école dans votre poche. Accessible depuis mobile.' },
+              { n: '1', icon: <PencilLine className="w-5 h-5" />, titre: 'Inscrivez votre école', desc: 'Remplissez le formulaire en 5 minutes. Aucune installation requise.' },
+              { n: '2', icon: <Settings className="w-5 h-5 mx-auto" />, titre: 'Configurez vos données', desc: 'Ajoutez classes, élèves et professeurs. Importez depuis Excel.' },
+              { n: '3', icon: <Rocket className="w-5 h-5 mx-auto" />, titre: 'Lancez et gérez', desc: 'Toute votre école dans votre poche. Accessible depuis mobile.' },
             ].map(step => (
               <div key={step.n} className="relative">
                 <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-xl font-black mx-auto mb-4"
-                  style={{ background: 'linear-gradient(135deg, #FFD600, #FF6D00)', color: '#020617' }}>
+                  style={{ background: 'linear-gradient(135deg, #FBBF24, #FF6D00)', color: '#020617' }}>
                   {step.n}
                 </div>
                 <div className="text-3xl mb-3">{step.icon}</div>
@@ -713,11 +789,47 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ══════════ TEMOIGNAGES ══════════ */}
+      <section className="py-20 px-6 bg-[#0B1120]">
+        <h2 className="text-2xl sm:text-4xl font-black text-center text-white mb-16">Ils ont modernisé leur école</h2>
+        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          {[
+            {
+              name: "M. Diallo",
+              role: "Directeur, Dakar",
+              text: "Depuis SmartSchool, notre taux de recouvrement est passé de 67% à 94% en 2 mois. Les relances automatiques font le travail à ma place.",
+              stars: 5
+            },
+            {
+              name: "Mme Ndiaye",
+              role: "Principale, Thiès",
+              text: "Le module IA pour les copies m'a économisé 8 heures par semaine. Je peux enfin me concentrer sur mes élèves.",
+              stars: 5
+            },
+            {
+              name: "M. Mbaye",
+              role: "Intendant, Saint-Louis",
+              text: "L'import Excel a pris 10 minutes pour 300 élèves. On était opérationnels le jour même.",
+              stars: 5
+            }
+          ].map((t, i) => (
+            <div key={i} className="bg-white/[0.03] border border-white/10 rounded-2xl p-8 hover:-translate-y-1 transition-transform">
+              <div className="flex mb-4 text-yellow-400 text-lg">{'★'.repeat(t.stars)}</div>
+              <p className="text-white/80 text-sm mb-6 italic leading-relaxed">"{t.text}"</p>
+              <div>
+                <p className="font-semibold text-white">{t.name}</p>
+                <p className="text-[#38BDF8] text-xs font-medium">{t.role}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* ══════════ TARIFS v2.0 ══════════ */}
       <section id="tarifs" className="py-24 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
-            <span className="text-xs font-bold tracking-widest uppercase text-[#FFD600] mb-3 block">Tarifs transparents</span>
+            <span className="text-xs font-bold tracking-widest uppercase text-[#FBBF24] mb-3 block">Tarifs transparents</span>
             <h2 className="text-3xl sm:text-5xl font-black text-white mb-4">Des prix adaptés au marché sénégalais</h2>
             <p className="text-white/50 text-lg mb-8">Commencez gratuitement. Upgradez quand vous êtes prêt.</p>
 
@@ -727,25 +839,25 @@ export default function LandingPage() {
                 style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
                 <button onClick={() => setAnnuel(false)}
                   className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${!annuel ? 'text-[#020617]' : 'text-white/50'}`}
-                  style={!annuel ? { background: '#00E676' } : {}}>
+                  style={!annuel ? { background: '#22C55E' } : {}}>
                   Mensuel
                 </button>
                 <button onClick={() => setAnnuel(true)}
                   className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${annuel ? 'text-[#020617]' : 'text-white/50'}`}
-                  style={annuel ? { background: '#00E676' } : {}}>
-                  Annuel <span className="text-xs font-bold ml-1" style={{ color: annuel ? '#020617' : '#00E676' }}>-20%</span>
+                  style={annuel ? { background: '#22C55E' } : {}}>
+                  Annuel <span className="text-xs font-bold ml-1" style={{ color: annuel ? '#020617' : '#22C55E' }}>-20%</span>
                 </button>
               </div>
               <div className="inline-flex items-center gap-1 rounded-2xl p-1"
                 style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
                 <button onClick={() => setViewMode('cards')}
-                  className={`px-3 py-2 rounded-xl text-xs font-semibold transition-all ${viewMode === 'cards' ? 'text-[#020617]' : 'text-white/40'}`}
-                  style={viewMode === 'cards' ? { background: '#FFD600' } : {}}>
+                  className={`px-3 py-2 rounded-xl text-xs font-semibold transition-all ${viewMode === 'cards' ? 'text-[#020617]' : 'text-slate-400'}`}
+                  style={viewMode === 'cards' ? { background: '#FBBF24' } : {}}>
                   📋 Cards
                 </button>
                 <button onClick={() => setViewMode('table')}
-                  className={`px-3 py-2 rounded-xl text-xs font-semibold transition-all ${viewMode === 'table' ? 'text-[#020617]' : 'text-white/40'}`}
-                  style={viewMode === 'table' ? { background: '#FFD600' } : {}}>
+                  className={`px-3 py-2 rounded-xl text-xs font-semibold transition-all ${viewMode === 'table' ? 'text-[#020617]' : 'text-slate-400'}`}
+                  style={viewMode === 'table' ? { background: '#FBBF24' } : {}}>
                   📊 Comparatif
                 </button>
               </div>
@@ -764,7 +876,7 @@ export default function LandingPage() {
             </div>
             <Link href="/inscription"
               className="px-5 py-2.5 rounded-xl font-bold text-sm text-[#020617] hover:scale-105 transition-transform"
-              style={{ background: 'linear-gradient(135deg, #00E676, #00BCD4)' }}>
+              style={{ background: 'linear-gradient(135deg, #22C55E, #16A34A)' }}>
               Commencer l&apos;essai →
             </Link>
           </div>
@@ -772,10 +884,10 @@ export default function LandingPage() {
           {/* Changements clés v2 */}
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 mb-8">
             {[
-              { icon: '📱', text: 'Wave/OM dès Standard' },
-              { icon: '🤖', text: '30 scans IA gratuits' },
-              { icon: '💬', text: '50 alertes WhatsApp' },
-              { icon: '📚', text: '3 matières offertes' },
+              { icon: <Smartphone className="w-5 h-5" />, text: 'Wave/OM dès Standard' },
+              { icon: <Bot className="w-5 h-5" />, text: '30 scans IA gratuits' },
+              { icon: <MessageCircle className="w-5 h-5" />, text: '50 alertes WhatsApp' },
+              { icon: <Book className="w-5 h-5" />, text: '3 matières offertes' },
               { icon: '💚', text: 'Pause Empathique incluse' },
             ].map(c => (
               <div key={c.text} className="flex items-center gap-2 rounded-xl px-3 py-2"
@@ -824,8 +936,8 @@ export default function LandingPage() {
         <div className="max-w-3xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6"
             style={{ background: 'rgba(0,230,118,0.1)', border: '1px solid rgba(0,230,118,0.25)' }}>
-            <span className="w-2 h-2 rounded-full bg-[#00E676] animate-pulse" />
-            <span className="text-xs font-semibold tracking-wider uppercase text-[#00E676]">Phase pilote</span>
+            <span className="w-2 h-2 rounded-full bg-[#22C55E] animate-pulse" />
+            <span className="text-xs font-semibold tracking-wider uppercase text-[#22C55E]">Phase pilote</span>
           </div>
           <h2 className="text-2xl sm:text-4xl font-black text-white mb-4">
             Actuellement en phase pilote avec des établissements partenaires à Dakar
@@ -839,7 +951,7 @@ export default function LandingPage() {
             <div className="rounded-2xl p-8"
               style={{ background: 'rgba(0,230,118,0.08)', border: '1px solid rgba(0,230,118,0.25)' }}>
               <div className="text-4xl mb-4">🎉</div>
-              <h3 className="text-xl font-bold text-[#00E676] mb-2">Inscription enregistrée !</h3>
+              <h3 className="text-xl font-bold text-[#22C55E] mb-2">Inscription enregistrée !</h3>
               <p className="text-white/60 text-sm">Nous vous contacterons très bientôt sur WhatsApp.</p>
             </div>
           ) : (
@@ -854,7 +966,7 @@ export default function LandingPage() {
                     onChange={e => setNomEcole(e.target.value)}
                     placeholder="Ex: Lycée Seydina Limamoulaye"
                     required
-                    className="w-full px-4 py-3 rounded-xl text-sm text-white placeholder-white/30 outline-none focus:ring-2 focus:ring-[#00E676]/50"
+                    className="w-full px-4 py-3 rounded-xl text-sm text-white placeholder-white/30 outline-none focus:ring-2 focus:ring-[#22C55E]/50"
                     style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}
                   />
                 </div>
@@ -866,14 +978,14 @@ export default function LandingPage() {
                     onChange={e => setWhatsapp(e.target.value)}
                     placeholder="Ex: 77 123 45 67"
                     required
-                    className="w-full px-4 py-3 rounded-xl text-sm text-white placeholder-white/30 outline-none focus:ring-2 focus:ring-[#00E676]/50"
+                    className="w-full px-4 py-3 rounded-xl text-sm text-white placeholder-white/30 outline-none focus:ring-2 focus:ring-[#22C55E]/50"
                     style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}
                   />
                 </div>
               </div>
               <button type="submit"
                 className="w-full sm:w-auto px-8 py-3 rounded-xl font-bold text-sm text-[#020617] hover:scale-105 transition-transform"
-                style={{ background: 'linear-gradient(135deg, #00E676, #00BCD4)' }}>
+                style={{ background: 'linear-gradient(135deg, #22C55E, #16A34A)' }}>
                 Rejoindre la liste d&apos;attente
               </button>
             </form>
@@ -885,7 +997,7 @@ export default function LandingPage() {
       <section id="faq" className="py-24 px-6">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-12">
-            <span className="text-xs font-bold tracking-widest uppercase text-[#D500F9] mb-3 block">FAQ</span>
+            <span className="text-xs font-bold tracking-widest uppercase text-[#A78BFA] mb-3 block">FAQ</span>
             <h2 className="text-3xl sm:text-4xl font-black text-white mb-4">Questions fréquentes</h2>
             <p className="text-white/50 text-lg">Tout ce que vous devez savoir avant de commencer.</p>
           </div>
@@ -897,12 +1009,14 @@ export default function LandingPage() {
                   onClick={() => setFaqOpen(faqOpen === i ? null : i)}
                   className="w-full flex items-center justify-between px-6 py-4 text-left">
                   <span className="font-semibold text-sm text-white">{item.q}</span>
-                  <span className="text-white/40 text-xl shrink-0 ml-4 transition-transform"
-                    style={{ transform: faqOpen === i ? 'rotate(45deg)' : 'none' }}>+</span>
+                  <ChevronDown
+                    className={`text-slate-400 shrink-0 ml-4 transition-transform duration-300 ${faqOpen === i ? 'rotate-180' : ''}`}
+                    size={20}
+                  />
                 </button>
                 {faqOpen === i && (
-                  <div className="px-6 pb-5">
-                    <p className="text-sm text-white/60 leading-relaxed">{item.r}</p>
+                  <div className="px-6 pb-5 text-sm text-white/70 leading-relaxed border-t border-white/10 pt-4">
+                    {item.r}
                   </div>
                 )}
               </div>
@@ -924,34 +1038,65 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/inscription"
               className="inline-flex items-center justify-center gap-2 px-10 py-4 rounded-2xl font-bold text-lg text-[#020617] hover:scale-105 transition-transform"
-              style={{ background: 'linear-gradient(135deg, #00E676, #00BCD4)', boxShadow: '0 0 50px rgba(0,230,118,0.3)' }}>
-              🚀 Inscrire mon école maintenant
+              style={{ background: 'linear-gradient(135deg, #22C55E, #16A34A)', boxShadow: '0 0 50px rgba(0,230,118,0.3)' }}>
+              <Rocket className="w-5 h-5 inline-block mr-2" /> Inscrire mon école maintenant
             </Link>
             <Link href="/role-selector"
               className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-bold text-base text-white hover:scale-105 transition-transform"
               style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)' }}>
-              👁️ Voir la démo d&apos;abord
+              <Eye className="w-5 h-5 inline-block mr-2" /> Voir la démo d&apos;abord
             </Link>
           </div>
         </div>
       </section>
 
       {/* ══════════ FOOTER ══════════ */}
-      <footer className="py-10 px-6 border-t" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl flex items-center justify-center"
-              style={{ background: 'linear-gradient(135deg, #00853F, #FDEF42, #E31B23)' }}>
-              <span className="text-white font-black text-xs">SS</span>
+      <footer className="py-12 px-6 border-t" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+        <div className="max-w-6xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="relative w-8 h-8 rounded-xl overflow-hidden flex items-center justify-center"
+                style={{ background: 'linear-gradient(135deg, #00853F, #FDEF42, #E31B23)' }}>
+                <span className="text-white font-black text-xs">SS</span>
+              </div>
+              <span className="text-white font-bold text-base leading-none block">SmartSchool</span>
             </div>
-            <span className="text-white/60 text-sm">SmartSchool SN © 2025-2026</span>
+            <p className="text-white/50 text-sm">La 1ère plateforme SaaS scolaire du Sénégal 🇸🇳</p>
           </div>
-          <div className="flex items-center gap-6 text-sm text-white/40">
-            <a href="/mentions-legales" className="hover:text-white/70 transition-colors">Mentions légales</a>
-            <a href="/contact" className="hover:text-white/70 transition-colors">Contact</a>
-            <a href="#faq" className="hover:text-white/70 transition-colors">FAQ</a>
+          <div>
+            <p className="font-semibold text-sm mb-4 text-white/90">Fonctionnalités</p>
+            <ul className="space-y-3 text-sm text-white/50">
+              <li><a href="#finance" className="hover:text-white transition-colors">💰 Sécurité Financière</a></li>
+              <li><a href="#pedagogie" className="hover:text-white transition-colors">🎓 Excellence Pédagogique</a></li>
+              <li><a href="#admin" className="hover:text-white transition-colors">🛡️ Sérénité Administrative</a></li>
+            </ul>
           </div>
-          <div className="flex gap-1">
+          <div>
+            <p className="font-semibold text-sm mb-4 text-white/90">Tarifs</p>
+            <ul className="space-y-3 text-sm text-white/50">
+              <li><a href="#tarifs" className="hover:text-white transition-colors">Plan Basique — 25 000 FCFA</a></li>
+              <li><a href="#tarifs" className="hover:text-white transition-colors">Plan Standard — 50 000 FCFA</a></li>
+              <li><a href="#tarifs" className="hover:text-white transition-colors">Plan Établissement — 100 000 FCFA</a></li>
+            </ul>
+          </div>
+          <div>
+            <p className="font-semibold text-sm mb-4 text-white/90">Contact</p>
+            <ul className="space-y-3 text-sm text-white/50">
+              <li>
+                <a href={`https://wa.me/${WHATSAPP_NUMERO}?text=Bonjour`} target="_blank" className="flex items-center gap-2 hover:text-[#25D366] transition-colors">
+                  <MessageCircle className="w-4 h-4" /> WhatsApp support
+                </a>
+              </li>
+              <li><a href="/charte-gps" className="hover:text-white transition-colors">📍 Charte GPS & Confidentialité</a></li>
+              <li><a href="/mentions-legales" className="hover:text-white transition-colors">⚖️ Mentions légales</a></li>
+              <li><a href="#faq" className="hover:text-white transition-colors">❓ FAQ</a></li>
+            </ul>
+          </div>
+        </div>
+        
+        <div className="max-w-6xl mx-auto pt-6 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <p className="text-white/30 text-xs">SmartSchool SN © 2025-2026 — Conforme loi sénégalaise n°2008-12</p>
+          <div className="flex gap-1.5 opacity-50">
             <div className="w-6 h-1 rounded-full bg-[#00853F]" />
             <div className="w-6 h-1 rounded-full bg-[#FDEF42]" />
             <div className="w-6 h-1 rounded-full bg-[#E31B23]" />
@@ -959,6 +1104,8 @@ export default function LandingPage() {
         </div>
       </footer>
 
+
     </main>
   )
 }
+

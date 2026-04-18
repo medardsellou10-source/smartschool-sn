@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useMemo } from 'react'
 import { useUser } from '@/hooks/useUser'
@@ -114,7 +114,7 @@ export default function SurveillantExportPage() {
                 className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all"
                 style={{
                   background: exportType === t.key ? 'rgba(255,214,0,0.12)' : 'rgba(255,255,255,0.04)',
-                  color: exportType === t.key ? '#FFD600' : '#94A3B8',
+                  color: exportType === t.key ? '#FBBF24' : '#94A3B8',
                   border: `1px solid ${exportType === t.key ? 'rgba(255,214,0,0.3)' : 'rgba(255,255,255,0.08)'}`,
                 }}>
                 <span>{t.icon}</span> {t.label}
@@ -159,7 +159,7 @@ export default function SurveillantExportPage() {
       <div className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-bold text-[#94A3B8] uppercase tracking-wider">Apercu</h2>
-          <span className="text-xs px-2 py-1 rounded-full" style={{ background: 'rgba(255,214,0,0.1)', color: '#FFD600', border: '1px solid rgba(255,214,0,0.2)' }}>
+          <span className="text-xs px-2 py-1 rounded-full" style={{ background: 'rgba(255,214,0,0.1)', color: '#FBBF24', border: '1px solid rgba(255,214,0,0.2)' }}>
             {currentData.length} enregistrement(s)
           </span>
         </div>
@@ -201,7 +201,7 @@ export default function SurveillantExportPage() {
                         <td className="py-2 px-2" style={{ color: '#94A3B8' }}>{row.type}</td>
                         <td className="py-2 px-2">
                           <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold"
-                            style={{ background: row.justifiee === 'Oui' ? 'rgba(0,230,118,0.15)' : 'rgba(255,23,68,0.15)', color: row.justifiee === 'Oui' ? '#00E676' : '#FF1744' }}>
+                            style={{ background: row.justifiee === 'Oui' ? 'rgba(0,230,118,0.15)' : 'rgba(255,23,68,0.15)', color: row.justifiee === 'Oui' ? '#22C55E' : '#F87171' }}>
                             {row.justifiee}
                           </span>
                         </td>
@@ -232,11 +232,11 @@ export default function SurveillantExportPage() {
       <div className="flex items-center gap-3">
         <button onClick={handleExport} disabled={currentData.length === 0}
           className="px-6 py-3 rounded-xl text-sm font-bold transition-all hover:opacity-90 disabled:opacity-40"
-          style={{ background: '#FFD600', color: '#020617' }}>
+          style={{ background: '#FBBF24', color: '#020617' }}>
           Exporter en CSV ({currentData.length})
         </button>
         {exported && (
-          <span className="text-sm font-semibold animate-fade-in" style={{ color: '#00E676' }}>
+          <span className="text-sm font-semibold animate-fade-in" style={{ color: '#22C55E' }}>
             Fichier telecharge !
           </span>
         )}
@@ -244,3 +244,4 @@ export default function SurveillantExportPage() {
     </div>
   )
 }
+

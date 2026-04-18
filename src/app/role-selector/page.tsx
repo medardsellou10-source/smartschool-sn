@@ -3,17 +3,19 @@
 import { useState } from 'react'
 import { DEMO_USERS } from '@/lib/demo-data'
 
+import { Shield, BookOpen, Eye, Users, GraduationCap, ClipboardList, Briefcase, CheckCircle } from 'lucide-react'
+
 const ROLES = [
   {
     key: 'admin_global',
     titre: 'Administrateur',
     sous_titre: 'Direction générale',
-    emoji: '🛡️',
+    emoji: <Shield className="w-7 h-7 text-[#F87171] opacity-80" />,
     description: 'Statistiques, finances, gestion globale',
     user: DEMO_USERS.admin,
     badges: ['Dashboard IA', 'Finance', 'RBAC'],
     href: '/admin',
-    color: '#FF1744',
+    color: '#F87171',
     glow: 'rgba(255,23,68,0.35)',
     bg: 'rgba(255,23,68,0.08)',
     icon: (
@@ -26,12 +28,12 @@ const ROLES = [
     key: 'professeur',
     titre: 'Professeur',
     sous_titre: 'Enseignant',
-    emoji: '👨‍🏫',
+    emoji: <BookOpen className="w-7 h-7 text-[#22C55E] opacity-80" />,
     description: 'Appel GPS, notes, cahier de texte, e-learning',
     user: DEMO_USERS.professeur,
     badges: ['Appel GPS', 'Notes', 'E-Learning'],
     href: '/professeur',
-    color: '#00E676',
+    color: '#22C55E',
     glow: 'rgba(0,230,118,0.35)',
     bg: 'rgba(0,230,118,0.08)',
     icon: (
@@ -45,12 +47,12 @@ const ROLES = [
     key: 'surveillant',
     titre: 'Surveillant',
     sous_titre: 'Discipline & présence',
-    emoji: '👁️',
+    emoji: <Eye className="w-7 h-7 text-[#FBBF24] opacity-80" />,
     description: 'Présence temps réel, absences, alertes SMS',
     user: DEMO_USERS.surveillant,
     badges: ['Temps réel', 'Alertes SMS', 'Heatmap'],
     href: '/surveillant',
-    color: '#FFD600',
+    color: '#FBBF24',
     glow: 'rgba(255,214,0,0.35)',
     bg: 'rgba(255,214,0,0.08)',
     icon: (
@@ -64,12 +66,12 @@ const ROLES = [
     key: 'parent',
     titre: 'Parent',
     sous_titre: 'Famille',
-    emoji: '👨‍👩‍👧',
+    emoji: <Users className="w-7 h-7 text-[#38BDF8] opacity-80" />,
     description: 'Bulletins, absences, paiements Wave/OM',
     user: DEMO_USERS.parent,
     badges: ['Wave', 'Orange Money', 'Bulletins PDF'],
     href: '/parent',
-    color: '#00E5FF',
+    color: '#38BDF8',
     glow: 'rgba(0,229,255,0.35)',
     bg: 'rgba(0,229,255,0.08)',
     icon: (
@@ -84,12 +86,12 @@ const ROLES = [
     key: 'eleve',
     titre: 'Élève',
     sous_titre: 'Espace apprenant',
-    emoji: '🎓',
+    emoji: <GraduationCap className="w-7 h-7 text-[#A78BFA] opacity-80" />,
     description: 'Notes, emploi du temps, e-learning, planning',
     user: DEMO_USERS.eleve,
     badges: ['E-Learning', 'Bulletins', 'Planning'],
     href: '/eleve',
-    color: '#D500F9',
+    color: '#A78BFA',
     glow: 'rgba(213,0,249,0.35)',
     bg: 'rgba(213,0,249,0.08)',
     icon: (
@@ -103,7 +105,7 @@ const ROLES = [
     key: 'secretaire',
     titre: 'Secrétaire',
     sous_titre: 'Administration',
-    emoji: '📋',
+    emoji: <ClipboardList className="w-7 h-7 text-[#FF6D00] opacity-80" />,
     description: 'Inscriptions, certificats, dossiers, courrier',
     user: DEMO_USERS.secretaire,
     badges: ['Inscriptions', 'Certificats', 'Courrier'],
@@ -124,12 +126,12 @@ const ROLES = [
     key: 'intendant',
     titre: 'Intendant',
     sous_titre: 'Gestion financière',
-    emoji: '💼',
+    emoji: <Briefcase className="w-7 h-7 text-[#16A34A] opacity-80" />,
     description: 'Budget, paiements, cantine, inventaire',
     user: DEMO_USERS.intendant,
     badges: ['Budget', 'Finances', 'Inventaire'],
     href: '/intendant',
-    color: '#00BCD4',
+    color: '#16A34A',
     glow: 'rgba(0,188,212,0.35)',
     bg: 'rgba(0,188,212,0.08)',
     icon: (
@@ -143,7 +145,7 @@ const ROLES = [
     key: 'censeur',
     titre: 'Censeur',
     sous_titre: 'Pédagogie & discipline',
-    emoji: '📚',
+    emoji: <CheckCircle className="w-7 h-7 text-[#3D5AFE] opacity-80" />,
     description: 'Pointage profs, examens, emplois du temps',
     user: DEMO_USERS.censeur,
     badges: ['Emplois du temps', 'Examens', 'Bulletins'],
@@ -174,27 +176,10 @@ export default function RoleSelectorPage() {
 
   return (
     <div className="min-h-screen relative flex flex-col items-center justify-center px-4 py-10 overflow-hidden">
-      <style jsx>{`
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(18px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes pulse-slow {
-          0%, 100% { opacity: 0.6; transform: scale(1); }
-          50%       { opacity: 1;   transform: scale(1.08); }
-        }
-        @keyframes shimmer-move {
-          0%   { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
-        }
-        .fade-up { animation: fadeUp 0.5s ease-out both; }
-        .blob    { animation: pulse-slow 8s ease-in-out infinite; }
-      `}</style>
-
       {/* ── Fond vidéo ── */}
       <div className="absolute inset-0">
         <video autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover">
-          <source src="/Vidéo/bg-role-classroom.mp4" type="video/mp4" />
+          <source src="/video/bg-role-classroom.mp4" type="video/mp4" />
         </video>
         <div className="absolute inset-0" style={{ background: 'rgba(2,6,23,0.85)' }} />
         {/* Blobs de couleur ambiant */}
@@ -380,3 +365,4 @@ export default function RoleSelectorPage() {
     </div>
   )
 }
+

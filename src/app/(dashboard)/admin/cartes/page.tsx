@@ -4,6 +4,8 @@ import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { isDemoMode, DEMO_ELEVES, DEMO_CLASSES } from '@/lib/demo-data'
+import { PageHeader } from '@/components/dashboard/PageHeader'
+import { CreditCard, Printer, Settings as SettingsIcon } from 'lucide-react'
 
 interface Eleve {
   id: string
@@ -166,52 +168,32 @@ export default function CartesScolairesPage() {
 
   return (
     <>
-      {/* Print CSS */}
-      <style jsx global>{`
-        @media print {
-          body * {
-            visibility: hidden;
-          }
-          .print-area, .print-area * {
-            visibility: visible;
-          }
-          .print-area {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-          }
-          .no-print {
-            display: none !important;
-          }
-          .student-card {
-            break-inside: avoid;
-            page-break-inside: avoid;
-            margin-bottom: 16px;
-          }
-        }
-      `}</style>
-
       <div className="space-y-6">
-        {/* En-tete */}
-        <div className="flex items-center justify-between flex-wrap gap-3 no-print">
-          <h1 className="text-2xl font-bold text-ss-text">Cartes Scolaires Numeriques</h1>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleGenerateAll}
-              className="flex items-center gap-2 bg-ss-cyan text-white font-medium text-sm px-4 py-2.5 rounded-xl hover:opacity-90 transition-opacity"
-            >
-              <span className="text-lg leading-none">&#9881;</span>
-              Generer toutes les cartes
-            </button>
-            <button
-              onClick={handlePrint}
-              className="flex items-center gap-2 bg-green-600 text-white font-medium text-sm px-4 py-2.5 rounded-xl hover:opacity-90 transition-opacity"
-            >
-              <span className="text-lg leading-none">&#128424;</span>
-              Imprimer
-            </button>
-          </div>
+        <div className="no-print">
+          <PageHeader
+            title="Cartes Scolaires Numériques"
+            description="Génération et impression des cartes d'identité scolaire."
+            icon={CreditCard}
+            accent="info"
+            actions={
+              <>
+                <button
+                  onClick={handleGenerateAll}
+                  className="flex items-center gap-2 bg-ss-info text-[#020617] font-semibold text-sm px-4 py-2.5 rounded-xl hover:opacity-90 transition-opacity cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ss-info focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617]"
+                >
+                  <SettingsIcon size={16} />
+                  Générer toutes les cartes
+                </button>
+                <button
+                  onClick={handlePrint}
+                  className="flex items-center gap-2 bg-ss-green text-[#020617] font-semibold text-sm px-4 py-2.5 rounded-xl hover:opacity-90 transition-opacity cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ss-green focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617]"
+                >
+                  <Printer size={16} />
+                  Imprimer
+                </button>
+              </>
+            }
+          />
         </div>
 
         {/* Filtres */}

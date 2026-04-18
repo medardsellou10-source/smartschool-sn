@@ -4,7 +4,10 @@ import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { StatCard } from '@/components/dashboard/StatCard'
+import { PageHeader } from '@/components/dashboard/PageHeader'
+import { EmptyState } from '@/components/dashboard/EmptyState'
 import { formatFCFA } from '@/lib/utils'
+import { Building2, School, Info, Users, GraduationCap, Wallet, BarChart3 } from 'lucide-react'
 
 interface EcoleData {
   id: string
@@ -242,13 +245,12 @@ export default function GroupeDashboard() {
   // --- NO GROUPE ---
   if (noGroupe) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-        <span className="text-6xl mb-4">🏫</span>
-        <h1 className="text-2xl font-bold text-ss-text mb-2">Pas de groupe scolaire</h1>
-        <p className="text-ss-text-secondary max-w-md">
-          Votre ecole ne fait pas partie d&apos;un groupe scolaire.
-          Contactez votre administrateur pour configurer un groupe multi-sites.
-        </p>
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <EmptyState
+          icon={School}
+          title="Pas de groupe scolaire"
+          message="Votre ecole ne fait pas partie d'un groupe scolaire. Contactez votre administrateur pour configurer un groupe multi-sites."
+        />
       </div>
     )
   }
@@ -261,26 +263,24 @@ export default function GroupeDashboard() {
   const tauxRecouvrementGlobal = totalFactures > 0 ? Math.round((totalPaye / totalFactures) * 1000) / 10 : 0
 
   return (
-    <div>
-      {/* Header */}
-      <div className="mb-6">
+    <div className="space-y-6">
+      <div>
         <div className="flex h-1 rounded-full overflow-hidden mb-3 max-w-xs">
           <div className="flex-1 bg-[#00853F]" />
           <div className="flex-1 bg-[#FDEF42]" />
           <div className="flex-1 bg-[#E31B23]" />
         </div>
-        <h1 className="text-2xl font-bold text-ss-text flex items-center gap-2">
-          <span>🏢</span> Groupe Scolaire &mdash; {groupe.nom}
-        </h1>
-        <p className="text-sm text-ss-text-muted mt-1">
-          {groupe.ecoles.length} ecole{groupe.ecoles.length > 1 ? 's' : ''} dans le groupe
-          &bull; {activeSchools.length} active{activeSchools.length > 1 ? 's' : ''}
-        </p>
+        <PageHeader
+          title={`Groupe Scolaire — ${groupe.nom}`}
+          description={`${groupe.ecoles.length} ecole${groupe.ecoles.length > 1 ? 's' : ''} dans le groupe • ${activeSchools.length} active${activeSchools.length > 1 ? 's' : ''}`}
+          icon={Building2}
+          accent="purple"
+        />
       </div>
 
       {/* Info banner */}
-      <div className="bg-ss-cyan/10 border border-ss-cyan/30 rounded-xl p-4 mb-6 flex items-start gap-3">
-        <span className="text-lg">ℹ️</span>
+      <div className="bg-ss-cyan/10 border border-ss-cyan/30 rounded-xl p-4 flex items-start gap-3">
+        <Info size={18} className="text-ss-cyan shrink-0 mt-0.5" aria-hidden="true" />
         <div>
           <p className="text-sm text-ss-text font-medium">Donnees consolidees</p>
           <p className="text-xs text-ss-text-muted mt-0.5">
@@ -297,28 +297,28 @@ export default function GroupeDashboard() {
           title="Total eleves"
           value={groupe.totalEleves.toLocaleString('fr-FR')}
           subtitle={`${activeSchools.length} ecoles actives`}
-          icon="👥"
+          icon={Users}
           color="green"
         />
         <StatCard
           title="Total professeurs"
           value={String(groupe.totalProfs)}
           subtitle={`${groupe.ecoles.length} etablissements`}
-          icon="👨‍🏫"
+          icon={GraduationCap}
           color="cyan"
         />
         <StatCard
           title="En attente"
           value={formatFCFA(groupe.totalImpayes)}
           subtitle={`Taux recouvrement: ${tauxRecouvrementGlobal}%`}
-          icon="💰"
+          icon={Wallet}
           color="red"
         />
         <StatCard
           title="Assiduite moyenne"
           value={`${groupe.tauxAssiduiteGlobal}%`}
           subtitle="Moyenne des ecoles actives"
-          icon="📊"
+          icon={BarChart3}
           color="gold"
         />
       </div>

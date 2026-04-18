@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -10,9 +10,9 @@ const ACCENT = '#FF6D00'
 type Inscription = typeof DEMO_INSCRIPTIONS[0]
 
 const STATUT_STYLE: Record<string, { bg: string; color: string; label: string }> = {
-  valide:     { bg: 'rgba(0,230,118,0.15)',  color: '#00E676', label: 'Validée' },
-  en_attente: { bg: 'rgba(255,214,0,0.15)',  color: '#FFD600', label: 'En attente' },
-  incomplet:  { bg: 'rgba(255,23,68,0.15)',  color: '#FF1744', label: 'Incomplet' },
+  valide:     { bg: 'rgba(0,230,118,0.15)',  color: '#22C55E', label: 'Validée' },
+  en_attente: { bg: 'rgba(255,214,0,0.15)',  color: '#FBBF24', label: 'En attente' },
+  incomplet:  { bg: 'rgba(255,23,68,0.15)',  color: '#F87171', label: 'Incomplet' },
 }
 
 export default function InscriptionsPage() {
@@ -105,7 +105,7 @@ export default function InscriptionsPage() {
                     <td className="px-4 py-3 text-sm text-slate-300">{insc.classe}</td>
                     <td className="px-4 py-3">
                       <span className="px-2 py-1 rounded-lg text-xs font-semibold"
-                        style={{ background: insc.type === 'reinscription' ? 'rgba(0,229,255,0.15)' : 'rgba(255,109,0,0.15)', color: insc.type === 'reinscription' ? '#00E5FF' : ACCENT }}>
+                        style={{ background: insc.type === 'reinscription' ? 'rgba(0,229,255,0.15)' : 'rgba(255,109,0,0.15)', color: insc.type === 'reinscription' ? '#38BDF8' : ACCENT }}>
                         {insc.type === 'reinscription' ? 'Réinscription' : 'Inscription'}
                       </span>
                     </td>
@@ -135,3 +135,4 @@ export default function InscriptionsPage() {
     </div>
   )
 }
+

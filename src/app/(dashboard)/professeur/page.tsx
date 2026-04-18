@@ -1,17 +1,23 @@
-'use client'
+﻿'use client'
 
 import { useMemo } from 'react'
 import { useUser } from '@/hooks/useUser'
 import { StatCard } from '@/components/dashboard/StatCard'
+import { EmptyState } from '@/components/dashboard/EmptyState'
 import { isDemoMode, DEMO_EMPLOIS_TEMPS, DEMO_MATIERES, DEMO_CLASSES, DEMO_POINTAGES } from '@/lib/demo-data'
+import { timeToMinutes, formatH } from '@/lib/format'
 import Link from 'next/link'
+import {
+  School, BookOpen, CheckCircle2, AlertTriangle, Clock, CalendarCheck,
+  ClipboardList, PenSquare, NotebookText, GraduationCap, MapPin, MessageSquare,
+} from 'lucide-react'
 
 const JOUR_LABELS: Record<number, string> = {
   1: 'Lundi', 2: 'Mardi', 3: 'Mercredi', 4: 'Jeudi', 5: 'Vendredi', 6: 'Samedi',
 }
 
 const MATIERE_COLORS = [
-  '#00E676', '#00E5FF', '#FFD600', '#D500F9', '#FF1744', '#448AFF', '#FF6D00',
+  '#22C55E', '#38BDF8', '#FBBF24', '#A78BFA', '#F87171', '#448AFF', '#FF6D00',
 ]
 
 export default function ProfesseurDashboard() {
@@ -70,13 +76,14 @@ export default function ProfesseurDashboard() {
       <div className="relative rounded-2xl overflow-hidden min-h-[130px]">
         <img
           src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1200&q=80"
-          alt="Professeur"
+          alt=""
+          aria-hidden="true"
           className="absolute inset-0 w-full h-full object-cover"
         />
         <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, rgba(2,6,23,0.95) 0%, rgba(2,6,23,0.6) 100%)' }} />
         <div className="relative px-6 py-5">
           <div className="flex items-center gap-2 mb-1">
-            <div className="w-2 h-2 rounded-full bg-[#00E676] animate-pulse" />
+            <div className="w-2 h-2 rounded-full bg-[#22C55E] animate-pulse" />
             <span className="text-[#94A3B8] text-xs font-semibold tracking-wider uppercase">Espace Professeur</span>
           </div>
           <h1 className="text-2xl font-black text-white">Bonjour, {user?.prenom} {user?.nom}</h1>
@@ -90,13 +97,13 @@ export default function ProfesseurDashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
         <StatCard title="Classes enseignées" value={classesEnseignees.length}
           subtitle={classesEnseignees.map(c => c ? `${c.niveau} ${c.nom}` : '').slice(0, 2).join(', ')}
-          icon="🏫" color="cyan" />
+          icon={School} color="cyan" delay={0} />
         <StatCard title="Cours aujourd'hui" value={coursAujourdhui.length}
-          subtitle={JOUR_LABELS[jourSemaine] || 'Dimanche'} icon="📚" color="green" />
+          subtitle={JOUR_LABELS[jourSemaine] || 'Dimanche'} icon={BookOpen} color="green" delay={80} />
         <StatCard title="Mon pointage" value={pointageLabel}
-          subtitle={pointageDuJour ? new Date(pointageDuJour.heure_arrivee).toLocaleTimeString('fr-SN', { hour: '2-digit', minute: '2-digit' }) : 'Pas encore pointé'}
-          icon={pointageDuJour?.statut === 'a_heure' ? '✅' : pointageDuJour ? '⚠️' : '⏰'}
-          color={pointageColor} />
+          subtitle={pointageDuJour ? formatH(pointageDuJour.heure_arrivee) : 'Pas encore pointé'}
+          icon={pointageDuJour?.statut === 'a_heure' ? CheckCircle2 : pointageDuJour ? AlertTriangle : Clock}
+          color={pointageColor} delay={160} />
       </div>
 
       {/* ── Actions rapides ── */}
@@ -104,17 +111,23 @@ export default function ProfesseurDashboard() {
         <h2 className="text-sm font-bold text-[#94A3B8] uppercase tracking-wider mb-4">Actions rapides</h2>
         <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
           {[
-            { href: '/professeur/appel',    icon: '📋', label: "Faire l'appel",   color: '#00853F' },
-            { href: '/professeur/notes',    icon: '📝', label: 'Saisir les notes', color: '#00E5FF' },
-            { href: '/professeur/cahier',   icon: '📚', label: 'Cahier de texte',  color: '#FFD600' },
-            { href: '/professeur/support-pedagogique', icon: '📖', label: 'Support Pédagogique', color: '#448AFF' },
-            { href: '/professeur/pointage', icon: '📍', label: 'Mon pointage GPS', color: '#D500F9' },
-            { href: '/professeur/messages', icon: '💬', label: 'Messagerie',       color: '#FF6D00' },
+            { href: '/professeur/appel',    Icon: ClipboardList, label: "Faire l'appel",    color: '#00853F' },
+            { href: '/professeur/notes',    Icon: PenSquare,     label: 'Saisir les notes', color: '#38BDF8' },
+            { href: '/professeur/cahier',   Icon: NotebookText,  label: 'Cahier de texte',  color: '#FBBF24' },
+            { href: '/professeur/support-pedagogique', Icon: GraduationCap, label: 'Support Pédagogique', color: '#448AFF' },
+            { href: '/professeur/pointage', Icon: MapPin,        label: 'Mon pointage GPS', color: '#A78BFA' },
+            { href: '/professeur/messages', Icon: MessageSquare, label: 'Messagerie',       color: '#FF6D00' },
           ].map(a => (
             <Link key={a.href} href={a.href}
-              className="flex flex-col items-center gap-2 p-4 rounded-xl text-center transition-all duration-200 hover:scale-105 active:scale-95"
+              className="group flex flex-col items-center gap-2 p-4 rounded-xl text-center transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617]"
               style={{ background: `${a.color}12`, border: `1px solid ${a.color}30` }}>
-              <span className="text-2xl">{a.icon}</span>
+              <span
+                className="w-10 h-10 rounded-xl flex items-center justify-center"
+                style={{ background: `${a.color}1a`, border: `1px solid ${a.color}40` }}
+                aria-hidden="true"
+              >
+                <a.Icon size={20} style={{ color: a.color }} />
+              </span>
               <span className="text-xs font-semibold leading-tight text-white">{a.label}</span>
             </Link>
           ))}
@@ -128,33 +141,34 @@ export default function ProfesseurDashboard() {
             Planning — {JOUR_LABELS[jourSemaine] || 'Aujourd\'hui'}
           </h2>
           <span className="text-xs px-2 py-1 rounded-full"
-            style={{ background: 'rgba(0,229,255,0.1)', color: '#00E5FF', border: '1px solid rgba(0,229,255,0.2)' }}>
+            style={{ background: 'rgba(0,229,255,0.1)', color: '#38BDF8', border: '1px solid rgba(0,229,255,0.2)' }}>
             {coursAujourdhui.length} cours
           </span>
         </div>
 
         {coursAujourdhui.length === 0 ? (
-          <div className="flex flex-col items-center py-10 text-center">
-            <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3 text-2xl"
-              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
-              📭
-            </div>
-            <p className="text-[#94A3B8] text-sm">{jourSemaine === 7 ? 'Dimanche — repos bien mérité !' : 'Aucun cours prévu aujourd\'hui'}</p>
-          </div>
+          <EmptyState
+            icon={CalendarCheck}
+            title={jourSemaine === 7 ? 'Dimanche' : 'Aucun cours prévu'}
+            message={jourSemaine === 7 ? 'Repos bien mérité !' : "Aucun cours n'est programmé pour aujourd'hui."}
+            compact
+          />
         ) : (
           <div className="space-y-3">
             {coursAujourdhui.map((cours, idx) => {
               const color = MATIERE_COLORS[idx % MATIERE_COLORS.length]
-              const now = today.toLocaleTimeString('fr-SN', { hour: '2-digit', minute: '2-digit' })
-              const isPast = cours.heure_fin < now
-              const isCurrent = cours.heure_debut <= now && cours.heure_fin > now
+              const nowMin = today.getHours() * 60 + today.getMinutes()
+              const debutMin = timeToMinutes(cours.heure_debut)
+              const finMin   = timeToMinutes(cours.heure_fin)
+              const isPast = finMin <= nowMin
+              const isCurrent = debutMin <= nowMin && finMin > nowMin
               return (
                 <div key={cours.id}
                   className="flex items-center gap-4 p-4 rounded-xl transition-all duration-200"
                   style={{
                     background: isCurrent ? `${color}12` : 'rgba(255,255,255,0.03)',
                     border: `1px solid ${isCurrent ? color + '40' : 'rgba(255,255,255,0.07)'}`,
-                    opacity: isPast && !isCurrent ? 0.5 : 1,
+                    opacity: isPast && !isCurrent ? 0.65 : 1,
                   }}>
                   {/* Indicateur */}
                   <div className="w-1 h-12 rounded-full shrink-0" style={{ background: color }} />
@@ -188,3 +202,4 @@ export default function ProfesseurDashboard() {
     </div>
   )
 }
+

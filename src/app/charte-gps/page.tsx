@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import Link from 'next/link'
 
@@ -24,7 +24,7 @@ export default function CharteGPSPage() {
           <section className="bg-ss-bg-secondary border border-ss-border p-6 sm:p-8 rounded-2xl">
             <div className="flex items-center gap-3 mb-4">
               <span className="text-2xl">🤝</span>
-              <h2 className="text-xl font-bold text-[#00E5FF]">Notre Engagement Éthique</h2>
+              <h2 className="text-xl font-bold text-[#38BDF8]">Notre Engagement Éthique</h2>
             </div>
             <p className="text-white/70 leading-relaxed text-sm sm:text-base">
               Chez SmartSchool SN, nous croyons qu'un professeur n'est pas un colis logistique. Le module de pointage GPS a été conçu avec des <strong>garde-fous éthiques stricts</strong> pour garantir le respect de votre vie privée et de votre dignité tout en offrant à la direction la sécurité nécessaire.
@@ -36,23 +36,23 @@ export default function CharteGPSPage() {
             <section className="bg-ss-bg-secondary border border-ss-border p-6 rounded-2xl">
               <div className="flex items-center gap-3 mb-4">
                 <span className="text-xl">✅</span>
-                <h3 className="font-bold text-[#00E676]">Ce que nous mesurons</h3>
+                <h3 className="font-bold text-[#22C55E]">Ce que nous mesurons</h3>
               </div>
               <ul className="space-y-3 text-sm text-white/70">
                 <li className="flex gap-2">
-                  <span className="text-[#00E676]">•</span>
+                  <span className="text-[#22C55E]">•</span>
                   <span><strong>Quoi :</strong> Uniquement si vous ouvrez l'application (Oui/Non) dans l'enceinte de l'école (rayon toléré).</span>
                 </li>
                 <li className="flex gap-2">
-                  <span className="text-[#00E676]">•</span>
+                  <span className="text-[#22C55E]">•</span>
                   <span><strong>Quand :</strong> Pendant les heures de cours, uniquement quand vous cliquez sur le bouton "Signaler ma présence".</span>
                 </li>
                 <li className="flex gap-2">
-                  <span className="text-[#00E676]">•</span>
+                  <span className="text-[#22C55E]">•</span>
                   <span><strong>Qui voit :</strong> Exclusivement le Directeur et le Censeur (ni les parents, ni les élèves).</span>
                 </li>
                 <li className="flex gap-2">
-                  <span className="text-[#00E676]">•</span>
+                  <span className="text-[#22C55E]">•</span>
                   <span><strong>Combien de temps :</strong> Les données GPS (latitude/longitude) sont <strong>automatiquement supprimées après 30 jours</strong>.</span>
                 </li>
               </ul>
@@ -122,3 +122,4 @@ export default function CharteGPSPage() {
     </main>
   )
 }
+

@@ -61,8 +61,8 @@ export function useUser() {
     }
 
     const supabase = createClient()
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) {
+    const { data: { user: authUser }, error: authError } = await supabase.auth.getUser()
+    if (authError || !authUser) {
       setUser(null)
       setLoading(false)
       return
@@ -71,7 +71,7 @@ export function useUser() {
     const { data } = await supabase
       .from('utilisateurs')
       .select('*')
-      .eq('id', session.user.id)
+      .eq('id', authUser.id)
       .single()
 
     setUser(data)

@@ -4,6 +4,8 @@ import { useState, useMemo } from 'react'
 import { useUser } from '@/hooks/useUser'
 import { isDemoMode, DEMO_EMPLOIS_TEMPS, DEMO_MATIERES, DEMO_CLASSES } from '@/lib/demo-data'
 import { createClient } from '@/lib/supabase/client'
+import { PageHeader } from '@/components/dashboard/PageHeader'
+import { NotebookText } from 'lucide-react'
 
 interface CahierEntry {
   id: string
@@ -176,7 +178,12 @@ export default function CahierPage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-4">
-      <h1 className="text-2xl font-bold text-ss-text">Cahier de Textes</h1>
+      <PageHeader
+        title="Cahier de Textes"
+        description="Rédaction et consultation du cahier de textes par classe."
+        icon={NotebookText}
+        accent="gold"
+      />
 
       {/* Selecteurs */}
       <div className="bg-ss-bg-secondary rounded-xl border border-ss-border p-4 space-y-3">

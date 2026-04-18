@@ -10,6 +10,8 @@ import {
   DEMO_PROFESSEURS,
   DEMO_EMPLOIS_TEMPS,
 } from '@/lib/demo-data'
+import { PageHeader } from '@/components/dashboard/PageHeader'
+import { CalendarRange } from 'lucide-react'
 
 interface Creneau {
   id: string
@@ -384,14 +386,17 @@ export default function EmploisTempsPage() {
 
   return (
     <div className="space-y-6">
-      {/* En-tête */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-2xl font-bold text-ss-text">Emplois du Temps</h1>
-        <select
-          value={selectedClasse}
-          onChange={e => setSelectedClasse(e.target.value)}
-          className="bg-ss-bg-secondary border border-ss-border text-ss-text rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ss-cyan/40"
-        >
+      <PageHeader
+        title="Emplois du Temps"
+        description="Organisation hebdomadaire par classe."
+        icon={CalendarRange}
+        accent="purple"
+        actions={
+          <select
+            value={selectedClasse}
+            onChange={e => setSelectedClasse(e.target.value)}
+            className="bg-ss-bg-secondary border border-ss-border text-ss-text rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ss-info/40 cursor-pointer"
+          >
           {classes.length === 0 && (
             <option value="">Aucune classe disponible</option>
           )}
@@ -400,8 +405,9 @@ export default function EmploisTempsPage() {
               {c.niveau} {c.nom}
             </option>
           ))}
-        </select>
-      </div>
+          </select>
+        }
+      />
 
       {/* Légende couleurs */}
       <div className="flex flex-wrap gap-2">

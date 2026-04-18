@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter, useSearchParams } from 'next/navigation'
 import type { UserRole } from '@/lib/types/database.types'
+import { UserCog, GraduationCap, Shield, Users, BookOpen, ClipboardList, Wallet, BarChart3, ShieldCheck, Lock } from 'lucide-react'
 
 type AuthTab = 'email' | 'phone'
 type AuthMode = 'login' | 'register'
@@ -17,6 +18,7 @@ const REGISTER_ROLES = [
   { value: 'intendant',  label: 'Intendant Scolaire' },
   { value: 'censeur',    label: 'Censeur' },
   { value: 'parent', label: 'Parent d\'élève' },
+  { value: 'eleve', label: 'Élève' },
 ]
 
 const ERROR_MESSAGES: Record<string, string> = {
@@ -25,26 +27,26 @@ const ERROR_MESSAGES: Record<string, string> = {
 }
 
 const DEMO_ROLES = [
-  { role: 'admin_global', label: 'Directeur / Admin', icon: '👨‍💼', route: '/admin', desc: 'Tableau de bord complet, finances, gestion' },
-  { role: 'professeur', label: 'Professeur', icon: '👨‍🏫', route: '/professeur', desc: 'Notes, pointage GPS, cahier de texte' },
-  { role: 'surveillant', label: 'Surveillant Général', icon: '🛡️', route: '/surveillant', desc: 'Suivi temps réel, absences, alertes' },
-  { role: 'parent', label: 'Parent d\'élève', icon: '👩‍👧', route: '/parent', desc: 'Bulletins, paiements, absences' },
-  { role: 'eleve', label: 'Élève', icon: '🎓', route: '/eleve', desc: 'Notes, bulletins, emploi du temps, e-learning' },
-  { role: 'secretaire', label: 'Secrétaire Général',  icon: '📋', route: '/secretaire', desc: 'Inscriptions, certificats de scolarité, dossiers administratifs, courrier' },
-  { role: 'intendant',  label: 'Intendant Scolaire',  icon: '💼', route: '/intendant',  desc: 'Budget, paiements, cantine, inventaire matériel' },
-  { role: 'censeur',    label: 'Censeur',              icon: '📚', route: '/censeur',    desc: 'Emplois du temps, pointage profs, examens, bulletins' },
+  { role: 'admin_global', label: 'Directeur / Admin', Icon: UserCog, route: '/admin', desc: 'Tableau de bord complet, finances, gestion', color: '#22C55E' },
+  { role: 'professeur', label: 'Professeur', Icon: GraduationCap, route: '/professeur', desc: 'Notes, pointage GPS, cahier de texte', color: '#38BDF8' },
+  { role: 'surveillant', label: 'Surveillant Général', Icon: Shield, route: '/surveillant', desc: 'Suivi temps réel, absences, alertes', color: '#FBBF24' },
+  { role: 'parent', label: 'Parent d\'élève', Icon: Users, route: '/parent', desc: 'Bulletins, paiements, absences', color: '#A78BFA' },
+  { role: 'eleve', label: 'Élève', Icon: BookOpen, route: '/eleve', desc: 'Notes, bulletins, emploi du temps, e-learning', color: '#F87171' },
+  { role: 'secretaire', label: 'Secrétaire Général', Icon: ClipboardList, route: '/secretaire', desc: 'Inscriptions, certificats, dossiers, courrier', color: '#38BDF8' },
+  { role: 'intendant', label: 'Intendant Scolaire', Icon: Wallet, route: '/intendant', desc: 'Budget, paiements, cantine, inventaire', color: '#FBBF24' },
+  { role: 'censeur', label: 'Censeur', Icon: BarChart3, route: '/censeur', desc: 'Emplois du temps, pointage, examens, bulletins', color: '#A78BFA' },
 ]
 
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[#020617] flex items-center justify-center">
+      <div className="min-h-screen bg-ss-bg flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 bg-[#00853F] rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <span className="text-white text-2xl font-bold">SS</span>
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: 'linear-gradient(135deg, #00853F, #FDEF42, #E31B23)' }}>
+            <span className="text-white text-2xl font-extrabold">SS</span>
           </div>
-          <div className="w-8 h-8 border-2 border-[#00E676] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-slate-400 text-sm">Chargement...</p>
+          <div className="w-8 h-8 border-2 border-ss-green border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-ss-text-secondary text-sm">Chargement...</p>
         </div>
       </div>
     }>
@@ -98,12 +100,52 @@ function LoginContent() {
     }
   }, [searchParams])
 
+  // Redirection automatique si déjà connecté
+  useEffect(() => {
+    const checkExistingSession = async () => {
+      const ROLE_ROUTES: Record<string, string> = {
+        admin_global: '/admin',
+        professeur: '/professeur',
+        surveillant: '/surveillant',
+        parent: '/parent',
+        eleve: '/eleve',
+        secretaire: '/secretaire',
+        intendant: '/intendant',
+        censeur: '/censeur',
+      }
+
+      // 1. Vérifier le mode démo d'abord
+      const demoCookie = document.cookie.split('; ').find(row => row.startsWith('ss_demo_role='))
+      if (demoCookie) {
+        const role = demoCookie.split('=')[1]
+        if (ROLE_ROUTES[role]) {
+           router.push(ROLE_ROUTES[role])
+           return
+        }
+      }
+
+      // 2. Vérifier la session Supabase
+      if (isSupabaseConfigured) {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+          const { data } = await supabase.from('utilisateurs').select('role').eq('id', user.id).single()
+          const profile = data as { role?: string } | null
+          if (profile?.role && ROLE_ROUTES[profile.role]) {
+            router.push(ROLE_ROUTES[profile.role])
+          }
+        }
+      }
+    }
+    
+    checkExistingSession()
+  }, [router, supabase, isSupabaseConfigured])
+
   // Mode démo : login par sélection de rôle
   // On utilise un cookie (lisible par le middleware) + localStorage (lisible côté client)
   const handleDemoLogin = (role: string, route: string) => {
     if (role === 'admin_global') {
       import('react-hot-toast').then(({ toast }) => {
-        toast.success('Code 2FA envoyé (Simulation)', { icon: '🔐' })
+        toast.success('Code 2FA envoyé (Simulation)', { icon: '🛡️' })
       })
       setPendingRoute({ role, route })
       setShow2FA(true)
@@ -113,7 +155,7 @@ function LoginContent() {
     const maxAge = 60 * 60 * 8 // 8 heures
     document.cookie = `ss_demo_role=${role}; path=/; max-age=${maxAge}; SameSite=Lax`
     localStorage.setItem('ss_demo_role', role)
-    router.push(route)
+    window.location.href = route
   }
 
   const handleVerify2FA = (e: React.FormEvent) => {
@@ -122,7 +164,7 @@ function LoginContent() {
       const maxAge = 60 * 60 * 8 // 8 heures
       document.cookie = `ss_demo_role=${pendingRoute.role}; path=/; max-age=${maxAge}; SameSite=Lax`
       localStorage.setItem('ss_demo_role', pendingRoute.role)
-      router.push(pendingRoute.route)
+      window.location.href = pendingRoute.route
     } else {
       import('react-hot-toast').then(({ toast }) => {
         toast.error('Code invalide')
@@ -132,8 +174,8 @@ function LoginContent() {
 
   // Après auth réussie, récupérer le rôle et rediriger
   const redirectByRole = async () => {
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) {
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
       setError('Échec de connexion')
       setLoading(false)
       return
@@ -142,7 +184,7 @@ function LoginContent() {
     const { data } = await supabase
       .from('utilisateurs')
       .select('*')
-      .eq('id', session.user.id)
+      .eq('id', user.id)
       .single()
 
     const utilisateur = data as { role: UserRole; actif: boolean } | null
@@ -325,7 +367,7 @@ function LoginContent() {
       <div className="flex-1 bg-[#FDEF42]" />
       <div className="flex-1 bg-[#E31B23]" />
     </div>
-    <div className="min-h-screen relative flex items-center justify-center px-4 overflow-hidden bg-[#020617]">
+    <div className="min-h-screen relative flex items-center justify-center px-4 overflow-hidden bg-ss-bg">
       {/* ── Vidéo background login ── */}
       <div className="absolute inset-0 z-0">
         <video
@@ -335,7 +377,7 @@ function LoginContent() {
           playsInline
           className="w-full h-full object-cover object-center"
         >
-          <source src="/Vidéo/bg-login.mp4" type="video/mp4" />
+          <source src="/video/bg-login.mp4" type="video/mp4" />
         </video>
         {/* Overlay sombre pour lisibilité du formulaire */}
         <div className="absolute inset-0 bg-gradient-to-br from-[#020617]/92 via-[#020617]/80 to-[#0B1120]/90" />
@@ -346,19 +388,19 @@ function LoginContent() {
       <div className="w-full max-w-md relative z-10">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-[#00853F] rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <span className="text-white text-2xl font-bold">SS</span>
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: 'linear-gradient(135deg, #00853F, #FDEF42, #E31B23)' }}>
+            <span className="text-white text-2xl font-extrabold">SS</span>
           </div>
-          <h1 className="text-2xl font-bold text-white">SmartSchool SN</h1>
-          <p className="text-slate-400 text-sm mt-1">Plateforme de gestion scolaire</p>
+          <h1 className="text-2xl font-extrabold text-ss-text tracking-tight">SmartSchool SN</h1>
+          <p className="text-ss-text-secondary text-sm mt-1">Plateforme de gestion scolaire</p>
         </div>
 
         {/* Mode Démo */}
         {true && (
-          <div className="bg-[#141833] rounded-2xl border border-slate-700/50 p-6">
-            <div className="bg-ss-cyan/10 border border-ss-cyan/30 rounded-xl px-4 py-3 mb-5">
-              <p className="text-ss-cyan text-sm font-semibold">Mode Démonstration</p>
-              <p className="text-slate-400 text-xs mt-0.5">Choisissez un profil pour explorer l&apos;application</p>
+          <div className="glass rounded-3xl p-6">
+            <div className="rounded-xl px-4 py-3 mb-5" style={{ background: 'rgba(34, 197, 94, 0.08)', border: '1px solid rgba(34, 197, 94, 0.20)' }}>
+              <p className="text-ss-green text-sm font-semibold">Mode Démonstration</p>
+              <p className="text-ss-text-secondary text-xs mt-0.5">Choisissez un profil pour explorer l&apos;application</p>
             </div>
 
             <div className="space-y-3">
@@ -366,14 +408,19 @@ function LoginContent() {
                 <button
                   key={r.role}
                   onClick={() => handleDemoLogin(r.role, r.route)}
-                  className="w-full flex items-center gap-4 p-4 bg-[#0A0E27] border border-slate-700/50 rounded-xl hover:border-ss-cyan/50 hover:bg-ss-bg-card transition-all text-left group min-h-[64px]"
+                  className="w-full flex items-center gap-4 p-4 rounded-xl transition-all text-left group min-h-[64px] cursor-pointer"
+                  style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = `${r.color}40`; e.currentTarget.style.background = `${r.color}08` }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'; e.currentTarget.style.background = 'rgba(255,255,255,0.03)' }}
                 >
-                  <span className="text-2xl">{r.icon}</span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-white font-semibold text-sm group-hover:text-ss-cyan transition-colors">{r.label}</p>
-                    <p className="text-slate-500 text-xs mt-0.5">{r.desc}</p>
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${r.color}12` }}>
+                    <r.Icon size={20} style={{ color: r.color }} />
                   </div>
-                  <span className="text-slate-600 group-hover:text-ss-cyan transition-colors">→</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-ss-text font-semibold text-sm group-hover:text-white transition-colors">{r.label}</p>
+                    <p className="text-ss-text-muted text-xs mt-0.5">{r.desc}</p>
+                  </div>
+                  <span className="text-ss-text-disabled group-hover:text-ss-text-secondary transition-colors">→</span>
                 </button>
               ))}
             </div>
@@ -382,15 +429,15 @@ function LoginContent() {
 
         {/* Mode Réel (Supabase configuré) */}
         {isSupabaseConfigured && (
-          <div className="bg-[#141833] rounded-2xl border border-slate-700/50 p-6">
+          <div className="glass rounded-3xl p-6">
             {/* Toggle Connexion / Inscription */}
-            <div className="flex bg-[#0A0E27] rounded-xl p-1 mb-6">
+            <div className="flex rounded-xl p-1 mb-6" style={{ background: 'rgba(255,255,255,0.03)' }}>
               <button
                 onClick={() => { setMode('login'); setError(''); setSuccess('') }}
                 className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition ${
                   mode === 'login'
                     ? 'bg-ss-green text-white'
-                    : 'text-slate-400 hover:text-white'
+                    : 'text-white/50 hover:text-white'
                 }`}
               >
                 Connexion
@@ -400,7 +447,7 @@ function LoginContent() {
                 className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition ${
                   mode === 'register'
                     ? 'bg-ss-green text-white'
-                    : 'text-slate-400 hover:text-white'
+                    : 'text-white/50 hover:text-white'
                 }`}
               >
                 Inscription
@@ -425,13 +472,13 @@ function LoginContent() {
             {mode === 'login' && (
               <>
                 {/* Onglets Email / SMS */}
-                <div className="flex bg-[#0A0E27] rounded-xl p-1 mb-5">
+                <div className="flex rounded-xl p-1 mb-5" style={{ background: 'rgba(255,255,255,0.03)' }}>
                   <button
                     onClick={() => { setTab('email'); setError('') }}
                     className={`flex-1 py-2 text-xs font-medium rounded-lg transition ${
                       tab === 'email'
-                        ? 'bg-slate-700 text-white'
-                        : 'text-slate-400 hover:text-white'
+                        ? 'bg-white/10 text-white'
+                        : 'text-white/50 hover:text-white'
                     }`}
                   >
                     Email / Mot de passe
@@ -440,8 +487,8 @@ function LoginContent() {
                     onClick={() => { setTab('phone'); setError(''); setOtpStep('phone') }}
                     className={`flex-1 py-2 text-xs font-medium rounded-lg transition ${
                       tab === 'phone'
-                        ? 'bg-slate-700 text-white'
-                        : 'text-slate-400 hover:text-white'
+                        ? 'bg-white/10 text-white'
+                        : 'text-white/50 hover:text-white'
                     }`}
                   >
                     SMS / OTP
@@ -452,29 +499,29 @@ function LoginContent() {
                 {tab === 'email' && (
                   <form onSubmit={handleEmailLogin} className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-1.5">Adresse email</label>
+                      <label className="block text-sm font-medium text-white/80 mb-1.5">Adresse email</label>
                       <input
                         type="email"
                         value={email}
                         onChange={e => setEmail(e.target.value)}
                         required
                         placeholder="admin@ecole.sn"
-                        className="w-full bg-[#0A0E27] border border-slate-600 text-white rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ss-green focus:border-transparent placeholder:text-slate-500"
+                        className="w-full px-4 py-3 rounded-xl text-sm text-white bg-white/5 border border-white/10 placeholder:text-white/30 focus:outline-none focus:border-ss-green/50 focus:bg-white/10 transition-all"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-1.5">Mot de passe</label>
+                      <label className="block text-sm font-medium text-white/80 mb-1.5">Mot de passe</label>
                       <input
                         type="password"
                         value={password}
                         onChange={e => setPassword(e.target.value)}
                         required
                         placeholder="Votre mot de passe"
-                        className="w-full bg-[#0A0E27] border border-slate-600 text-white rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ss-green focus:border-transparent placeholder:text-slate-500"
+                        className="w-full px-4 py-3 rounded-xl text-sm text-white bg-white/5 border border-white/10 placeholder:text-white/30 focus:outline-none focus:border-ss-green/50 focus:bg-white/10 transition-all"
                       />
                     </div>
                     <div className="flex justify-end">
-                      <a href="/reset-password" className="text-xs text-[#00E676] hover:underline">
+                      <a href="/reset-password" className="text-xs text-ss-green hover:underline">
                         Mot de passe oublié ?
                       </a>
                     </div>
@@ -492,16 +539,16 @@ function LoginContent() {
                 {tab === 'phone' && otpStep === 'phone' && (
                   <form onSubmit={handleSendOtp} className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-1.5">Numéro de téléphone</label>
+                      <label className="block text-sm font-medium text-white/80 mb-1.5">Numéro de téléphone</label>
                       <div className="flex gap-2">
-                        <div className="flex items-center bg-[#0A0E27] border border-slate-600 rounded-lg px-3 text-slate-400 text-sm">+221</div>
+                        <div className="flex items-center px-4 rounded-xl text-sm text-white/50 bg-white/5 border border-white/10">+221</div>
                         <input
                           type="tel"
                           value={phone}
                           onChange={e => setPhone(e.target.value)}
                           required
                           placeholder="77 123 45 67"
-                          className="flex-1 bg-[#0A0E27] border border-slate-600 text-white rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ss-green placeholder:text-slate-500"
+                          className="flex-1 px-4 py-3 rounded-xl text-sm text-white bg-transparent border-none placeholder:text-white/30 focus:outline-none transition-all"
                         />
                       </div>
                     </div>
@@ -519,7 +566,7 @@ function LoginContent() {
                 {tab === 'phone' && otpStep === 'code' && (
                   <form onSubmit={handleVerifyOtp} className="space-y-4">
                     <div className="text-center mb-2">
-                      <p className="text-slate-300 text-sm">
+                      <p className="text-white/80 text-sm">
                         Code envoyé au <span className="text-white font-medium">{phone}</span>
                       </p>
                     </div>
@@ -530,7 +577,7 @@ function LoginContent() {
                       required
                       placeholder="000000"
                       maxLength={6}
-                      className="w-full bg-[#0A0E27] border border-slate-600 text-white rounded-lg px-4 py-2.5 text-sm text-center tracking-[0.5em] font-mono text-lg focus:outline-none focus:ring-2 focus:ring-ss-green placeholder:text-slate-500 placeholder:tracking-[0.5em]"
+                      className="w-full px-4 py-3 rounded-xl text-sm text-white bg-white/5 border border-white/10 text-center tracking-[0.5em] font-mono text-lg focus:outline-none focus:border-ss-green/50 focus:bg-white/10 placeholder:text-white/30 placeholder:tracking-[0.5em] transition-all"
                     />
                     <button
                       type="submit"
@@ -542,7 +589,7 @@ function LoginContent() {
                     <button
                       type="button"
                       onClick={() => { setOtpStep('phone'); setOtpCode('') }}
-                      className="w-full text-slate-400 text-sm hover:text-white transition"
+                      className="w-full text-white/50 text-sm hover:text-white transition"
                     >
                       Renvoyer un nouveau code
                     </button>
@@ -556,61 +603,61 @@ function LoginContent() {
               <form onSubmit={handleRegister} className="space-y-4">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-1.5">Prénom</label>
+                    <label className="block text-sm font-medium text-white/80 mb-1.5">Prénom</label>
                     <input
                       type="text"
                       value={prenom}
                       onChange={e => setPrenom(e.target.value)}
                       required
                       placeholder="Mamadou"
-                      className="w-full bg-[#0A0E27] border border-slate-600 text-white rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ss-green focus:border-transparent placeholder:text-slate-500"
+                      className="w-full px-4 py-3 rounded-xl text-sm text-white bg-white/5 border border-white/10 placeholder:text-white/30 focus:outline-none focus:border-ss-green/50 focus:bg-white/10 transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-1.5">Nom</label>
+                    <label className="block text-sm font-medium text-white/80 mb-1.5">Nom</label>
                     <input
                       type="text"
                       value={nom}
                       onChange={e => setNom(e.target.value)}
                       required
                       placeholder="Diallo"
-                      className="w-full bg-[#0A0E27] border border-slate-600 text-white rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ss-green focus:border-transparent placeholder:text-slate-500"
+                      className="w-full px-4 py-3 rounded-xl text-sm text-white bg-white/5 border border-white/10 placeholder:text-white/30 focus:outline-none focus:border-ss-green/50 focus:bg-white/10 transition-all"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1.5">Adresse email</label>
+                  <label className="block text-sm font-medium text-white/80 mb-1.5">Adresse email</label>
                   <input
                     type="email"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                     required
                     placeholder="votre@email.sn"
-                    className="w-full bg-[#0A0E27] border border-slate-600 text-white rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ss-green focus:border-transparent placeholder:text-slate-500"
+                    className="w-full px-4 py-3 rounded-xl text-sm text-white bg-white/5 border border-white/10 placeholder:text-white/30 focus:outline-none focus:border-ss-green/50 focus:bg-white/10 transition-all"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1.5">Téléphone</label>
+                  <label className="block text-sm font-medium text-white/80 mb-1.5">Téléphone</label>
                   <div className="flex gap-2">
-                    <div className="flex items-center bg-[#0A0E27] border border-slate-600 rounded-lg px-3 text-slate-400 text-sm">+221</div>
+                    <div className="flex items-center px-4 rounded-xl text-sm text-white/50 bg-white/5 border border-white/10">+221</div>
                     <input
                       type="tel"
                       value={telephone}
                       onChange={e => setTelephone(e.target.value)}
                       placeholder="77 123 45 67"
-                      className="flex-1 bg-[#0A0E27] border border-slate-600 text-white rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ss-green placeholder:text-slate-500"
+                      className="flex-1 px-4 py-3 rounded-xl text-sm text-white bg-transparent border-none placeholder:text-white/30 focus:outline-none transition-all"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1.5">Rôle</label>
+                  <label className="block text-sm font-medium text-white/80 mb-1.5">Rôle</label>
                   <select
                     value={registerRole}
                     onChange={e => setRegisterRole(e.target.value)}
-                    className="w-full bg-[#0A0E27] border border-slate-600 text-white rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ss-green focus:border-transparent"
+                    className="w-full px-4 py-3 rounded-xl text-sm text-white bg-white/5 border border-white/10 focus:outline-none focus:border-ss-green/50 focus:bg-white/10 transition-all"
                   >
                     {REGISTER_ROLES.map(r => (
                       <option key={r.value} value={r.value}>{r.label}</option>
@@ -619,26 +666,26 @@ function LoginContent() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1.5">Mot de passe</label>
+                  <label className="block text-sm font-medium text-white/80 mb-1.5">Mot de passe</label>
                   <input
                     type="password"
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                     required
                     placeholder="Minimum 6 caractères"
-                    className="w-full bg-[#0A0E27] border border-slate-600 text-white rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ss-green focus:border-transparent placeholder:text-slate-500"
+                    className="w-full px-4 py-3 rounded-xl text-sm text-white bg-white/5 border border-white/10 placeholder:text-white/30 focus:outline-none focus:border-ss-green/50 focus:bg-white/10 transition-all"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1.5">Confirmer le mot de passe</label>
+                  <label className="block text-sm font-medium text-white/80 mb-1.5">Confirmer le mot de passe</label>
                   <input
                     type="password"
                     value={confirmPassword}
                     onChange={e => setConfirmPassword(e.target.value)}
                     required
                     placeholder="Retapez le mot de passe"
-                    className="w-full bg-[#0A0E27] border border-slate-600 text-white rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ss-green focus:border-transparent placeholder:text-slate-500"
+                    className="w-full px-4 py-3 rounded-xl text-sm text-white bg-white/5 border border-white/10 placeholder:text-white/30 focus:outline-none focus:border-ss-green/50 focus:bg-white/10 transition-all"
                   />
                 </div>
 
@@ -654,7 +701,7 @@ function LoginContent() {
           </div>
         )}
 
-        <p className="text-center text-slate-600 text-xs mt-6">
+        <p className="text-center text-white/40 text-xs mt-6">
           SmartSchool SN v2.0 &copy; 2025-2026
         </p>
       </div>
@@ -662,12 +709,12 @@ function LoginContent() {
       {/* MODAL 2FA SIMULATION */}
       {show2FA && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#141833] border border-slate-700/50 rounded-2xl w-full max-w-sm p-6 shadow-2xl">
-            <div className="w-12 h-12 bg-ss-green/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl">🔐</span>
+          <div className="glass rounded-3xl w-full max-w-sm p-6 shadow-2xl">
+            <div className="w-12 h-12 bg-ss-green/12 rounded-full flex items-center justify-center mx-auto mb-4">
+              <ShieldCheck size={24} className="text-ss-green" />
             </div>
             <h3 className="text-white text-lg font-bold text-center mb-2">Authentification à deux facteurs</h3>
-            <p className="text-slate-400 text-sm text-center mb-6">
+            <p className="text-white/50 text-sm text-center mb-6">
               Veuillez saisir le code à 6 chiffres envoyé sur votre application d'authentification ou par SMS.
             </p>
             <form onSubmit={handleVerify2FA}>
@@ -679,14 +726,14 @@ function LoginContent() {
                   required
                   placeholder="000000"
                   maxLength={6}
-                  className="w-full bg-[#0A0E27] border border-slate-600 text-white rounded-lg px-4 py-3 text-sm text-center tracking-[0.75em] font-mono text-xl focus:outline-none focus:ring-2 focus:ring-ss-green placeholder:text-slate-500 placeholder:tracking-[0.5em]"
+                  className="w-full px-4 py-4 rounded-xl text-white bg-white/5 border border-white/10 text-center tracking-[0.75em] font-mono text-xl focus:outline-none focus:border-ss-green/50 focus:bg-white/10 placeholder:text-white/30 placeholder:tracking-[0.5em] transition-all"
                 />
               </div>
               <div className="flex gap-3">
                 <button
                   type="button"
                   onClick={() => setShow2FA(false)}
-                  className="flex-1 px-4 py-2.5 rounded-xl border border-slate-700 text-slate-300 hover:bg-slate-800 transition"
+                  className="flex-1 px-4 py-2.5 rounded-xl border border-white/10 text-white/80 hover:bg-white/5 transition"
                 >
                   Annuler
                 </button>
@@ -706,3 +753,4 @@ function LoginContent() {
     </>
   )
 }
+

@@ -8,7 +8,7 @@
 CREATE TABLE IF NOT EXISTS corrections_eleves (
   id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   ecole_id        UUID REFERENCES ecoles(id) ON DELETE CASCADE,
-  prof_id         UUID REFERENCES profils(id),
+  prof_id         UUID REFERENCES utilisateurs(id),
   classe_id       TEXT,
   classe_nom      TEXT,
   nom_eleve       TEXT NOT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS notes_soumises (
   id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   reference         TEXT UNIQUE NOT NULL,
   ecole_id          UUID REFERENCES ecoles(id) ON DELETE CASCADE,
-  prof_id           UUID REFERENCES profils(id),
+  prof_id           UUID REFERENCES utilisateurs(id),
   prof_nom          TEXT,
   classe_id         TEXT,
   classe_nom        TEXT NOT NULL,
@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS notes_soumises (
   moyenne_classe    NUMERIC(4,2),
   nb_eleves         INTEGER,
   statut            TEXT DEFAULT 'en_attente' CHECK (statut IN ('en_attente', 'valide', 'rejete')),
-  censeur_id        UUID REFERENCES profils(id),
+  censeur_id        UUID REFERENCES utilisateurs(id),
   censeur_commentaire TEXT,
   date_soumission   TIMESTAMPTZ DEFAULT NOW(),
   date_validation   TIMESTAMPTZ,
@@ -69,30 +69,30 @@ ALTER TABLE notes_soumises ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "prof_voir_ses_corrections"
   ON corrections_eleves FOR SELECT
   USING (prof_id = auth.uid() OR ecole_id IN (
-    SELECT ecole_id FROM profils WHERE id = auth.uid()
+    SELECT ecole_id FROM utilisateurs WHERE id = auth.uid()
   ));
 
 CREATE POLICY "prof_inserer_corrections"
   ON corrections_eleves FOR INSERT
   WITH CHECK (ecole_id IN (
-    SELECT ecole_id FROM profils WHERE id = auth.uid()
+    SELECT ecole_id FROM utilisateurs WHERE id = auth.uid()
   ));
 
 -- Notes soumises : censeur voit toutes celles de son école
 CREATE POLICY "voir_notes_de_son_ecole"
   ON notes_soumises FOR SELECT
   USING (ecole_id IN (
-    SELECT ecole_id FROM profils WHERE id = auth.uid()
+    SELECT ecole_id FROM utilisateurs WHERE id = auth.uid()
   ));
 
 CREATE POLICY "prof_inserer_notes"
   ON notes_soumises FOR INSERT
   WITH CHECK (ecole_id IN (
-    SELECT ecole_id FROM profils WHERE id = auth.uid()
+    SELECT ecole_id FROM utilisateurs WHERE id = auth.uid()
   ));
 
 CREATE POLICY "censeur_valider_notes"
   ON notes_soumises FOR UPDATE
   USING (ecole_id IN (
-    SELECT ecole_id FROM profils WHERE id = auth.uid() AND role IN ('censeur', 'admin_global')
+    SELECT ecole_id FROM utilisateurs WHERE id = auth.uid() AND role IN ('censeur', 'admin_global')
   ));

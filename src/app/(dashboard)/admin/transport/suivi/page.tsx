@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { PageHeader } from '@/components/dashboard/PageHeader'
+import { MapPin } from 'lucide-react'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -241,42 +243,36 @@ export default function SuiviGPSPage() {
   return (
     <div>
       {/* ─── Header ──────────────────────────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-ss-text flex items-center gap-2">
-            <span role="img" aria-label="carte">🗺️</span> Suivi GPS en direct
-          </h1>
-          <p className="text-sm text-ss-text-muted mt-1">
-            Position des bus scolaires en temps reel
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          {/* Live indicator */}
-          <span className="flex items-center gap-1.5 text-xs text-[#00853F] bg-[#00853F]/10 px-3 py-1.5 rounded-full">
-            <span className="w-2 h-2 rounded-full bg-[#00853F] animate-pulse" />
-            En direct
-          </span>
-
-          {/* Vehicle filter */}
-          <select
-            value={selectedVehicule}
-            onChange={(e) => setSelectedVehicule(e.target.value)}
-            className="bg-ss-bg-secondary border border-ss-border text-ss-text text-sm rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00853F]/50"
-          >
-            <option value="all">Tous les vehicules</option>
-            {vehicules.map(v => (
-              <option key={v.id} value={v.id}>
-                {v.immatriculation} {v.marque ? `- ${v.marque}` : ''}
-              </option>
-            ))}
-          </select>
-
-          {/* Refresh info */}
-          <span className="text-xs text-ss-text-muted hidden sm:inline">
-            Maj: {lastRefresh.toLocaleTimeString('fr-SN', { hour: '2-digit', minute: '2-digit' })}
-          </span>
-        </div>
+      <div className="mb-6">
+        <PageHeader
+          title="Suivi GPS en direct"
+          description="Position des bus scolaires en temps reel"
+          icon={MapPin}
+          accent="green"
+          actions={
+            <div className="flex items-center gap-3 flex-wrap">
+              <span className="flex items-center gap-1.5 text-xs text-[#00853F] bg-[#00853F]/10 px-3 py-1.5 rounded-full">
+                <span className="w-2 h-2 rounded-full bg-[#00853F] animate-pulse" />
+                En direct
+              </span>
+              <select
+                value={selectedVehicule}
+                onChange={(e) => setSelectedVehicule(e.target.value)}
+                className="bg-ss-bg-secondary border border-ss-border text-ss-text text-sm rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00853F]/50"
+              >
+                <option value="all">Tous les vehicules</option>
+                {vehicules.map(v => (
+                  <option key={v.id} value={v.id}>
+                    {v.immatriculation} {v.marque ? `- ${v.marque}` : ''}
+                  </option>
+                ))}
+              </select>
+              <span className="text-xs text-ss-text-muted hidden sm:inline">
+                Maj: {lastRefresh.toLocaleTimeString('fr-SN', { hour: '2-digit', minute: '2-digit' })}
+              </span>
+            </div>
+          }
+        />
       </div>
 
       {/* ─── Main grid: Map + Sidebar ────────────────────────────────────── */}

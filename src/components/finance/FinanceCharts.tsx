@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useMemo } from 'react'
 import {
@@ -25,7 +25,7 @@ interface FinanceChartsProps {
 
 const STATUT_COLORS: Record<string, string> = {
   paye: '#00C853',
-  partiellement_paye: '#FFD600',
+  partiellement_paye: '#FBBF24',
   en_attente: '#9FA8DA',
   en_retard: '#FF5252',
   annule: '#666',
@@ -143,7 +143,7 @@ export function FinanceCharts({ repartition, evolution, tauxRecouvrement }: Fina
                 formatter={(value: string) => value === 'encaisse' ? 'Encaissé' : 'Attendu'}
                 wrapperStyle={{ fontSize: '11px', color: '#9FA8DA' }}
               />
-              <Bar dataKey="encaisse" fill="#00BCD4" radius={[3, 3, 0, 0]} barSize={16} />
+              <Bar dataKey="encaisse" fill="#16A34A" radius={[3, 3, 0, 0]} barSize={16} />
               <Line
                 type="monotone"
                 dataKey="attendu"
@@ -159,3 +159,4 @@ export function FinanceCharts({ repartition, evolution, tauxRecouvrement }: Fina
     </div>
   )
 }
+

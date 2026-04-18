@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useRef, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
@@ -8,11 +8,11 @@ import ChatMessageComponent from './ChatMessage'
 import ChatInput from './ChatInput'
 
 const ROLE_COLORS: Record<string, string> = {
-  admin_global: '#FF1744',
-  professeur: '#00E676',
-  surveillant: '#FFD600',
-  parent: '#00E5FF',
-  eleve: '#D500F9',
+  admin_global: '#F87171',
+  professeur: '#22C55E',
+  surveillant: '#FBBF24',
+  parent: '#38BDF8',
+  eleve: '#A78BFA',
 }
 
 const ROLE_LABELS: Record<string, string> = {
@@ -64,7 +64,7 @@ export default function ChatWidget() {
   const pathname = usePathname()
   const { user } = useUser()
   const role = user?.role || roleFromPath(pathname)
-  const accentColor = ROLE_COLORS[role] || '#D500F9'
+  const accentColor = ROLE_COLORS[role] || '#A78BFA'
 
   const [isOpen, setIsOpen] = useState(false)
   const [isMinimized, setIsMinimized] = useState(false)
@@ -255,3 +255,4 @@ export default function ChatWidget() {
     </>
   )
 }
+

@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { isDemoMode, DEMO_CLASSES, DEMO_ELEVES } from '@/lib/demo-data'
+import { PageHeader } from '@/components/dashboard/PageHeader'
+import { FileText } from 'lucide-react'
 
 interface Classe { id: string; nom: string; niveau: string }
 interface Eleve { id: string; nom: string; prenom: string; matricule: string }
@@ -123,7 +125,12 @@ export default function AdminBulletinsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-ss-text">Génération des Bulletins</h1>
+      <PageHeader
+        title="Génération des Bulletins"
+        description="Préparez et éditez les bulletins par classe et trimestre."
+        icon={FileText}
+        accent="gold"
+      />
 
       {/* Sélecteur trimestre */}
       <div className="flex gap-2">

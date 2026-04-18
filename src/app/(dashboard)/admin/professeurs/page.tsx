@@ -4,6 +4,8 @@ import { useEffect, useState, useMemo, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { isDemoMode, DEMO_PROFESSEURS } from '@/lib/demo-data'
+import { PageHeader } from '@/components/dashboard/PageHeader'
+import { UserSquare2, Search } from 'lucide-react'
 
 interface Professeur {
   id: string
@@ -82,18 +84,23 @@ export default function ProfesseursPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-2xl font-bold text-ss-text">Gestion des Professeurs</h1>
-        <div className="flex items-center gap-3 text-sm">
-          <span className="text-ss-green">{totalActifs} actif{totalActifs > 1 ? 's' : ''}</span>
-          <span className="text-ss-text-muted">/</span>
-          <span className="text-ss-text-muted">{totalInactifs} inactif{totalInactifs > 1 ? 's' : ''}</span>
-        </div>
-      </div>
+      <PageHeader
+        title="Gestion des Professeurs"
+        description="Consultation et gestion du corps enseignant."
+        icon={UserSquare2}
+        accent="info"
+        actions={
+          <div className="flex items-center gap-3 text-sm px-3 py-2 rounded-xl bg-white/5 border border-white/10">
+            <span className="text-ss-green font-semibold">{totalActifs} actif{totalActifs > 1 ? 's' : ''}</span>
+            <span className="text-ss-text-muted">/</span>
+            <span className="text-ss-text-muted">{totalInactifs} inactif{totalInactifs > 1 ? 's' : ''}</span>
+          </div>
+        }
+      />
 
       {/* Recherche */}
       <div className="relative">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-ss-text-muted text-lg">🔍</span>
+        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-ss-text-muted pointer-events-none" aria-hidden="true" />
         <input
           type="text"
           placeholder="Rechercher par nom, prenom ou telephone..."

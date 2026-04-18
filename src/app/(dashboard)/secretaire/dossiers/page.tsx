@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -91,7 +91,7 @@ export default function DossiersPage() {
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="text-xs px-2 py-1 rounded-lg font-semibold"
-                    style={{ background: 'rgba(255,23,68,0.15)', color: '#FF1744' }}>
+                    style={{ background: 'rgba(255,23,68,0.15)', color: '#F87171' }}>
                     Incomplet
                   </span>
                   <button className="text-xs px-3 py-1 rounded-lg"
@@ -136,3 +136,4 @@ export default function DossiersPage() {
     </div>
   )
 }
+

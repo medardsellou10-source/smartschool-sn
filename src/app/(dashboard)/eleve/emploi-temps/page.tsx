@@ -1,9 +1,11 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { isDemoMode, DEMO_ELEVES, DEMO_EMPLOIS_TEMPS, DEMO_MATIERES, DEMO_CLASSES } from '@/lib/demo-data'
+import { PageHeader } from '@/components/dashboard/PageHeader'
+import { CalendarDays } from 'lucide-react'
 
 interface CoursItem {
   id: string
@@ -16,7 +18,7 @@ interface CoursItem {
 
 const JOUR_LABELS: Record<number, string> = { 1: 'Lundi', 2: 'Mardi', 3: 'Mercredi', 4: 'Jeudi', 5: 'Vendredi', 6: 'Samedi' }
 const JOUR_SHORT: Record<number, string> = { 0: 'Sem', 1: 'Lun', 2: 'Mar', 3: 'Mer', 4: 'Jeu', 5: 'Ven', 6: 'Sam' }
-const MATIERE_COLORS = ['#00E676', '#00E5FF', '#FFD600', '#D500F9', '#FF6D00', '#FF1744', '#448AFF']
+const MATIERE_COLORS = ['#22C55E', '#38BDF8', '#FBBF24', '#A78BFA', '#FF6D00', '#F87171', '#448AFF']
 
 export default function EleveEmploiTempsPage() {
   const { user, loading: userLoading } = useUser()
@@ -99,11 +101,12 @@ export default function EleveEmploiTempsPage() {
 
   return (
     <div className="space-y-5 pb-6 animate-fade-in">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-black text-white">Mon Emploi du Temps</h1>
-        <p className="text-sm mt-1" style={{ color: '#94A3B8' }}>{JOUR_LABELS[jourSemaine]} — {today.toLocaleDateString('fr-SN', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
-      </div>
+      <PageHeader
+        title="Mon Emploi du Temps"
+        description={`${JOUR_LABELS[jourSemaine]} — ${today.toLocaleDateString('fr-SN', { day: 'numeric', month: 'long', year: 'numeric' })}`}
+        icon={CalendarDays}
+        accent="purple"
+      />
 
       {/* Day filter */}
       <div className="flex gap-1.5 overflow-x-auto scrollbar-hide pb-1">
@@ -115,11 +118,11 @@ export default function EleveEmploiTempsPage() {
               className="px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all"
               style={{
                 background: isActive ? 'rgba(213,0,249,0.15)' : 'rgba(255,255,255,0.04)',
-                color: isActive ? '#D500F9' : isToday ? '#D500F9' : '#94A3B8',
+                color: isActive ? '#A78BFA' : isToday ? '#A78BFA' : '#94A3B8',
                 border: `1px solid ${isActive ? 'rgba(213,0,249,0.3)' : isToday ? 'rgba(213,0,249,0.15)' : 'rgba(255,255,255,0.08)'}`,
               }}>
               {JOUR_SHORT[j]}
-              {isToday && j !== 0 && <span className="ml-1 w-1.5 h-1.5 rounded-full bg-[#D500F9] inline-block" />}
+              {isToday && j !== 0 && <span className="ml-1 w-1.5 h-1.5 rounded-full bg-[#A78BFA] inline-block" />}
             </button>
           )
         })}
@@ -148,8 +151,8 @@ export default function EleveEmploiTempsPage() {
                 {selectedJour === 0 && (
                   <div className="flex items-center gap-3 mb-3">
                     <div className="flex items-center gap-2">
-                      {isToday && <span className="w-2 h-2 rounded-full bg-[#D500F9] animate-pulse" />}
-                      <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: isToday ? '#D500F9' : '#94A3B8' }}>
+                      {isToday && <span className="w-2 h-2 rounded-full bg-[#A78BFA] animate-pulse" />}
+                      <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: isToday ? '#A78BFA' : '#94A3B8' }}>
                         {JOUR_LABELS[jour]}
                       </h2>
                     </div>
@@ -161,7 +164,7 @@ export default function EleveEmploiTempsPage() {
                 {/* Course cards */}
                 <div className="space-y-2">
                   {cours.map(c => {
-                    const color = matiereColorMap[c.matiere_nom] || '#00E676'
+                    const color = matiereColorMap[c.matiere_nom] || '#22C55E'
                     const isCurrent = isToday && c.heure_debut <= now && c.heure_fin > now
                     const isPast = isToday && c.heure_fin < now
 
@@ -201,3 +204,4 @@ export default function EleveEmploiTempsPage() {
     </div>
   )
 }
+

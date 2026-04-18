@@ -1,11 +1,13 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { isDemoMode } from '@/lib/demo-data'
+import { PageHeader } from '@/components/dashboard/PageHeader'
+import { BadgeCheck } from 'lucide-react'
 
-const ACCENT = '#FF1744'
+const ACCENT = '#F87171'
 
 interface Abonnement {
   id: string
@@ -34,7 +36,7 @@ const PLANS_DEMO: Plan[] = [
     id: 'basique',
     nom: 'Basique',
     emoji: '🥉',
-    couleur: '#00E676',
+    couleur: '#22C55E',
     prix_mensuel: 25000,
     prix_annuel: 240000,
     max_eleves: 200,
@@ -54,7 +56,7 @@ const PLANS_DEMO: Plan[] = [
     id: 'standard',
     nom: 'Standard',
     emoji: '🥈',
-    couleur: '#00E5FF',
+    couleur: '#38BDF8',
     prix_mensuel: 50000,
     prix_annuel: 480000,
     max_eleves: 600,
@@ -78,7 +80,7 @@ const PLANS_DEMO: Plan[] = [
     id: 'etablissement',
     nom: 'Établissement',
     emoji: '🥇',
-    couleur: '#FFD600',
+    couleur: '#FBBF24',
     prix_mensuel: 100000,
     prix_annuel: 960000,
     max_eleves: 1500,
@@ -175,10 +177,10 @@ export default function AbonnementPage() {
   const urgence = joursRestants <= 7
 
   const statutConfig = {
-    trial:    { label: 'Essai gratuit', color: '#00E676', bg: 'rgba(0,230,118,0.1)' },
-    actif:    { label: 'Actif',         color: '#00E676', bg: 'rgba(0,230,118,0.1)' },
-    expire:   { label: 'Expiré',        color: '#FF1744', bg: 'rgba(255,23,68,0.1)' },
-    suspendu: { label: 'Suspendu',      color: '#FFD600', bg: 'rgba(255,214,0,0.1)' },
+    trial:    { label: 'Essai gratuit', color: '#22C55E', bg: 'rgba(0,230,118,0.1)' },
+    actif:    { label: 'Actif',         color: '#22C55E', bg: 'rgba(0,230,118,0.1)' },
+    expire:   { label: 'Expiré',        color: '#F87171', bg: 'rgba(255,23,68,0.1)' },
+    suspendu: { label: 'Suspendu',      color: '#FBBF24', bg: 'rgba(255,214,0,0.1)' },
     annule:   { label: 'Annulé',        color: '#94A3B8', bg: 'rgba(148,163,184,0.1)' },
   }
 
@@ -206,11 +208,12 @@ export default function AbonnementPage() {
         </div>
       )}
 
-      {/* En-tête */}
-      <div>
-        <h1 className="text-2xl font-bold text-white">Mon Abonnement</h1>
-        <p className="text-slate-400 text-sm mt-1">Gérez votre plan et votre facturation SmartSchool SN</p>
-      </div>
+      <PageHeader
+        title="Mon Abonnement"
+        description="Gérez votre plan et votre facturation SmartSchool SN."
+        icon={BadgeCheck}
+        accent="danger"
+      />
 
       {/* Abonnement actuel */}
       {abonnement && planActuel && (
@@ -235,7 +238,7 @@ export default function AbonnementPage() {
               </div>
             </div>
             <div className="text-right">
-              <div className="text-4xl font-black" style={{ color: urgence ? '#FF1744' : planActuel.couleur }}>
+              <div className="text-4xl font-black" style={{ color: urgence ? '#F87171' : planActuel.couleur }}>
                 {joursRestants}j
               </div>
               <div className="text-xs text-slate-400">restants</div>
@@ -254,7 +257,7 @@ export default function AbonnementPage() {
               <div className="h-full rounded-full transition-all"
                 style={{
                   width: `${Math.min(100, (joursRestants / 30) * 100)}%`,
-                  background: urgence ? '#FF1744' : `linear-gradient(90deg, ${planActuel.couleur}, ${planActuel.couleur}80)`,
+                  background: urgence ? '#F87171' : `linear-gradient(90deg, ${planActuel.couleur}, ${planActuel.couleur}80)`,
                 }} />
             </div>
           </div>
@@ -290,7 +293,7 @@ export default function AbonnementPage() {
         <div className="flex items-center gap-3 mb-4">
           <h2 className="text-lg font-bold text-white">🚀 Nouvelles fonctionnalités (2025-2026)</h2>
           <span className="px-2.5 py-1 rounded-full text-xs font-bold"
-            style={{ background: 'rgba(0,229,255,0.15)', color: '#00E5FF' }}>8 NOUVELLES</span>
+            style={{ background: 'rgba(0,229,255,0.15)', color: '#38BDF8' }}>8 NOUVELLES</span>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {NOUVELLES_FONCTIONNALITES.map(({ icon, titre, desc, plan }) => (
@@ -303,7 +306,7 @@ export default function AbonnementPage() {
                 <span className="shrink-0 text-[9px] font-bold px-2 py-0.5 rounded-full"
                   style={{
                     background: plan === 'Établissement' ? 'rgba(255,214,0,0.12)' : 'rgba(0,229,255,0.12)',
-                    color: plan === 'Établissement' ? '#FFD600' : '#00E5FF',
+                    color: plan === 'Établissement' ? '#FBBF24' : '#38BDF8',
                     border: `1px solid ${plan === 'Établissement' ? 'rgba(255,214,0,0.2)' : 'rgba(0,229,255,0.2)'}`,
                   }}>
                   {plan}
@@ -385,7 +388,7 @@ export default function AbonnementPage() {
         </div>
         <a href="mailto:contact@smartschool.sn"
           className="px-5 py-2.5 rounded-xl font-bold text-sm hover:opacity-90 transition-opacity"
-          style={{ background: 'rgba(213,0,249,0.1)', border: '1px solid rgba(213,0,249,0.3)', color: '#D500F9' }}>
+          style={{ background: 'rgba(213,0,249,0.1)', border: '1px solid rgba(213,0,249,0.3)', color: '#A78BFA' }}>
           Nous contacter →
         </a>
       </div>
@@ -417,3 +420,4 @@ export default function AbonnementPage() {
     </div>
   )
 }
+

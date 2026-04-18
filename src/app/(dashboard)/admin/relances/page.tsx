@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
+import { PageHeader } from '@/components/dashboard/PageHeader'
+import { Mail } from 'lucide-react'
 
 interface FactureImpayee {
   id: string
@@ -109,7 +111,7 @@ export default function RelancesPage() {
   if (loading) {
     return (
       <div className="p-6 space-y-6">
-        <h1 className="text-2xl font-bold text-ss-text">📨 Relances automatiques</h1>
+        <PageHeader title="Relances automatiques" icon={Mail} accent="gold" />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[1, 2, 3].map(i => (
             <div key={i} className="bg-ss-bg-secondary rounded-xl p-5 h-[120px] ss-shimmer" />
@@ -122,28 +124,21 @@ export default function RelancesPage() {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-ss-text">📨 Relances automatiques</h1>
-          <p className="text-ss-text-secondary text-sm mt-1">
-            Relances WhatsApp hebdomadaires pour les factures en attente
-          </p>
-        </div>
-        <button
-          onClick={lancerRelances}
-          disabled={sending || factures.length === 0}
-          className="px-6 py-3 bg-[#00853F] hover:bg-[#006d33] text-white rounded-lg font-semibold flex items-center gap-2 disabled:opacity-50 transition-colors"
-        >
-          {sending ? (
-            <>
-              <span className="animate-spin">⏳</span> Envoi en cours...
-            </>
-          ) : (
-            <>📱 Lancer les relances maintenant</>
-          )}
-        </button>
-      </div>
+      <PageHeader
+        title="Relances automatiques"
+        description="Relances WhatsApp hebdomadaires pour les factures en attente."
+        icon={Mail}
+        accent="gold"
+        actions={
+          <button
+            onClick={lancerRelances}
+            disabled={sending || factures.length === 0}
+            className="px-5 py-2.5 bg-ss-green hover:opacity-90 text-[#020617] rounded-xl font-semibold text-sm flex items-center gap-2 disabled:opacity-50 transition-opacity cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ss-green focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617]"
+          >
+            {sending ? 'Envoi en cours…' : 'Lancer les relances'}
+          </button>
+        }
+      />
 
       {/* Résultat */}
       {result && (

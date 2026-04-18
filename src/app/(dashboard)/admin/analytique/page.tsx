@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { StatCard } from '@/components/dashboard/StatCard'
+import { PageHeader } from '@/components/dashboard/PageHeader'
+import { BarChart3 } from 'lucide-react'
 
 interface EleveRisque {
   id: string
@@ -197,7 +199,7 @@ export default function AnalytiquePage() {
   if (loading) {
     return (
       <div className="p-6 space-y-6">
-        <h1 className="text-2xl font-bold text-ss-text">📊 Analytique prédictif</h1>
+        <PageHeader title="Analytique prédictif" icon={BarChart3} accent="purple" />
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map(i => (
             <div key={i} className="bg-ss-bg-secondary rounded-xl p-5 h-[120px] ss-shimmer" />
@@ -212,10 +214,13 @@ export default function AnalytiquePage() {
     <div className="p-6 space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-ss-text">📊 Analytique prédictif</h1>
-        <p className="text-ss-text-secondary text-sm mt-1">
-          Identification des élèves à risque de décrochage scolaire
-        </p>
+        <PageHeader
+          title="Analytique prédictif"
+          description="Identification des élèves à risque de décrochage scolaire."
+          icon={BarChart3}
+          accent="purple"
+          compact
+        />
         {/* Bande tricolore */}
         <div className="flex h-1 rounded-full overflow-hidden mt-3 max-w-xs">
           <div className="flex-1 bg-[#00853F]" />

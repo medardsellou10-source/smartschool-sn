@@ -1,9 +1,11 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { isDemoMode, DEMO_POINTAGES, DEMO_PROFESSEURS } from '@/lib/demo-data'
+import { PageHeader } from '@/components/dashboard/PageHeader'
+import { CalendarClock, Download } from 'lucide-react'
 
 interface PointageCell {
   prof_id: string
@@ -13,9 +15,9 @@ interface PointageCell {
 }
 
 const STATUT_PALETTE: Record<string, { bg: string; color: string; label: string }> = {
-  a_heure: { bg: 'rgba(0,230,118,0.3)', color: '#00E676', label: 'A l\'heure' },
-  retard_leger: { bg: 'rgba(255,214,0,0.3)', color: '#FFD600', label: 'Retard leger' },
-  retard_grave: { bg: 'rgba(255,23,68,0.3)', color: '#FF1744', label: 'Retard grave' },
+  a_heure: { bg: 'rgba(0,230,118,0.3)', color: '#22C55E', label: 'A l\'heure' },
+  retard_leger: { bg: 'rgba(255,214,0,0.3)', color: '#FBBF24', label: 'Retard leger' },
+  retard_grave: { bg: 'rgba(255,23,68,0.3)', color: '#F87171', label: 'Retard grave' },
 }
 
 function downloadCSV(headers: string[], rows: string[][], filename: string) {
@@ -119,20 +121,29 @@ export default function AdminPointageHistoriquePage() {
 
   return (
     <div className="space-y-5 pb-6 animate-fade-in">
-      {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-2xl font-black text-white">Historique Pointages</h1>
-        <div className="flex items-center gap-3">
-          <input type="month" value={selectedMonth} onChange={e => setSelectedMonth(e.target.value)}
-            className="px-3 py-2 rounded-xl text-sm font-medium text-white outline-none"
-            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }} />
-          <button onClick={handleExportCSV}
-            className="px-4 py-2 rounded-xl text-sm font-bold transition-all hover:opacity-90"
-            style={{ background: '#FF1744', color: '#fff' }}>
-            Export CSV
-          </button>
-        </div>
-      </div>
+      <PageHeader
+        title="Historique Pointages"
+        description="Présence et retards des professeurs par mois."
+        icon={CalendarClock}
+        accent="danger"
+        actions={
+          <>
+            <input
+              type="month"
+              value={selectedMonth}
+              onChange={e => setSelectedMonth(e.target.value)}
+              className="px-3 py-2.5 rounded-xl text-sm font-medium text-ss-text outline-none bg-ss-bg-secondary border border-ss-border cursor-pointer"
+            />
+            <button
+              onClick={handleExportCSV}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-opacity hover:opacity-90 cursor-pointer bg-ss-danger text-[#020617] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ss-danger focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617]"
+            >
+              <Download size={16} />
+              Export CSV
+            </button>
+          </>
+        }
+      />
 
       {/* Legend */}
       <div className="flex flex-wrap gap-4">
@@ -205,7 +216,7 @@ export default function AdminPointageHistoriquePage() {
                 className="px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all"
                 style={{
                   background: sortBy === s.key ? 'rgba(255,23,68,0.12)' : 'rgba(255,255,255,0.04)',
-                  color: sortBy === s.key ? '#FF1744' : '#475569',
+                  color: sortBy === s.key ? '#F87171' : '#475569',
                 }}>
                 {s.label}
               </button>
@@ -215,16 +226,16 @@ export default function AdminPointageHistoriquePage() {
 
         <div className="space-y-2">
           {profStats.map(prof => {
-            const tauxColor = prof.taux >= 90 ? '#00E676' : prof.taux >= 70 ? '#FFD600' : '#FF1744'
+            const tauxColor = prof.taux >= 90 ? '#22C55E' : prof.taux >= 70 ? '#FBBF24' : '#F87171'
             return (
               <div key={prof.id} className="flex items-center gap-3 p-3 rounded-xl"
                 style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-white truncate">{prof.nom}</p>
                   <div className="flex gap-3 mt-1">
-                    <span className="text-[10px]" style={{ color: '#00E676' }}>{prof.aHeure} present(s)</span>
-                    <span className="text-[10px]" style={{ color: '#FFD600' }}>{prof.retardLeger} leger(s)</span>
-                    <span className="text-[10px]" style={{ color: '#FF1744' }}>{prof.retardGrave} grave(s)</span>
+                    <span className="text-[10px]" style={{ color: '#22C55E' }}>{prof.aHeure} present(s)</span>
+                    <span className="text-[10px]" style={{ color: '#FBBF24' }}>{prof.retardLeger} leger(s)</span>
+                    <span className="text-[10px]" style={{ color: '#F87171' }}>{prof.retardGrave} grave(s)</span>
                   </div>
                 </div>
                 <div className="text-right shrink-0">
@@ -240,3 +251,4 @@ export default function AdminPointageHistoriquePage() {
     </div>
   )
 }
+

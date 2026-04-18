@@ -1,19 +1,19 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { isDemoMode, DEMO_INVENTAIRE } from '@/lib/demo-data'
 
-const ACCENT = '#00BCD4'
+const ACCENT = '#16A34A'
 function fmt(v: number) { return new Intl.NumberFormat('fr-FR').format(v) + ' FCFA' }
 
 type Article = typeof DEMO_INVENTAIRE[0]
 
 const ETAT_STYLE: Record<string, { bg: string; color: string; label: string }> = {
-  bon:    { bg: 'rgba(0,230,118,0.15)', color: '#00E676', label: 'Bon état' },
-  moyen:  { bg: 'rgba(255,214,0,0.15)', color: '#FFD600', label: 'État moyen' },
-  mauvais:{ bg: 'rgba(255,23,68,0.15)', color: '#FF1744', label: 'Mauvais état' },
+  bon:    { bg: 'rgba(0,230,118,0.15)', color: '#22C55E', label: 'Bon état' },
+  moyen:  { bg: 'rgba(255,214,0,0.15)', color: '#FBBF24', label: 'État moyen' },
+  mauvais:{ bg: 'rgba(255,23,68,0.15)', color: '#F87171', label: 'Mauvais état' },
 }
 
 export default function InventairePage() {
@@ -121,3 +121,4 @@ export default function InventairePage() {
     </div>
   )
 }
+

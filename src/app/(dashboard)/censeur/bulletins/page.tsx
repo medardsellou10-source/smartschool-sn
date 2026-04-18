@@ -1,7 +1,9 @@
-'use client'
+﻿'use client'
 
 import { useState, useMemo, useCallback } from 'react'
 import { useUser } from '@/hooks/useUser'
+import { PageHeader } from '@/components/dashboard/PageHeader'
+import { FileText, Printer, CheckCircle2, Users, BarChart3, Target } from 'lucide-react'
 import {
   isDemoMode,
   DEMO_CLASSES, DEMO_MATIERES, DEMO_ELEVES,
@@ -36,13 +38,13 @@ interface EleveBulletin {
 // ── Mention sénégalaise ────────────────────────────────────────
 function getMention(avg: number | null): { mention: string; color: string; conseil: string } {
   if (avg === null) return { mention: '—', color: '#64748B', conseil: 'Données insuffisantes' }
-  if (avg >= 18) return { mention: 'Excellent', color: '#FFD600', conseil: 'Félicitations du conseil de classe' }
-  if (avg >= 16) return { mention: 'Très Bien', color: '#00E676', conseil: 'Mention Honorable avec félicitations' }
-  if (avg >= 14) return { mention: 'Bien', color: '#00E5FF', conseil: 'Mention Honorable' }
+  if (avg >= 18) return { mention: 'Excellent', color: '#FBBF24', conseil: 'Félicitations du conseil de classe' }
+  if (avg >= 16) return { mention: 'Très Bien', color: '#22C55E', conseil: 'Mention Honorable avec félicitations' }
+  if (avg >= 14) return { mention: 'Bien', color: '#38BDF8', conseil: 'Mention Honorable' }
   if (avg >= 12) return { mention: 'Assez Bien', color: '#7C4DFF', conseil: 'Mention Assez Bien' }
   if (avg >= 10) return { mention: 'Passable', color: '#FF6D00', conseil: 'Admis(e) — Effort à poursuivre' }
   if (avg >= 8)  return { mention: 'Insuffisant', color: '#FF6D00', conseil: 'Redoublement à envisager' }
-  return { mention: 'Très Insuffisant', color: '#FF1744', conseil: 'Redoublement fortement recommandé' }
+  return { mention: 'Très Insuffisant', color: '#F87171', conseil: 'Redoublement fortement recommandé' }
 }
 
 // ── Moteur de calcul ───────────────────────────────────────────
@@ -105,11 +107,11 @@ function calcBulletins(classeId: string, trimestre: number): EleveBulletin[] {
 
 function noteColor(note: number | null): string {
   if (note === null) return '#475569'
-  if (note >= 16) return '#FFD600'
-  if (note >= 14) return '#00E676'
-  if (note >= 10) return '#00E5FF'
+  if (note >= 16) return '#FBBF24'
+  if (note >= 14) return '#22C55E'
+  if (note >= 10) return '#38BDF8'
   if (note >= 8)  return '#FF6D00'
-  return '#FF1744'
+  return '#F87171'
 }
 
 // ── Bulletin imprimable ────────────────────────────────────────
@@ -449,7 +451,7 @@ export default function BulletinsPage() {
                     <span className="text-xs font-bold px-2.5 py-1 rounded-full"
                       style={{
                         background: n.statut === 'valide' ? 'rgba(0,230,118,0.15)' : n.statut === 'rejete' ? 'rgba(255,23,68,0.15)' : 'rgba(255,214,0,0.15)',
-                        color: n.statut === 'valide' ? '#00E676' : n.statut === 'rejete' ? '#FF1744' : '#FFD600',
+                        color: n.statut === 'valide' ? '#22C55E' : n.statut === 'rejete' ? '#F87171' : '#FBBF24',
                         border: `1px solid ${n.statut === 'valide' ? 'rgba(0,230,118,0.3)' : n.statut === 'rejete' ? 'rgba(255,23,68,0.3)' : 'rgba(255,214,0,0.3)'}`,
                       }}>
                       {n.statut === 'valide' ? '✅ Validé' : n.statut === 'rejete' ? '✕ Rejeté' : '⏳ En attente'}
@@ -473,12 +475,12 @@ export default function BulletinsPage() {
                     <div className="ml-auto flex gap-2">
                       <button onClick={() => handleRejeterNotes(n.id)}
                         className="text-xs px-3 py-1.5 rounded-lg font-semibold transition-all"
-                        style={{ background: 'rgba(255,23,68,0.1)', color: '#FF1744', border: '1px solid rgba(255,23,68,0.25)' }}>
+                        style={{ background: 'rgba(255,23,68,0.1)', color: '#F87171', border: '1px solid rgba(255,23,68,0.25)' }}>
                         ✕ Rejeter
                       </button>
                       <button onClick={() => handleValiderNotes(n.id)} disabled={validatingNote === n.id}
                         className="text-xs px-4 py-1.5 rounded-lg font-bold transition-all disabled:opacity-60"
-                        style={{ background: 'rgba(0,230,118,0.15)', color: '#00E676', border: '1px solid rgba(0,230,118,0.3)' }}>
+                        style={{ background: 'rgba(0,230,118,0.15)', color: '#22C55E', border: '1px solid rgba(0,230,118,0.3)' }}>
                         {validatingNote === n.id ? (
                           <><span className="inline-block w-3 h-3 border border-current/30 border-t-current rounded-full animate-spin mr-1" />Validation...</>
                         ) : '✓ Valider les notes'}
@@ -506,7 +508,7 @@ export default function BulletinsPage() {
                       <div className="text-[10px] font-bold text-ss-text-muted pb-1 text-center">NOTE / 20</div>
                       <div className="text-[10px] font-bold text-ss-text-muted pb-1 text-right">MENTION</div>
                       {n.notes.map((note, i) => {
-                        const noteColor = note.note >= 16 ? '#00E676' : note.note >= 10 ? '#00E5FF' : '#FF1744'
+                        const noteColor = note.note >= 16 ? '#22C55E' : note.note >= 10 ? '#38BDF8' : '#F87171'
                         return (
                           <>
                             <div key={`name-${i}`} className="text-sm text-ss-text py-0.5">{note.nomEleve}</div>
@@ -533,35 +535,44 @@ export default function BulletinsPage() {
 
       {/* ── Vue écran ─────────────────────────────────────────── */}
       <div className="print:hidden space-y-5 max-w-6xl mx-auto">
-        <div className="flex items-center justify-between gap-3 flex-wrap">
-          <div>
-            <h1 className="text-2xl font-bold text-ss-text">📋 Bulletins de Notes</h1>
-            <p className="text-ss-text-muted text-sm mt-0.5">Calcul automatique des moyennes — {ANNEE}</p>
-          </div>
-          <div className="flex gap-2 flex-wrap">
-            <button onClick={handlePrintAll}
-              className="text-sm px-4 py-2.5 rounded-xl border border-ss-border text-ss-text-secondary hover:border-ss-cyan hover:text-ss-cyan transition-all min-h-[44px]">
-              🖨️ Imprimer tous
-            </button>
-            <button onClick={handleValidate} disabled={validating || validated}
-              className={`text-sm px-4 py-2.5 rounded-xl font-bold min-h-[44px] transition-all ${validated
-                ? 'bg-ss-green/20 border border-ss-green text-ss-green'
-                : 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white hover:opacity-90 disabled:opacity-60'}`}>
-              {validating ? '⏳ Validation...' : validated ? '✅ Bulletins validés' : '✔ Valider les bulletins'}
-            </button>
-          </div>
-        </div>
+        <PageHeader
+          title="Bulletins de Notes"
+          description={`Calcul automatique des moyennes — ${ANNEE}`}
+          icon={FileText}
+          accent="purple"
+          actions={
+            <div className="flex gap-2 flex-wrap">
+              <button onClick={handlePrintAll}
+                className="inline-flex items-center gap-2 text-sm px-4 py-2.5 rounded-xl border border-ss-border text-ss-text-secondary hover:border-ss-cyan hover:text-ss-cyan transition-all min-h-[44px]">
+                <Printer size={16} /> Imprimer tous
+              </button>
+              <button onClick={handleValidate} disabled={validating || validated}
+                className={`inline-flex items-center gap-2 text-sm px-4 py-2.5 rounded-xl font-bold min-h-[44px] transition-all ${validated
+                  ? 'bg-ss-green/20 border border-ss-green text-ss-green'
+                  : 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white hover:opacity-90 disabled:opacity-60'}`}>
+                <CheckCircle2 size={16} />
+                {validating ? 'Validation...' : validated ? 'Bulletins validés' : 'Valider les bulletins'}
+              </button>
+            </div>
+          }
+        />
 
         {/* KPIs */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[
-            { label: 'Total élèves', value: bulletins.length, color: '#3D5AFE', icon: '👥' },
-            { label: 'Admis (≥10)', value: nbAdmis, color: '#00E676', icon: '✅' },
-            { label: 'Moy. classe', value: classeMoyenne > 0 ? classeMoyenne.toFixed(2) : '—', color: '#00E5FF', icon: '📊' },
-            { label: 'Taux réussite', value: bulletins.length > 0 ? `${Math.round(nbAdmis / bulletins.length * 100)}%` : '—', color: '#FFD600', icon: '🎯' },
+            { label: 'Total élèves', value: bulletins.length, color: '#3D5AFE', Icon: Users },
+            { label: 'Admis (≥10)', value: nbAdmis, color: '#22C55E', Icon: CheckCircle2 },
+            { label: 'Moy. classe', value: classeMoyenne > 0 ? classeMoyenne.toFixed(2) : '—', color: '#38BDF8', Icon: BarChart3 },
+            { label: 'Taux réussite', value: bulletins.length > 0 ? `${Math.round(nbAdmis / bulletins.length * 100)}%` : '—', color: '#FBBF24', Icon: Target },
           ].map(kpi => (
             <div key={kpi.label} className="bg-ss-bg-secondary rounded-xl border border-ss-border p-4 text-center">
-              <span className="text-xl">{kpi.icon}</span>
+              <span
+                className="inline-flex w-10 h-10 rounded-xl items-center justify-center"
+                style={{ background: `${kpi.color}1a`, border: `1px solid ${kpi.color}33` }}
+                aria-hidden="true"
+              >
+                <kpi.Icon size={18} style={{ color: kpi.color }} />
+              </span>
               <p style={{ color: kpi.color }} className="text-2xl font-bold mt-1">{kpi.value}</p>
               <p className="text-ss-text-muted text-xs mt-1">{kpi.label}</p>
             </div>
@@ -606,12 +617,12 @@ export default function BulletinsPage() {
             <p className="text-xs font-semibold text-ss-text-secondary mb-3">Distribution des mentions — {classeLabel} T{selectedTrimestre}</p>
             <div className="flex flex-wrap gap-2">
               {[
-                { label: 'Excellent', color: '#FFD600', min: 18 },
-                { label: 'Très Bien', color: '#00E676', min: 16 },
-                { label: 'Bien', color: '#00E5FF', min: 14 },
+                { label: 'Excellent', color: '#FBBF24', min: 18 },
+                { label: 'Très Bien', color: '#22C55E', min: 16 },
+                { label: 'Bien', color: '#38BDF8', min: 14 },
                 { label: 'Assez Bien', color: '#7C4DFF', min: 12 },
                 { label: 'Passable', color: '#FF6D00', min: 10 },
-                { label: 'Insuffisant', color: '#FF1744', min: 0 },
+                { label: 'Insuffisant', color: '#F87171', min: 0 },
               ].map(m => {
                 const count = bulletins.filter(b => {
                   const avg = b.moyenneGenerale ?? 0
@@ -717,3 +728,4 @@ export default function BulletinsPage() {
     </>
   )
 }
+

@@ -3,6 +3,8 @@
 import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
+import { PageHeader } from '@/components/dashboard/PageHeader'
+import { Laptop } from 'lucide-react'
 
 // ── Types ───────────────────────────────────────────────────────
 type TabKey = 'cours' | 'devoirs' | 'classes_virtuelles'
@@ -514,13 +516,12 @@ export default function ProfesseurElearningPage() {
   // ── Render ──
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-ss-bg-secondary rounded-xl border border-ss-border p-5">
-        <h1 className="text-2xl font-bold text-ss-text">E-Learning</h1>
-        <p className="text-sm text-ss-text-secondary mt-1">
-          Gerez vos cours, devoirs et classes virtuelles
-        </p>
-      </div>
+      <PageHeader
+        title="E-Learning"
+        description="Gérez vos cours, devoirs et classes virtuelles."
+        icon={Laptop}
+        accent="info"
+      />
 
       {/* Onglets */}
       <div className="flex gap-2 overflow-x-auto pb-1">

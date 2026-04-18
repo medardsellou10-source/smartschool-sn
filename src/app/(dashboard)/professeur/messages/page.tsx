@@ -1,9 +1,11 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { isDemoMode } from '@/lib/demo-data'
+import { PageHeader } from '@/components/dashboard/PageHeader'
+import { MessageSquare } from 'lucide-react'
 
 interface Conversation {
   id: string
@@ -191,12 +193,13 @@ export default function ProfesseurMessagesPage() {
 
   return (
     <div className="animate-fade-in" style={{ height: 'calc(100vh - 120px)' }}>
-      {/* Header */}
       <div className="mb-4">
-        <h1 className="text-2xl font-black text-white">Messagerie</h1>
-        <p className="text-sm mt-1" style={{ color: '#94A3B8' }}>
-          {conversations.reduce((sum, c) => sum + c.nonLu, 0)} message(s) non lu(s)
-        </p>
+        <PageHeader
+          title="Messagerie"
+          description={`${conversations.reduce((sum, c) => sum + c.nonLu, 0)} message(s) non lu(s)`}
+          icon={MessageSquare}
+          accent="warn"
+        />
       </div>
 
       <div className="flex gap-4 h-[calc(100%-80px)]">
@@ -221,7 +224,7 @@ export default function ProfesseurMessagesPage() {
                 }}>
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xs font-bold shrink-0"
-                    style={{ background: 'rgba(0,230,118,0.1)', border: '1px solid rgba(0,230,118,0.2)', color: '#00E676' }}>
+                    style={{ background: 'rgba(0,230,118,0.1)', border: '1px solid rgba(0,230,118,0.2)', color: '#22C55E' }}>
                     {conv.parent_nom.split(' ').map(n => n[0]).join('')}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -229,7 +232,7 @@ export default function ProfesseurMessagesPage() {
                       <p className="text-sm font-bold text-white truncate">{conv.parent_nom}</p>
                       {conv.nonLu > 0 && (
                         <span className="w-5 h-5 rounded-full text-[9px] font-black flex items-center justify-center shrink-0"
-                          style={{ background: '#00E676', color: '#020617' }}>{conv.nonLu}</span>
+                          style={{ background: '#22C55E', color: '#020617' }}>{conv.nonLu}</span>
                       )}
                     </div>
                     <p className="text-[10px] mt-0.5" style={{ color: '#475569' }}>{conv.eleve_nom} · {conv.classe}</p>
@@ -257,7 +260,7 @@ export default function ProfesseurMessagesPage() {
               <div className="flex items-center gap-3 px-4 py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.02)' }}>
                 <button onClick={() => setSelectedConv(null)} className="lg:hidden text-white text-lg mr-1">&larr;</button>
                 <div className="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold shrink-0"
-                  style={{ background: 'rgba(0,230,118,0.1)', border: '1px solid rgba(0,230,118,0.2)', color: '#00E676' }}>
+                  style={{ background: 'rgba(0,230,118,0.1)', border: '1px solid rgba(0,230,118,0.2)', color: '#22C55E' }}>
                   {selectedConvData?.parent_nom.split(' ').map(n => n[0]).join('')}
                 </div>
                 <div>
@@ -303,7 +306,7 @@ export default function ProfesseurMessagesPage() {
                 />
                 <button onClick={handleSend} disabled={!newMessage.trim()}
                   className="px-4 py-2.5 rounded-xl text-sm font-bold transition-all hover:opacity-90 disabled:opacity-40 shrink-0"
-                  style={{ background: '#00E676', color: '#020617' }}>
+                  style={{ background: '#22C55E', color: '#020617' }}>
                   Envoyer
                 </button>
               </div>
@@ -314,3 +317,4 @@ export default function ProfesseurMessagesPage() {
     </div>
   )
 }
+

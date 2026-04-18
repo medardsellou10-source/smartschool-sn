@@ -4,10 +4,12 @@ import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { StatCard } from '@/components/dashboard/StatCard'
+import { PageHeader } from '@/components/dashboard/PageHeader'
 import { FinanceCharts } from '@/components/finance/FinanceCharts'
 import { TableauImpayes } from '@/components/finance/TableauImpayes'
 import { formatFCFA } from '@/lib/utils'
 import { isDemoMode, DEMO_FACTURES, DEMO_PAIEMENTS, DEMO_ELEVES } from '@/lib/demo-data'
+import { Wallet } from 'lucide-react'
 
 interface KPIs {
   encaisseMois: number
@@ -258,10 +260,13 @@ export default function FinancesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-2xl font-bold text-ss-text">Gestion Financière</h1>
-        <ExportButton ecoleId={ecoleId!} />
-      </div>
+      <PageHeader
+        title="Gestion Financière"
+        description="Suivi des encaissements, impayés et indicateurs clés."
+        icon={Wallet}
+        accent="green"
+        actions={<ExportButton ecoleId={ecoleId!} />}
+      />
 
       {/* KPI Cards */}
       {kpis && (

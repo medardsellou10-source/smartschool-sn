@@ -1,15 +1,15 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState, useMemo } from 'react'
 import { useUser } from '@/hooks/useUser'
 import { createClient } from '@/lib/supabase/client'
 import { isDemoMode, DEMO_PAIEMENTS_COMPTABLE, DEMO_TARIFS, DEMO_CLASSES } from '@/lib/demo-data'
 
-const ACCENT = '#00BCD4'
-const GREEN  = '#00E676'
+const ACCENT = '#16A34A'
+const GREEN  = '#22C55E'
 const ORANGE = '#FF6D00'
-const RED    = '#FF1744'
-const GOLD   = '#FFD600'
+const RED    = '#F87171'
+const GOLD   = '#FBBF24'
 
 function fmt(v: number) { return new Intl.NumberFormat('fr-FR').format(v) + ' FCFA' }
 function pct(a: number, b: number) { return b === 0 ? 0 : Math.round((a / b) * 100) }
@@ -889,3 +889,4 @@ export default function PaiementsPage() {
     </div>
   )
 }
+

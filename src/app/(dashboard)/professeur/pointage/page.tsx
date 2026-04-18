@@ -2,6 +2,8 @@
 
 import { useUser } from '@/hooks/useUser'
 import { PointageGPS } from '@/components/pointage/PointageGPS'
+import { PageHeader } from '@/components/dashboard/PageHeader'
+import { MapPin } from 'lucide-react'
 
 export default function PointagePage() {
   const { user, loading } = useUser()
@@ -27,8 +29,13 @@ export default function PointagePage() {
   const userName = user ? `${user.prenom} ${user.nom}` : 'Professeur (démo)'
 
   return (
-    <div className="max-w-lg mx-auto">
-      <h1 className="text-2xl font-bold text-ss-text mb-6">Pointage GPS</h1>
+    <div className="max-w-lg mx-auto space-y-6">
+      <PageHeader
+        title="Pointage GPS"
+        description="Marquez votre présence de façon sécurisée."
+        icon={MapPin}
+        accent="purple"
+      />
       <PointageGPS
         userId={userId}
         ecoleId={ecoleId}

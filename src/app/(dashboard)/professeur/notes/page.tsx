@@ -5,6 +5,8 @@ import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { GrilleNotes } from '@/components/notes/GrilleNotes'
 import { isDemoMode, DEMO_CLASSES, DEMO_MATIERES, DEMO_EVALUATIONS, DEMO_ELEVES, DEMO_ECOLE } from '@/lib/demo-data'
+import { PageHeader } from '@/components/dashboard/PageHeader'
+import { PenSquare } from 'lucide-react'
 
 interface Classe {
   id: string
@@ -208,7 +210,12 @@ export default function NotesPage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-4">
-      <h1 className="text-2xl font-bold text-ss-text">Saisie des Notes</h1>
+      <PageHeader
+        title="Saisie des Notes"
+        description={`Trimestre ${trimestre} — saisie par classe, matière et évaluation.`}
+        icon={PenSquare}
+        accent="info"
+      />
 
       {/* Sélecteurs */}
       <div className="bg-ss-bg-secondary rounded-xl border border-ss-border p-4 space-y-3">

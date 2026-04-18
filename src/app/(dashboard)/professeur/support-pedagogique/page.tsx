@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useMemo } from 'react'
 import { useUser } from '@/hooks/useUser'
@@ -15,15 +15,15 @@ import { CONTENU_NATIF } from '@/lib/contenu-pedagogique'
 
 // ── Couleurs par matière ──
 const MATIERE_COLORS: Record<string, string> = {
-  'Mathématiques': '#00E5FF',
-  'Français': '#FFD600',
+  'Mathématiques': '#38BDF8',
+  'Français': '#FBBF24',
   'Anglais': '#FF6D00',
-  'Sciences Physiques': '#00E676',
+  'Sciences Physiques': '#22C55E',
   'SVT': '#76FF03',
-  'Histoire-Géographie': '#D500F9',
+  'Histoire-Géographie': '#A78BFA',
   'Philosophie': '#448AFF',
-  'Éducation Physique': '#FF1744',
-  'Éducation Civique': '#00BCD4',
+  'Éducation Physique': '#F87171',
+  'Éducation Civique': '#16A34A',
   'LV2': '#FF9100',
   'Espagnol / Arabe': '#FF9100',
   'Dessin / Art Plastique': '#E040FB',
@@ -35,7 +35,7 @@ const TYPE_ICONS: Record<string, string> = {
 }
 
 const TYPE_COLORS: Record<string, string> = {
-  cours: '#00E676', tp: '#00E5FF', td: '#FFD600', revision: '#FF6D00', evaluation: '#FF1744',
+  cours: '#22C55E', tp: '#38BDF8', td: '#FBBF24', revision: '#FF6D00', evaluation: '#F87171',
 }
 
 type TabId = 'grille' | 'planning' | 'modules' | 'suivi' | 'semestre' | 'semaine' | 'ressources'
@@ -44,7 +44,7 @@ const RESSOURCE_ICONS: Record<string, string> = {
   annale: '📄', video: '▶️', tp_virtuel: '🔬', exercice: '✏️', resume: '📋', tutorat: '🤝',
 }
 const RESSOURCE_COLORS: Record<string, string> = {
-  annale: '#FF6D00', video: '#FF1744', tp_virtuel: '#00E5FF', exercice: '#7C4DFF', resume: '#00E676', tutorat: '#FFD600',
+  annale: '#FF6D00', video: '#F87171', tp_virtuel: '#38BDF8', exercice: '#7C4DFF', resume: '#22C55E', tutorat: '#FBBF24',
 }
 const RESSOURCE_LABELS: Record<string, string> = {
   annale: 'Annale', video: 'Vidéo', tp_virtuel: 'TP Virtuel', exercice: 'Exercice', resume: 'Fiche', tutorat: 'Tutorat',
@@ -204,7 +204,7 @@ export default function SupportPedagogiquePage() {
   }
 
   function ouvrirFiche(res: RessourceEnLigne) {
-    const color = RESSOURCE_COLORS[res.type] || '#00E5FF'
+    const color = RESSOURCE_COLORS[res.type] || '#38BDF8'
     const pts = res.description.split(' — ').map(s => `<li>${s.trim()}</li>`).join('')
     const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">
 <title>${res.titre}</title>
@@ -501,7 +501,7 @@ function toggleCorr(){
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(0,229,255,0.1) 50px, rgba(0,229,255,0.1) 51px), repeating-linear-gradient(0deg, transparent, transparent 50px, rgba(0,229,255,0.1) 50px, rgba(0,229,255,0.1) 51px)' }} />
         <div className="relative px-6 py-5">
           <div className="flex items-center gap-2 mb-1">
-            <div className="w-2 h-2 rounded-full bg-[#00E5FF] animate-pulse" />
+            <div className="w-2 h-2 rounded-full bg-[#38BDF8] animate-pulse" />
             <span className="text-[#94A3B8] text-xs font-semibold tracking-wider uppercase">Support Pedagogique</span>
           </div>
           <h1 className="text-2xl font-black text-white">Programme Officiel MEN</h1>
@@ -547,7 +547,7 @@ function toggleCorr(){
           <button key={tab.id} onClick={() => setActiveTab(tab.id)}
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all duration-200"
             style={activeTab === tab.id
-              ? { background: 'rgba(0,229,255,0.15)', color: '#00E5FF', border: '1px solid rgba(0,229,255,0.3)' }
+              ? { background: 'rgba(0,229,255,0.15)', color: '#38BDF8', border: '1px solid rgba(0,229,255,0.3)' }
               : { background: 'rgba(255,255,255,0.03)', color: '#94A3B8', border: '1px solid rgba(255,255,255,0.07)' }}>
             <span>{tab.icon}</span> {tab.label}
           </button>
@@ -574,7 +574,7 @@ function toggleCorr(){
               </thead>
               <tbody>
                 {grille.matieres.map((m, idx) => {
-                  const color = MATIERE_COLORS[m.matiere] || '#00E5FF'
+                  const color = MATIERE_COLORS[m.matiere] || '#38BDF8'
                   return (
                     <tr key={m.matiere} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}
                       className="transition-colors duration-150 hover:bg-white/[0.02]">
@@ -602,8 +602,8 @@ function toggleCorr(){
               </tbody>
               <tfoot>
                 <tr style={{ borderTop: '2px solid rgba(0,229,255,0.3)' }}>
-                  <td className="py-3 px-4 font-black text-[#00E5FF]">TOTAL</td>
-                  <td className="text-center py-3 px-4 font-black text-xl text-[#00E5FF]">{grille.total_heures}h</td>
+                  <td className="py-3 px-4 font-black text-[#38BDF8]">TOTAL</td>
+                  <td className="text-center py-3 px-4 font-black text-xl text-[#38BDF8]">{grille.total_heures}h</td>
                   <td className="text-center py-3 px-4 font-bold text-[#94A3B8]">
                     {grille.matieres.reduce((s, m) => s + m.coefficient, 0)}
                   </td>
@@ -645,7 +645,7 @@ function toggleCorr(){
             ) : (
               <div className="space-y-4">
                 {allProgrammes.map(prog => {
-                  const color = MATIERE_COLORS[prog.matiere] || '#00E5FF'
+                  const color = MATIERE_COLORS[prog.matiere] || '#38BDF8'
                   return (
                     <div key={`${prog.matiere}-${prog.niveau}-${prog.serie}`} className="rounded-xl p-4"
                       style={{ background: `${color}06`, border: `1px solid ${color}15` }}>
@@ -695,7 +695,7 @@ function toggleCorr(){
               <div className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
                 <div className="flex items-center gap-3 mb-2">
                   <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
-                    style={{ background: `${MATIERE_COLORS[programme.matiere] || '#00E5FF'}15`, border: `1px solid ${MATIERE_COLORS[programme.matiere] || '#00E5FF'}30` }}>
+                    style={{ background: `${MATIERE_COLORS[programme.matiere] || '#38BDF8'}15`, border: `1px solid ${MATIERE_COLORS[programme.matiere] || '#38BDF8'}30` }}>
                     📖
                   </div>
                   <div>
@@ -709,7 +709,7 @@ function toggleCorr(){
 
               {/* Modules détaillés */}
               {programme.modules.map(mod => {
-                const color = MATIERE_COLORS[programme.matiere] || '#00E5FF'
+                const color = MATIERE_COLORS[programme.matiere] || '#38BDF8'
                 const modLeconsFaites = mod.lecons.filter(l => leconsValidees.has(l.id)).length
                 const modPct = Math.round((modLeconsFaites / mod.lecons.length) * 100)
                 return (
@@ -739,7 +739,7 @@ function toggleCorr(){
                     {/* Leçons */}
                     <div className="divide-y divide-white/[0.04]">
                       {mod.lecons.map(lecon => {
-                        const typeColor = TYPE_COLORS[lecon.type] || '#00E5FF'
+                        const typeColor = TYPE_COLORS[lecon.type] || '#38BDF8'
                         const done = leconsValidees.has(lecon.id)
                         return (
                           <div key={lecon.id} className="flex items-center gap-3 px-4 py-3 transition-all duration-150 hover:bg-white/[0.02]"
@@ -815,7 +815,7 @@ function toggleCorr(){
               <h2 className="text-sm font-bold text-[#94A3B8] uppercase tracking-wider mb-4">Progression par module</h2>
               <div className="space-y-3">
                 {programme.modules.map(mod => {
-                  const color = MATIERE_COLORS[programme.matiere] || '#00E5FF'
+                  const color = MATIERE_COLORS[programme.matiere] || '#38BDF8'
                   const modFait = mod.lecons.filter(l => leconsValidees.has(l.id)).length
                   const modPct = Math.round((modFait / mod.lecons.length) * 100)
                   return (
@@ -828,10 +828,10 @@ function toggleCorr(){
                         </div>
                         <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
                           <div className="h-full rounded-full transition-all duration-500"
-                            style={{ width: `${modPct}%`, background: modPct === 100 ? '#00E676' : color }} />
+                            style={{ width: `${modPct}%`, background: modPct === 100 ? '#22C55E' : color }} />
                         </div>
                       </div>
-                      <span className="text-xs font-bold w-10 text-right" style={{ color: modPct === 100 ? '#00E676' : '#94A3B8' }}>
+                      <span className="text-xs font-bold w-10 text-right" style={{ color: modPct === 100 ? '#22C55E' : '#94A3B8' }}>
                         {modPct}%
                       </span>
                     </div>
@@ -865,7 +865,7 @@ function toggleCorr(){
                   <span>{new Date(sem.debut).toLocaleDateString('fr-SN', { day: 'numeric', month: 'short' })}</span>
                   <span>→</span>
                   <span>{new Date(sem.fin).toLocaleDateString('fr-SN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-                  <span className="px-2 py-0.5 rounded-full font-bold" style={{ background: 'rgba(0,229,255,0.1)', color: '#00E5FF' }}>
+                  <span className="px-2 py-0.5 rounded-full font-bold" style={{ background: 'rgba(0,229,255,0.1)', color: '#38BDF8' }}>
                     {sem.semaines} sem
                   </span>
                 </div>
@@ -874,7 +874,7 @@ function toggleCorr(){
               {/* Timeline visuelle */}
               <div className="space-y-2">
                 {sem.periodes.map((p, idx) => {
-                  const typeColor = p.type === 'cours' ? '#00E676' : p.type === 'evaluation' ? '#FF1744' : p.type === 'revision' ? '#FFD600' : '#94A3B8'
+                  const typeColor = p.type === 'cours' ? '#22C55E' : p.type === 'evaluation' ? '#F87171' : p.type === 'revision' ? '#FBBF24' : '#94A3B8'
                   const typeIcon = p.type === 'cours' ? '📖' : p.type === 'evaluation' ? '📋' : p.type === 'revision' ? '🔄' : '🏖️'
                   const semCount = p.fin_semaine - p.debut_semaine + 1
                   const isCurrent = semaineActuelle >= (sem.semestre === 1 ? p.debut_semaine : p.debut_semaine + 18) &&
@@ -910,9 +910,9 @@ function toggleCorr(){
           {/* Légende */}
           <div className="flex flex-wrap gap-3 px-1">
             {[
-              { label: 'Cours', color: '#00E676', icon: '📖' },
-              { label: 'Evaluation', color: '#FF1744', icon: '📋' },
-              { label: 'Revision', color: '#FFD600', icon: '🔄' },
+              { label: 'Cours', color: '#22C55E', icon: '📖' },
+              { label: 'Evaluation', color: '#F87171', icon: '📋' },
+              { label: 'Revision', color: '#FBBF24', icon: '🔄' },
               { label: 'Vacances', color: '#94A3B8', icon: '🏖️' },
             ].map(l => (
               <div key={l.label} className="flex items-center gap-1.5 text-xs" style={{ color: l.color }}>
@@ -935,14 +935,14 @@ function toggleCorr(){
             <div className="flex items-center justify-between flex-wrap gap-3">
               <div>
                 <h2 className="text-xl font-black text-white">
-                  Semaine <span style={{ color: '#00E5FF' }}>S{semaineActuelle}</span> — Année 2025-2026
+                  Semaine <span style={{ color: '#38BDF8' }}>S{semaineActuelle}</span> — Année 2025-2026
                 </h2>
                 <p className="text-sm mt-1" style={{ color: '#94A3B8' }}>
                   {selectedNiveau}{selectedSerie && NIVEAUX_LYCEE.includes(selectedNiveau) && selectedNiveau !== 'Seconde' ? ` Série ${selectedSerie}` : ''} · {allProgrammes.length} matière{allProgrammes.length > 1 ? 's' : ''} disponibles
                 </p>
               </div>
               <div className="flex gap-2">
-                <div className="px-3 py-1.5 rounded-xl text-xs font-bold" style={{ background: 'rgba(0,229,255,0.12)', color: '#00E5FF', border: '1px solid rgba(0,229,255,0.25)' }}>
+                <div className="px-3 py-1.5 rounded-xl text-xs font-bold" style={{ background: 'rgba(0,229,255,0.12)', color: '#38BDF8', border: '1px solid rgba(0,229,255,0.25)' }}>
                   Sem {semaineActuelle}/36
                 </div>
               </div>
@@ -956,8 +956,8 @@ function toggleCorr(){
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {planningDeLaSemaine.map(({ prog, progression, heuresFaites, pct, retard }) => {
-                const color = MATIERE_COLORS[prog.matiere] || '#00E5FF'
-                const alertColor = retard === 'danger' ? '#FF1744' : retard === 'warning' ? '#FFD600' : '#00E676'
+                const color = MATIERE_COLORS[prog.matiere] || '#38BDF8'
+                const alertColor = retard === 'danger' ? '#F87171' : retard === 'warning' ? '#FBBF24' : '#22C55E'
                 const alertIcon = retard === 'danger' ? '🚨' : retard === 'warning' ? '⚠️' : '✅'
                 return (
                   <div key={`${prog.matiere}-${prog.serie}`} className="rounded-2xl overflow-hidden"
@@ -982,7 +982,7 @@ function toggleCorr(){
                     <div className="px-4 pt-3">
                       <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
                         <div className="h-full rounded-full transition-all duration-500"
-                          style={{ width: `${pct}%`, background: pct >= 90 ? '#00E676' : pct >= 60 ? color : alertColor }} />
+                          style={{ width: `${pct}%`, background: pct >= 90 ? '#22C55E' : pct >= 60 ? color : alertColor }} />
                       </div>
                     </div>
 
@@ -1025,7 +1025,7 @@ function toggleCorr(){
                         </div>
                       ) : (
                         <div className="text-center py-2">
-                          <p className="text-xs font-bold" style={{ color: '#00E676' }}>
+                          <p className="text-xs font-bold" style={{ color: '#22C55E' }}>
                             ✅ Programme terminé — Révisions BAC
                           </p>
                         </div>
@@ -1077,7 +1077,7 @@ function toggleCorr(){
                 </p>
                 {planningDeLaSemaine.slice(0, 6).map(({ prog, progression }) => (
                   <div key={prog.matiere} className="flex items-start gap-2 mb-1">
-                    <span className="text-[10px] font-bold w-32 shrink-0" style={{ color: MATIERE_COLORS[prog.matiere] || '#00E5FF' }}>
+                    <span className="text-[10px] font-bold w-32 shrink-0" style={{ color: MATIERE_COLORS[prog.matiere] || '#38BDF8' }}>
                       {prog.matiere.substring(0, 14).padEnd(14)}
                     </span>
                     <span className="text-[10px]" style={{ color: '#94A3B8' }}>
@@ -1103,7 +1103,7 @@ function toggleCorr(){
               const count = t === 'all'
                 ? getRessources({ niveau: selectedNiveau, serie: NIVEAUX_LYCEE.includes(selectedNiveau) && selectedNiveau !== 'Seconde' ? selectedSerie : undefined }).length
                 : getRessources({ niveau: selectedNiveau, type: t, serie: NIVEAUX_LYCEE.includes(selectedNiveau) && selectedNiveau !== 'Seconde' ? selectedSerie : undefined }).length
-              const color = t === 'all' ? '#00E5FF' : RESSOURCE_COLORS[t]
+              const color = t === 'all' ? '#38BDF8' : RESSOURCE_COLORS[t]
               const icon = t === 'all' ? '🌐' : RESSOURCE_ICONS[t]
               const label = t === 'all' ? 'Tout' : RESSOURCE_LABELS[t]
               return (
@@ -1136,10 +1136,10 @@ function toggleCorr(){
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {ressources.map(res => {
-                const color = RESSOURCE_COLORS[res.type] || '#00E5FF'
+                const color = RESSOURCE_COLORS[res.type] || '#38BDF8'
                 const icon = RESSOURCE_ICONS[res.type] || '📄'
                 const label = RESSOURCE_LABELS[res.type] || res.type
-                const matiereColor = MATIERE_COLORS[res.matiere] || '#00E5FF'
+                const matiereColor = MATIERE_COLORS[res.matiere] || '#38BDF8'
                 return (
                   <div key={res.id} className="rounded-xl overflow-hidden transition-all duration-200 hover:scale-[1.01]"
                     style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid ${color}18` }}>
@@ -1208,3 +1208,4 @@ function toggleCorr(){
     </div>
   )
 }
+

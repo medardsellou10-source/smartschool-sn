@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -7,6 +7,8 @@ import {
   isDemoMode, DEMO_ELEVES, DEMO_CLASSES, DEMO_MATIERES,
   DEMO_MOYENNES_TRIMESTRE, DEMO_MOYENNE_GENERALE
 } from '@/lib/demo-data'
+import { PageHeader } from '@/components/dashboard/PageHeader'
+import { FileText } from 'lucide-react'
 
 interface MoyenneMatiere {
   matiere_nom: string
@@ -15,11 +17,11 @@ interface MoyenneMatiere {
 }
 
 function getMention(moy: number): { label: string; color: string } {
-  if (moy >= 16) return { label: 'Tres Bien', color: '#00E676' }
-  if (moy >= 14) return { label: 'Bien', color: '#00E676' }
-  if (moy >= 12) return { label: 'Assez Bien', color: '#00E5FF' }
-  if (moy >= 10) return { label: 'Passable', color: '#FFD600' }
-  return { label: 'Insuffisant', color: '#FF1744' }
+  if (moy >= 16) return { label: 'Tres Bien', color: '#22C55E' }
+  if (moy >= 14) return { label: 'Bien', color: '#22C55E' }
+  if (moy >= 12) return { label: 'Assez Bien', color: '#38BDF8' }
+  if (moy >= 10) return { label: 'Passable', color: '#FBBF24' }
+  return { label: 'Insuffisant', color: '#F87171' }
 }
 
 function getAppreciation(moy: number): string {
@@ -107,26 +109,27 @@ export default function EleveBulletinsPage() {
 
   return (
     <div className="space-y-5 pb-6 animate-fade-in">
-      {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div>
-          <h1 className="text-2xl font-black text-white">Mes Bulletins</h1>
-          <p className="text-sm mt-1" style={{ color: '#94A3B8' }}>{eleveNom} — {classeNom}</p>
-        </div>
-        <div className="flex items-center gap-1 p-1 rounded-xl" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
-          {[1, 2, 3].map(t => (
-            <button key={t} onClick={() => setTrimestre(t)}
-              className="px-4 py-2 rounded-lg text-sm font-bold transition-all"
-              style={{
-                background: trimestre === t ? 'rgba(213,0,249,0.15)' : 'transparent',
-                color: trimestre === t ? '#D500F9' : '#94A3B8',
-                border: trimestre === t ? '1px solid rgba(213,0,249,0.3)' : '1px solid transparent',
-              }}>
-              T{t}
-            </button>
-          ))}
-        </div>
-      </div>
+      <PageHeader
+        title="Mes Bulletins"
+        description={`${eleveNom} — ${classeNom}`}
+        icon={FileText}
+        accent="purple"
+        actions={
+          <div className="flex items-center gap-1 p-1 rounded-xl" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            {[1, 2, 3].map(t => (
+              <button key={t} onClick={() => setTrimestre(t)}
+                className="px-4 py-2 rounded-lg text-sm font-bold transition-all"
+                style={{
+                  background: trimestre === t ? 'rgba(213,0,249,0.15)' : 'transparent',
+                  color: trimestre === t ? '#A78BFA' : '#94A3B8',
+                  border: trimestre === t ? '1px solid rgba(213,0,249,0.3)' : '1px solid transparent',
+                }}>
+                T{t}
+              </button>
+            ))}
+          </div>
+        }
+      />
 
       {/* Bulletin */}
       {loading ? (
@@ -151,7 +154,7 @@ export default function EleveBulletinsPage() {
 
             {/* Rows */}
             {moyennes.map((m, idx) => {
-              const noteColor = m.moyenne >= 14 ? '#00E676' : m.moyenne >= 10 ? '#FFD600' : '#FF1744'
+              const noteColor = m.moyenne >= 14 ? '#22C55E' : m.moyenne >= 10 ? '#FBBF24' : '#F87171'
               return (
                 <div key={idx} className="grid grid-cols-12 gap-2 px-5 py-3 items-center"
                   style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
@@ -209,3 +212,4 @@ export default function EleveBulletinsPage() {
     </div>
   )
 }
+

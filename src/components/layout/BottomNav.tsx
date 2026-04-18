@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -90,13 +90,13 @@ const BOTTOM_MENUS: Record<string, BottomItem[]> = {
 }
 
 const ROLE_COLORS: Record<string, string> = {
-  admin_global: '#FF1744',
-  professeur: '#00E676',
-  surveillant: '#FFD600',
-  parent: '#00E5FF',
-  eleve: '#D500F9',
+  admin_global: '#F87171',
+  professeur: '#22C55E',
+  surveillant: '#FBBF24',
+  parent: '#38BDF8',
+  eleve: '#A78BFA',
   secretaire: '#FF6D00',
-  intendant: '#00BCD4',
+  intendant: '#16A34A',
   censeur: '#3D5AFE',
 }
 
@@ -117,7 +117,7 @@ export function BottomNav() {
 
   const role = (user?.role || roleFromPath(pathname)) as UserRole
   const items = BOTTOM_MENUS[role] || BOTTOM_MENUS.admin_global
-  const accentColor = ROLE_COLORS[role] || '#00E676'
+  const accentColor = ROLE_COLORS[role] || '#22C55E'
 
   const handleTap = () => {
     if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(30)
@@ -167,7 +167,7 @@ export function BottomNav() {
               {/* Badge */}
               {item.badge && item.badge > 0 && (
                 <span className="absolute top-2 right-1/4 w-4 h-4 text-white text-[9px] font-bold rounded-full flex items-center justify-center"
-                  style={{ background: '#FF1744' }}>
+                  style={{ background: '#F87171' }}>
                   {item.badge > 9 ? '9+' : item.badge}
                 </span>
               )}
@@ -184,3 +184,4 @@ export function BottomNav() {
     </nav>
   )
 }
+
