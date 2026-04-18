@@ -189,6 +189,8 @@ export function GrilleNotes({ classeId, matiereId, evaluationId, eleves, userId,
     setPendingCount(pending.size)
 
     let hasError = false
+    const notifiedPairs: { eleve_id: string; evaluation_id: string }[] = []
+
     for (const [eleveId, { note, absent }] of pending) {
       const validated = noteSchema.safeParse(note)
       const finalNote = validated.success ? validated.data : null
@@ -207,6 +209,9 @@ export function GrilleNotes({ classeId, matiereId, evaluationId, eleves, userId,
       if (error) {
         console.error('Erreur sauvegarde note:', error)
         hasError = true
+      } else if (!absent && finalNote !== null) {
+        // Collecter les notes réellement sauvegardées pour notification
+        notifiedPairs.push({ eleve_id: eleveId, evaluation_id: evaluationId })
       }
     }
 
@@ -215,6 +220,16 @@ export function GrilleNotes({ classeId, matiereId, evaluationId, eleves, userId,
 
     if (!hasError) {
       setTimeout(() => setSyncStatus('idle'), 2000)
+
+      // Déclencher l'Agent 4 en arrière-plan (fire-and-forget)
+      // On n'attend pas la réponse pour ne pas bloquer l'UI
+      for (const pair of notifiedPairs) {
+        fetch('/api/agent/diffuseur-notes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(pair),
+        }).catch(() => {/* silencieux — la notif est non-critique */})
+      }
     }
   }, [evaluationId, userId, supabase])
 
