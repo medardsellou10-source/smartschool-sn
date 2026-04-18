@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useUser } from '@/hooks/useUser'
 import { useEcole } from '@/hooks/useEcole'
+import { useNotifications } from '@/hooks/useNotifications'
 import { ROLE_LABELS } from '@/lib/constants'
 import type { Role } from '@/lib/constants'
 
@@ -123,6 +124,7 @@ export function Navbar() {
     : 'SS'
 
   const navItems = MOBILE_MENUS[role] || MOBILE_MENUS.admin_global
+  const { unreadCount } = useNotifications()
 
   // Bouton "Retour accueil" : visible uniquement quand on n'est PAS déjà sur la page d'accueil du rôle
   const homeHref = rootHrefForRole(role)
@@ -203,16 +205,24 @@ export function Navbar() {
       {/* Droite */}
       <div className="flex items-center gap-1.5 sm:gap-2">
         {/* Notifications */}
-        <button
+        <Link
+          href="/notifications"
           className="relative w-9 h-9 flex items-center justify-center rounded-xl transition-colors"
           style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', color: '#94A3B8' }}
+          aria-label="Notifications"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full"
-            style={{ background: '#F87171', boxShadow: '0 0 6px rgba(255,23,68,0.8)' }} />
-        </button>
+          {unreadCount > 0 && (
+            <span
+              className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center text-[10px] font-bold text-white rounded-full px-1"
+              style={{ background: '#F87171', boxShadow: '0 0 8px rgba(248,113,113,0.7)' }}
+            >
+              {unreadCount > 9 ? '9+' : unreadCount}
+            </span>
+          )}
+        </Link>
 
         {/* Avatar */}
         <div
