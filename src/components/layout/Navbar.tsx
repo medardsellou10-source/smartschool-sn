@@ -102,6 +102,12 @@ function roleFromPath(pathname: string): string {
   return 'admin_global'
 }
 
+// Retourne la racine (page d'accueil) du rôle courant
+function rootHrefForRole(role: string): string {
+  if (role === 'admin_global') return '/admin'
+  return `/${role}`
+}
+
 export function Navbar() {
   const pathname = usePathname()
   const { user, logout } = useUser()
@@ -117,6 +123,10 @@ export function Navbar() {
     : 'SS'
 
   const navItems = MOBILE_MENUS[role] || MOBILE_MENUS.admin_global
+
+  // Bouton "Retour accueil" : visible uniquement quand on n'est PAS déjà sur la page d'accueil du rôle
+  const homeHref = rootHrefForRole(role)
+  const showHomeButton = pathname !== homeHref
 
   return (
     <header
@@ -139,6 +149,28 @@ export function Navbar() {
             <path d="M3 5h14M3 10h14M3 15h14" strokeLinecap="round" />
           </svg>
         </button>
+
+        {/* Bouton Retour Accueil — raccourci universel vers la page d'accueil du rôle */}
+        {showHomeButton && (
+          <Link
+            href={homeHref}
+            prefetch
+            className="flex items-center gap-1.5 h-9 px-2.5 sm:px-3 rounded-xl transition-all shrink-0 text-xs sm:text-sm font-semibold"
+            style={{
+              background: `${accentColor}15`,
+              border: `1px solid ${accentColor}35`,
+              color: accentColor,
+            }}
+            aria-label="Retour à l'accueil"
+            title="Retour à l'accueil"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" strokeLinecap="round" strokeLinejoin="round" />
+              <polyline points="9 22 9 12 15 12 15 22" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            <span className="hidden sm:inline">Accueil</span>
+          </Link>
+        )}
         {/* Logo école sur mobile */}
         <div className="flex items-center gap-2 lg:hidden min-w-0">
           <div className="w-7 h-7 rounded-lg overflow-hidden flex items-center justify-center text-[10px] font-black text-white shrink-0"
