@@ -1,12 +1,22 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { isDemoMode, getDemoRoleCookie, DEMO_USERS } from '@/lib/demo-data'
 import type { Database } from '@/lib/types/database.types'
 
 type Utilisateur = Database['public']['Tables']['utilisateurs']['Row']
+
+// ── Cache module-level : partagé entre tous les composants ────────────────────
+// Évite que Sidebar + Navbar + BottomNav + page déclenchent chacun une requête DB
+let _cachedUser: Utilisateur | null = null
+let _fetchInProgress: Promise<void> | null = null
+let _listeners: Array<(u: Utilisateur | null, loading: boolean) => void> = []
+
+function notify(user: Utilisateur | null, loading: boolean) {
+  _listeners.forEach(fn => fn(user, loading))
+}
 
 function roleFromPath(pathname: string): string {
   if (pathname.startsWith('/professeur')) return 'professeur'
@@ -19,16 +29,13 @@ function roleFromPath(pathname: string): string {
   return 'admin_global'
 }
 
-function getDemoUser(pathname: string): Utilisateur | null {
-  // Priorité : URL path → cookie → localStorage → fallback admin
+function getDemoUser(pathname: string): Utilisateur {
   const pathRole = roleFromPath(pathname)
   let role: string
 
   if (pathRole !== 'admin_global') {
-    // Le path indique clairement un rôle
     role = pathRole
   } else {
-    // Fallback : lire cookie (prioritaire car lisible dès le middleware) puis localStorage
     role = getDemoRoleCookie()
       || (typeof window !== 'undefined' ? localStorage.getItem('ss_demo_role') : null)
       || 'admin_global'
@@ -36,80 +43,129 @@ function getDemoUser(pathname: string): Utilisateur | null {
 
   const userMap: Record<string, Utilisateur> = {
     admin_global: DEMO_USERS.admin as Utilisateur,
-    professeur: DEMO_USERS.professeur as Utilisateur,
-    surveillant: DEMO_USERS.surveillant as Utilisateur,
-    parent: DEMO_USERS.parent as Utilisateur,
-    eleve: DEMO_USERS.eleve as Utilisateur,
-    secretaire: DEMO_USERS.secretaire as Utilisateur,
-    intendant: DEMO_USERS.intendant as Utilisateur,
-    censeur: DEMO_USERS.censeur as Utilisateur,
+    professeur:   DEMO_USERS.professeur as Utilisateur,
+    surveillant:  DEMO_USERS.surveillant as Utilisateur,
+    parent:       DEMO_USERS.parent as Utilisateur,
+    eleve:        DEMO_USERS.eleve as Utilisateur,
+    secretaire:   DEMO_USERS.secretaire as Utilisateur,
+    intendant:    DEMO_USERS.intendant as Utilisateur,
+    censeur:      DEMO_USERS.censeur as Utilisateur,
   }
   return userMap[role] || DEMO_USERS.admin as Utilisateur
 }
 
+async function fetchAndCacheUser(): Promise<void> {
+  if (_fetchInProgress) return _fetchInProgress
+
+  _fetchInProgress = (async () => {
+    try {
+      const supabase = createClient()
+      const { data: { user: authUser }, error } = await supabase.auth.getUser()
+      if (error || !authUser) {
+        _cachedUser = null
+        notify(null, false)
+        return
+      }
+
+      const { data } = await supabase
+        .from('utilisateurs')
+        .select('*')
+        .eq('id', authUser.id)
+        .single()
+
+      _cachedUser = data ?? null
+      notify(_cachedUser, false)
+    } catch {
+      _cachedUser = null
+      notify(null, false)
+    } finally {
+      _fetchInProgress = null
+    }
+  })()
+
+  return _fetchInProgress
+}
+
 export function useUser() {
   const pathname = usePathname()
-  const [user, setUser] = useState<Utilisateur | null>(null)
-  const [loading, setLoading] = useState(true)
+  const demo = isDemoMode()
 
-  const fetchUser = useCallback(async () => {
-    // Mode démo : retourner un utilisateur fictif basé sur l'URL
-    if (isDemoMode()) {
-      setUser(getDemoUser(pathname))
-      setLoading(false)
-      return
-    }
+  // En mode démo : résoudre immédiatement depuis le pathname (zéro réseau)
+  const demoUser = demo ? getDemoUser(pathname) : null
 
-    const supabase = createClient()
-    const { data: { user: authUser }, error: authError } = await supabase.auth.getUser()
-    if (authError || !authUser) {
-      setUser(null)
-      setLoading(false)
-      return
-    }
+  const [user, setUser] = useState<Utilisateur | null>(
+    demo ? demoUser : _cachedUser
+  )
+  const [loading, setLoading] = useState(demo ? false : _cachedUser === null)
 
-    const { data } = await supabase
-      .from('utilisateurs')
-      .select('*')
-      .eq('id', authUser.id)
-      .single()
-
-    setUser(data)
-    setLoading(false)
-  }, [pathname])
-
+  // Référence stable pour éviter les updates sur composant démonté
+  const mounted = useRef(true)
   useEffect(() => {
-    fetchUser()
+    mounted.current = true
+    return () => { mounted.current = false }
+  }, [])
 
-    if (isDemoMode()) {
-      // Écouter les changements de rôle démo
-      const handleStorage = (e: StorageEvent) => {
-        if (e.key === 'ss_demo_role') fetchUser()
-      }
-      window.addEventListener('storage', handleStorage)
-      return () => window.removeEventListener('storage', handleStorage)
+  // Mode démo : mettre à jour l'user si le pathname change (changement de rôle)
+  useEffect(() => {
+    if (!demo) return
+    const u = getDemoUser(pathname)
+    setUser(u)
+    setLoading(false)
+  }, [demo, pathname])
+
+  // Mode prod : s'abonner au cache partagé
+  useEffect(() => {
+    if (demo) return
+
+    // Si cache disponible → pas de loading
+    if (_cachedUser !== null) {
+      setUser(_cachedUser)
+      setLoading(false)
+      return
     }
 
+    // S'abonner aux mises à jour du cache
+    const listener = (u: Utilisateur | null, l: boolean) => {
+      if (!mounted.current) return
+      setUser(u)
+      setLoading(l)
+    }
+    _listeners.push(listener)
+
+    // Déclencher le fetch si pas déjà en cours
+    fetchAndCacheUser()
+
+    // Écouter les changements d'auth (login/logout)
     const supabase = createClient()
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
-      fetchUser()
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_OUT') {
+        _cachedUser = null
+        notify(null, false)
+      } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        _cachedUser = null // invalider le cache
+        fetchAndCacheUser()
+      }
     })
 
-    return () => subscription.unsubscribe()
-  }, [fetchUser])
+    return () => {
+      _listeners = _listeners.filter(fn => fn !== listener)
+      subscription.unsubscribe()
+    }
+  }, [demo])
 
-  const logout = async () => {
-    if (isDemoMode()) {
-      // Effacer cookie ET localStorage
+  const logout = useCallback(async () => {
+    if (demo) {
       document.cookie = 'ss_demo_role=; path=/; max-age=0; SameSite=Lax'
       localStorage.removeItem('ss_demo_role')
       window.location.href = '/login'
       return
     }
+    _cachedUser = null
+    _fetchInProgress = null
     const supabase = createClient()
     await supabase.auth.signOut()
     window.location.href = '/login'
-  }
+  }, [demo])
 
   return { user, loading, logout }
 }
