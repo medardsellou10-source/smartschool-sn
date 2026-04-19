@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Suspense } from 'react'
-import { getRolesForType, type TypeEtablissement } from '@/lib/school-roles'
+import { getRolesForType, TYPE_META, type TypeEtablissement } from '@/lib/school-roles'
 import { Building, Book, Landmark, Baby, GraduationCap, MapPin, Trophy, Shield, Rocket, Check, Lock, ShieldCheck, Eye, EyeOff, Smartphone, CreditCard, ChevronDown, CheckCircle2 } from 'lucide-react'
 
 const PLANS = [
@@ -266,7 +266,8 @@ function InscriptionForm() {
               <div>
                 <label className={labelClass} style={labelStyle}>Nom de l'établissement *</label>
                 <input value={nomEcole} onChange={e => setNomEcole(e.target.value)}
-                  placeholder="Lycée Al-Azhar" className={inputClass} style={inputStyle} />
+                  placeholder="Lycée Al-Azhar" className={inputClass} style={inputStyle}
+                  autoComplete="organization" name="school-name" />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
@@ -284,34 +285,67 @@ function InscriptionForm() {
                 />
               </div>
 
-              {/* Aperçu des rôles disponibles pour ce type */}
+              {/* Aperçu enrichi des rôles disponibles pour ce type */}
               {(() => {
-                const roles = getRolesForType(typeEtab as TypeEtablissement).filter(r => r.key !== 'admin_global')
-                const typeInfo = TYPES.find(t => t.v === typeEtab)
+                const allRoles = getRolesForType(typeEtab as TypeEtablissement)
+                const adminRole = allRoles.find(r => r.key === 'admin_global')
+                const otherRoles = allRoles.filter(r => r.key !== 'admin_global')
+                const meta = TYPE_META[typeEtab as TypeEtablissement]
                 return (
-                  <div className="rounded-xl p-4 space-y-2.5"
-                    style={{ background: 'rgba(0,229,255,0.04)', border: '1px solid rgba(0,229,255,0.12)' }}>
-                    <p className="text-xs font-semibold flex items-center gap-2" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                      <span>{typeInfo?.badge}</span>
-                      Rôles inclus pour {typeInfo?.l} ({roles.length + 1} accès)
-                    </p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {/* Admin toujours en premier */}
-                      <span className="flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full"
-                        style={{ background: 'rgba(0,229,255,0.1)', color: '#38BDF8', border: '1px solid rgba(0,229,255,0.2)' }}>
-                        {getRolesForType(typeEtab as TypeEtablissement).find(r => r.key === 'admin_global')?.label ?? 'Directeur'}
-                      </span>
-                      {roles.map(r => (
+                  <div className="rounded-xl overflow-hidden"
+                    style={{ border: `1px solid ${meta.color}30`, background: `${meta.color}07` }}>
+
+                    {/* En-tête type */}
+                    <div className="px-4 pt-4 pb-3 flex items-start justify-between gap-3"
+                      style={{ borderBottom: `1px solid ${meta.color}18` }}>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-bold flex items-center gap-1.5" style={{ color: meta.color }}>
+                          <span>{meta.badge}</span>
+                          {meta.label}
+                          <span className="font-normal opacity-70">· {allRoles.length} rôles</span>
+                        </p>
+                        <p className="text-[10px] mt-0.5 leading-relaxed" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                          {meta.cycle}{meta.exam ? ` · ${meta.exam}` : ''} · {meta.ages}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Badges rapides */}
+                    <div className="px-4 py-3 flex flex-wrap gap-1.5"
+                      style={{ borderBottom: `1px solid ${meta.color}18` }}>
+                      {adminRole && (
+                        <span className="flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-full"
+                          style={{ background: `${adminRole.color}18`, color: adminRole.color, border: `1px solid ${adminRole.color}35` }}>
+                          {adminRole.icon} {adminRole.label}
+                        </span>
+                      )}
+                      {otherRoles.map(r => (
                         <span key={r.key}
                           className="flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-full"
-                          style={{ background: `${r.color}12`, color: r.color, border: `1px solid ${r.color}25` }}>
+                          style={{ background: `${r.color}12`, color: r.color, border: `1px solid ${r.color}28` }}>
                           {r.icon} {r.label}
                         </span>
                       ))}
                     </div>
-                    <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.3)' }}>
-                      Ces rôles seront disponibles dans votre dashboard. Vous pourrez ajouter les utilisateurs après inscription.
-                    </p>
+
+                    {/* Détail des rôles (2 colonnes) */}
+                    <div className="px-4 py-3 grid grid-cols-2 gap-2">
+                      {allRoles.map(r => (
+                        <div key={r.key} className="rounded-lg p-2.5"
+                          style={{ background: `${r.color}09`, border: `1px solid ${r.color}20` }}>
+                          <p className="text-[11px] font-bold flex items-center gap-1" style={{ color: r.color }}>
+                            {r.icon} {r.label}
+                          </p>
+                          <p className="text-[10px] mt-0.5 leading-snug" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                            {r.description}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="px-4 pb-3 text-[10px]" style={{ color: 'rgba(255,255,255,0.25)' }}>
+                      Ces rôles seront actifs dans votre dashboard. Ajoutez les utilisateurs après inscription.
+                    </div>
                   </div>
                 )
               })()}
@@ -320,12 +354,14 @@ function InscriptionForm() {
                 <div>
                   <label className={labelClass} style={labelStyle}>Ville / Commune *</label>
                   <input value={ville} onChange={e => setVille(e.target.value)}
-                    placeholder="Parcelles Assainies" className={inputClass} style={inputStyle} />
+                    placeholder="Parcelles Assainies" className={inputClass} style={inputStyle}
+                    autoComplete="address-level2" name="school-city" />
                 </div>
                 <div>
                   <label className={labelClass} style={labelStyle}>Nb. d'élèves (approx.)</label>
                   <input value={nbEleves} onChange={e => setNbEleves(e.target.value)}
-                    placeholder="250" type="number" className={inputClass} style={inputStyle} />
+                    placeholder="250" type="number" className={inputClass} style={inputStyle}
+                    autoComplete="off" name="school-students-count" />
                 </div>
               </div>
 
@@ -333,12 +369,14 @@ function InscriptionForm() {
                 <div>
                   <label className={labelClass} style={labelStyle}>Téléphone de l'école</label>
                   <input value={telephone} onChange={e => setTelephone(e.target.value)}
-                    placeholder="77 123 45 67" className={inputClass} style={inputStyle} />
+                    placeholder="77 123 45 67" className={inputClass} style={inputStyle}
+                    type="tel" inputMode="tel" autoComplete="off" name="school-phone" />
                 </div>
                 <div>
                   <label className={labelClass} style={labelStyle}>Site web (optionnel)</label>
                   <input value={siteWeb} onChange={e => setSiteWeb(e.target.value)}
-                    placeholder="www.monecole.sn" className={inputClass} style={inputStyle} />
+                    placeholder="www.monecole.sn" className={inputClass} style={inputStyle}
+                    type="url" autoComplete="url" name="school-website" />
                 </div>
               </div>
             </div>
@@ -346,46 +384,59 @@ function InscriptionForm() {
 
           {/* ══ ÉTAPE 2 : Admin ══ */}
           {step === 2 && (
-            <div className="space-y-4">
+            // `autoComplete="off"` + attributs spécifiques pour bloquer l'autofill
+            // Chrome qui remplissait "Téléphone" avec un email et pré-remplissait le password.
+            <form className="space-y-4" autoComplete="off" onSubmit={e => e.preventDefault()}>
               <div>
                 <h1 className="text-2xl font-black text-white mb-0.5">Compte administrateur</h1>
                 <p className="text-sm" style={{ color: 'rgba(255,255,255,0.35)' }}>Étape 2/4 — Votre accès directeur</p>
               </div>
 
+              {/* Inputs leurre pour neutraliser l'autofill Chrome (masqués) */}
+              <input type="text" name="fakeusernameremembered" autoComplete="username" tabIndex={-1} aria-hidden="true" className="hidden" />
+              <input type="password" name="fakepasswordremembered" autoComplete="current-password" tabIndex={-1} aria-hidden="true" className="hidden" />
+
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className={labelClass} style={labelStyle}>Prénom *</label>
                   <input value={adminPrenom} onChange={e => setAdminPrenom(e.target.value)}
-                    placeholder="Ibrahima" className={inputClass} style={inputStyle} />
+                    placeholder="Ibrahima" className={inputClass} style={inputStyle}
+                    autoComplete="given-name" name="admin-given-name" />
                 </div>
                 <div>
                   <label className={labelClass} style={labelStyle}>Nom *</label>
                   <input value={adminNom} onChange={e => setAdminNom(e.target.value)}
-                    placeholder="Sow" className={inputClass} style={inputStyle} />
+                    placeholder="Sow" className={inputClass} style={inputStyle}
+                    autoComplete="family-name" name="admin-family-name" />
                 </div>
               </div>
 
               <div>
                 <label className={labelClass} style={labelStyle}>Email *</label>
                 <input value={adminEmail} onChange={e => setAdminEmail(e.target.value)}
-                  type="email" placeholder="directeur@monecole.sn" className={inputClass} style={inputStyle} />
+                  type="email" placeholder="directeur@monecole.sn" className={inputClass} style={inputStyle}
+                  autoComplete="off" name="admin-email-new" inputMode="email" />
               </div>
 
               <div>
                 <label className={labelClass} style={labelStyle}>Téléphone</label>
                 <input value={adminTel} onChange={e => setAdminTel(e.target.value)}
-                  placeholder="77 123 45 67" className={inputClass} style={inputStyle} />
+                  placeholder="77 123 45 67" className={inputClass} style={inputStyle}
+                  type="tel" inputMode="tel" autoComplete="off" name="admin-phone-new" />
               </div>
 
               <div>
                 <label className={labelClass} style={labelStyle}>Mot de passe * (8 caractères min.)</label>
                 <div className="relative">
                   <input value={adminMdp} onChange={e => setAdminMdp(e.target.value)}
-                    type={showMdp ? 'text' : 'password'} placeholder="••••••••" className={inputClass} style={{ ...inputStyle, paddingRight: '3rem' }} />
+                    type={showMdp ? 'text' : 'password'} placeholder="••••••••"
+                    className={inputClass} style={{ ...inputStyle, paddingRight: '3rem' }}
+                    autoComplete="new-password" name="admin-new-password" />
                   <button type="button" onClick={() => setShowMdp(v => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-xs"
-                    style={{ color: 'rgba(255,255,255,0.4)' }}>
-                    {showMdp ? '<EyeOff className="w-4 h-4" />' : '<Eye className="w-4 h-4" />'}
+                    className="absolute right-3 top-1/2 -translate-y-1/2"
+                    aria-label={showMdp ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                    style={{ color: 'rgba(255,255,255,0.5)' }}>
+                    {showMdp ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
@@ -393,9 +444,11 @@ function InscriptionForm() {
               <div>
                 <label className={labelClass} style={labelStyle}>Confirmer le mot de passe *</label>
                 <input value={adminMdpConfirm} onChange={e => setAdminMdpConfirm(e.target.value)}
-                  type={showMdp ? 'text' : 'password'} placeholder="••••••••" className={inputClass} style={inputStyle} />
+                  type={showMdp ? 'text' : 'password'} placeholder="••••••••"
+                  className={inputClass} style={inputStyle}
+                  autoComplete="new-password" name="admin-new-password-confirm" />
               </div>
-            </div>
+            </form>
           )}
 
           {/* ══ ÉTAPE 3 : Plan ══ */}

@@ -115,7 +115,8 @@ export function BottomNav() {
   const pathname = usePathname()
   const { user } = useUser()
 
-  const role = (user?.role || roleFromPath(pathname)) as UserRole
+  const pathRole = roleFromPath(pathname)
+  const role = (pathRole !== 'admin_global' ? pathRole : (user?.role || 'admin_global')) as UserRole
   const items = BOTTOM_MENUS[role] || BOTTOM_MENUS.admin_global
   const accentColor = ROLE_COLORS[role] || '#22C55E'
 

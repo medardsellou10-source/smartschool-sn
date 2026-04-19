@@ -1,6 +1,7 @@
-﻿'use client'
+'use client'
 
-import { useMemo } from 'react'
+import { useEffect, useState, useCallback } from 'react'
+import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { StatCard } from '@/components/dashboard/StatCard'
 import { EmptyState } from '@/components/dashboard/EmptyState'
@@ -20,37 +21,112 @@ const MATIERE_COLORS = [
   '#22C55E', '#38BDF8', '#FBBF24', '#A78BFA', '#F87171', '#448AFF', '#FF6D00',
 ]
 
+interface CoursItem {
+  id: string
+  matiere_nom: string
+  classe_nom: string
+  heure_debut: string
+  heure_fin: string
+  salle: string | null
+  jour_semaine: number
+}
+
+interface PointageItem {
+  statut: string
+  minutes_retard: number
+  heure_arrivee: string
+}
+
 export default function ProfesseurDashboard() {
   const { user, loading: userLoading } = useUser()
+  const supabase = createClient()
 
   const today = new Date()
   const jsDay = today.getDay()
   const jourSemaine = jsDay === 0 ? 7 : jsDay
   const profId = user?.id || ''
 
-  const coursAujourdhui = useMemo(() => {
-    if (!isDemoMode() || !profId) return []
-    return DEMO_EMPLOIS_TEMPS
+  const [coursAujourdhui, setCoursAujourdhui] = useState<CoursItem[]>([])
+  const [nbClasses, setNbClasses] = useState(0)
+  const [pointageDuJour, setPointageDuJour] = useState<PointageItem | null>(null)
+  const [dataLoading, setDataLoading] = useState(true)
+
+  const loadDemoData = useCallback(() => {
+    if (!profId) return
+    const todayStr = today.toISOString().split('T')[0]
+    const cours = DEMO_EMPLOIS_TEMPS
       .filter(e => e.prof_id === profId && e.jour_semaine === jourSemaine)
       .sort((a, b) => a.heure_debut.localeCompare(b.heure_debut))
       .map(e => ({
-        ...e,
+        id: e.id,
         matiere_nom: DEMO_MATIERES.find(m => m.id === e.matiere_id)?.nom || 'Matière',
         classe_nom: (() => { const c = DEMO_CLASSES.find(c => c.id === e.classe_id); return c ? `${c.niveau} ${c.nom}` : 'Classe' })(),
+        heure_debut: e.heure_debut,
+        heure_fin: e.heure_fin,
+        salle: e.salle,
+        jour_semaine: e.jour_semaine,
       }))
-  }, [profId, jourSemaine])
+    setCoursAujourdhui(cours)
+    const classeIds = new Set(DEMO_EMPLOIS_TEMPS.filter(e => e.prof_id === profId).map(e => e.classe_id))
+    setNbClasses(classeIds.size)
+    const p = DEMO_POINTAGES.find(p => p.prof_id === profId && p.date_pointage === todayStr) || null
+    setPointageDuJour(p ? { statut: p.statut, minutes_retard: p.minutes_retard, heure_arrivee: p.heure_arrivee } : null)
+    setDataLoading(false)
+  }, [profId, jourSemaine, today])
 
-  const classesEnseignees = useMemo(() => {
-    if (!isDemoMode() || !profId) return []
-    const classeIds = [...new Set(DEMO_EMPLOIS_TEMPS.filter(e => e.prof_id === profId).map(e => e.classe_id))]
-    return classeIds.map(id => DEMO_CLASSES.find(c => c.id === id)).filter(Boolean)
-  }, [profId])
-
-  const pointageDuJour = useMemo(() => {
-    if (!isDemoMode() || !profId) return null
+  const loadRealData = useCallback(async () => {
+    if (!profId) return
+    setDataLoading(true)
     const todayStr = today.toISOString().split('T')[0]
-    return DEMO_POINTAGES.find(p => p.prof_id === profId && p.date_pointage === todayStr) || null
-  }, [profId, today])
+
+    const [emploiRes, pointageRes, classesRes] = await Promise.all([
+      (supabase.from('emplois_temps') as any)
+        .select('id, heure_debut, heure_fin, salle, matieres(nom), classes(nom, niveau)')
+        .eq('prof_id', profId)
+        .eq('jour_semaine', jourSemaine),
+      supabase.from('pointages_profs')
+        .select('statut, minutes_retard, heure_arrivee')
+        .eq('prof_id', profId)
+        .eq('date_pointage', todayStr)
+        .maybeSingle(),
+      (supabase.from('emplois_temps') as any)
+        .select('classe_id')
+        .eq('prof_id', profId),
+    ])
+
+    if (emploiRes.data) {
+      const cours: CoursItem[] = (emploiRes.data as any[]).map(e => ({
+        id: e.id,
+        matiere_nom: e.matieres?.nom || 'Matière',
+        classe_nom: e.classes ? `${e.classes.niveau} ${e.classes.nom}` : 'Classe',
+        heure_debut: e.heure_debut,
+        heure_fin: e.heure_fin,
+        salle: e.salle,
+        jour_semaine: jourSemaine,
+      }))
+      cours.sort((a, b) => a.heure_debut.localeCompare(b.heure_debut))
+      setCoursAujourdhui(cours)
+    }
+
+    if (pointageRes.data) {
+      setPointageDuJour(pointageRes.data as PointageItem)
+    }
+
+    if (classesRes.data) {
+      setNbClasses(new Set((classesRes.data as any[]).map(e => e.classe_id)).size)
+    }
+
+    setDataLoading(false)
+  }, [profId, jourSemaine, supabase, today])
+
+  useEffect(() => {
+    if (!user) return
+    if (isDemoMode()) {
+      loadDemoData()
+    } else {
+      loadRealData()
+    }
+  }, [user, loadDemoData, loadRealData])
 
   const pointageColor = pointageDuJour
     ? pointageDuJour.statut === 'a_heure' ? 'green' : pointageDuJour.statut === 'retard_leger' ? 'gold' : 'red'
@@ -95,15 +171,15 @@ export default function ProfesseurDashboard() {
 
       {/* ── Stats ── */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-        <StatCard title="Classes enseignées" value={classesEnseignees.length}
-          subtitle={classesEnseignees.map(c => c ? `${c.niveau} ${c.nom}` : '').slice(0, 2).join(', ')}
-          icon={School} color="cyan" delay={0} />
-        <StatCard title="Cours aujourd'hui" value={coursAujourdhui.length}
-          subtitle={JOUR_LABELS[jourSemaine] || 'Dimanche'} icon={BookOpen} color="green" delay={80} />
-        <StatCard title="Mon pointage" value={pointageLabel}
+        <StatCard title="Classes enseignées" value={dataLoading ? '—' : nbClasses}
+          subtitle="Ce semestre"
+          icon={School} color="cyan" delay={0} loading={dataLoading} />
+        <StatCard title="Cours aujourd'hui" value={dataLoading ? '—' : coursAujourdhui.length}
+          subtitle={JOUR_LABELS[jourSemaine] || 'Dimanche'} icon={BookOpen} color="green" delay={80} loading={dataLoading} />
+        <StatCard title="Mon pointage" value={dataLoading ? '—' : pointageLabel}
           subtitle={pointageDuJour ? formatH(pointageDuJour.heure_arrivee) : 'Pas encore pointé'}
           icon={pointageDuJour?.statut === 'a_heure' ? CheckCircle2 : pointageDuJour ? AlertTriangle : Clock}
-          color={pointageColor} delay={160} />
+          color={pointageColor} delay={160} loading={dataLoading} />
       </div>
 
       {/* ── Actions rapides ── */}
@@ -142,11 +218,15 @@ export default function ProfesseurDashboard() {
           </h2>
           <span className="text-xs px-2 py-1 rounded-full"
             style={{ background: 'rgba(0,229,255,0.1)', color: '#38BDF8', border: '1px solid rgba(0,229,255,0.2)' }}>
-            {coursAujourdhui.length} cours
+            {dataLoading ? '...' : `${coursAujourdhui.length} cours`}
           </span>
         </div>
 
-        {coursAujourdhui.length === 0 ? (
+        {dataLoading ? (
+          <div className="space-y-3">
+            {[...Array(2)].map((_, i) => <div key={i} className="h-16 rounded-xl ss-shimmer" style={{ background: 'rgba(255,255,255,0.03)' }} />)}
+          </div>
+        ) : coursAujourdhui.length === 0 ? (
           <EmptyState
             icon={CalendarCheck}
             title={jourSemaine === 7 ? 'Dimanche' : 'Aucun cours prévu'}
@@ -170,22 +250,15 @@ export default function ProfesseurDashboard() {
                     border: `1px solid ${isCurrent ? color + '40' : 'rgba(255,255,255,0.07)'}`,
                     opacity: isPast && !isCurrent ? 0.65 : 1,
                   }}>
-                  {/* Indicateur */}
                   <div className="w-1 h-12 rounded-full shrink-0" style={{ background: color }} />
-
-                  {/* Horaires */}
                   <div className="w-16 shrink-0 text-center">
                     <p className="text-sm font-black text-white">{cours.heure_debut}</p>
                     <p className="text-xs" style={{ color: '#475569' }}>{cours.heure_fin}</p>
                   </div>
-
-                  {/* Infos */}
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold text-white truncate">{cours.matiere_nom}</p>
-                    <p className="text-xs mt-0.5" style={{ color: '#94A3B8' }}>{cours.classe_nom} · {cours.salle}</p>
+                    <p className="text-xs mt-0.5" style={{ color: '#94A3B8' }}>{cours.classe_nom}{cours.salle && ` · ${cours.salle}`}</p>
                   </div>
-
-                  {/* Badge état */}
                   {isCurrent && (
                     <span className="text-[10px] font-bold px-2 py-1 rounded-full shrink-0 flex items-center gap-1"
                       style={{ background: `${color}20`, color, border: `1px solid ${color}40` }}>
@@ -202,4 +275,3 @@ export default function ProfesseurDashboard() {
     </div>
   )
 }
-

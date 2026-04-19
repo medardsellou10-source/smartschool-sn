@@ -134,7 +134,8 @@ export function Sidebar() {
   const { user, logout } = useUser()
   const { ecole } = useEcole()
 
-  const role = (user?.role || roleFromPathname(pathname)) as UserRole
+  const pathRole = roleFromPathname(pathname)
+  const role = (pathRole !== 'admin_global' ? pathRole : (user?.role || 'admin_global')) as UserRole
   const items = MENUS[role] || MENUS.admin_global
   // Utiliser la couleur de l'école si disponible, sinon la couleur du rôle (source unique : role-colors.ts)
   const ecoleColor = ecole?.couleur_primaire

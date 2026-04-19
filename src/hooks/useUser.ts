@@ -142,6 +142,11 @@ export function useUser() {
         _cachedUser = null
         notify(null, false)
       } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        // Purge any stale demo state so isDemoMode() returns false
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('ss_demo_role')
+          document.cookie = 'ss_demo_role=; path=/; max-age=0; SameSite=Lax'
+        }
         _cachedUser = null // invalider le cache
         fetchAndCacheUser()
       }
@@ -162,6 +167,7 @@ export function useUser() {
     }
     _cachedUser = null
     _fetchInProgress = null
+    document.cookie = 'ss_user_role=; path=/; max-age=0; SameSite=Lax'
     const supabase = createClient()
     await supabase.auth.signOut()
     window.location.href = '/login'

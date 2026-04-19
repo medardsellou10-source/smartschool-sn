@@ -400,8 +400,34 @@ export function getDemoRoleCookie(): string | null {
   return match ? match.split('=')[1] : null
 }
 
+/**
+ * Le mode démo est-il autorisé par l'environnement ?
+ * DOIT correspondre exactement à la logique de `src/proxy.ts` (sécurité).
+ * En production Supabase, renvoie false → aucun cookie démo n'est pris en compte.
+ */
+export function isDemoAllowedClient(): boolean {
+  // Doit correspondre EXACTEMENT à `isDemoAllowed()` dans src/proxy.ts :
+  // le démo n'est actif QUE si Supabase n'est pas configuré. Aucun flag
+  // d'environnement ne peut réactiver le démo en production.
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? ''
+  const supabaseReady =
+    url.length > 0 && !url.includes('placeholder') && !url.includes('[PROJECT_REF]') &&
+    key.length > 0 && !key.includes('placeholder')
+  return !supabaseReady
+}
+
 export function isDemoMode(): boolean {
   if (typeof window === 'undefined') return false
+  // Sécurité : en prod Supabase, même si un cookie forgé existe, on refuse le mode démo.
+  if (!isDemoAllowedClient()) {
+    // Nettoyage défensif
+    try {
+      localStorage.removeItem('ss_demo_role')
+      document.cookie = 'ss_demo_role=; path=/; max-age=0; SameSite=Lax'
+    } catch {}
+    return false
+  }
   // Vrai si cookie démo présent OU localStorage (rétrocompatibilité)
   return !!(getDemoRoleCookie() || localStorage.getItem('ss_demo_role'))
 }

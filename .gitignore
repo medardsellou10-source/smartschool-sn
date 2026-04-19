@@ -50,3 +50,12 @@ supabase/.temp/
 /playwright/.cache/
 
 .vercel
+
+# Dev scratch — ne jamais commiter
+/refactor_auth.js
+/refactor_login_reset.js
+/lint-errors.json
+/.agent/
+/design-system/
+/.env.pull
+/.env.vercel.*

@@ -1,6 +1,7 @@
-﻿'use client'
+'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
+import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { useEcole } from '@/hooks/useEcole'
 import { StatCard } from '@/components/dashboard/StatCard'
@@ -8,25 +9,89 @@ import Link from 'next/link'
 import { isDemoMode, DEMO_BUDGET, DEMO_INVENTAIRE } from '@/lib/demo-data'
 import { formatCFA, formatCFACompact } from '@/lib/format'
 
-const ACCENT = '#2DD4BF' // teal — aligné sur ROLE_ACCENTS
+const ACCENT = '#2DD4BF'
 const CARD = { background: 'rgba(2,6,23,0.80)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.10)' }
+
+interface BudgetData {
+  annee: string
+  total_budget: number
+  recettes_encaissees: number
+  depenses_engagees: number
+  solde: number
+  lignes: { id: string; categorie: string; budget: number; depense: number }[]
+}
 
 export default function IntendantDashboard() {
   const { user, loading: userLoading } = useUser()
   const { ecole } = useEcole()
-  const [budget, setBudget] = useState<typeof DEMO_BUDGET | null>(null)
+  const supabase = createClient()
+  const [budget, setBudget] = useState<BudgetData | null>(null)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    if (!isDemoMode() || !user) return
-    setBudget(DEMO_BUDGET)
+  const loadDemoData = useCallback(() => {
+    if (!user) return
+    setBudget(DEMO_BUDGET as BudgetData)
     setLoading(false)
   }, [user])
 
-  useEffect(() => {
-    if (isDemoMode() || !user) return
+  const loadRealData = useCallback(async () => {
+    if (!user?.ecole_id) return
+    setLoading(true)
+    const ecoleId = user.ecole_id
+    const annee = new Date().getFullYear().toString()
+
+    const [facturesRes, paiementsRes] = await Promise.all([
+      (supabase.from('factures') as any)
+        .select('id, type_frais, montant_total, montant_verse, solde_restant, statut')
+        .eq('ecole_id', ecoleId),
+      (supabase.from('paiements') as any)
+        .select('id, montant, statut_confirmation')
+        .eq('ecole_id', ecoleId)
+        .eq('statut_confirmation', 'confirmed'),
+    ])
+
+    const factures = (facturesRes.data || []) as any[]
+    const paiements = (paiementsRes.data || []) as any[]
+
+    const totalBudget = factures.reduce((s: number, f: any) => s + (f.montant_total || 0), 0)
+    const totalVerse = factures.reduce((s: number, f: any) => s + (f.montant_verse || 0), 0)
+    const totalSolde = factures.reduce((s: number, f: any) => s + (f.solde_restant || 0), 0)
+    const recettesConfirmees = paiements.reduce((s: number, p: any) => s + (p.montant || 0), 0)
+
+    // Group by type_frais for budget lines
+    const byType: Record<string, { budget: number; depense: number }> = {}
+    for (const f of factures) {
+      const t = f.type_frais || 'Autres'
+      if (!byType[t]) byType[t] = { budget: 0, depense: 0 }
+      byType[t].budget += f.montant_total || 0
+      byType[t].depense += f.montant_verse || 0
+    }
+    const lignes = Object.entries(byType).map(([cat, v], i) => ({
+      id: String(i),
+      categorie: cat,
+      budget: v.budget,
+      depense: v.depense,
+    }))
+
+    setBudget({
+      annee,
+      total_budget: totalBudget,
+      recettes_encaissees: recettesConfirmees || totalVerse,
+      depenses_engagees: totalVerse,
+      solde: totalSolde,
+      lignes,
+    })
     setLoading(false)
-  }, [user])
+  }, [user, supabase])
+
+  useEffect(() => {
+    if (!user) return
+    if (isDemoMode()) {
+      loadDemoData()
+    } else {
+      loadRealData()
+    }
+  }, [user, loadDemoData, loadRealData])
 
   if (userLoading || loading) {
     return (
@@ -39,7 +104,9 @@ export default function IntendantDashboard() {
     )
   }
 
-  const pctDepense = budget ? Math.round((budget.depenses_engagees / budget.total_budget) * 100) : 0
+  const pctDepense = budget && budget.total_budget > 0
+    ? Math.round((budget.depenses_engagees / budget.total_budget) * 100)
+    : 0
 
   return (
     <div className="space-y-6 animate-fade-in pb-24 lg:pb-6">
@@ -66,7 +133,7 @@ export default function IntendantDashboard() {
               </div>
             </div>
             <p className="text-sm text-slate-300">
-              Budget {budget?.annee} · {new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+              Finances {budget?.annee} · {new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
             </p>
           </div>
           <div className="hidden lg:flex gap-2">
@@ -84,31 +151,31 @@ export default function IntendantDashboard() {
         </div>
       </div>
 
-      {/* StatCards — montants compacts pour éviter la troncature */}
+      {/* StatCards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <StatCard
-          title="Budget non engagé"
-          value={budget ? formatCFACompact(budget.total_budget - budget.depenses_engagees) : '—'}
-          subtitle={`sur ${budget ? formatCFACompact(budget.total_budget) : '—'}`}
+          title="Total facturé"
+          value={budget ? formatCFACompact(budget.total_budget) : '—'}
+          subtitle="cette année"
           icon="🏦" color="teal" href="/intendant/budget" delay={0}
         />
         <StatCard
           title="Recettes encaissées"
           value={budget ? formatCFACompact(budget.recettes_encaissees) : '—'}
-          subtitle="cette année"
-          icon="💰" color="green" trend="up" trendValue="+8%" href="/intendant/paiements" delay={80}
+          subtitle="paiements confirmés"
+          icon="💰" color="green" trend="up" href="/intendant/paiements" delay={80}
         />
         <StatCard
-          title="Dépenses engagées"
+          title="Montant versé"
           value={budget ? formatCFACompact(budget.depenses_engagees) : '—'}
-          subtitle={`${pctDepense}% du budget`}
+          subtitle={`${pctDepense}% du total`}
           icon="📊" color="orange" href="/intendant/budget" delay={160}
         />
         <StatCard
-          title="Solde trésorerie"
+          title="Solde impayé"
           value={budget ? formatCFACompact(budget.solde) : '—'}
-          subtitle="disponible"
-          icon="💳" color="indigo" href="/intendant/paiements" delay={240}
+          subtitle="reste à encaisser"
+          icon="💳" color={budget && budget.solde > 0 ? 'red' : 'indigo'} href="/intendant/paiements" delay={240}
         />
       </div>
 
@@ -120,10 +187,15 @@ export default function IntendantDashboard() {
           <h2 className="text-lg font-bold text-white mb-5 flex items-center gap-2">
             <span style={{ color: ACCENT }}>📊</span> Lignes budgétaires {budget?.annee}
           </h2>
-          {budget && (
+          {!budget || budget.lignes.length === 0 ? (
+            <div className="flex flex-col items-center py-8 text-center">
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3 text-2xl" style={{ background: `${ACCENT}15`, border: `1px solid ${ACCENT}25` }}>📋</div>
+              <p className="text-sm" style={{ color: '#94A3B8' }}>Aucune facture enregistrée</p>
+            </div>
+          ) : (
             <div className="space-y-4">
-              {budget.lignes.map(lig => {
-                const pct = Math.round((lig.depense / lig.budget) * 100)
+              {budget.lignes.slice(0, 6).map(lig => {
+                const pct = lig.budget > 0 ? Math.min(100, Math.round((lig.depense / lig.budget) * 100)) : 0
                 const barColor = pct > 80 ? '#F87171' : pct > 50 ? '#FBBF24' : ACCENT
                 return (
                   <div key={lig.id}>
@@ -139,13 +211,9 @@ export default function IntendantDashboard() {
                       aria-valuenow={pct}
                       aria-valuemin={0}
                       aria-valuemax={100}
-                      aria-label={`${lig.categorie} : ${pct}% engagé`}>
+                      aria-label={`${lig.categorie} : ${pct}% encaissé`}>
                       <div className="h-full rounded-full transition-all"
-                        style={{
-                          width: `${pct}%`,
-                          background: barColor,
-                          boxShadow: `0 0 10px ${barColor}80`,
-                        }} />
+                        style={{ width: `${pct}%`, background: barColor, boxShadow: `0 0 10px ${barColor}80` }} />
                     </div>
                   </div>
                 )
@@ -176,32 +244,25 @@ export default function IntendantDashboard() {
             ))}
           </div>
 
-          {/* Inventaire résumé */}
-          <div className="mt-5 pt-5" style={{ borderTop: '1px solid rgba(255,255,255,0.09)' }}>
-            <p className="text-sm text-slate-300 font-semibold mb-2">Inventaire ({DEMO_INVENTAIRE.length} catégories)</p>
-            {(() => {
-              const bon = DEMO_INVENTAIRE.filter(i => i.etat === 'bon').length
-              const pct = Math.round((bon / Math.max(DEMO_INVENTAIRE.length, 1)) * 100)
-              return (
-                <div className="flex items-center gap-3">
-                  <div className="flex-1 h-2 rounded-full bg-white/10 overflow-hidden"
-                    role="progressbar"
-                    aria-valuenow={pct}
-                    aria-valuemin={0}
-                    aria-valuemax={100}
-                    aria-label={`Inventaire en bon état : ${pct}%`}>
-                    <div className="h-full rounded-full" style={{ width: `${pct}%`, background: ACCENT, boxShadow: `0 0 8px ${ACCENT}60` }} />
-                  </div>
-                  <span className="text-sm font-bold" style={{ color: ACCENT }}>
-                    {bon}/{DEMO_INVENTAIRE.length} bon état
-                  </span>
+          {/* Taux de recouvrement */}
+          {budget && budget.total_budget > 0 && (
+            <div className="mt-5 pt-5" style={{ borderTop: '1px solid rgba(255,255,255,0.09)' }}>
+              <p className="text-sm text-slate-300 font-semibold mb-2">Taux de recouvrement</p>
+              <div className="flex items-center gap-3">
+                <div className="flex-1 h-2 rounded-full bg-white/10 overflow-hidden"
+                  role="progressbar"
+                  aria-valuenow={pctDepense}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label={`Taux de recouvrement : ${pctDepense}%`}>
+                  <div className="h-full rounded-full" style={{ width: `${pctDepense}%`, background: ACCENT, boxShadow: `0 0 8px ${ACCENT}60` }} />
                 </div>
-              )
-            })()}
-          </div>
+                <span className="text-sm font-bold" style={{ color: ACCENT }}>{pctDepense}%</span>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
   )
 }
-

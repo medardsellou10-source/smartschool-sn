@@ -115,7 +115,8 @@ export function Navbar() {
   const { ecole } = useEcole()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  const role = user?.role || roleFromPath(pathname)
+  const pathRole = roleFromPath(pathname)
+  const role = pathRole !== 'admin_global' ? pathRole : (user?.role || 'admin_global')
   const roleLabel = ROLE_LABELS[role as Role] ?? role
   const accentColor = ecole?.couleur_primaire || ROLE_COLORS[role] || '#22C55E'
   const ecoleNom = ecole?.nom || 'SmartSchool SN'

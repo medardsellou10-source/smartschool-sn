@@ -34,10 +34,6 @@ interface EleveSimple {
 // ONGLETS est désormais calculé dynamiquement selon le type d'école
 // (remplacé par getAdminOnglets(typeEtablissement) dans le composant)
 
-function generateTempPassword() {
-  return 'Temp' + Math.random().toString(36).slice(2, 8) + '!'
-}
-
 // Helper pour créer un utilisateur demo depuis DEMO_USERS
 function demoUser(key: keyof typeof DEMO_USERS, role: Role): Utilisateur {
   const u = DEMO_USERS[key]
@@ -70,6 +66,7 @@ export default function UtilisateursPage() {
   const [showModal, setShowModal] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [inviteSuccess, setInviteSuccess] = useState('')
 
   // Champs du formulaire
   const [formPrenom, setFormPrenom] = useState('')
@@ -201,61 +198,38 @@ export default function UtilisateursPage() {
     }
 
     try {
-      const supabase = createClient()
-      const tempPwd = generateTempPassword()
-
-      // 1. Créer compte auth
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: formEmail.trim(),
-        password: tempPwd,
+      // Appel de l'API serveur qui envoie un email d'invitation Supabase
+      // (l'utilisateur reçoit un lien pour définir son mot de passe)
+      const res = await fetch('/api/admin/invite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formEmail.trim(),
+          prenom: formPrenom.trim(),
+          nom: formNom.trim(),
+          telephone: formTelephone.trim() || undefined,
+          role: onglet,
+          ecole_id: ecoleId,
+          classe_id: onglet === 'eleve' ? formClasse || undefined : undefined,
+          matricule: onglet === 'eleve' ? formMatricule.trim() || undefined : undefined,
+          enfants_ids: onglet === 'parent' ? formEnfants : undefined,
+        }),
       })
 
-      if (authError || !authData.user) {
-        setError(authError?.message || 'Erreur lors de la création du compte.')
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error || 'Erreur lors de l\'invitation.')
         setSaving(false)
         return
       }
 
-      const userId = authData.user.id
-
-      // 2. Créer profil utilisateur
-      await (supabase.from('utilisateurs') as any).insert({
-        id: userId,
-        ecole_id: ecoleId,
-        nom: formNom.trim(),
-        prenom: formPrenom.trim(),
-        telephone: formTelephone.trim(),
-        role: onglet,
-        actif: true,
-      })
-
-      // 3. Si élève: créer dans eleves
-      if (onglet === 'eleve' && formClasse) {
-        await (supabase.from('eleves') as any).insert({
-          id: userId,
-          ecole_id: ecoleId,
-          classe_id: formClasse,
-          nom: formNom.trim(),
-          prenom: formPrenom.trim(),
-          matricule: formMatricule.trim() || `MAT-${Date.now()}`,
-          sexe: 'M',
-          actif: true,
-        })
-      }
-
-      // 4. Si parent + enfants: lier les élèves
-      if (onglet === 'parent' && formEnfants.length > 0) {
-        for (const eleveId of formEnfants) {
-          await (supabase.from('eleves') as any)
-            .update({ parent_principal_id: userId })
-            .eq('id', eleveId)
-        }
-      }
-
+      setInviteSuccess(`✉️ Invitation envoyée à ${formEmail.trim()}. L'utilisateur recevra un lien par email pour définir son mot de passe.`)
       await loadData()
       setShowModal(false)
+      // Effacer le message après 6 secondes
+      setTimeout(() => setInviteSuccess(''), 6000)
     } catch {
-      setError('Une erreur inattendue est survenue.')
+      setError('Connexion au serveur impossible.')
     } finally {
       setSaving(false)
     }
@@ -296,10 +270,18 @@ export default function UtilisateursPage() {
             className="flex items-center gap-2 bg-ss-info text-[#020617] font-semibold text-sm px-4 py-2.5 rounded-xl hover:opacity-90 transition-opacity cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ss-info focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617]"
           >
             <Plus size={16} />
-            Ajouter {roleSingulier[onglet]}
+            Inviter {roleSingulier[onglet]}
           </button>
         }
       />
+
+      {/* Notification succès invitation */}
+      {inviteSuccess && (
+        <div className="rounded-xl px-4 py-3 text-sm"
+          style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.25)', color: '#86EFAC' }}>
+          {inviteSuccess}
+        </div>
+      )}
 
       {/* Onglets — filtrés par type d'établissement */}
       <div className="flex flex-wrap gap-1 border-b border-ss-border">
@@ -398,7 +380,7 @@ export default function UtilisateursPage() {
           <div className="bg-[#141833] rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-lg font-bold text-ss-text">
-                Ajouter {['intendant', 'surveillant'].includes(onglet) ? 'un' : onglet === 'eleve' ? 'un' : 'un(e)'} {roleSingulier[onglet].toLowerCase()}
+                Inviter {['intendant', 'surveillant'].includes(onglet) ? 'un' : onglet === 'eleve' ? 'un' : 'un(e)'} {roleSingulier[onglet].toLowerCase()}
               </h2>
               <button
                 onClick={() => setShowModal(false)}
@@ -543,7 +525,7 @@ export default function UtilisateursPage() {
                   disabled={saving}
                   className="flex-1 bg-ss-cyan text-white font-medium text-sm py-2.5 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
                 >
-                  {saving ? 'Enregistrement...' : 'Ajouter'}
+                  {saving ? 'Envoi de l\'invitation...' : '✉️ Envoyer l\'invitation'}
                 </button>
               </div>
             </form>

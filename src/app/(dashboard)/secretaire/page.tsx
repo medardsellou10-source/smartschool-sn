@@ -1,24 +1,29 @@
-﻿'use client'
+'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
+import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { useEcole } from '@/hooks/useEcole'
 import { StatCard } from '@/components/dashboard/StatCard'
 import Link from 'next/link'
 import { isDemoMode, DEMO_INSCRIPTIONS, DEMO_CERTIFICATS, DEMO_COURRIERS } from '@/lib/demo-data'
+import { relativeTime } from '@/lib/format'
 
 const ACCENT = '#FF6D00'
 const CARD = { background: 'rgba(2,6,23,0.80)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.10)' }
 
+interface ActivityItem { text: string; time: string; type: string }
+
 export default function SecretaireDashboard() {
   const { user, loading: userLoading } = useUser()
   const { ecole } = useEcole()
+  const supabase = createClient()
   const [stats, setStats] = useState({ inscriptions: 0, certificats: 0, dossiers: 0, courrier: 0 })
-  const [activite, setActivite] = useState<{ text: string; time: string; type: string }[]>([])
+  const [activite, setActivite] = useState<ActivityItem[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    if (!isDemoMode() || !user) return
+  const loadDemoData = useCallback(() => {
+    if (!user) return
     setStats({
       inscriptions: DEMO_INSCRIPTIONS.length,
       certificats: DEMO_CERTIFICATS.filter(c => c.statut === 'emis').length,
@@ -35,10 +40,60 @@ export default function SecretaireDashboard() {
     setLoading(false)
   }, [user])
 
-  useEffect(() => {
-    if (isDemoMode() || !user) return
+  const loadRealData = useCallback(async () => {
+    if (!user?.ecole_id) return
+    setLoading(true)
+    const ecoleId = user.ecole_id
+
+    const [elevesRes, elevesIncompletRes, notifsRes] = await Promise.all([
+      supabase.from('eleves')
+        .select('id', { count: 'exact', head: true })
+        .eq('ecole_id', ecoleId)
+        .eq('actif', true),
+      supabase.from('eleves')
+        .select('id', { count: 'exact', head: true })
+        .eq('ecole_id', ecoleId)
+        .eq('actif', true)
+        .is('photo_url', null),
+      (supabase.from('notifications') as any)
+        .select('id, titre, contenu, type_notif, created_at')
+        .eq('ecole_id', ecoleId)
+        .order('created_at', { ascending: false })
+        .limit(8),
+    ])
+
+    const totalEleves = elevesRes.count || 0
+    const dossiersIncomplets = elevesIncompletRes.count || 0
+    const notifs = (notifsRes.data || []) as any[]
+
+    setStats({
+      inscriptions: totalEleves,
+      certificats: notifs.filter(n => n.type_notif === 'certificat').length,
+      dossiers: dossiersIncomplets,
+      courrier: notifs.filter(n => n.type_notif === 'courrier' || n.type_notif === 'message').length,
+    })
+
+    const typeMap: Record<string, string> = {
+      note: 'cert', absence: 'warn', paiement: 'insc', message: 'courr',
+      certificat: 'cert', appel_valide: 'insc',
+    }
+    setActivite(notifs.slice(0, 6).map(n => ({
+      text: n.titre,
+      time: relativeTime(n.created_at),
+      type: typeMap[n.type_notif] || 'courr',
+    })))
+
     setLoading(false)
-  }, [user])
+  }, [user, supabase])
+
+  useEffect(() => {
+    if (!user) return
+    if (isDemoMode()) {
+      loadDemoData()
+    } else {
+      loadRealData()
+    }
+  }, [user, loadDemoData, loadRealData])
 
   if (userLoading || loading) {
     return (
@@ -100,10 +155,10 @@ export default function SecretaireDashboard() {
 
       {/* StatCards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <StatCard title="Inscriptions" value={stats.inscriptions} subtitle="total année" icon="📝" color="orange" href="/secretaire/inscriptions" delay={0} />
+        <StatCard title="Élèves inscrits" value={stats.inscriptions} subtitle="total année" icon="📝" color="orange" href="/secretaire/inscriptions" delay={0} />
         <StatCard title="Certificats émis" value={stats.certificats} subtitle="cette année" icon="📜" color="teal" href="/secretaire/certificats" delay={80} />
-        <StatCard title="Dossiers incomplets" value={stats.dossiers} subtitle="à compléter" icon="⚠️" color="gold" trend={stats.dossiers > 0 ? 'up' : undefined} href="/secretaire/dossiers" delay={160} />
-        <StatCard title="Courrier en attente" value={stats.courrier} subtitle="à traiter" icon="📬" color="red" href="/secretaire/courrier" delay={240} />
+        <StatCard title="Dossiers incomplets" value={stats.dossiers} subtitle="sans photo" icon="⚠️" color="gold" trend={stats.dossiers > 0 ? 'up' : undefined} href="/secretaire/dossiers" delay={160} />
+        <StatCard title="Messages reçus" value={stats.courrier} subtitle="non traités" icon="📬" color="red" href="/secretaire/courrier" delay={240} />
       </div>
 
       {/* Grille principale */}
@@ -114,20 +169,27 @@ export default function SecretaireDashboard() {
           <h2 className="text-lg font-bold text-white mb-5 flex items-center gap-2">
             <span style={{ color: ACCENT }}>⏱</span> Activité récente
           </h2>
-          <div className="space-y-3">
-            {activite.map((a, i) => (
-              <div key={i} className="flex items-start gap-3 p-4 rounded-xl"
-                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
-                <span className="text-xl mt-0.5">{activityIcon[a.type]}</span>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-white leading-snug">{a.text}</p>
-                  <p className="text-xs text-slate-400 mt-1">{a.time}</p>
+          {activite.length === 0 ? (
+            <div className="flex flex-col items-center py-8 text-center">
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3 text-2xl" style={{ background: `${ACCENT}15`, border: `1px solid ${ACCENT}25` }}>📋</div>
+              <p className="text-sm" style={{ color: '#94A3B8' }}>Aucune activité récente</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {activite.map((a, i) => (
+                <div key={i} className="flex items-start gap-3 p-4 rounded-xl"
+                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                  <span className="text-xl mt-0.5">{activityIcon[a.type] || '📋'}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-white leading-snug">{a.text}</p>
+                    <p className="text-xs text-slate-400 mt-1">{a.time}</p>
+                  </div>
+                  <div className="w-2.5 h-2.5 rounded-full mt-1.5 shrink-0"
+                    style={{ background: activityColor[a.type] || ACCENT, boxShadow: `0 0 8px ${activityColor[a.type] || ACCENT}` }} />
                 </div>
-                <div className="w-2.5 h-2.5 rounded-full mt-1.5 shrink-0"
-                  style={{ background: activityColor[a.type], boxShadow: `0 0 8px ${activityColor[a.type]}` }} />
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Actions rapides */}
@@ -156,4 +218,3 @@ export default function SecretaireDashboard() {
     </div>
   )
 }
-
