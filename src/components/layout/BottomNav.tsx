@@ -45,7 +45,7 @@ const BOTTOM_MENUS: Record<string, BottomItem[]> = {
     { href: '/professeur',                label: 'Accueil',  icon: HomeIcon },
     { href: '/professeur/appel',          label: 'Appel',    icon: ClipIcon },
     { href: '/professeur/notes',          label: 'Notes',    icon: PencilIcon },
-    { href: '/professeur/correction-ia',  label: 'Pré-analyse', icon: RobotIcon },
+    { href: '/professeur/hub',            label: 'Hub',      icon: MonitorIcon },
     { href: '/professeur/cahier',         label: 'Cahier',   icon: BookIcon },
   ],
   surveillant: [
@@ -62,8 +62,8 @@ const BOTTOM_MENUS: Record<string, BottomItem[]> = {
   eleve: [
     { href: '/eleve',               label: 'Accueil',   icon: HomeIcon },
     { href: '/eleve/notes',         label: 'Notes',     icon: ChartIcon },
+    { href: '/eleve/hub',           label: 'Hub',       icon: MonitorIcon },
     { href: '/eleve/correction',    label: 'Correction',icon: RobotIcon },
-    { href: '/eleve/elearning',     label: 'Cours',     icon: MonitorIcon },
     { href: '/eleve/emploi-temps',  label: 'Planning',  icon: ClipIcon },
   ],
   secretaire: [

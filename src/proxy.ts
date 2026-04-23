@@ -7,15 +7,11 @@
  *
  * Règles (par ordre de priorité) :
  *   1. Routes publiques (/login, /, /reset-password, assets, webhooks…) → libres
- *   2. Mode démo : ne fonctionne QUE si Supabase n'est pas configuré
- *      (dev local / preview sans backend). Dès qu'une URL Supabase valide
- *      est présente, le mode démo est définitivement désactivé : aucun flag
- *      d'environnement ne peut le réactiver. Un cookie `ss_demo_role`
- *      injecté manuellement est IGNORÉ + PURGÉ → zéro bypass en production.
- *   3. En production Supabase : session obligatoire, profil `utilisateurs`
- *      obligatoire (source de vérité pour le rôle), compte `actif=true`,
- *      cloisonnement strict entre rôles (un professeur ne peut pas
- *      accéder à /admin).
+ *   2. Mode démo : activé via NEXT_PUBLIC_DEMO_MODE=true OU si Supabase n'est pas configuré.
+ *      Le cookie `ss_demo_role` est lu pour router l'utilisateur.
+ *   3. En production Supabase (mode démo désactivé) : session obligatoire,
+ *      profil `utilisateurs` obligatoire, compte `actif=true`,
+ *      cloisonnement strict entre rôles.
  */
 
 import { NextResponse, type NextRequest } from 'next/server'
@@ -101,13 +97,13 @@ function isProtectedRoute(pathname: string): boolean {
 
 /**
  * Supabase est-il configuré avec de vraies clés (pas un placeholder) ?
- * → Si oui, le mode démo est automatiquement désactivé (sécurité prod).
  */
 function isSupabaseConfigured(): boolean {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? ''
   return (
     url.length > 0 &&
+    url.startsWith('https://') &&
     !url.includes('placeholder') &&
     !url.includes('[PROJECT_REF]') &&
     key.length > 0 &&
@@ -116,19 +112,14 @@ function isSupabaseConfigured(): boolean {
 }
 
 /**
- * Le mode démo (cookies `ss_demo_role`) est-il autorisé ?
- * → Uniquement si Supabase n'est pas configuré (dev local / preview sans backend).
- * Dès qu'une URL + clé Supabase valides sont présentes, le démo est mort.
- * Aucun flag d'env ne peut contourner : la sécurité prime.
+ * Le mode démo est-il autorisé ?
+ * → Activé si NEXT_PUBLIC_DEMO_MODE=true OU si Supabase n'est pas configuré.
+ * Peut coexister avec Supabase configuré pour les démonstrations.
  */
 function isDemoAllowed(): boolean {
+  const explicitFlag = process.env.NEXT_PUBLIC_DEMO_MODE
+  if (explicitFlag === 'true') return true
   return !isSupabaseConfigured()
-}
-
-/** Supprime les cookies démo (utilisé dès qu'on détecte un cookie injecté en prod) */
-function purgeDemoCookies(response: NextResponse) {
-  response.cookies.set('ss_demo_role', '', { path: '/', maxAge: 0, sameSite: 'lax' })
-  response.cookies.set('ss_user_role', '', { path: '/', maxAge: 0, sameSite: 'lax' })
 }
 
 /** Redirige vers le dashboard du rôle si la route cible appartient à un autre rôle */
@@ -156,14 +147,12 @@ export async function proxy(request: NextRequest) {
   const supabaseReady = isSupabaseConfigured()
   const demoRole = request.cookies.get('ss_demo_role')?.value
 
-  // 1. Routes publiques → libres, mais on purge les cookies démo si prod
+  // 1. Routes publiques → libres
   if (isPublic(pathname)) {
-    const res = NextResponse.next({ request })
-    if (!demoAllowed && demoRole) purgeDemoCookies(res)
-    return res
+    return NextResponse.next({ request })
   }
 
-  // 2. Mode démo : ne fonctionne QUE si explicitement autorisé par l'environnement
+  // 2. Mode démo : fonctionne si explicitement autorisé par env flag OU Supabase non configuré
   if (demoAllowed && demoRole && ROLE_HOME[demoRole]) {
     // Protéger le cloisonnement entre rôles même en démo
     if (isProtectedRoute(pathname)) return enforceRole(request, demoRole)
@@ -171,11 +160,10 @@ export async function proxy(request: NextRequest) {
   }
 
   // ──────────────────────────────────────────────────────────────────────────
-  // À partir d'ici : auth Supabase réelle obligatoire
+  // À partir d'ici : auth Supabase réelle
   // ──────────────────────────────────────────────────────────────────────────
 
-  // Si Supabase n'est pas configuré ET mode démo pas autorisé → on ne peut
-  // pas authentifier. On laisse passer uniquement les routes non-protégées.
+  // Si Supabase n'est pas configuré ET pas de cookie démo valide → login
   if (!supabaseReady) {
     if (!isProtectedRoute(pathname)) return NextResponse.next({ request })
     const url = request.nextUrl.clone()
@@ -185,7 +173,6 @@ export async function proxy(request: NextRequest) {
 
   // Session Supabase : rafraîchissement des cookies
   let response = NextResponse.next({ request })
-  if (!demoAllowed && demoRole) purgeDemoCookies(response)
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -198,7 +185,6 @@ export async function proxy(request: NextRequest) {
           response = NextResponse.next({ request })
           cookiesToSet.forEach(({ name, value, options }) =>
             response.cookies.set(name, value, options))
-          if (!demoAllowed && demoRole) purgeDemoCookies(response)
         },
       },
     },
@@ -220,9 +206,6 @@ export async function proxy(request: NextRequest) {
   }
 
   // 5. Authentifié : vérifier le profil côté serveur (source de vérité)
-  //    - profil obligatoire
-  //    - compte actif=true obligatoire
-  //    - rôle valide obligatoire
   const { data: profile } = await supabase
     .from('utilisateurs')
     .select('role, actif')
@@ -235,9 +218,7 @@ export async function proxy(request: NextRequest) {
     const loginUrl = new URL('/login', request.url)
     loginUrl.searchParams.set('error', !profile ? 'no_profile' : (!profile.actif ? 'suspended' : 'invalid_role'))
     const redirect = NextResponse.redirect(loginUrl)
-    // Également purger les cookies app
     redirect.cookies.set('ss_user_role', '', { path: '/', maxAge: 0, sameSite: 'lax' })
-    if (!demoAllowed) redirect.cookies.set('ss_demo_role', '', { path: '/', maxAge: 0, sameSite: 'lax' })
     return redirect
   }
 

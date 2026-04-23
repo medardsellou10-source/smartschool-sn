@@ -81,6 +81,7 @@ const MENUS: Record<string, NavItem[]> = {
     { href: '/professeur/support-pedagogique', label: 'Support Pédagogique', icon: Icons.calendar },
     { href: '/professeur/messages', label: 'Messagerie', icon: Icons.message },
     { href: '/professeur/elearning', label: 'E-Learning', icon: Icons.monitor },
+    { href: '/professeur/hub', label: 'Hub Vidéo', icon: Icons.book },
   ],
   surveillant: [
     { href: '/surveillant', label: 'Accueil', icon: Icons.home },
@@ -105,6 +106,7 @@ const MENUS: Record<string, NavItem[]> = {
     { href: '/eleve/cahier-texte', label: 'Cahier de texte', icon: Icons.book },
     { href: '/eleve/ressources', label: 'Ressources & Annales', icon: Icons.teacher },
     { href: '/eleve/elearning', label: 'E-Learning', icon: Icons.monitor },
+    { href: '/eleve/hub', label: 'Hub Vidéo', icon: Icons.book },
   ],
   secretaire: [
     { href: '/secretaire',              label: 'Accueil',      icon: Icons.home },

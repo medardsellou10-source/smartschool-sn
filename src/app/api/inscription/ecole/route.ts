@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 
 function isSupabaseConfigured(): boolean {
+  // Si le mode démo est explicitement activé, on simule sans Supabase
+  if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true') return false
   return !!(
     process.env.NEXT_PUBLIC_SUPABASE_URL?.startsWith('https://') &&
     process.env.SUPABASE_SERVICE_ROLE_KEY &&

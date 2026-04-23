@@ -65,16 +65,18 @@ function LoginContent() {
   const supabaseUrl        = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
   const supabaseKey        = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? ''
   const isSupabaseConfigured = supabaseUrl.length > 0
+    && supabaseUrl.startsWith('https://')
     && !supabaseUrl.includes('placeholder')
     && !supabaseUrl.includes('[PROJECT_REF]')
     && supabaseKey.length > 0
     && !supabaseKey.includes('placeholder')
   /**
-   * Mode démo autorisé UNIQUEMENT si Supabase n'est pas configuré
-   * (dev local / preview sans backend). Cohérent avec `proxy.ts` côté serveur.
-   * Aucun flag d'environnement ne peut activer le démo en production.
+   * Mode démo autorisé si :
+   *  - Le flag NEXT_PUBLIC_DEMO_MODE=true est défini (démo explicite), OU
+   *  - Supabase n'est pas configuré (dev sans backend)
+   * Cohérent avec `proxy.ts` côté serveur.
    */
-  const demoAllowed = !isSupabaseConfigured
+  const demoAllowed = process.env.NEXT_PUBLIC_DEMO_MODE === 'true' || !isSupabaseConfigured
 
   // Afficher erreurs passées via query params (venant du proxy ou d'autres redirections)
   useEffect(() => {
@@ -82,9 +84,10 @@ function LoginContent() {
     if (e && ERROR_MESSAGES[e]) setError(ERROR_MESSAGES[e])
   }, [searchParams])
 
-  // Purger tout cookie démo résiduel si on arrive sur /login en mode Supabase réel
+  // Ne purge les cookies démo que si le mode démo est désactivé ET on n'est pas en démo
   useEffect(() => {
     if (demoAllowed) return
+    // Mode démo désactivé : nettoyer les éventuels cookies résiduels
     document.cookie = 'ss_demo_role=; path=/; max-age=0; SameSite=Lax'
     localStorage.removeItem('ss_demo_role')
   }, [demoAllowed])
