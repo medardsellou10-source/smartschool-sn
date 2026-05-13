@@ -1,7 +1,6 @@
 ﻿'use client'
 
-import { useEffect, useState, useMemo } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { useState, useMemo } from 'react'
 import { useUser } from '@/hooks/useUser'
 import { StatCard } from '@/components/dashboard/StatCard'
 import {
@@ -27,11 +26,9 @@ function getPeriodeDates(periode: Periode): { start: string; end: string } {
 }
 
 export default function SurveillantStatistiquesPage() {
-  const { user, loading: userLoading } = useUser()
-  const supabase = createClient()
+  const { loading: userLoading } = useUser()
 
   const [periode, setPeriode] = useState<Periode>('mois')
-  const [loading, setLoading] = useState(false)
 
   const dates = useMemo(() => getPeriodeDates(periode), [periode])
 
