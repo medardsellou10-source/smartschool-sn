@@ -54,8 +54,8 @@ function ChatMessageComponent({ message, accentColor }: ChatMessageProps) {
       <div
         className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed relative ${
           isUser
-            ? 'bg-white/10 text-white rounded-br-md'
-            : 'bg-white/5 text-white/90 rounded-bl-md border border-white/10'
+            ? 'bg-ss-text/10 text-ss-text rounded-br-md'
+            : 'bg-ss-text/5 text-ss-text-secondary rounded-bl-md border border-ss-text/10'
         }`}
         style={isUser ? { backgroundColor: `${accentColor}30`, borderColor: `${accentColor}50` } : undefined}
       >
@@ -78,11 +78,11 @@ function ChatMessageComponent({ message, accentColor }: ChatMessageProps) {
 
         {/* Outils utilisés */}
         {message.toolsUsed && message.toolsUsed.length > 0 && (
-          <div className="mt-2 pt-2 border-t border-white/10 flex flex-wrap gap-1">
+          <div className="mt-2 pt-2 border-t border-ss-text/10 flex flex-wrap gap-1">
             {message.toolsUsed.map((tool, i) => (
               <span
                 key={i}
-                className="text-[10px] px-2 py-0.5 rounded-full bg-white/10 text-white/50"
+                className="text-[10px] px-2 py-0.5 rounded-full bg-ss-text/10 text-ss-text-secondary"
               >
                 🔧 {tool}
               </span>
@@ -91,7 +91,7 @@ function ChatMessageComponent({ message, accentColor }: ChatMessageProps) {
         )}
 
         {/* Footer : heure + bouton vocal */}
-        <div className={`flex items-center justify-between mt-1 ${isUser ? 'text-white/40' : 'text-white/30'}`}>
+        <div className={`flex items-center justify-between mt-1 ${isUser ? 'text-ss-text-secondary' : 'text-ss-text-secondary'}`}>
           <span className="text-[10px]">
             {message.timestamp.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
           </span>
@@ -102,8 +102,8 @@ function ChatMessageComponent({ message, accentColor }: ChatMessageProps) {
               onClick={speakMessage}
               className={`ml-2 p-1 rounded-md transition-all ${
                 isSpeaking
-                  ? 'text-white/70 bg-white/10'
-                  : 'text-white/20 hover:text-white/50 opacity-0 group-hover:opacity-100'
+                  ? 'text-ss-text-secondary bg-ss-text/10'
+                  : 'text-ss-text-secondary hover:text-ss-text-secondary opacity-0 group-hover:opacity-100'
               }`}
               title={isSpeaking ? 'Arrêter la lecture' : 'Écouter'}
             >
@@ -136,7 +136,7 @@ function formatMarkdown(text: string): string {
     // Italic
     .replace(/_(.*?)_/g, '<em>$1</em>')
     // Code inline
-    .replace(/`(.*?)`/g, '<code class="bg-white/10 px-1 rounded text-xs">$1</code>')
+    .replace(/`(.*?)`/g, '<code class="bg-ss-text/10 px-1 rounded text-xs">$1</code>')
     // Line breaks
     .replace(/\n/g, '<br/>')
     // Lists

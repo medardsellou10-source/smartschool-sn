@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -48,15 +48,15 @@ export default function BudgetPage() {
     load()
   }, [user])
 
-  if (userLoading || loading) return <div className="p-6 animate-pulse space-y-4">{[...Array(6)].map((_, i) => <div key={i} className="h-16 rounded-xl bg-white/5" />)}</div>
+  if (userLoading || loading) return <div className="p-6 animate-pulse space-y-4">{[...Array(6)].map((_, i) => <div key={i} className="h-16 rounded-xl bg-ss-text/5" />)}</div>
 
   return (
     <div className="space-y-6 pb-24 lg:pb-6 animate-fade-in">
       <div>
-        <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+        <h1 className="text-2xl font-bold text-ss-text flex items-center gap-2">
           <span style={{ color: ACCENT }}>📈</span> Budget {budget?.annee}
         </h1>
-        <p className="text-sm text-slate-400 mt-1">Suivi des lignes budgétaires et dépenses</p>
+        <p className="text-sm text-ss-text-muted mt-1">Suivi des lignes budgétaires et dépenses</p>
       </div>
 
       {/* Résumé global */}
@@ -71,9 +71,9 @@ export default function BudgetPage() {
               style={{ background: `${s.color}08`, border: `1px solid ${s.color}25` }}>
               <div className="flex items-center gap-3 mb-2">
                 <span className="text-2xl">{s.icon}</span>
-                <p className="text-xs text-slate-400">{s.label}</p>
+                <p className="text-xs text-ss-text-muted">{s.label}</p>
               </div>
-              <p className="text-lg font-black text-white">{s.value}</p>
+              <p className="text-lg font-black text-ss-text">{s.value}</p>
             </div>
           ))}
         </div>
@@ -81,17 +81,17 @@ export default function BudgetPage() {
 
       {/* Lignes budgétaires détaillées */}
       {budget && (
-        <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(2,6,23,0.82)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.12)' }}>
-          <div className="px-5 py-4 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-            <h2 className="text-base font-bold text-white">Détail des lignes budgétaires</h2>
-            <span className="text-xs text-slate-400">{budget.lignes.length} lignes</span>
+        <div className="rounded-2xl overflow-hidden" style={{ background: 'var(--ss-surface-elevated)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid var(--ss-glass-border)' }}>
+          <div className="px-5 py-4 flex items-center justify-between" style={{ borderBottom: '1px solid var(--ss-glass-card-hover)' }}>
+            <h2 className="text-base font-bold text-ss-text">Détail des lignes budgétaires</h2>
+            <span className="text-xs text-ss-text-muted">{budget.lignes.length} lignes</span>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+                <tr style={{ borderBottom: '1px solid var(--ss-glass-card-hover)' }}>
                   {['Catégorie', 'Budget alloué', 'Dépenses', 'Reste', 'Avancement'].map(h => (
-                    <th key={h} className="px-5 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">{h}</th>
+                    <th key={h} className="px-5 py-3 text-left text-xs font-semibold text-ss-text-muted uppercase tracking-wider">{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -99,19 +99,19 @@ export default function BudgetPage() {
                 {budget.lignes.map((lig, i) => {
                   const pct = Math.round((lig.depense / lig.budget) * 100)
                   return (
-                    <tr key={lig.id} className="hover:bg-white/5 transition-colors"
-                      style={i < budget.lignes.length - 1 ? { borderBottom: '1px solid rgba(255,255,255,0.04)' } : {}}>
-                      <td className="px-5 py-4 text-sm font-semibold text-white">{lig.categorie}</td>
-                      <td className="px-5 py-4 text-sm text-slate-300">{fmt(lig.budget)}</td>
-                      <td className="px-5 py-4 text-sm" style={{ color: pct > 80 ? '#F87171' : '#94A3B8' }}>{fmt(lig.depense)}</td>
+                    <tr key={lig.id} className="hover:bg-ss-text/5 transition-colors"
+                      style={i < budget.lignes.length - 1 ? { borderBottom: '1px solid var(--ss-glass-card-bg)' } : {}}>
+                      <td className="px-5 py-4 text-sm font-semibold text-ss-text">{lig.categorie}</td>
+                      <td className="px-5 py-4 text-sm text-ss-text-secondary">{fmt(lig.budget)}</td>
+                      <td className="px-5 py-4 text-sm" style={{ color: pct > 80 ? '#F87171' : 'var(--ss-text-muted)' }}>{fmt(lig.depense)}</td>
                       <td className="px-5 py-4 text-sm font-semibold" style={{ color: ACCENT }}>{fmt(lig.reste)}</td>
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-2">
-                          <div className="w-20 h-2 rounded-full bg-white/10 overflow-hidden">
+                          <div className="w-20 h-2 rounded-full bg-ss-text/10 overflow-hidden">
                             <div className="h-full rounded-full"
                               style={{ width: `${pct}%`, background: pct > 80 ? '#F87171' : pct > 50 ? '#FBBF24' : ACCENT }} />
                           </div>
-                          <span className="text-xs font-semibold text-slate-300">{pct}%</span>
+                          <span className="text-xs font-semibold text-ss-text-secondary">{pct}%</span>
                         </div>
                       </td>
                     </tr>

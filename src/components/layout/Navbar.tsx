@@ -9,6 +9,9 @@ import { useEcole } from '@/hooks/useEcole'
 import { useNotifications } from '@/hooks/useNotifications'
 import { ROLE_LABELS } from '@/lib/constants'
 import type { Role } from '@/lib/constants'
+import { ImpersonateSelector } from '@/components/admin/ImpersonateSelector'
+import { PaysSelector } from '@/components/layout/PaysSelector'
+import { ThemeToggle } from '@/components/theme-toggle'
 
 const ROLE_COLORS: Record<string, string> = {
   admin_global: '#F87171',
@@ -135,8 +138,8 @@ export function Navbar() {
     <header
       className="h-14 flex items-center justify-between px-3 sm:px-4 shrink-0 z-30 relative"
       style={{
-        background: 'rgba(11,17,32,0.9)',
-        borderBottom: '1px solid rgba(255,255,255,0.05)',
+        background: 'var(--ss-glass-dark-bg)',
+        borderBottom: '1px solid var(--ss-border)',
         backdropFilter: 'blur(20px)',
       }}
     >
@@ -145,7 +148,7 @@ export function Navbar() {
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           className="lg:hidden w-9 h-9 flex items-center justify-center rounded-xl transition-colors shrink-0"
-          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', color: '#94A3B8' }}
+          style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-border)', color: 'var(--ss-text-secondary)' }}
           aria-label="Menu"
         >
           <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
@@ -183,7 +186,7 @@ export function Navbar() {
               : <span>{ecoleInitiales}</span>
             }
           </div>
-          <span className="text-sm font-bold text-white truncate max-w-[120px] sm:max-w-[160px]">{ecoleNom}</span>
+          <span className="text-sm font-bold text-ss-text truncate max-w-[120px] sm:max-w-[160px]">{ecoleNom}</span>
         </div>
       </div>
 
@@ -192,24 +195,30 @@ export function Navbar() {
         {user ? (
           <>
             <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: accentColor }} />
-            <span className="text-sm font-semibold text-white">{user.prenom} {user.nom}</span>
+            <span className="text-sm font-semibold text-ss-text">{user.prenom} {user.nom}</span>
             <span className="text-xs font-semibold px-2.5 py-1 rounded-full"
               style={{ background: `${accentColor}18`, color: accentColor, border: `1px solid ${accentColor}30` }}>
               {roleLabel}
             </span>
           </>
         ) : (
-          <span className="text-sm text-[#475569]">SmartSchool SN</span>
+          <span className="text-sm text-ss-text-disabled">SmartSchool SN</span>
         )}
       </div>
 
       {/* Droite */}
       <div className="flex items-center gap-1.5 sm:gap-2">
+        {/* WAED-CI #2 — Sélecteur de pays */}
+        <PaysSelector variant="compact" className="hidden sm:inline-flex" />
+        {/* WAED #1 — "Voir comme..." pour Directeur/Censeur */}
+        <ImpersonateSelector />
+        {/* Bascule de theme Dark / Light */}
+        <ThemeToggle className="!h-9 !w-9" />
         {/* Notifications */}
         <Link
           href="/notifications"
           className="relative w-9 h-9 flex items-center justify-center rounded-xl transition-colors"
-          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', color: '#94A3B8' }}
+          style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-border)', color: 'var(--ss-text-secondary)' }}
           aria-label="Notifications"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -247,7 +256,8 @@ export function Navbar() {
         <>
           {/* Overlay */}
           <div
-            className="lg:hidden fixed inset-0 bg-[#020617]/80 z-40 backdrop-blur-sm"
+            className="lg:hidden fixed inset-0 z-40 backdrop-blur-sm"
+            style={{ background: 'var(--ss-overlay)' }}
             onClick={() => setMobileMenuOpen(false)}
           />
 
@@ -256,14 +266,14 @@ export function Navbar() {
             className="lg:hidden fixed top-0 left-0 bottom-0 z-50 flex flex-col overflow-hidden"
             style={{
               width: 'min(288px, 85vw)',
-              background: 'rgba(11,17,32,0.98)',
-              borderRight: '1px solid rgba(255,255,255,0.07)',
+              background: 'var(--ss-bg-secondary)',
+              borderRight: '1px solid var(--ss-border)',
               backdropFilter: 'blur(24px)',
             }}
           >
             {/* En-tête drawer */}
             <div className="flex items-center justify-between p-4 shrink-0"
-              style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+              style={{ borderBottom: '1px solid var(--ss-border)' }}>
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-9 h-9 rounded-xl overflow-hidden flex items-center justify-center font-black text-sm text-white shrink-0"
                   style={{ background: ecole?.logo_url ? 'transparent' : `linear-gradient(135deg, ${accentColor}cc, ${accentColor}66)` }}>
@@ -273,7 +283,7 @@ export function Navbar() {
                   }
                 </div>
                 <div className="min-w-0">
-                  <p className="text-sm font-bold text-white truncate">{ecoleNom}</p>
+                  <p className="text-sm font-bold text-ss-text truncate">{ecoleNom}</p>
                   {ecole?.slogan && (
                     <p className="text-[10px] truncate" style={{ color: `${accentColor}99` }}>{ecole.slogan}</p>
                   )}
@@ -282,7 +292,7 @@ export function Navbar() {
               <button
                 onClick={() => setMobileMenuOpen(false)}
                 className="w-9 h-9 flex items-center justify-center rounded-xl shrink-0"
-                style={{ background: 'rgba(255,255,255,0.05)', color: '#475569' }}
+                style={{ background: 'var(--ss-glass-card-bg)', color: 'var(--ss-text-disabled)' }}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" />
@@ -294,7 +304,7 @@ export function Navbar() {
             {user && (
               <div className="px-3 pt-3 shrink-0">
                 <div className="flex items-center gap-3 p-3 rounded-xl"
-                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                  style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-border)' }}>
                   <div className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm overflow-hidden shrink-0"
                     style={{ background: `linear-gradient(135deg, ${accentColor}30, ${accentColor}15)`, border: `1.5px solid ${accentColor}50`, color: accentColor }}>
                     {user.photo_url
@@ -304,7 +314,7 @@ export function Navbar() {
                     }
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold text-white truncate">{user.prenom} {user.nom}</p>
+                    <p className="text-sm font-semibold text-ss-text truncate">{user.prenom} {user.nom}</p>
                     <p className="text-[11px] capitalize truncate" style={{ color: accentColor }}>{roleLabel}</p>
                   </div>
                 </div>
@@ -325,11 +335,11 @@ export function Navbar() {
                     style={isActive ? {
                       background: `${accentColor}18`,
                       border: `1px solid ${accentColor}30`,
-                      color: 'white',
+                      color: 'var(--ss-text)',
                     } : {
                       background: 'transparent',
                       border: '1px solid transparent',
-                      color: '#475569',
+                      color: 'var(--ss-text-disabled)',
                     }}
                   >
                     {/* Indicateur actif */}
@@ -347,7 +357,7 @@ export function Navbar() {
             </nav>
 
             {/* Déconnexion */}
-            <div className="p-3 shrink-0" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+            <div className="p-3 shrink-0" style={{ borderTop: '1px solid var(--ss-border)' }}>
               <button
                 onClick={() => { logout(); setMobileMenuOpen(false) }}
                 className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium min-h-[48px]"

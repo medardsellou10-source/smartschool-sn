@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { isDemoMode, DEMO_ELEVES, DEMO_CLASSES, DEMO_MATIERES } from '@/lib/demo-data'
@@ -313,16 +313,16 @@ function ScannerModal({
     <div className="fixed inset-0 z-50 flex flex-col" style={{ background: '#000', touchAction: 'none' }}>
       <div className="flex items-center justify-between px-4 py-3 z-10" style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}>
         <div>
-          <p className="text-white font-bold text-sm">{title}</p>
-          <p className="text-white/50 text-xs">Cadrez la copie dans le guide</p>
+          <p className="text-ss-text font-bold text-sm">{title}</p>
+          <p className="text-ss-text-secondary text-xs">Cadrez la copie dans le guide</p>
         </div>
-        <button onClick={onClose} className="w-9 h-9 rounded-full flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-all text-xl">✕</button>
+        <button onClick={onClose} className="w-9 h-9 rounded-full flex items-center justify-center text-ss-text-secondary hover:text-ss-text hover:bg-ss-text/10 transition-all text-xl">✕</button>
       </div>
 
       {cameraError ? (
         <div className="flex-1 flex flex-col items-center justify-center gap-4 px-8 text-center">
           <span className="text-5xl">📵</span>
-          <p className="text-white/70 text-sm">{cameraError}</p>
+          <p className="text-ss-text-secondary text-sm">{cameraError}</p>
           <button onClick={() => startCamera(facingMode)} className="px-6 py-2.5 rounded-xl text-sm font-bold text-black" style={{ background: '#22C55E' }}>Réessayer</button>
         </div>
       ) : (
@@ -332,7 +332,7 @@ function ScannerModal({
           {captured && <img src={captured} alt="scan" className="absolute inset-0 w-full h-full object-contain" style={{ background: '#111' }} />}
           {!cameraReady && !captured && (
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <div className="w-8 h-8 border-2 border-ss-text/30 border-t-white rounded-full animate-spin" />
             </div>
           )}
           {!captured && cameraReady && (
@@ -355,7 +355,7 @@ function ScannerModal({
           <div className="flex items-center justify-between gap-4">
             <button onClick={() => setFilterOn(v => !v)}
               className="flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all text-xs font-medium"
-              style={filterOn ? { background: 'rgba(0,229,255,0.15)', color: '#38BDF8', border: '1px solid rgba(0,229,255,0.3)' } : { background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.5)', border: '1px solid transparent' }}>
+              style={filterOn ? { background: 'rgba(0,229,255,0.15)', color: '#38BDF8', border: '1px solid rgba(0,229,255,0.3)' } : { background: 'var(--ss-glass-card-hover)', color: 'var(--ss-glass-border)', border: '1px solid transparent' }}>
               <span className="text-lg">📄</span>Filtre doc
             </button>
             <button onClick={handleCapture} disabled={!cameraReady}
@@ -365,27 +365,27 @@ function ScannerModal({
             </button>
             <button onClick={() => setFacingMode(m => m === 'environment' ? 'user' : 'environment')}
               className="flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all text-xs font-medium"
-              style={{ background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.5)', border: '1px solid transparent' }}>
+              style={{ background: 'var(--ss-glass-card-hover)', color: 'var(--ss-glass-border)', border: '1px solid transparent' }}>
               <span className="text-lg">🔄</span>Retourner
             </button>
           </div>
         ) : (
           <div className="space-y-3">
             <div>
-              <label className="block text-xs text-white/50 mb-1.5 font-medium">Nom de l&apos;élève</label>
+              <label className="block text-xs text-ss-text-secondary mb-1.5 font-medium">Nom de l&apos;élève</label>
               <input value={nameInput} onChange={e => setNameInput(e.target.value)} list="suggestions-scanner"
                 placeholder="Ex: Awa Diallo" autoFocus
-                className="w-full px-4 py-3 rounded-xl text-sm text-white"
-                style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', outline: 'none' }} />
+                className="w-full px-4 py-3 rounded-xl text-sm text-ss-text"
+                style={{ background: 'var(--ss-glass-card-hover)', border: '1px solid var(--ss-glass-border)', outline: 'none' }} />
               {suggestions.length > 0 && <datalist id="suggestions-scanner">{suggestions.map(s => <option key={s} value={s} />)}</datalist>}
             </div>
             <div className="flex gap-3">
               <button onClick={handleRetake} className="flex-1 py-3 rounded-xl text-sm font-semibold transition-all"
-                style={{ background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.12)' }}>↩ Reprendre</button>
+                style={{ background: 'var(--ss-glass-card-hover)', color: 'var(--ss-glass-border)', border: '1px solid var(--ss-glass-border)' }}>↩ Reprendre</button>
               <button onClick={handleConfirm} className="flex-1 py-3 rounded-xl text-sm font-bold transition-all active:scale-95"
                 style={{ background: 'linear-gradient(135deg, #22C55E, #16A34A)', color: '#020617' }}>✓ Valider · Suivant</button>
             </div>
-            <button onClick={onClose} className="w-full py-2.5 rounded-xl text-xs text-white/40 hover:text-white/60 transition-all">Terminer le scan ({title})</button>
+            <button onClick={onClose} className="w-full py-2.5 rounded-xl text-xs text-ss-text-secondary hover:text-ss-text-secondary transition-all">Terminer le scan ({title})</button>
           </div>
         )}
       </div>
@@ -408,39 +408,39 @@ function QuestionCard({ q }: { q: CorrectionQuestion }) {
           {s.label}
         </span>
         {/* Numéro question */}
-        <span className="text-xs font-semibold text-white/60 shrink-0">Q{q.question_numero}</span>
+        <span className="text-xs font-semibold text-ss-text-secondary shrink-0">Q{q.question_numero}</span>
         {/* Extrait réponse donnée */}
-        <span className="flex-1 text-xs text-white/50 truncate">{q.reponse_donnee || '—'}</span>
+        <span className="flex-1 text-xs text-ss-text-secondary truncate">{q.reponse_donnee || '—'}</span>
         {/* Points */}
         <span className="shrink-0 text-sm font-bold tabular-nums" style={{ color: s.color }}>
           {q.points_obtenus}/{q.points_max}
         </span>
         {/* Chevron */}
-        <span className="shrink-0 text-white/30 text-xs transition-transform" style={{ transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)' }}>▼</span>
+        <span className="shrink-0 text-ss-text-secondary text-xs transition-transform" style={{ transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)' }}>▼</span>
       </button>
 
       {expanded && (
-        <div className="px-3 pb-3 space-y-2 border-t" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+        <div className="px-3 pb-3 space-y-2 border-t" style={{ borderColor: 'var(--ss-glass-card-hover)' }}>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
             <div className="rounded-lg p-2.5" style={{ background: 'rgba(0,230,118,0.06)', border: '1px solid rgba(0,230,118,0.15)' }}>
               <p className="text-[10px] font-bold text-green-400 mb-1">RÉPONSE ATTENDUE</p>
-              <p className="text-xs text-white/70 leading-relaxed">{q.reponse_attendue}</p>
+              <p className="text-xs text-ss-text-secondary leading-relaxed">{q.reponse_attendue}</p>
             </div>
-            <div className="rounded-lg p-2.5" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' }}>
-              <p className="text-[10px] font-bold text-white/40 mb-1">RÉPONSE DONNÉE</p>
-              <p className="text-xs text-white/70 leading-relaxed">{q.reponse_donnee || <em className="text-white/30">Aucune réponse</em>}</p>
+            <div className="rounded-lg p-2.5" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-border)' }}>
+              <p className="text-[10px] font-bold text-ss-text-secondary mb-1">RÉPONSE DONNÉE</p>
+              <p className="text-xs text-ss-text-secondary leading-relaxed">{q.reponse_donnee || <em className="text-ss-text-secondary">Aucune réponse</em>}</p>
             </div>
           </div>
           {q.explication && (
             <div className="rounded-lg p-2.5" style={{ background: 'rgba(0,229,255,0.06)', border: '1px solid rgba(0,229,255,0.15)' }}>
               <p className="text-[10px] font-bold text-cyan-400 mb-1">EXPLICATION PROF</p>
-              <p className="text-xs text-white/70 leading-relaxed">{q.explication}</p>
+              <p className="text-xs text-ss-text-secondary leading-relaxed">{q.explication}</p>
             </div>
           )}
           {q.feedback_eleve && (
             <div className="rounded-lg p-2.5" style={{ background: 'rgba(124,77,255,0.08)', border: '1px solid rgba(124,77,255,0.2)' }}>
               <p className="text-[10px] font-bold mb-1" style={{ color: '#7C4DFF' }}>MESSAGE POUR L&apos;ÉLÈVE</p>
-              <p className="text-xs text-white/70 leading-relaxed italic">&ldquo;{q.feedback_eleve}&rdquo;</p>
+              <p className="text-xs text-ss-text-secondary leading-relaxed italic">&ldquo;{q.feedback_eleve}&rdquo;</p>
             </div>
           )}
           {q.type_erreur && q.type_erreur !== 'aucune' && (
@@ -464,16 +464,16 @@ function ExerciceAccordion({ ex }: { ex: ResultatParExercice }) {
   const barColor = pct >= 75 ? '#22C55E' : pct >= 50 ? '#FBBF24' : '#F87171'
 
   return (
-    <div className="rounded-xl border overflow-hidden" style={{ borderColor: 'rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)' }}>
+    <div className="rounded-xl border overflow-hidden" style={{ borderColor: 'var(--ss-glass-card-hover)', background: 'var(--ss-glass-card-bg)' }}>
       <button className="w-full flex items-center gap-3 px-4 py-3 text-left" onClick={() => setOpen(o => !o)}>
-        <span className="text-xs font-bold text-white/40 shrink-0">EX.{ex.exercice_numero}</span>
-        <span className="flex-1 text-sm font-semibold text-white/80 text-left truncate">{ex.exercice_titre}</span>
+        <span className="text-xs font-bold text-ss-text-secondary shrink-0">EX.{ex.exercice_numero}</span>
+        <span className="flex-1 text-sm font-semibold text-ss-text-secondary text-left truncate">{ex.exercice_titre}</span>
         <span className="shrink-0 text-xs font-bold tabular-nums" style={{ color: barColor }}>{ex.points_obtenus}/{ex.points_max} pts</span>
         <span className="shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full tabular-nums" style={{ background: barColor + '18', color: barColor }}>{pct}%</span>
-        <span className="shrink-0 text-white/30 text-xs transition-transform" style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>▼</span>
+        <span className="shrink-0 text-ss-text-secondary text-xs transition-transform" style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>▼</span>
       </button>
       {/* Barre de progression */}
-      <div className="h-1 mx-4 mb-2 bg-white/5 rounded-full overflow-hidden">
+      <div className="h-1 mx-4 mb-2 bg-ss-text/5 rounded-full overflow-hidden">
         <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: barColor }} />
       </div>
       {open && (
@@ -501,7 +501,7 @@ function StudentResultCard({ r, saved, onSave, onDownloadPDF, pdfLoading }: {
 
   return (
     <div className={`rounded-xl border transition-all ${saved ? 'border-ss-green/30' : 'border-ss-border'}`}
-      style={{ background: saved ? 'rgba(0,230,118,0.04)' : 'rgba(255,255,255,0.03)' }}>
+      style={{ background: saved ? 'rgba(0,230,118,0.04)' : 'var(--ss-glass-card-bg)' }}>
 
       {/* Header élève */}
       <div className="flex items-center gap-3 p-4">
@@ -516,7 +516,7 @@ function StudentResultCard({ r, saved, onSave, onDownloadPDF, pdfLoading }: {
               {r.mention}
             </span>
             {r.nom_detecte_sur_copie && r.nom_detecte_sur_copie !== r.nom_eleve && (
-              <span className="text-[9px] text-white/30 truncate">copie: {r.nom_detecte_sur_copie}</span>
+              <span className="text-[9px] text-ss-text-secondary truncate">copie: {r.nom_detecte_sur_copie}</span>
             )}
           </div>
         </div>
@@ -577,7 +577,7 @@ function StudentResultCard({ r, saved, onSave, onDownloadPDF, pdfLoading }: {
       <div className="px-4 pb-3 flex gap-2">
         <button onClick={() => setExpanded(e => !e)}
           className="flex-1 py-2 rounded-lg text-xs font-semibold transition-all"
-          style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.6)', border: '1px solid rgba(255,255,255,0.1)' }}>
+          style={{ background: 'var(--ss-glass-card-hover)', color: 'var(--ss-glass-border)', border: '1px solid var(--ss-glass-border)' }}>
           {expanded ? '▲ Masquer le détail' : '▼ Voir question par question'}
         </button>
         {onDownloadPDF && (
@@ -612,7 +612,7 @@ function StudentResultCard({ r, saved, onSave, onDownloadPDF, pdfLoading }: {
               <div className="rounded-lg p-3" style={{ background: 'rgba(0,230,118,0.06)', border: '1px solid rgba(0,230,118,0.2)' }}>
                 <p className="text-[10px] font-bold text-green-400 mb-1.5">POINTS FORTS</p>
                 <ul className="space-y-0.5">
-                  {r.points_forts.map((p, i) => <li key={i} className="text-xs text-white/65 flex items-start gap-1"><span className="text-green-400 shrink-0">✓</span>{p}</li>)}
+                  {r.points_forts.map((p, i) => <li key={i} className="text-xs text-ss-text-secondary flex items-start gap-1"><span className="text-green-400 shrink-0">✓</span>{p}</li>)}
                 </ul>
               </div>
             )}
@@ -620,7 +620,7 @@ function StudentResultCard({ r, saved, onSave, onDownloadPDF, pdfLoading }: {
               <div className="rounded-lg p-3" style={{ background: 'rgba(255,23,68,0.06)', border: '1px solid rgba(255,23,68,0.2)' }}>
                 <p className="text-[10px] font-bold text-red-400 mb-1.5">À AMÉLIORER</p>
                 <ul className="space-y-0.5">
-                  {r.points_faibles.map((p, i) => <li key={i} className="text-xs text-white/65 flex items-start gap-1"><span className="text-red-400 shrink-0">✕</span>{p}</li>)}
+                  {r.points_faibles.map((p, i) => <li key={i} className="text-xs text-ss-text-secondary flex items-start gap-1"><span className="text-red-400 shrink-0">✕</span>{p}</li>)}
                 </ul>
               </div>
             )}
@@ -628,7 +628,7 @@ function StudentResultCard({ r, saved, onSave, onDownloadPDF, pdfLoading }: {
               <div className="rounded-lg p-3" style={{ background: 'rgba(0,229,255,0.06)', border: '1px solid rgba(0,229,255,0.2)' }}>
                 <p className="text-[10px] font-bold text-cyan-400 mb-1.5">CONSEILS</p>
                 <ul className="space-y-0.5">
-                  {r.conseils.map((c, i) => <li key={i} className="text-xs text-white/65 flex items-start gap-1"><span className="text-cyan-400 shrink-0">→</span>{c}</li>)}
+                  {r.conseils.map((c, i) => <li key={i} className="text-xs text-ss-text-secondary flex items-start gap-1"><span className="text-cyan-400 shrink-0">→</span>{c}</li>)}
                 </ul>
               </div>
             )}
@@ -638,7 +638,7 @@ function StudentResultCard({ r, saved, onSave, onDownloadPDF, pdfLoading }: {
           {r.appreciation_generale && (
             <div className="rounded-lg p-3" style={{ background: 'rgba(124,77,255,0.08)', border: '1px solid rgba(124,77,255,0.2)' }}>
               <p className="text-[10px] font-bold mb-1" style={{ color: '#7C4DFF' }}>APPRÉCIATION GÉNÉRALE</p>
-              <p className="text-sm text-white/70 leading-relaxed italic">&ldquo;{r.appreciation_generale}&rdquo;</p>
+              <p className="text-sm text-ss-text-secondary leading-relaxed italic">&ldquo;{r.appreciation_generale}&rdquo;</p>
             </div>
           )}
         </div>
@@ -920,7 +920,7 @@ export default function CorrectionIAPage() {
               { num: '3', icon: '✏️', label: 'VALIDATION PROF', desc: 'Vous validez, modifiez ou signalez chaque note' },
               { num: '4', icon: '📋', label: 'PUBLICATION', desc: 'Seules les notes validées par vous sont publiées' },
             ].map(step => (
-              <div key={step.num} className="rounded-lg p-3 text-center" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+              <div key={step.num} className="rounded-lg p-3 text-center" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
                 <span className="text-2xl block mb-1">{step.icon}</span>
                 <p className="text-[9px] font-bold text-ss-cyan mb-1">{step.label}</p>
                 <p className="text-[10px] text-ss-text-muted leading-tight">{step.desc}</p>
@@ -936,7 +936,7 @@ export default function CorrectionIAPage() {
         <div className="flex gap-1 bg-ss-bg-secondary rounded-xl p-1 border border-ss-border">
           {(['nouvelle', 'resultats'] as const).map(t => (
             <button key={t} onClick={() => setTab(t)}
-              className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${tab === t ? 'bg-ss-green text-white shadow' : 'text-ss-text-secondary hover:text-ss-text'}`}>
+              className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${tab === t ? 'bg-ss-green text-ss-text shadow' : 'text-ss-text-secondary hover:text-ss-text'}`}>
               {t === 'nouvelle' ? 'Nouvelle pré-analyse' : `Résultats${results.length > 0 ? ` (${results.length})` : ''}`}
             </button>
           ))}
@@ -949,7 +949,7 @@ export default function CorrectionIAPage() {
             {/* Étape 1 — Corrigé */}
             <div className="bg-ss-bg-secondary rounded-xl border border-ss-border p-5 space-y-3">
               <div className="flex items-center gap-2">
-                <span className="w-6 h-6 bg-ss-green text-white rounded-full text-xs font-bold flex items-center justify-center">1</span>
+                <span className="w-6 h-6 bg-ss-green text-ss-text rounded-full text-xs font-bold flex items-center justify-center">1</span>
                 <h2 className="font-semibold text-ss-text">Corrigé officiel</h2>
               </div>
               <p className="text-xs text-ss-text-muted">Uploadez ou scannez le corrigé avec les barèmes par question.</p>
@@ -961,7 +961,7 @@ export default function CorrectionIAPage() {
                 </button>
                 <button onClick={() => corrInputRef.current?.click()}
                   className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all"
-                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.6)' }}>
+                  style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-border)', color: 'var(--ss-glass-border)' }}>
                   📁 Upload fichier
                 </button>
               </div>
@@ -1060,7 +1060,7 @@ export default function CorrectionIAPage() {
             {/* Étape 3 — Paramètres */}
             <div className="bg-ss-bg-secondary rounded-xl border border-ss-border p-5 space-y-3">
               <div className="flex items-center gap-2">
-                <span className="w-6 h-6 bg-indigo-500 text-white rounded-full text-xs font-bold flex items-center justify-center">3</span>
+                <span className="w-6 h-6 bg-indigo-500 text-ss-text rounded-full text-xs font-bold flex items-center justify-center">3</span>
                 <h2 className="font-semibold text-ss-text">Paramètres</h2>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -1110,10 +1110,10 @@ export default function CorrectionIAPage() {
             )}
 
             <button onClick={handleSubmit} disabled={processing}
-              className="w-full bg-gradient-to-r from-ss-green to-ss-cyan text-white py-4 rounded-xl text-base font-bold hover:opacity-90 disabled:opacity-60 transition-all min-h-[56px] flex items-center justify-center gap-3">
+              className="w-full bg-gradient-to-r from-ss-green to-ss-cyan text-ss-text py-4 rounded-xl text-base font-bold hover:opacity-90 disabled:opacity-60 transition-all min-h-[56px] flex items-center justify-center gap-3">
               {processing ? (
                 <>
-                  <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span className="w-5 h-5 border-2 border-ss-text/30 border-t-white rounded-full animate-spin" />
                   <div className="text-left">
                     <p>Pré-analyse IA en cours... {progress}%</p>
                     {progressMsg && <p className="text-xs font-normal opacity-80">{progressMsg}</p>}

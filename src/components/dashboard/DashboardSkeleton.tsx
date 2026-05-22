@@ -25,7 +25,7 @@ export function DashboardSkeleton({
       {showBanner && (
         <div
           className="h-40 rounded-2xl"
-          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
+          style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-border)' }}
         />
       )}
 
@@ -35,7 +35,7 @@ export function DashboardSkeleton({
           <div
             key={i}
             className="h-[120px] rounded-2xl"
-            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
+            style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-border)' }}
           />
         ))}
       </div>
@@ -46,15 +46,15 @@ export function DashboardSkeleton({
           <div
             key={i}
             className="rounded-2xl p-6 h-64"
-            style={{ background: 'rgba(2,6,23,0.80)', border: '1px solid rgba(255,255,255,0.10)' }}
+            style={{ background: 'var(--ss-glass-dark-bg)', border: '1px solid var(--ss-border)' }}
           >
-            <div className="h-5 w-32 mb-5 rounded" style={{ background: 'rgba(255,255,255,0.08)' }} />
+            <div className="h-5 w-32 mb-5 rounded" style={{ background: 'var(--ss-glass-card-hover)' }} />
             <div className="space-y-3">
               {Array.from({ length: 4 }).map((_, j) => (
                 <div
                   key={j}
                   className="h-12 rounded-xl"
-                  style={{ background: 'rgba(255,255,255,0.04)' }}
+                  style={{ background: 'var(--ss-glass-card-bg)' }}
                 />
               ))}
             </div>

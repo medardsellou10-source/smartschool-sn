@@ -261,7 +261,7 @@ export function PointageGPS({ userId, ecoleId, userName }: PointageGPSProps) {
             <p className="text-ss-text-secondary text-sm mt-1 whitespace-pre-line">{errorMsg}</p>
             <button
               onClick={handlePointage}
-              className="mt-4 bg-ss-cyan text-white px-6 py-3 rounded-xl font-semibold text-sm min-h-[48px] transition-colors hover:bg-ss-cyan/80"
+              className="mt-4 bg-ss-cyan text-ss-text px-6 py-3 rounded-xl font-semibold text-sm min-h-[48px] transition-colors hover:bg-ss-cyan/80"
             >
               Réessayer
             </button>
@@ -298,7 +298,7 @@ export function PointageGPS({ userId, ecoleId, userName }: PointageGPSProps) {
             <p className="text-ss-text-secondary text-sm mt-1">{errorMsg}</p>
             <button
               onClick={handlePointage}
-              className="mt-4 bg-ss-cyan text-white px-6 py-3 rounded-xl font-semibold text-sm min-h-[48px]"
+              className="mt-4 bg-ss-cyan text-ss-text px-6 py-3 rounded-xl font-semibold text-sm min-h-[48px]"
             >
               Réessayer
             </button>
@@ -331,7 +331,7 @@ export function PointageGPS({ userId, ecoleId, userName }: PointageGPSProps) {
             <button
               onClick={handlePointage}
               disabled={state !== 'idle'}
-              className="w-full bg-ss-green text-white py-4 rounded-xl font-semibold text-base min-h-[56px] transition-colors hover:bg-ss-green/90 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_4px_20px_rgba(0,133,63,0.3)]"
+              className="w-full bg-ss-green text-ss-text py-4 rounded-xl font-semibold text-base min-h-[56px] transition-colors hover:bg-ss-green/90 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_4px_20px_rgba(0,133,63,0.3)]"
             >
               {state === 'idle' ? '📍 Signaler ma présence à l\'école' : 'Pointage en cours...'}
             </button>

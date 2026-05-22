@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useEffect, useState, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -107,15 +107,15 @@ export default function SurveillantStatistiquesPage() {
   }, [dates])
 
   if (userLoading) {
-    return <div className="space-y-4">{[...Array(4)].map((_, i) => <div key={i} className="h-28 rounded-2xl ss-shimmer" style={{ background: 'rgba(255,255,255,0.03)' }} />)}</div>
+    return <div className="space-y-4">{[...Array(4)].map((_, i) => <div key={i} className="h-28 rounded-2xl ss-shimmer" style={{ background: 'var(--ss-glass-card-bg)' }} />)}</div>
   }
 
   return (
     <div className="space-y-5 pb-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-2xl font-black text-white">Statistiques</h1>
-        <div className="flex gap-1 p-1 rounded-xl" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
+        <h1 className="text-2xl font-black text-ss-text">Statistiques</h1>
+        <div className="flex gap-1 p-1 rounded-xl" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
           {([
             { key: 'mois' as const, label: 'Ce mois' },
             { key: 't1' as const, label: 'T1' },
@@ -126,7 +126,7 @@ export default function SurveillantStatistiquesPage() {
               className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
               style={{
                 background: periode === p.key ? 'rgba(255,214,0,0.15)' : 'transparent',
-                color: periode === p.key ? '#FBBF24' : '#94A3B8',
+                color: periode === p.key ? '#FBBF24' : 'var(--ss-text-muted)',
                 border: periode === p.key ? '1px solid rgba(255,214,0,0.3)' : '1px solid transparent',
               }}>
               {p.label}
@@ -146,22 +146,22 @@ export default function SurveillantStatistiquesPage() {
       )}
 
       {/* Absences par classe - Bar chart */}
-      <div className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-        <h2 className="text-sm font-bold text-[#94A3B8] uppercase tracking-wider mb-4">Absences par classe</h2>
+      <div className="rounded-2xl p-5" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
+        <h2 className="text-sm font-bold text-[var(--ss-text-muted)] uppercase tracking-wider mb-4">Absences par classe</h2>
         {absencesParClasse.length === 0 ? (
-          <p className="text-sm text-center py-6" style={{ color: '#475569' }}>Aucune donnee</p>
+          <p className="text-sm text-center py-6" style={{ color: 'var(--ss-text-disabled)' }}>Aucune donnee</p>
         ) : (
           <div className="space-y-3">
             {absencesParClasse.map((c, idx) => (
               <div key={idx} className="flex items-center gap-3">
-                <span className="text-xs font-semibold text-white w-20 shrink-0 truncate">{c.nom}</span>
-                <div className="flex-1 h-7 rounded-lg overflow-hidden" style={{ background: 'rgba(255,255,255,0.04)' }}>
+                <span className="text-xs font-semibold text-ss-text w-20 shrink-0 truncate">{c.nom}</span>
+                <div className="flex-1 h-7 rounded-lg overflow-hidden" style={{ background: 'var(--ss-glass-card-bg)' }}>
                   <div className="h-full rounded-lg flex items-center px-2 transition-all duration-500"
                     style={{
                       width: `${Math.max((c.count / maxAbsClasse) * 100, 8)}%`,
                       background: c.count > 10 ? 'rgba(255,23,68,0.3)' : c.count > 5 ? 'rgba(255,214,0,0.3)' : 'rgba(0,230,118,0.3)',
                     }}>
-                    <span className="text-[10px] font-bold text-white">{c.count}</span>
+                    <span className="text-[10px] font-bold text-ss-text">{c.count}</span>
                   </div>
                 </div>
               </div>
@@ -173,18 +173,18 @@ export default function SurveillantStatistiquesPage() {
       {/* Two columns: Prof ranking + Top absent students */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Ponctualite profs */}
-        <div className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-          <h2 className="text-sm font-bold text-[#94A3B8] uppercase tracking-wider mb-4">Ponctualite professeurs</h2>
+        <div className="rounded-2xl p-5" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
+          <h2 className="text-sm font-bold text-[var(--ss-text-muted)] uppercase tracking-wider mb-4">Ponctualite professeurs</h2>
           <div className="space-y-2">
             {profPonctualite.map((p, idx) => {
               const color = p.taux >= 90 ? '#22C55E' : p.taux >= 70 ? '#FBBF24' : '#F87171'
               return (
                 <div key={idx} className="flex items-center gap-3 p-3 rounded-xl"
-                  style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
-                  <span className="text-xs font-bold w-6 text-center" style={{ color: '#475569' }}>{idx + 1}</span>
+                  style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-bg)' }}>
+                  <span className="text-xs font-bold w-6 text-center" style={{ color: 'var(--ss-text-disabled)' }}>{idx + 1}</span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-white truncate">{p.nom}</p>
-                    <p className="text-[10px]" style={{ color: '#475569' }}>{p.aHeure}/{p.total} jours</p>
+                    <p className="text-sm font-semibold text-ss-text truncate">{p.nom}</p>
+                    <p className="text-[10px]" style={{ color: 'var(--ss-text-disabled)' }}>{p.aHeure}/{p.total} jours</p>
                   </div>
                   <span className="text-sm font-black px-2 py-0.5 rounded-md"
                     style={{ background: `${color}15`, color }}>{p.taux}%</span>
@@ -195,22 +195,22 @@ export default function SurveillantStatistiquesPage() {
         </div>
 
         {/* Top eleves absents */}
-        <div className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-          <h2 className="text-sm font-bold text-[#94A3B8] uppercase tracking-wider mb-4">Eleves les plus absents</h2>
+        <div className="rounded-2xl p-5" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
+          <h2 className="text-sm font-bold text-[var(--ss-text-muted)] uppercase tracking-wider mb-4">Eleves les plus absents</h2>
           {topAbsents.length === 0 ? (
-            <p className="text-sm text-center py-6" style={{ color: '#475569' }}>Aucune absence</p>
+            <p className="text-sm text-center py-6" style={{ color: 'var(--ss-text-disabled)' }}>Aucune absence</p>
           ) : (
             <div className="space-y-2">
               {topAbsents.map((e, idx) => (
                 <div key={idx} className="flex items-center gap-3 p-3 rounded-xl"
-                  style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-bg)' }}>
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold shrink-0"
                     style={{ background: 'rgba(255,23,68,0.1)', border: '1px solid rgba(255,23,68,0.2)', color: '#F87171' }}>
                     {e.count}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-white truncate">{e.nom}</p>
-                    <p className="text-xs" style={{ color: '#94A3B8' }}>{e.classe}</p>
+                    <p className="text-sm font-semibold text-ss-text truncate">{e.nom}</p>
+                    <p className="text-xs" style={{ color: 'var(--ss-text-muted)' }}>{e.classe}</p>
                   </div>
                 </div>
               ))}

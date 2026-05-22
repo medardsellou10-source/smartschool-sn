@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useEffect, useState, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -116,7 +116,7 @@ export default function AdminPointageHistoriquePage() {
   }
 
   if (userLoading) {
-    return <div className="space-y-4">{[...Array(3)].map((_, i) => <div key={i} className="h-32 rounded-2xl ss-shimmer" style={{ background: 'rgba(255,255,255,0.03)' }} />)}</div>
+    return <div className="space-y-4">{[...Array(3)].map((_, i) => <div key={i} className="h-32 rounded-2xl ss-shimmer" style={{ background: 'var(--ss-glass-card-bg)' }} />)}</div>
   }
 
   return (
@@ -150,28 +150,28 @@ export default function AdminPointageHistoriquePage() {
         {Object.entries(STATUT_PALETTE).map(([key, pal]) => (
           <div key={key} className="flex items-center gap-1.5">
             <div className="w-4 h-4 rounded-sm" style={{ background: pal.bg }} />
-            <span className="text-xs" style={{ color: '#94A3B8' }}>{pal.label}</span>
+            <span className="text-xs" style={{ color: 'var(--ss-text-muted)' }}>{pal.label}</span>
           </div>
         ))}
         <div className="flex items-center gap-1.5">
           <div className="w-4 h-4 rounded-sm" style={{ background: 'rgba(100,116,139,0.2)' }} />
-          <span className="text-xs" style={{ color: '#94A3B8' }}>Non pointe</span>
+          <span className="text-xs" style={{ color: 'var(--ss-text-muted)' }}>Non pointe</span>
         </div>
       </div>
 
       {/* Heatmap */}
       {loading ? (
-        <div className="h-64 rounded-2xl ss-shimmer" style={{ background: 'rgba(255,255,255,0.03)' }} />
+        <div className="h-64 rounded-2xl ss-shimmer" style={{ background: 'var(--ss-glass-card-bg)' }} />
       ) : (
-        <div className="rounded-2xl p-5 overflow-x-auto scrollbar-hide" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+        <div className="rounded-2xl p-5 overflow-x-auto scrollbar-hide" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
           <table className="w-full min-w-[600px]">
             <thead>
               <tr>
-                <th className="text-left text-xs pb-3 pr-3 sticky left-0" style={{ color: '#475569', background: 'rgba(2,6,23,0.95)' }}>Professeur</th>
+                <th className="text-left text-xs pb-3 pr-3 sticky left-0" style={{ color: 'var(--ss-text-disabled)', background: 'var(--ss-surface-elevated)' }}>Professeur</th>
                 {workingDays.map(d => {
                   const date = new Date(d)
                   return (
-                    <th key={d} className="text-center text-[9px] pb-3 px-0.5 w-8" style={{ color: '#475569' }}>
+                    <th key={d} className="text-center text-[9px] pb-3 px-0.5 w-8" style={{ color: 'var(--ss-text-disabled)' }}>
                       {date.getDate()}<br />
                       <span className="text-[8px]">{['Di','Lu','Ma','Me','Je','Ve','Sa'][date.getDay()]}</span>
                     </th>
@@ -182,7 +182,7 @@ export default function AdminPointageHistoriquePage() {
             <tbody>
               {profStats.map(prof => (
                 <tr key={prof.id}>
-                  <td className="text-xs text-white py-1 pr-3 truncate max-w-[140px] sticky left-0" style={{ background: 'rgba(2,6,23,0.95)' }}>
+                  <td className="text-xs text-ss-text py-1 pr-3 truncate max-w-[140px] sticky left-0" style={{ background: 'var(--ss-surface-elevated)' }}>
                     {prof.nom}
                   </td>
                   {workingDays.map(d => {
@@ -204,9 +204,9 @@ export default function AdminPointageHistoriquePage() {
       )}
 
       {/* Summary table */}
-      <div className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+      <div className="rounded-2xl p-5" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-bold text-[#94A3B8] uppercase tracking-wider">Resume par professeur</h2>
+          <h2 className="text-sm font-bold text-[var(--ss-text-muted)] uppercase tracking-wider">Resume par professeur</h2>
           <div className="flex gap-1">
             {([
               { key: 'nom' as const, label: 'Nom' },
@@ -215,8 +215,8 @@ export default function AdminPointageHistoriquePage() {
               <button key={s.key} onClick={() => setSortBy(s.key)}
                 className="px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all"
                 style={{
-                  background: sortBy === s.key ? 'rgba(255,23,68,0.12)' : 'rgba(255,255,255,0.04)',
-                  color: sortBy === s.key ? '#F87171' : '#475569',
+                  background: sortBy === s.key ? 'rgba(255,23,68,0.12)' : 'var(--ss-glass-card-bg)',
+                  color: sortBy === s.key ? '#F87171' : 'var(--ss-text-disabled)',
                 }}>
                 {s.label}
               </button>
@@ -229,9 +229,9 @@ export default function AdminPointageHistoriquePage() {
             const tauxColor = prof.taux >= 90 ? '#22C55E' : prof.taux >= 70 ? '#FBBF24' : '#F87171'
             return (
               <div key={prof.id} className="flex items-center gap-3 p-3 rounded-xl"
-                style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-bg)' }}>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-white truncate">{prof.nom}</p>
+                  <p className="text-sm font-semibold text-ss-text truncate">{prof.nom}</p>
                   <div className="flex gap-3 mt-1">
                     <span className="text-[10px]" style={{ color: '#22C55E' }}>{prof.aHeure} present(s)</span>
                     <span className="text-[10px]" style={{ color: '#FBBF24' }}>{prof.retardLeger} leger(s)</span>
@@ -241,7 +241,7 @@ export default function AdminPointageHistoriquePage() {
                 <div className="text-right shrink-0">
                   <span className="text-lg font-black px-2 py-0.5 rounded-md"
                     style={{ background: `${tauxColor}15`, color: tauxColor }}>{prof.taux}%</span>
-                  <p className="text-[10px] mt-0.5" style={{ color: '#475569' }}>{prof.total} jours</p>
+                  <p className="text-[10px] mt-0.5" style={{ color: 'var(--ss-text-disabled)' }}>{prof.total} jours</p>
                 </div>
               </div>
             )

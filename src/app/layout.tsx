@@ -7,6 +7,9 @@ import { CookieConsentBanner } from '@/components/ui/CookieConsentBanner'
 import { OfflineSynchronizer } from '@/components/OfflineSynchronizer'
 import { Analytics } from '@vercel/analytics/react'
 import { MessageCircle } from 'lucide-react'
+import { PaysProvider } from '@/lib/context/PaysContext'
+import { ThemeProvider } from '@/components/theme-provider'
+import { ThemeToggle } from '@/components/theme-toggle'
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin', 'latin-ext'],
@@ -61,17 +64,21 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr">
+    <html lang="fr" suppressHydrationWarning>
       <head>
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       </head>
       <body className={plusJakarta.className}>
-        <Toaster position="top-center" toastOptions={{ style: { background: '#0F172A', color: '#F8FAFC', border: '1px solid rgba(255,255,255,0.08)', fontFamily: 'Plus Jakarta Sans, system-ui, sans-serif', borderRadius: '12px' } }} />
+        <ThemeProvider>
+        <PaysProvider>
+        <Toaster position="top-center" toastOptions={{ style: { background: 'var(--ss-bg-secondary)', color: 'var(--ss-text)', border: '1px solid var(--ss-border)', fontFamily: 'Plus Jakarta Sans, system-ui, sans-serif', borderRadius: '12px' } }} />
         <OfflineIndicator />
         {children}
         <CookieConsentBanner />
         <OfflineSynchronizer />
         <Analytics />
+        {/* Toggle de theme flottant — global */}
+        <ThemeToggle floating />
         {/* Bouton WhatsApp flottant global */}
         <a
           href="https://wa.me/221770000000?text=Bonjour%2C%20je%20souhaite%20en%20savoir%20plus%20sur%20SmartSchool%20SN."
@@ -86,6 +93,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           <MessageCircle className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
         </a>
+        </PaysProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

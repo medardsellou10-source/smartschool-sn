@@ -164,7 +164,7 @@ export default function PaiementPage() {
         <button
           onClick={() => setFilter('unpaid')}
           className={`px-4 py-2 rounded-lg text-sm font-medium min-h-[40px] transition-colors ${
-            filter === 'unpaid' ? 'bg-ss-cyan text-white' : 'bg-ss-bg-secondary text-ss-text-secondary border border-ss-border'
+            filter === 'unpaid' ? 'bg-ss-cyan text-ss-text' : 'bg-ss-bg-secondary text-ss-text-secondary border border-ss-border'
           }`}
         >
           En attente
@@ -172,7 +172,7 @@ export default function PaiementPage() {
         <button
           onClick={() => setFilter('all')}
           className={`px-4 py-2 rounded-lg text-sm font-medium min-h-[40px] transition-colors ${
-            filter === 'all' ? 'bg-ss-cyan text-white' : 'bg-ss-bg-secondary text-ss-text-secondary border border-ss-border'
+            filter === 'all' ? 'bg-ss-cyan text-ss-text' : 'bg-ss-bg-secondary text-ss-text-secondary border border-ss-border'
           }`}
         >
           Toutes
@@ -222,7 +222,7 @@ export default function PaiementPage() {
                 {f.statut !== 'paye' && !isOffline && (
                   <button
                     onClick={() => setSelectedFacture(f)}
-                    className="bg-ss-green text-white px-4 py-2.5 rounded-xl text-sm font-semibold min-h-[44px] hover:bg-ss-green/80 transition-colors"
+                    className="bg-ss-green text-ss-text px-4 py-2.5 rounded-xl text-sm font-semibold min-h-[44px] hover:bg-ss-green/80 transition-colors"
                   >
                     Payer
                   </button>

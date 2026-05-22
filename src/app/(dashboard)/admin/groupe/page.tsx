@@ -482,7 +482,7 @@ export default function GroupeDashboard() {
                       style={{ width: `${barWidth * (ecole.montantPaye / ecole.facturesTotales || 0)}%` }}
                     >
                       {barWidth * (ecole.montantPaye / ecole.facturesTotales || 0) > 15 && (
-                        <span className="text-[9px] text-white font-medium">Paye</span>
+                        <span className="text-[9px] text-ss-text font-medium">Paye</span>
                       )}
                     </div>
                     <div
@@ -490,7 +490,7 @@ export default function GroupeDashboard() {
                       style={{ width: `${barWidth * (ecole.montantImpaye / ecole.facturesTotales || 0)}%` }}
                     >
                       {barWidth * (ecole.montantImpaye / ecole.facturesTotales || 0) > 15 && (
-                        <span className="text-[9px] text-white font-medium">En attente</span>
+                        <span className="text-[9px] text-ss-text font-medium">En attente</span>
                       )}
                     </div>
                   </div>

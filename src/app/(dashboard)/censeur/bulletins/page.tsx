@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState, useMemo, useCallback } from 'react'
 import { useUser } from '@/hooks/useUser'
@@ -37,7 +37,7 @@ interface EleveBulletin {
 
 // ── Mention sénégalaise ────────────────────────────────────────
 function getMention(avg: number | null): { mention: string; color: string; conseil: string } {
-  if (avg === null) return { mention: '—', color: '#64748B', conseil: 'Données insuffisantes' }
+  if (avg === null) return { mention: '—', color: 'var(--ss-text-muted)', conseil: 'Données insuffisantes' }
   if (avg >= 18) return { mention: 'Excellent', color: '#FBBF24', conseil: 'Félicitations du conseil de classe' }
   if (avg >= 16) return { mention: 'Très Bien', color: '#22C55E', conseil: 'Mention Honorable avec félicitations' }
   if (avg >= 14) return { mention: 'Bien', color: '#38BDF8', conseil: 'Mention Honorable' }
@@ -106,7 +106,7 @@ function calcBulletins(classeId: string, trimestre: number): EleveBulletin[] {
 }
 
 function noteColor(note: number | null): string {
-  if (note === null) return '#475569'
+  if (note === null) return 'var(--ss-text-disabled)'
   if (note >= 16) return '#FBBF24'
   if (note >= 14) return '#22C55E'
   if (note >= 10) return '#38BDF8'
@@ -461,7 +461,7 @@ export default function BulletinsPage() {
 
                 {/* Aperçu notes + actions */}
                 <div className="border-t px-4 py-3 flex flex-wrap items-center gap-3"
-                  style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+                  style={{ borderColor: 'var(--ss-glass-card-hover)' }}>
                   {/* Mini liste notes */}
                   <button onClick={() => setExpandedNote(expandedNote === n.id ? null : n.id)}
                     className="text-xs text-ss-text-muted hover:text-ss-text transition-all flex items-center gap-1">
@@ -501,7 +501,7 @@ export default function BulletinsPage() {
 
                 {/* Table des notes (dépliable) */}
                 {expandedNote === n.id && (
-                  <div className="border-t px-4 pb-4 pt-3" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+                  <div className="border-t px-4 pb-4 pt-3" style={{ borderColor: 'var(--ss-glass-card-hover)' }}>
                     <div className="grid grid-cols-3 gap-x-2 gap-y-1">
                       {/* Header */}
                       <div className="text-[10px] font-bold text-ss-text-muted pb-1">ÉLÈVE</div>
@@ -549,7 +549,7 @@ export default function BulletinsPage() {
               <button onClick={handleValidate} disabled={validating || validated}
                 className={`inline-flex items-center gap-2 text-sm px-4 py-2.5 rounded-xl font-bold min-h-[44px] transition-all ${validated
                   ? 'bg-ss-green/20 border border-ss-green text-ss-green'
-                  : 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white hover:opacity-90 disabled:opacity-60'}`}>
+                  : 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-ss-text hover:opacity-90 disabled:opacity-60'}`}>
                 <CheckCircle2 size={16} />
                 {validating ? 'Validation...' : validated ? 'Bulletins validés' : 'Valider les bulletins'}
               </button>

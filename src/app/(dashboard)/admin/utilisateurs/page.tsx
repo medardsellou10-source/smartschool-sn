@@ -523,7 +523,7 @@ export default function UtilisateursPage() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex-1 bg-ss-cyan text-white font-medium text-sm py-2.5 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
+                  className="flex-1 bg-ss-cyan text-ss-text font-medium text-sm py-2.5 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
                 >
                   {saving ? 'Envoi de l\'invitation...' : '✉️ Envoyer l\'invitation'}
                 </button>

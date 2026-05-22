@@ -140,7 +140,7 @@ export default function AdminBulletinsPage() {
             onClick={() => setTrimestre(t)}
             className={`px-6 py-2.5 rounded-xl text-sm font-semibold min-h-[44px] transition-colors ${
               trimestre === t
-                ? 'bg-[#00853F] text-white'
+                ? 'bg-[#00853F] text-ss-text'
                 : 'bg-ss-bg-secondary text-ss-text-secondary border border-ss-border'
             }`}
           >
@@ -244,7 +244,7 @@ export default function AdminBulletinsPage() {
           <button
             onClick={handleGenerate}
             disabled={generating}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-[#00853F] text-white rounded-xl font-semibold hover:bg-[#00853F]/90 disabled:opacity-50 transition text-sm min-h-[48px]"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-[#00853F] text-ss-text rounded-xl font-semibold hover:bg-[#00853F]/90 disabled:opacity-50 transition text-sm min-h-[48px]"
           >
             {generating ? (
               <>

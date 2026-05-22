@@ -51,7 +51,7 @@ export function StatCard(props: StatCardProps) {
     return (
       <div
         className="rounded-2xl p-4 sm:p-5 min-h-[100px] sm:min-h-[120px] ss-shimmer"
-        style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
+        style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-border)' }}
         aria-busy="true"
       />
     )
@@ -70,10 +70,10 @@ export function StatCard(props: StatCardProps) {
     'group relative rounded-2xl p-4 sm:p-5 min-h-[100px] sm:min-h-[120px] overflow-hidden' +
     ' transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg' +
     (delay != null ? ' animate-fade-in-up' : '') +
-    (href ? ' block cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617]' : '')
+    (href ? ' block cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-ss-bg' : '')
 
   const cardStyle: React.CSSProperties = {
-    background: `linear-gradient(135deg, ${palette.bg}, rgba(15,23,42,0.8))`,
+    background: `linear-gradient(135deg, ${palette.bg}, var(--ss-bg-card))`,
     border: `1px solid ${palette.border}`,
     ...(animationStyle || {}),
     ...(href ? { } : {}),

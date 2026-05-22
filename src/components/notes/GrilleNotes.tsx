@@ -2,6 +2,8 @@
 
 import { useState, useCallback, useRef, useEffect, memo } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { isDemoMode } from '@/lib/demo-data'
+import { demoListNotes, demoUpsertNote } from '@/lib/demo/notes-store'
 import { z } from 'zod'
 
 // Types
@@ -140,6 +142,15 @@ export function GrilleNotes({ classeId, matiereId, evaluationId, eleves, userId,
   // Charger notes existantes
   useEffect(() => {
     async function loadNotes() {
+      if (isDemoMode()) {
+        const rows = demoListNotes(evaluationId)
+        const map = new Map<string, { note: number | null; absent: boolean }>()
+        for (const row of rows) {
+          map.set(row.eleve_id, { note: row.note, absent: row.absent_eval })
+        }
+        setNotes(map)
+        return
+      }
       const { data } = await supabase
         .from('notes')
         .select('*')
@@ -158,6 +169,11 @@ export function GrilleNotes({ classeId, matiereId, evaluationId, eleves, userId,
       // Charger les moyennes du trimestre pour chaque élève
       const eleveIds = eleves.map(e => e.id)
       if (eleveIds.length === 0) return
+      if (isDemoMode()) {
+        // Pas de vue calculée en démo — laisser vide
+        setMoyennes(new Map())
+        return
+      }
 
       const { data } = await supabase
         .from('v_moyennes_trimestre')
@@ -190,10 +206,25 @@ export function GrilleNotes({ classeId, matiereId, evaluationId, eleves, userId,
 
     let hasError = false
     const notifiedPairs: { eleve_id: string; evaluation_id: string }[] = []
+    const demo = isDemoMode()
 
     for (const [eleveId, { note, absent }] of pending) {
       const validated = noteSchema.safeParse(note)
       const finalNote = validated.success ? validated.data : null
+
+      if (demo) {
+        demoUpsertNote({
+          eleve_id: eleveId,
+          evaluation_id: evaluationId,
+          note: absent ? null : finalNote,
+          absent_eval: absent,
+          saisi_par: userId,
+        })
+        if (!absent && finalNote !== null) {
+          notifiedPairs.push({ eleve_id: eleveId, evaluation_id: evaluationId })
+        }
+        continue
+      }
 
       const { error } = await (supabase.from('notes') as any).upsert(
         {
@@ -468,11 +499,11 @@ export function GrilleNotes({ classeId, matiereId, evaluationId, eleves, userId,
             <button
               onClick={handlePublish}
               disabled={publishing || allNotes.length === 0}
-              className="flex-1 bg-gradient-to-r from-ss-green to-ss-cyan text-white py-3 rounded-xl text-sm font-bold hover:opacity-90 disabled:opacity-50 transition-all min-h-[48px] flex items-center justify-center gap-2"
+              className="flex-1 bg-gradient-to-r from-ss-green to-ss-cyan text-ss-text py-3 rounded-xl text-sm font-bold hover:opacity-90 disabled:opacity-50 transition-all min-h-[48px] flex items-center justify-center gap-2"
             >
               {publishing ? (
                 <>
-                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span className="w-4 h-4 border-2 border-ss-text/30 border-t-white rounded-full animate-spin" />
                   Publication en cours...
                 </>
               ) : (

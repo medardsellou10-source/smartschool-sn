@@ -169,7 +169,7 @@ export default function EleveElearningPage() {
       <div className="flex gap-1 bg-ss-bg-secondary rounded-lg p-1">
         {tabs.map(t => (
           <button key={t.key} onClick={() => setTab(t.key)}
-            className={`flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${tab === t.key ? 'bg-[#00853F] text-white' : 'text-ss-text-secondary hover:text-ss-text'}`}>
+            className={`flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${tab === t.key ? 'bg-[#00853F] text-ss-text' : 'text-ss-text-secondary hover:text-ss-text'}`}>
             <t.Icon size={14} aria-hidden="true" /> {t.label} ({t.count})
           </button>
         ))}
@@ -191,7 +191,7 @@ export default function EleveElearningPage() {
                 <div className="bg-ss-bg-card rounded-lg p-4 text-ss-text whitespace-pre-wrap">{selectedCours.contenu}</div>
               )}
               {selectedCours.fichier_url && (
-                <a href={selectedCours.fichier_url} target="_blank" className="mt-4 inline-block px-4 py-2 bg-[#00853F] text-white rounded-lg">
+                <a href={selectedCours.fichier_url} target="_blank" className="mt-4 inline-block px-4 py-2 bg-[#00853F] text-ss-text rounded-lg">
                   📥 Télécharger le fichier ({selectedCours.fichier_type})
                 </a>
               )}
@@ -268,7 +268,7 @@ export default function EleveElearningPage() {
                       className="w-full bg-ss-bg-card border border-ss-border rounded-lg p-3 text-ss-text text-sm min-h-[100px]" />
                     <div className="flex gap-2">
                       <button onClick={() => soumettre(d.id)} disabled={submitting}
-                        className="px-4 py-2 bg-[#00853F] text-white rounded-lg text-sm disabled:opacity-50">
+                        className="px-4 py-2 bg-[#00853F] text-ss-text rounded-lg text-sm disabled:opacity-50">
                         {submitting ? '⏳ Envoi...' : '📤 Soumettre'}
                       </button>
                       <button onClick={() => { setShowSoumission(null); setSoumissionTexte('') }}
@@ -326,7 +326,7 @@ export default function EleveElearningPage() {
                 {(isNow || (!isPast && cv.lien_reunion)) && (
                   <a href={cv.lien_reunion || '#'} target="_blank" rel="noopener"
                     className={`mt-3 inline-block px-4 py-2 rounded-lg text-sm font-medium ${
-                      isNow ? 'bg-[#00853F] text-white animate-pulse' : 'bg-[#00853F]/20 text-[#00853F]'
+                      isNow ? 'bg-[#00853F] text-ss-text animate-pulse' : 'bg-[#00853F]/20 text-[#00853F]'
                     }`}>
                     {isNow ? '🎥 Rejoindre maintenant' : '🔗 Lien de la classe'}
                   </a>

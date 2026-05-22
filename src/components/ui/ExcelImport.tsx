@@ -108,29 +108,29 @@ export function ExcelImport({ onImport, expectedColumns, templateUrl }: ExcelImp
       <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
         <span className="text-3xl">📄</span>
       </div>
-      <h3 className="text-lg font-bold text-white mb-2">Import Excel Intelligent</h3>
-      <p className="text-slate-400 text-sm mb-6">
+      <h3 className="text-lg font-bold text-ss-text mb-2">Import Excel Intelligent</h3>
+      <p className="text-ss-text-muted text-sm mb-6">
         Glissez-déposez votre fichier Excel ou CSV ici, ou cliquez pour parcourir.
       </p>
       
       {fileName && (
         <div className="bg-[#141833] py-2 px-4 rounded-lg inline-flex items-center gap-2 mb-4">
           <span className="text-ss-green">✓</span>
-          <span className="text-sm text-slate-300 truncate max-w-[200px]">{fileName}</span>
+          <span className="text-sm text-ss-text-secondary truncate max-w-[200px]">{fileName}</span>
         </div>
       )}
 
       <div>
         <button
           onClick={() => fileInputRef.current?.click()}
-          className="bg-slate-800 hover:bg-slate-700 text-white font-medium py-2 px-6 rounded-lg transition"
+          className="bg-slate-800 hover:bg-slate-700 text-ss-text font-medium py-2 px-6 rounded-lg transition"
         >
           Parcourir les fichiers
         </button>
       </div>
       {expectedColumns && (
         <div className="mt-4 pt-4 border-t border-slate-700/50 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-slate-500 text-left">
+          <p className="text-xs text-ss-text-muted text-left">
             Colonnes attendues : {expectedColumns.join(', ')}
           </p>
           {templateUrl && (

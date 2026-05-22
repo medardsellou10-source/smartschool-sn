@@ -147,6 +147,27 @@ export async function proxy(request: NextRequest) {
   const supabaseReady = isSupabaseConfigured()
   const demoRole = request.cookies.get('ss_demo_role')?.value
 
+  // ─── PREMIUM #1 — URL secrète Super Admin (cockpit Créateur SaaS) ────
+  // /__waed-master et /__waed-2fa sont accessibles UNIQUEMENT si :
+  //   - mode démo + cookie ss_demo_role === 'super_admin'
+  //   - OU session Supabase + utilisateurs.role === 'super_admin'
+  //   - ET le cookie super_admin_2fa est présent (sauf sur /__waed-2fa)
+  // Sinon → 404 (rewrite, on ne révèle pas l'existence de la route).
+  if (pathname.startsWith('/__waed-master') || pathname.startsWith('/__waed-2fa')) {
+    const isSuper = demoAllowed && demoRole === 'super_admin'
+    if (!isSuper) {
+      return NextResponse.rewrite(new URL('/404', request.url))
+    }
+    // 2FA requis pour /__waed-master (pas pour la page 2FA elle-même)
+    if (pathname.startsWith('/__waed-master')) {
+      const has2fa = request.cookies.get('super_admin_2fa')?.value === 'verified'
+      if (!has2fa) {
+        return NextResponse.redirect(new URL('/__waed-2fa', request.url))
+      }
+    }
+    return NextResponse.next({ request })
+  }
+
   // 1. Routes publiques → libres
   if (isPublic(pathname)) {
     return NextResponse.next({ request })

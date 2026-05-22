@@ -1,11 +1,32 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useUser } from '@/hooks/useUser'
 import { isDemoMode, DEMO_EMPLOIS_TEMPS, DEMO_MATIERES, DEMO_CLASSES } from '@/lib/demo-data'
 import { createClient } from '@/lib/supabase/client'
 import { PageHeader } from '@/components/dashboard/PageHeader'
 import { NotebookText } from 'lucide-react'
+
+const DEMO_CAHIER_KEY = 'ss_demo_cahier_entries_v1'
+
+function readDemoCahier(): CahierEntry[] {
+  if (typeof window === 'undefined') return []
+  try {
+    const raw = window.localStorage.getItem(DEMO_CAHIER_KEY)
+    if (!raw) return []
+    const parsed = JSON.parse(raw)
+    return Array.isArray(parsed) ? parsed : []
+  } catch {
+    return []
+  }
+}
+
+function writeDemoCahier(list: CahierEntry[]) {
+  if (typeof window === 'undefined') return
+  try {
+    window.localStorage.setItem(DEMO_CAHIER_KEY, JSON.stringify(list))
+  } catch {}
+}
 
 interface CahierEntry {
   id: string
@@ -28,9 +49,14 @@ export default function CahierPage() {
   const [selectedClasse, setSelectedClasse] = useState('')
   const [selectedMatiere, setSelectedMatiere] = useState('')
 
-  // Entries (demo: local state)
+  // Entries (demo: persisted localStorage, réel: Supabase)
   const [entries, setEntries] = useState<CahierEntry[]>([])
   const [loadingEntries, setLoadingEntries] = useState(false)
+
+  // Hydrate depuis localStorage au montage (mode démo)
+  useEffect(() => {
+    if (isDemoMode()) setEntries(readDemoCahier())
+  }, [])
 
   // Form
   const [showForm, setShowForm] = useState(false)
@@ -136,7 +162,11 @@ export default function CahierPage() {
     }
 
     if (isDemoMode()) {
-      setEntries(prev => [newEntry, ...prev])
+      setEntries(prev => {
+        const next = [newEntry, ...prev]
+        writeDemoCahier(next)
+        return next
+      })
     } else {
       const { data, error } = await (supabase.from('cahier_texte') as any)
         .insert({
@@ -224,7 +254,7 @@ export default function CahierPage() {
       {selectedClasse && selectedMatiere && (
         <button
           onClick={() => setShowForm(!showForm)}
-          className="w-full bg-ss-cyan text-white py-3 rounded-xl font-bold text-sm min-h-[48px] hover:bg-ss-cyan/80 transition-colors"
+          className="w-full bg-ss-cyan text-ss-text py-3 rounded-xl font-bold text-sm min-h-[48px] hover:bg-ss-cyan/80 transition-colors"
         >
           {showForm ? 'Annuler' : '+ Nouvelle entree'}
         </button>
@@ -270,7 +300,7 @@ export default function CahierPage() {
           <button
             onClick={handleSubmit}
             disabled={saving || !titre.trim() || !contenu.trim()}
-            className="w-full bg-ss-green text-white py-3 rounded-xl font-bold text-sm min-h-[48px] hover:bg-ss-green/80 disabled:opacity-50 transition-colors"
+            className="w-full bg-ss-green text-ss-text py-3 rounded-xl font-bold text-sm min-h-[48px] hover:bg-ss-green/80 disabled:opacity-50 transition-colors"
           >
             {saving ? 'Enregistrement...' : 'Enregistrer'}
           </button>

@@ -1,28 +1,49 @@
 'use client'
 
-import { Flame, Sparkles } from 'lucide-react'
-import { useXp } from '@/hooks/useProgress'
-import { xpLevel } from '@/lib/hub/progress'
+/**
+ * GamificationBadge — affiche XP + streak + badges depuis localStorage
+ */
 
-/** Pastille compacte affichée dans le header : XP + streak. */
-export function GamificationBadge() {
-  const { xp } = useXp()
-  const level = xpLevel(xp.xp)
+import { Flame, Star } from 'lucide-react'
+import type { XpState } from '@/types/hub'
 
+interface GamificationBadgeProps {
+  xpState: XpState
+}
+
+export function GamificationBadge({ xpState }: GamificationBadgeProps) {
   return (
-    <div
-      className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-[var(--color-ss-bg-card)] px-3 py-1.5 text-xs"
-      aria-label={`Niveau ${level}, ${xp.xp} XP, série ${xp.streakDays} jours`}
-    >
-      <span className="inline-flex items-center gap-1 font-semibold text-[var(--color-ss-warn)]">
-        <Sparkles className="h-3.5 w-3.5" aria-hidden /> {xp.xp} XP
-      </span>
-      <span className="text-white/20">|</span>
-      <span className="inline-flex items-center gap-1 font-semibold text-[var(--color-ss-danger)]">
-        <Flame className="h-3.5 w-3.5" aria-hidden /> {xp.streakDays}j
-      </span>
-      <span className="text-white/20">|</span>
-      <span className="font-semibold text-[var(--color-ss-info)]">Nv. {level}</span>
+    <div className="flex items-center gap-2">
+      {/* XP */}
+      <div
+        className="inline-flex items-center gap-1 rounded-full border border-amber-400/30 bg-amber-400/10 px-2.5 py-1"
+        title={`${xpState.xp} points d'expérience`}
+      >
+        <Star className="h-3 w-3 text-amber-400" aria-hidden />
+        <span className="text-[11px] font-bold text-amber-300">{xpState.xp} XP</span>
+      </div>
+
+      {/* Streak */}
+      {xpState.streakDays > 0 && (
+        <div
+          className="inline-flex items-center gap-1 rounded-full border border-orange-400/30 bg-orange-400/10 px-2.5 py-1"
+          title={`${xpState.streakDays} jour(s) de suite`}
+        >
+          <Flame className="h-3 w-3 text-orange-400" aria-hidden />
+          <span className="text-[11px] font-bold text-orange-300">{xpState.streakDays}j</span>
+        </div>
+      )}
+
+      {/* Badges (max 2 affichés) */}
+      {xpState.badges.slice(0, 2).map(badge => (
+        <span
+          key={badge}
+          className="hidden sm:inline-flex items-center gap-1 rounded-full border border-purple-400/30 bg-purple-400/10 px-2.5 py-1 text-[11px] font-semibold text-purple-300"
+          title={badge}
+        >
+          {badge}
+        </span>
+      ))}
     </div>
   )
 }

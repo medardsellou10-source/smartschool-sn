@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState } from 'react'
 import { isDemoMode } from '@/lib/demo-data'
@@ -98,31 +98,31 @@ function QuestionDetail({ q, index }: { q: CorrectionComplete['resultats_par_exe
       <button className="w-full flex items-center gap-3 px-4 py-3 text-left" onClick={() => setOpen(o => !o)}>
         <span className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-black shrink-0"
           style={{ background: s.color, color: '#020617' }}>{s.icon}</span>
-        <span className="text-xs font-bold text-white/50 shrink-0">Q{q.question_numero}</span>
-        <span className="flex-1 text-sm text-white/70 truncate">{q.reponse_donnee || <em className="text-white/30">Non répondu</em>}</span>
+        <span className="text-xs font-bold text-ss-text-secondary shrink-0">Q{q.question_numero}</span>
+        <span className="flex-1 text-sm text-ss-text-secondary truncate">{q.reponse_donnee || <em className="text-ss-text-secondary">Non répondu</em>}</span>
         <span className="shrink-0 text-sm font-black tabular-nums" style={{ color: s.color }}>{q.points_obtenus}/{q.points_max}</span>
-        <span className="shrink-0 text-white/30 text-xs" style={{ transform: open ? 'rotate(180deg)' : undefined }}>▼</span>
+        <span className="shrink-0 text-ss-text-secondary text-xs" style={{ transform: open ? 'rotate(180deg)' : undefined }}>▼</span>
       </button>
 
       {open && (
-        <div className="px-4 pb-4 space-y-3 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
+        <div className="px-4 pb-4 space-y-3 border-t" style={{ borderColor: 'var(--ss-glass-card-bg)' }}>
           {/* Ce que tu as écrit */}
-          <div className="mt-3 rounded-lg p-3" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-            <p className="text-[10px] font-bold text-white/40 mb-1">CE QUE TU AS ÉCRIT</p>
-            <p className="text-sm text-white/75 leading-relaxed">{q.reponse_donnee || <em className="text-white/30">Aucune réponse</em>}</p>
+          <div className="mt-3 rounded-lg p-3" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
+            <p className="text-[10px] font-bold text-ss-text-secondary mb-1">CE QUE TU AS ÉCRIT</p>
+            <p className="text-sm text-ss-text-secondary leading-relaxed">{q.reponse_donnee || <em className="text-ss-text-secondary">Aucune réponse</em>}</p>
           </div>
 
           {/* Réponse correcte */}
           <div className="rounded-lg p-3" style={{ background: 'rgba(0,230,118,0.06)', border: '1px solid rgba(0,230,118,0.2)' }}>
             <p className="text-[10px] font-bold text-green-400 mb-1">RÉPONSE CORRECTE</p>
-            <p className="text-sm text-white/75 leading-relaxed">{q.reponse_attendue}</p>
+            <p className="text-sm text-ss-text-secondary leading-relaxed">{q.reponse_attendue}</p>
           </div>
 
           {/* Explication */}
           {q.explication && (
             <div className="rounded-lg p-3" style={{ background: 'rgba(0,229,255,0.06)', border: '1px solid rgba(0,229,255,0.15)' }}>
               <p className="text-[10px] font-bold text-cyan-400 mb-1">EXPLICATION</p>
-              <p className="text-sm text-white/70 leading-relaxed">{q.explication}</p>
+              <p className="text-sm text-ss-text-secondary leading-relaxed">{q.explication}</p>
             </div>
           )}
 
@@ -130,7 +130,7 @@ function QuestionDetail({ q, index }: { q: CorrectionComplete['resultats_par_exe
           {q.feedback_eleve && (
             <div className="rounded-lg p-3" style={{ background: 'rgba(124,77,255,0.08)', border: '1px solid rgba(124,77,255,0.2)' }}>
               <p className="text-[10px] font-bold mb-1" style={{ color: '#7C4DFF' }}>MESSAGE DE TON PROFESSEUR</p>
-              <p className="text-sm text-white/75 leading-relaxed italic">&ldquo;{q.feedback_eleve}&rdquo;</p>
+              <p className="text-sm text-ss-text-secondary leading-relaxed italic">&ldquo;{q.feedback_eleve}&rdquo;</p>
             </div>
           )}
 
@@ -195,14 +195,14 @@ export default function EleveCorrectionPage() {
           style={{ background: `radial-gradient(circle at 70% 30%, ${mc}, transparent 60%)` }} />
 
         <p className="text-6xl font-black tabular-nums" style={{ color: mc }}>{correction.note_finale.toFixed(1)}</p>
-        <p className="text-white/50 text-sm mt-1">/ {correction.total_points} points</p>
+        <p className="text-ss-text-secondary text-sm mt-1">/ {correction.total_points} points</p>
 
         <span className="inline-block mt-3 px-5 py-1.5 rounded-full text-base font-bold"
           style={{ background: mc + '20', border: `1px solid ${mc}50`, color: mc }}>
           {correction.mention}
         </span>
 
-        <div className="mt-4 flex justify-center gap-4 text-xs text-white/50">
+        <div className="mt-4 flex justify-center gap-4 text-xs text-ss-text-secondary">
           <span>{correction.structure_corrige.matiere}</span>
           <span>•</span>
           <span>{new Date(correction.created_at).toLocaleDateString('fr-SN', { day: '2-digit', month: 'long', year: 'numeric' })}</span>
@@ -255,22 +255,22 @@ export default function EleveCorrectionPage() {
 
           return (
             <div key={ex.exercice_numero} className="rounded-xl border overflow-hidden"
-              style={{ borderColor: 'rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.03)' }}>
+              style={{ borderColor: 'var(--ss-glass-border)', background: 'var(--ss-glass-card-bg)' }}>
               <button className="w-full flex items-center gap-3 px-4 py-3 text-left"
                 onClick={() => setOpenExercice(isOpen ? null : ex.exercice_numero)}>
-                <span className="shrink-0 text-xs font-bold text-white/40">EX.{ex.exercice_numero}</span>
-                <span className="flex-1 text-sm font-semibold text-white/80 truncate">{ex.exercice_titre}</span>
+                <span className="shrink-0 text-xs font-bold text-ss-text-secondary">EX.{ex.exercice_numero}</span>
+                <span className="flex-1 text-sm font-semibold text-ss-text-secondary truncate">{ex.exercice_titre}</span>
                 <span className="shrink-0 text-xs font-bold tabular-nums" style={{ color: barColor }}>
                   {ex.points_obtenus}/{ex.points_max} pts
                 </span>
                 <span className="shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full"
                   style={{ background: barColor + '18', color: barColor }}>{pct}%</span>
-                <span className="shrink-0 text-white/30 text-xs transition-transform"
+                <span className="shrink-0 text-ss-text-secondary text-xs transition-transform"
                   style={{ transform: isOpen ? 'rotate(180deg)' : undefined }}>▼</span>
               </button>
 
               {/* Barre de progression */}
-              <div className="h-1 mx-4 mb-1 bg-white/5 rounded-full overflow-hidden">
+              <div className="h-1 mx-4 mb-1 bg-ss-text/5 rounded-full overflow-hidden">
                 <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: barColor }} />
               </div>
 
@@ -291,7 +291,7 @@ export default function EleveCorrectionPage() {
             <p className="text-xs font-bold text-green-400 mb-2">TES POINTS FORTS</p>
             <ul className="space-y-1">
               {correction.points_forts.map((p, i) => (
-                <li key={i} className="text-sm text-white/70 flex items-start gap-2">
+                <li key={i} className="text-sm text-ss-text-secondary flex items-start gap-2">
                   <span className="text-green-400 shrink-0 mt-0.5">✓</span>{p}
                 </li>
               ))}
@@ -303,7 +303,7 @@ export default function EleveCorrectionPage() {
             <p className="text-xs font-bold text-red-400 mb-2">CE QU&apos;IL FAUT AMÉLIORER</p>
             <ul className="space-y-1">
               {correction.points_faibles.map((p, i) => (
-                <li key={i} className="text-sm text-white/70 flex items-start gap-2">
+                <li key={i} className="text-sm text-ss-text-secondary flex items-start gap-2">
                   <span className="text-red-400 shrink-0 mt-0.5">→</span>{p}
                 </li>
               ))}
@@ -318,7 +318,7 @@ export default function EleveCorrectionPage() {
           <p className="text-xs font-bold text-cyan-400 mb-2">CONSEILS POUR PROGRESSER</p>
           <ul className="space-y-1">
             {correction.conseils.map((c, i) => (
-              <li key={i} className="text-sm text-white/70 flex items-start gap-2">
+              <li key={i} className="text-sm text-ss-text-secondary flex items-start gap-2">
                 <span className="text-cyan-400 shrink-0 mt-0.5">→</span>{c}
               </li>
             ))}
@@ -330,7 +330,7 @@ export default function EleveCorrectionPage() {
       {correction.appreciation_generale && (
         <div className="rounded-xl p-5" style={{ background: 'rgba(124,77,255,0.08)', border: '1px solid rgba(124,77,255,0.2)' }}>
           <p className="text-xs font-bold mb-2" style={{ color: '#7C4DFF' }}>MOT DU PROFESSEUR</p>
-          <p className="text-sm text-white/75 leading-relaxed italic">&ldquo;{correction.appreciation_generale}&rdquo;</p>
+          <p className="text-sm text-ss-text-secondary leading-relaxed italic">&ldquo;{correction.appreciation_generale}&rdquo;</p>
         </div>
       )}
 

@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { GrilleNotes } from '@/components/notes/GrilleNotes'
 import { isDemoMode, DEMO_CLASSES, DEMO_MATIERES, DEMO_EVALUATIONS, DEMO_ELEVES, DEMO_ECOLE } from '@/lib/demo-data'
+import { demoCreateEvaluation, demoListEvaluations } from '@/lib/demo/notes-store'
 import { PageHeader } from '@/components/dashboard/PageHeader'
 import { PenSquare } from 'lucide-react'
 
@@ -108,11 +109,14 @@ export default function NotesPage() {
   useEffect(() => {
     if (!selectedClasse || !selectedMatiere) { setEvaluations([]); return }
     if (isDemoMode()) {
-      setEvaluations(
-        DEMO_EVALUATIONS
-          .filter(e => e.classe_id === selectedClasse && e.matiere_id === selectedMatiere)
-          .map(e => ({ id: e.id, titre: e.titre, type_eval: e.type_eval, date_eval: e.date_eval, trimestre: e.trimestre, coefficient_eval: e.coefficient_eval }))
-      )
+      const seed = DEMO_EVALUATIONS
+        .filter(e => e.classe_id === selectedClasse && e.matiere_id === selectedMatiere)
+        .map(e => ({ id: e.id, titre: e.titre, type_eval: e.type_eval, date_eval: e.date_eval, trimestre: e.trimestre, coefficient_eval: e.coefficient_eval }))
+      const created = demoListEvaluations({
+        classe_id: selectedClasse,
+        matiere_id: selectedMatiere,
+      }).map(e => ({ id: e.id, titre: e.titre, type_eval: e.type_eval, date_eval: e.date_eval, trimestre: e.trimestre, coefficient_eval: e.coefficient_eval }))
+      setEvaluations([...created, ...seed])
       return
     }
     async function load() {
@@ -170,6 +174,30 @@ export default function NotesPage() {
   const handleCreateEval = useCallback(async () => {
     if (!selectedClasse || !selectedMatiere || !user) return
     setCreatingEval(true)
+
+    if (isDemoMode()) {
+      const created = demoCreateEvaluation({
+        classe_id: selectedClasse,
+        matiere_id: selectedMatiere,
+        prof_id: user.id,
+        type_eval: newEvalType,
+        titre: newEvalTitre || `${newEvalType} — ${new Date().toLocaleDateString('fr-SN')}`,
+        date_eval: new Date().toISOString().split('T')[0],
+        trimestre,
+        coefficient_eval: newEvalCoeff,
+      })
+      setEvaluations(prev => [
+        { id: created.id, titre: created.titre, type_eval: created.type_eval, date_eval: created.date_eval, trimestre: created.trimestre, coefficient_eval: created.coefficient_eval },
+        ...prev,
+      ])
+      setSelectedEval(created.id)
+      setShowNewEval(false)
+      setNewEvalTitre('')
+      setNewEvalType('devoir')
+      setNewEvalCoeff(1)
+      setCreatingEval(false)
+      return
+    }
 
     const { data, error } = await (supabase.from('evaluations') as any).insert({
       classe_id: selectedClasse,
@@ -272,7 +300,7 @@ export default function NotesPage() {
               </select>
               <button
                 onClick={() => { setShowNewEval(!showNewEval); setSelectedEval('') }}
-                className="shrink-0 bg-ss-cyan text-white px-4 py-3 rounded-xl text-sm font-medium min-h-[48px] hover:bg-ss-cyan/80 transition-colors"
+                className="shrink-0 bg-ss-cyan text-ss-text px-4 py-3 rounded-xl text-sm font-medium min-h-[48px] hover:bg-ss-cyan/80 transition-colors"
               >
                 + Nouvelle
               </button>
@@ -320,7 +348,7 @@ export default function NotesPage() {
             <button
               onClick={handleCreateEval}
               disabled={creatingEval}
-              className="w-full bg-ss-green text-white py-2.5 rounded-lg text-sm font-semibold hover:bg-ss-green/80 disabled:opacity-50 transition-colors min-h-[44px]"
+              className="w-full bg-ss-green text-ss-text py-2.5 rounded-lg text-sm font-semibold hover:bg-ss-green/80 disabled:opacity-50 transition-colors min-h-[44px]"
             >
               {creatingEval ? 'Création...' : 'Créer et saisir les notes'}
             </button>

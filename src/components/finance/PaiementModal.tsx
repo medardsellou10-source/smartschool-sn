@@ -229,7 +229,7 @@ export function PaiementModal({ facture, onClose, onSuccess }: PaiementModalProp
                   <button
                     onClick={handlePayer}
                     disabled={state === 'loading'}
-                    className="w-full bg-[#1DC3E4] text-white py-4 rounded-xl font-bold text-base min-h-[56px] transition-colors hover:bg-[#1DC3E4]/80 disabled:opacity-50"
+                    className="w-full bg-[#1DC3E4] text-ss-text py-4 rounded-xl font-bold text-base min-h-[56px] transition-colors hover:bg-[#1DC3E4]/80 disabled:opacity-50"
                   >
                     {state === 'loading' ? (
                       <span className="flex items-center justify-center gap-2">
@@ -267,7 +267,7 @@ export function PaiementModal({ facture, onClose, onSuccess }: PaiementModalProp
                   <button
                     onClick={handlePayer}
                     disabled={state === 'loading' || telephone.length < 9}
-                    className="w-full bg-[#FF6600] text-white py-4 rounded-xl font-bold text-base min-h-[56px] transition-colors hover:bg-[#FF6600]/80 disabled:opacity-50"
+                    className="w-full bg-[#FF6600] text-ss-text py-4 rounded-xl font-bold text-base min-h-[56px] transition-colors hover:bg-[#FF6600]/80 disabled:opacity-50"
                   >
                     {state === 'loading' ? (
                       <span className="flex items-center justify-center gap-2">
@@ -312,7 +312,7 @@ export function PaiementModal({ facture, onClose, onSuccess }: PaiementModalProp
                   <button
                     onClick={handlePayer}
                     disabled={state === 'loading' || montantEspeces <= 0}
-                    className="w-full bg-ss-green text-white py-4 rounded-xl font-bold text-base min-h-[56px] transition-colors hover:bg-ss-green/80 disabled:opacity-50"
+                    className="w-full bg-ss-green text-ss-text py-4 rounded-xl font-bold text-base min-h-[56px] transition-colors hover:bg-ss-green/80 disabled:opacity-50"
                   >
                     {state === 'loading' ? (
                       <span className="flex items-center justify-center gap-2">

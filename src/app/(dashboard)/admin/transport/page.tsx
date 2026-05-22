@@ -1072,7 +1072,7 @@ export default function TransportPage() {
                 <button type="button" onClick={() => setShowModal(false)} className="flex-1 bg-ss-bg-secondary border border-ss-border text-ss-text-muted font-medium text-sm py-2.5 rounded-xl hover:text-ss-text transition-colors">
                   Annuler
                 </button>
-                <button type="submit" disabled={saving} className="flex-1 bg-[#00853F] text-white font-medium text-sm py-2.5 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50">
+                <button type="submit" disabled={saving} className="flex-1 bg-[#00853F] text-ss-text font-medium text-sm py-2.5 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50">
                   {saving ? 'Enregistrement...' : editId ? 'Modifier' : 'Enregistrer'}
                 </button>
               </div>

@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -35,7 +35,7 @@ export default function DossiersPage() {
     load()
   }, [user])
 
-  if (userLoading || loading) return <div className="p-6 animate-pulse space-y-4">{[...Array(5)].map((_, i) => <div key={i} className="h-20 rounded-xl bg-white/5" />)}</div>
+  if (userLoading || loading) return <div className="p-6 animate-pulse space-y-4">{[...Array(5)].map((_, i) => <div key={i} className="h-20 rounded-xl bg-ss-text/5" />)}</div>
 
   const complets = dossiers.filter(d => d.dossier_complet)
   const incomplets = dossiers.filter(d => !d.dossier_complet)
@@ -43,16 +43,16 @@ export default function DossiersPage() {
   return (
     <div className="space-y-6 pb-24 lg:pb-6 animate-fade-in">
       {toast && (
-        <div className="fixed top-4 right-4 z-50 px-5 py-3 rounded-2xl text-sm font-semibold text-white shadow-xl"
-          style={{ background: 'rgba(2,6,23,0.96)', border: `1px solid ${ACCENT}60`, backdropFilter: 'blur(24px)', maxWidth: '340px' }}>
+        <div className="fixed top-4 right-4 z-50 px-5 py-3 rounded-2xl text-sm font-semibold text-ss-text shadow-xl"
+          style={{ background: 'var(--ss-surface-elevated)', border: `1px solid ${ACCENT}60`, backdropFilter: 'blur(24px)', maxWidth: '340px' }}>
           <span style={{ color: ACCENT }}>ℹ️</span> {toast}
         </div>
       )}
       <div>
-        <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+        <h1 className="text-2xl font-bold text-ss-text flex items-center gap-2">
           <span style={{ color: ACCENT }}>🗂</span> Dossiers Administratifs
         </h1>
-        <p className="text-sm text-slate-400 mt-1">Gestion des dossiers des élèves</p>
+        <p className="text-sm text-ss-text-muted mt-1">Gestion des dossiers des élèves</p>
       </div>
 
       {/* Résumé */}
@@ -61,33 +61,33 @@ export default function DossiersPage() {
           style={{ background: 'rgba(0,230,118,0.12)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(0,230,118,0.25)' }}>
           <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl bg-green-500/20">✅</div>
           <div>
-            <p className="text-sm text-slate-300">Dossiers complets</p>
-            <p className="text-3xl font-black text-white">{complets.length}</p>
+            <p className="text-sm text-ss-text-secondary">Dossiers complets</p>
+            <p className="text-3xl font-black text-ss-text">{complets.length}</p>
           </div>
         </div>
         <div className="rounded-2xl p-5 flex items-center gap-4"
           style={{ background: 'rgba(255,109,0,0.12)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: `1px solid ${ACCENT}45` }}>
           <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl" style={{ background: `${ACCENT}20` }}>⚠️</div>
           <div>
-            <p className="text-sm text-slate-300">Dossiers incomplets</p>
-            <p className="text-3xl font-black text-white">{incomplets.length}</p>
+            <p className="text-sm text-ss-text-secondary">Dossiers incomplets</p>
+            <p className="text-3xl font-black text-ss-text">{incomplets.length}</p>
           </div>
         </div>
       </div>
 
       {/* Dossiers incomplets */}
       {incomplets.length > 0 && (
-        <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(2,6,23,0.82)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: `1px solid ${ACCENT}35` }}>
-          <div className="px-5 py-3 flex items-center gap-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+        <div className="rounded-2xl overflow-hidden" style={{ background: 'var(--ss-surface-elevated)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: `1px solid ${ACCENT}35` }}>
+          <div className="px-5 py-3 flex items-center gap-2" style={{ borderBottom: '1px solid var(--ss-glass-card-hover)' }}>
             <span style={{ color: ACCENT }}>⚠️</span>
-            <h2 className="text-sm font-bold text-white">Dossiers à compléter ({incomplets.length})</h2>
+            <h2 className="text-sm font-bold text-ss-text">Dossiers à compléter ({incomplets.length})</h2>
           </div>
           <div className="divide-y divide-white/5">
             {incomplets.map(d => (
-              <div key={d.id} className="flex items-center justify-between px-5 py-4 hover:bg-white/5 transition-colors">
+              <div key={d.id} className="flex items-center justify-between px-5 py-4 hover:bg-ss-text/5 transition-colors">
                 <div>
-                  <p className="text-sm font-semibold text-white">{d.prenom} {d.nom}</p>
-                  <p className="text-xs text-slate-400">{d.classe} · {d.type === 'reinscription' ? 'Réinscription' : 'Inscription'}</p>
+                  <p className="text-sm font-semibold text-ss-text">{d.prenom} {d.nom}</p>
+                  <p className="text-xs text-ss-text-muted">{d.classe} · {d.type === 'reinscription' ? 'Réinscription' : 'Inscription'}</p>
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="text-xs px-2 py-1 rounded-lg font-semibold"
@@ -107,25 +107,25 @@ export default function DossiersPage() {
       )}
 
       {/* Tous les dossiers */}
-      <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(2,6,23,0.82)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.12)' }}>
-        <div className="px-5 py-3 flex items-center gap-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+      <div className="rounded-2xl overflow-hidden" style={{ background: 'var(--ss-surface-elevated)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid var(--ss-glass-border)' }}>
+        <div className="px-5 py-3 flex items-center gap-2" style={{ borderBottom: '1px solid var(--ss-glass-card-hover)' }}>
           <span style={{ color: ACCENT }}>📁</span>
-          <h2 className="text-sm font-bold text-white">Tous les dossiers ({dossiers.length})</h2>
+          <h2 className="text-sm font-bold text-ss-text">Tous les dossiers ({dossiers.length})</h2>
         </div>
         <div className="divide-y divide-white/5">
           {dossiers.map(d => (
-            <div key={d.id} className="flex items-center justify-between px-5 py-4 hover:bg-white/5 transition-colors">
+            <div key={d.id} className="flex items-center justify-between px-5 py-4 hover:bg-ss-text/5 transition-colors">
               <div className="flex items-center gap-3">
                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm ${d.dossier_complet ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
                   {d.dossier_complet ? '✓' : '✗'}
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-white">{d.prenom} {d.nom}</p>
-                  <p className="text-xs text-slate-400">{d.classe} · {new Date(d.date).toLocaleDateString('fr-FR')}</p>
+                  <p className="text-sm font-semibold text-ss-text">{d.prenom} {d.nom}</p>
+                  <p className="text-xs text-ss-text-muted">{d.classe} · {new Date(d.date).toLocaleDateString('fr-FR')}</p>
                 </div>
               </div>
               <button className="text-xs px-3 py-1 rounded-lg"
-                style={{ background: 'rgba(255,255,255,0.05)', color: '#94A3B8', border: '1px solid rgba(255,255,255,0.1)' }}
+                style={{ background: 'var(--ss-glass-card-bg)', color: 'var(--ss-text-muted)', border: '1px solid var(--ss-glass-border)' }}
                 onClick={() => showToast(`Dossier de ${d.prenom} ${d.nom} — disponible avec la base de données.`)}>
                 Ouvrir
               </button>

@@ -1,35 +1,60 @@
 'use client'
 
-/**
- * Recherche + filtrage mémoïsé sur la liste mock des leçons.
- * v2 : remplacer MOCK_LESSONS par fetch('/api/hub/lessons').
- */
-
-import { useMemo } from 'react'
+import { useDeferredValue, useMemo, useState } from 'react'
 import { MOCK_LESSONS } from '@/lib/hub/mockLessons'
-import type { HubFilters, Lesson } from '@/types/hub'
+import type { HubFilters, Lesson, SubjectId, NiveauId } from '@/types/hub'
 
-function norm(s: string) {
-  return s
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
+const DEFAULT_FILTERS: HubFilters = {
+  query:   '',
+  subject: 'all',
+  niveau:  'all',
 }
 
-export function useLessons(filters: HubFilters): Lesson[] {
-  return useMemo(() => {
-    const q = norm(filters.query.trim())
-    return MOCK_LESSONS.filter(l => {
-      if (filters.subject !== 'all' && l.subject !== filters.subject) return false
-      if (filters.niveau !== 'all' && l.niveau !== filters.niveau) return false
-      if (q.length === 0) return true
-      const haystack = norm(`${l.title} ${l.description} ${l.teacher.name}`)
-      return haystack.includes(q)
-    })
-  }, [filters.query, filters.subject, filters.niveau])
-}
+export function useLessons() {
+  const [filters, setFilters] = useState<HubFilters>(DEFAULT_FILTERS)
 
-/** Récupère une leçon par ID (mock). Retourne null si non trouvée. */
-export function findLesson(id: string): Lesson | null {
-  return MOCK_LESSONS.find(l => l.id === id) ?? null
+  // React 19 — deferredQuery évite les re-renders bloquants sur chaque frappe
+  const deferredQuery = useDeferredValue(filters.query)
+
+  const filtered = useMemo<Lesson[]>(() => {
+    let list = MOCK_LESSONS.slice()
+
+    if (deferredQuery.trim()) {
+      const needle = deferredQuery.toLowerCase()
+      list = list.filter(
+        l =>
+          l.title.toLowerCase().includes(needle) ||
+          l.teacher.name.toLowerCase().includes(needle) ||
+          l.description.toLowerCase().includes(needle),
+      )
+    }
+
+    if (filters.subject !== 'all') {
+      list = list.filter(l => l.subject === filters.subject)
+    }
+
+    if (filters.niveau !== 'all') {
+      list = list.filter(l => l.niveau === filters.niveau)
+    }
+
+    return list
+  }, [deferredQuery, filters.subject, filters.niveau])
+
+  function setQuery(query: string) {
+    setFilters(f => ({ ...f, query }))
+  }
+
+  function setSubject(subject: SubjectId | 'all') {
+    setFilters(f => ({ ...f, subject }))
+  }
+
+  function setNiveau(niveau: NiveauId | 'all') {
+    setFilters(f => ({ ...f, niveau }))
+  }
+
+  function resetFilters() {
+    setFilters(DEFAULT_FILTERS)
+  }
+
+  return { filters, filtered, setQuery, setSubject, setNiveau, resetFilters }
 }

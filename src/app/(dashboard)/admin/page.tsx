@@ -43,7 +43,7 @@ const QUICK_LINKS = [
   { href: '/admin/export',              icon: Landmark,    label: 'Export IMEN',   color: '#E31B23' },
   { href: '/admin/analytique',          icon: BarChart3,   label: 'Analytique',    color: '#A78BFA' },
   { href: '/admin/pointage-historique', icon: CalendarClock, label: 'Pointages',   color: '#F87171' },
-  { href: '/admin/parametres',          icon: Settings,    label: 'Paramètres',    color: '#94A3B8' },
+  { href: '/admin/parametres',          icon: Settings,    label: 'Paramètres',    color: 'var(--ss-text-muted)' },
 ]
 
 export default function AdminDashboard() {
@@ -143,9 +143,9 @@ export default function AdminDashboard() {
   if (userLoading || loading) {
     return (
       <div className="space-y-6 animate-fade-in">
-        <div className="h-32 rounded-2xl ss-shimmer" style={{ background: 'rgba(255,255,255,0.03)' }} />
+        <div className="h-32 rounded-2xl ss-shimmer" style={{ background: 'var(--ss-glass-card-bg)' }} />
         <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
-          {[...Array(4)].map((_, i) => <div key={i} className="h-32 rounded-2xl ss-shimmer" style={{ background: 'rgba(255,255,255,0.03)' }} />)}
+          {[...Array(4)].map((_, i) => <div key={i} className="h-32 rounded-2xl ss-shimmer" style={{ background: 'var(--ss-glass-card-bg)' }} />)}
         </div>
       </div>
     )
@@ -165,14 +165,14 @@ export default function AdminDashboard() {
           alt=""
           className="absolute inset-0 w-full h-full object-cover object-center"
         />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, rgba(2,6,23,0.95) 0%, rgba(2,6,23,0.6) 100%)' }} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, var(--ss-surface-elevated) 0%, var(--ss-surface-elevated) 100%)' }} />
         <div className="absolute inset-0 flex items-center px-6 py-5">
           <div>
             <div className="flex items-center gap-2 mb-2">
               <span className="w-2 h-2 rounded-full bg-ss-green animate-pulse" aria-hidden="true" />
               <span className="text-ss-text-secondary text-xs font-semibold tracking-wider uppercase">Tableau de bord</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-white leading-tight">
+            <h1 className="text-2xl sm:text-3xl font-black text-ss-text leading-tight">
               Bonjour, {user?.prenom}
             </h1>
             <p className="text-ss-text-secondary text-sm mt-1">
@@ -184,7 +184,7 @@ export default function AdminDashboard() {
 
       {/* ── Onglets ── */}
       <nav role="tablist" aria-label="Sections du tableau de bord"
-        className="flex overflow-x-auto scrollbar-hide gap-2 border-b border-white/5 pb-2">
+        className="flex overflow-x-auto scrollbar-hide gap-2 border-b border-ss-text/5 pb-2">
         {TABS.map(t => {
           const Icon = t.icon
           const active = activeTab === t.id
@@ -194,10 +194,10 @@ export default function AdminDashboard() {
               role="tab"
               aria-selected={active}
               onClick={() => setActiveTab(t.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ss-info focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617] ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ss-info focus-visible:ring-offset-2 focus-visible:ring-offset-ss-bg ${
                 active
                   ? 'bg-ss-info text-[#020617] shadow-[0_0_15px_rgba(56,189,248,0.3)]'
-                  : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white'
+                  : 'bg-ss-text/5 text-ss-text/60 hover:bg-ss-text/10 hover:text-ss-text'
               }`}
             >
               <Icon size={16} />
@@ -224,7 +224,7 @@ export default function AdminDashboard() {
                   { classe: 'Tle S', note: '13.8/20', desc: 'Examens blancs en cours' },
                   { classe: '4ème B', note: '13.5/20', desc: 'Progression stable' },
                 ].map((c, i) => (
-                  <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
+                  <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-ss-text/5 border border-ss-text/5">
                     <div className="flex flex-col min-w-0">
                       <span className="font-bold text-ss-text text-sm truncate">{i+1}. {c.classe}</span>
                       <span className="text-xs text-ss-text-muted truncate">{c.desc}</span>
@@ -297,7 +297,7 @@ export default function AdminDashboard() {
                   Préparez et générez automatiquement les bulletins formatés selon les standards du Ministère.
                 </p>
                 <Link href="/admin/export"
-                  className="bg-ss-info text-[#020617] px-6 py-2 rounded-xl font-bold text-sm cursor-pointer transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ss-info focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617]">
+                  className="bg-ss-info text-[#020617] px-6 py-2 rounded-xl font-bold text-sm cursor-pointer transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ss-info focus-visible:ring-offset-2 focus-visible:ring-offset-ss-bg">
                   Générer les bulletins
                 </Link>
               </div>
@@ -327,7 +327,7 @@ export default function AdminDashboard() {
                   {data.activiteRecente.filter(a => a.color === 'green').map((item, i) => {
                     const c = alertColors[item.color] || alertColors.cyan
                     return (
-                      <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-white/5">
+                      <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-ss-text/5">
                         <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
                           style={{ background: c.bg, border: `1px solid ${c.border}` }}>
                           <CreditCard size={16} style={{ color: c.color }} />
@@ -341,7 +341,7 @@ export default function AdminDashboard() {
                   })}
                 </div>
               )}
-              <div className="mt-4 pt-3 border-t border-white/10 text-center">
+              <div className="mt-4 pt-3 border-t border-ss-text/10 text-center">
                 <Link href="/intendant/paiements" className="text-sm text-ss-info hover:underline">
                   Gérer les recouvrements (Intendant) →
                 </Link>
@@ -360,13 +360,13 @@ export default function AdminDashboard() {
                 <span className="text-5xl font-black text-ss-text leading-none">{profsPointes}</span>
                 <span className="text-2xl text-ss-text-muted mb-1">/ {data.totalProfs}</span>
               </div>
-              <div className="w-full h-2 rounded-full mb-2" style={{ background: 'rgba(255,255,255,0.05)' }}>
+              <div className="w-full h-2 rounded-full mb-2" style={{ background: 'var(--ss-glass-card-hover)' }}>
                 <div className="h-2 rounded-full transition-all duration-700"
                   style={{ width: `${presencePct}%`, background: 'linear-gradient(90deg, #00853F, #22C55E)', boxShadow: '0 0 10px rgba(34,197,94,0.4)' }} />
               </div>
               <p className="text-xs text-ss-text-muted">{presencePct}% présents aujourd&apos;hui</p>
 
-              <div className="mt-4 pt-4 grid grid-cols-3 gap-2" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+              <div className="mt-4 pt-4 grid grid-cols-3 gap-2" style={{ borderTop: '1px solid var(--ss-border)' }}>
                 {[
                   { label: "À l'heure", value: profsPointes },
                   { label: 'Absents', value: data.totalProfs - profsPointes },
@@ -411,7 +411,7 @@ export default function AdminDashboard() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="rounded-2xl p-5 flex items-center gap-4 bg-white/5 border border-white/10">
+            <div className="rounded-2xl p-5 flex items-center gap-4 bg-ss-text/5 border border-ss-text/10">
               <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
                 style={{ background: 'rgba(56,189,248,0.12)', border: '1px solid rgba(56,189,248,0.25)' }}>
                 <Users size={20} className="text-ss-info" />
@@ -421,7 +421,7 @@ export default function AdminDashboard() {
                 <p className="text-sm text-ss-text-muted">{data.totalEleves} élèves actifs</p>
               </div>
             </div>
-            <div className="rounded-2xl p-5 flex items-center gap-4 bg-white/5 border border-white/10">
+            <div className="rounded-2xl p-5 flex items-center gap-4 bg-ss-text/5 border border-ss-text/10">
               <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
                 style={{ background: 'rgba(251,191,36,0.12)', border: '1px solid rgba(251,191,36,0.25)' }}>
                 <UtensilsCrossed size={20} className="text-ss-warn" />
@@ -444,7 +444,7 @@ export default function AdminDashboard() {
               <Link
                 key={a.href}
                 href={a.href}
-                className="flex flex-col items-center gap-2 p-4 rounded-xl text-center transition-all duration-200 cursor-pointer hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617]"
+                className="flex flex-col items-center gap-2 p-4 rounded-xl text-center transition-all duration-200 cursor-pointer hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-ss-bg"
                 style={{ background: `${a.color}12`, border: `1px solid ${a.color}25` }}
               >
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center"

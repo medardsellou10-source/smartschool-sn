@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -14,7 +14,7 @@ type Examen = typeof DEMO_EXAMENS[0]
 const STATUT_STYLE: Record<string, { bg: string; color: string; label: string }> = {
   en_cours:  { bg: 'rgba(0,230,118,0.15)',   color: '#22C55E', label: 'En cours' },
   planifie:  { bg: `rgba(61,90,254,0.15)`,    color: ACCENT,    label: 'Planifié' },
-  termine:   { bg: 'rgba(100,116,139,0.15)',  color: '#64748B', label: 'Terminé' },
+  termine:   { bg: 'rgba(100,116,139,0.15)',  color: 'var(--ss-text-muted)', label: 'Terminé' },
 }
 
 const TYPE_ICON: Record<string, string> = { bfem: '🎓', bac: '🏆', composition: '📋' }
@@ -50,13 +50,13 @@ export default function ExamensPage() {
 
   const filtered = filtre === 'tous' ? examens : examens.filter(e => e.statut === filtre)
 
-  if (userLoading || loading) return <div className="p-6 animate-pulse space-y-4">{[...Array(5)].map((_, i) => <div key={i} className="h-20 rounded-xl bg-white/5" />)}</div>
+  if (userLoading || loading) return <div className="p-6 animate-pulse space-y-4">{[...Array(5)].map((_, i) => <div key={i} className="h-20 rounded-xl bg-ss-text/5" />)}</div>
 
   return (
     <div className="space-y-6 pb-24 lg:pb-6 animate-fade-in">
       {toast && (
-        <div className="fixed top-4 right-4 z-50 px-5 py-3 rounded-2xl text-sm font-semibold text-white shadow-xl flex items-center gap-2"
-          style={{ background: 'rgba(2,6,23,0.96)', border: `1px solid ${ACCENT}60`, backdropFilter: 'blur(24px)', maxWidth: '340px' }}>
+        <div className="fixed top-4 right-4 z-50 px-5 py-3 rounded-2xl text-sm font-semibold text-ss-text shadow-xl flex items-center gap-2"
+          style={{ background: 'var(--ss-surface-elevated)', border: `1px solid ${ACCENT}60`, backdropFilter: 'blur(24px)', maxWidth: '340px' }}>
           <Info size={16} style={{ color: ACCENT }} aria-hidden="true" /> {toast}
         </div>
       )}
@@ -66,7 +66,7 @@ export default function ExamensPage() {
         icon={FileCheck2}
         accent="purple"
         actions={
-          <button className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white min-h-[40px]"
+          <button className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-ss-text min-h-[40px]"
             style={{ background: ACCENT }}
             onClick={() => showToast('Mode démo — Planification d\'examen disponible avec la base de données.')}>
             <Plus size={16} /> Planifier examen
@@ -79,7 +79,7 @@ export default function ExamensPage() {
         {(['tous', 'en_cours', 'planifie', 'termine'] as const).map(f => (
           <button key={f} onClick={() => setFiltre(f)}
             className="px-4 py-2 rounded-xl text-sm font-semibold transition-all"
-            style={filtre === f ? { background: ACCENT, color: 'white' } : { background: 'rgba(255,255,255,0.05)', color: '#94A3B8', border: '1px solid rgba(255,255,255,0.1)' }}>
+            style={filtre === f ? { background: ACCENT, color: 'white' } : { background: 'var(--ss-glass-card-bg)', color: 'var(--ss-text-muted)', border: '1px solid var(--ss-glass-border)' }}>
             {f === 'tous' ? 'Tous' : f === 'en_cours' ? '🟢 En cours' : f === 'planifie' ? '🔵 Planifiés' : '⬛ Terminés'}
           </button>
         ))}
@@ -91,7 +91,7 @@ export default function ExamensPage() {
           const s = STATUT_STYLE[exam.statut] || STATUT_STYLE.planifie
           return (
             <div key={exam.id} className="rounded-2xl p-5"
-              style={{ background: 'rgba(2,6,23,0.82)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: `1px solid ${s.color}35` }}>
+              style={{ background: 'var(--ss-surface-elevated)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: `1px solid ${s.color}35` }}>
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0"
@@ -99,11 +99,11 @@ export default function ExamensPage() {
                     {TYPE_ICON[exam.type] || '📋'}
                   </div>
                   <div>
-                    <h3 className="text-base font-bold text-white">{exam.titre}</h3>
-                    <p className="text-sm text-slate-300 mt-1">
+                    <h3 className="text-base font-bold text-ss-text">{exam.titre}</h3>
+                    <p className="text-sm text-ss-text-secondary mt-1">
                       {new Date(exam.date_debut).toLocaleDateString('fr-FR')} → {new Date(exam.date_fin).toLocaleDateString('fr-FR')}
                     </p>
-                    <p className="text-sm text-slate-400 mt-0.5">{exam.salle}</p>
+                    <p className="text-sm text-ss-text-muted mt-0.5">{exam.salle}</p>
                     <div className="flex gap-1 flex-wrap mt-2">
                       {exam.classes.map(c => (
                         <span key={c} className="px-2 py-0.5 rounded-md text-xs font-semibold"

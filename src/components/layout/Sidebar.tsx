@@ -60,6 +60,15 @@ const MENUS: Record<string, NavItem[]> = {
     { href: '/admin/classes', label: 'Classes', icon: Icons.school },
     { href: '/admin/emplois-temps', label: 'Emplois du temps', icon: Icons.calendar },
     { href: '/admin/cartes', label: 'Cartes scolaires', icon: Icons.card },
+    { href: '/admin/parents/welcome', label: 'Fiche accueil parent', icon: Icons.users },
+    { href: '/admin/acces-rang', label: 'Annuaire (rang)', icon: Icons.users },
+    { href: '/admin/audit', label: 'Audit Trail', icon: Icons.shield },
+    { href: '/admin/notifications-config', label: 'Notifications (config)', icon: Icons.bell },
+    { href: '/admin/coges', label: 'COGES / APE 🇨🇮', icon: Icons.building },
+    { href: '/admin/programme', label: 'Programme scolaire', icon: Icons.book },
+    { href: '/admin/export-officiel', label: 'Bulletins / Export ministère', icon: Icons.file },
+    { href: '/admin/superadmin', label: 'SuperAdmin WAED 🌍', icon: Icons.chart },
+    { href: '/admin/waed-status', label: 'Statut déploiement WAED', icon: Icons.checkSquare },
     { href: '/admin/relances', label: 'Relances', icon: Icons.bell },
     { href: '/admin/transport', label: 'Transport', icon: Icons.bus },
     { href: '/admin/cantine', label: 'Cantine', icon: Icons.food },
@@ -74,6 +83,7 @@ const MENUS: Record<string, NavItem[]> = {
   professeur: [
     { href: '/professeur', label: 'Accueil', icon: Icons.home },
     { href: '/professeur/appel', label: "Faire l'appel", icon: Icons.clipboard },
+    { href: '/professeur/emploi-temps', label: 'Mon emploi du temps', icon: Icons.calendar },
     { href: '/professeur/pointage', label: 'Mon pointage', icon: Icons.mappin },
     { href: '/professeur/notes', label: 'Notes', icon: Icons.pencil },
     { href: '/professeur/correction-ia', label: 'Pré-analyse IA', icon: Icons.robot },
@@ -81,11 +91,13 @@ const MENUS: Record<string, NavItem[]> = {
     { href: '/professeur/support-pedagogique', label: 'Support Pédagogique', icon: Icons.calendar },
     { href: '/professeur/messages', label: 'Messagerie', icon: Icons.message },
     { href: '/professeur/elearning', label: 'E-Learning', icon: Icons.monitor },
-    { href: '/professeur/hub', label: 'Hub Vidéo', icon: Icons.book },
   ],
   surveillant: [
     { href: '/surveillant', label: 'Accueil', icon: Icons.home },
     { href: '/surveillant/absences', label: 'Absences', icon: Icons.clipboard },
+    { href: '/surveillant/justificatifs', label: 'Justificatifs', icon: Icons.checkSquare },
+    { href: '/surveillant/activites', label: 'Activités', icon: Icons.calendar },
+    { href: '/surveillant/emploi-temps', label: 'EDT classes', icon: Icons.calendar },
     { href: '/surveillant/statistiques', label: 'Statistiques', icon: Icons.chart },
     { href: '/surveillant/export', label: 'Export rapports', icon: Icons.export },
   ],
@@ -95,6 +107,7 @@ const MENUS: Record<string, NavItem[]> = {
     { href: '/parent/absences', label: 'Absences', icon: Icons.clipboard },
     { href: '/parent/paiement', label: 'Paiement', icon: Icons.payment },
     { href: '/parent/messages', label: 'Messages', icon: Icons.message },
+    { href: '/parent/activites', label: 'Activités', icon: Icons.calendar },
     { href: '/parent/transport', label: 'Transport', icon: Icons.bus },
     { href: '/parent/cantine', label: 'Cantine', icon: Icons.food },
   ],
@@ -102,11 +115,11 @@ const MENUS: Record<string, NavItem[]> = {
     { href: '/eleve', label: 'Mon espace', icon: Icons.trophy },
     { href: '/eleve/notes', label: 'Mes Notes & Classements', icon: Icons.chart },
     { href: '/eleve/bulletins', label: 'Bulletins', icon: Icons.file },
-    { href: '/eleve/emploi-temps', label: 'Emploi du temps', icon: Icons.calendar },
+    { href: '/eleve/emploi-temps', label: 'Emploi du temps (semaine)', icon: Icons.calendar },
+    { href: '/eleve/edt-mobile', label: 'Emploi du temps (jour)', icon: Icons.calendar },
     { href: '/eleve/cahier-texte', label: 'Cahier de texte', icon: Icons.book },
     { href: '/eleve/ressources', label: 'Ressources & Annales', icon: Icons.teacher },
     { href: '/eleve/elearning', label: 'E-Learning', icon: Icons.monitor },
-    { href: '/eleve/hub', label: 'Hub Vidéo', icon: Icons.book },
   ],
   secretaire: [
     { href: '/secretaire',              label: 'Accueil',      icon: Icons.home },
@@ -116,14 +129,17 @@ const MENUS: Record<string, NavItem[]> = {
     { href: '/secretaire/courrier',     label: 'Courrier',     icon: Icons.inbox },
   ],
   intendant: [
-    { href: '/intendant',              label: 'Accueil',    icon: Icons.home },
-    { href: '/intendant/budget',       label: 'Budget',     icon: Icons.trending },
-    { href: '/intendant/paiements',    label: 'Paiements',  icon: Icons.money },
+    { href: '/intendant',                  label: 'Accueil',           icon: Icons.home },
+    { href: '/intendant/moteur-financier', label: 'Moteur Financier',  icon: Icons.trending },
+    { href: '/intendant/budget',           label: 'Budget',            icon: Icons.trending },
+    { href: '/intendant/paiements',        label: 'Paiements',         icon: Icons.money },
     { href: '/intendant/cantine',      label: 'Cantine',    icon: Icons.food },
     { href: '/intendant/inventaire',   label: 'Inventaire', icon: Icons.database },
   ],
   censeur: [
     { href: '/censeur',               label: 'Accueil',          icon: Icons.home },
+    { href: '/censeur/pilotage',      label: 'Pilotage école',   icon: Icons.chart },
+    { href: '/censeur/activites',     label: 'Activités (validation)', icon: Icons.checkSquare },
     { href: '/censeur/professeurs',   label: 'Pointage profs',   icon: Icons.teacher },
     { href: '/censeur/emplois-temps', label: 'Emplois du temps', icon: Icons.calendar },
     { href: '/censeur/examens',       label: 'Examens',          icon: Icons.clipboard },
@@ -151,8 +167,8 @@ export function Sidebar() {
   return (
     <aside className="hidden lg:flex flex-col w-60 shrink-0 relative"
       style={{
-        background: 'rgba(11,17,32,0.95)',
-        borderRight: '1px solid rgba(255,255,255,0.06)',
+        background: 'var(--ss-glass-dark-bg)',
+        borderRight: '1px solid var(--ss-border)',
         backdropFilter: 'blur(20px)',
       }}>
 
@@ -161,7 +177,7 @@ export function Sidebar() {
         style={{ background: `radial-gradient(circle, ${accentColor}, transparent 70%)` }} />
 
       {/* Logo école */}
-      <div className="p-5" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+      <div className="p-5" style={{ borderBottom: '1px solid var(--ss-border)' }}>
         {/* Barre couleur école */}
         <div className="flex h-1 rounded-full overflow-hidden mb-4">
           <div className="flex-1 rounded-full" style={{ background: accentColor }} />
@@ -177,7 +193,7 @@ export function Sidebar() {
             )}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-bold text-white leading-none truncate">
+            <p className="text-sm font-bold text-ss-text leading-none truncate">
               {ecole?.nom || 'SmartSchool SN'}
             </p>
             <p className="text-[10px] font-medium mt-0.5 truncate" style={{ color: `${accentColor}99` }}>
@@ -199,8 +215,8 @@ export function Sidebar() {
               className={cn(
                 'relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group min-h-[44px]',
                 isActive
-                  ? 'text-white'
-                  : 'text-[#475569] hover:text-[#94A3B8]'
+                  ? 'text-ss-text'
+                  : 'text-ss-text-disabled hover:text-ss-text-secondary'
               )}
               style={isActive ? {
                 background: `${accentColor}18`,
@@ -215,7 +231,7 @@ export function Sidebar() {
                   style={{ background: accentColor, boxShadow: `0 0 8px ${accentColor}` }} />
               )}
               <span className={cn('transition-colors duration-200 shrink-0',
-                isActive ? '' : 'group-hover:text-[#94A3B8]')}
+                isActive ? '' : 'group-hover:text-ss-text-secondary')}
                 style={isActive ? { color: accentColor } : {}}>
                 {item.icon}
               </span>
@@ -232,20 +248,20 @@ export function Sidebar() {
       </nav>
 
       {/* Profil */}
-      <div className="p-3" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+      <div className="p-3" style={{ borderTop: '1px solid var(--ss-border)' }}>
         <div className="flex items-center gap-3 p-3 rounded-xl mb-2"
-          style={{ background: 'rgba(255,255,255,0.03)' }}>
+          style={{ background: 'var(--ss-glass-card-bg)' }}>
           <div className="relative w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0 overflow-hidden"
             style={{ background: `linear-gradient(135deg, ${accentColor}40, ${accentColor}20)`, border: `1.5px solid ${accentColor}50` }}>
             {user?.photo_url
               ? <img src={user.photo_url} alt="" className="w-full h-full object-cover" />
               : <span style={{ color: accentColor }}>{user ? getInitials(user.prenom, user.nom) : 'SS'}</span>
             }
-            <div className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-[#22C55E] border-2"
-              style={{ borderColor: '#0B1120' }} />
+            <div className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-ss-green border-2"
+              style={{ borderColor: 'var(--ss-bg-secondary)' }} />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold text-white truncate leading-tight">
+            <p className="text-sm font-semibold text-ss-text truncate leading-tight">
               {user ? `${user.prenom} ${user.nom}` : 'Démo'}
             </p>
             <p className="text-[11px] capitalize truncate" style={{ color: accentColor }}>

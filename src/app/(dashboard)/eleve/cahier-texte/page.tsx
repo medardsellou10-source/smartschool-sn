@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useEffect, useState, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -106,7 +106,7 @@ export default function EleveCahierTextePage() {
   const nbDevoirs = items.filter(i => i.type === 'devoir').length
 
   if (userLoading) {
-    return <div className="space-y-4">{[...Array(5)].map((_, i) => <div key={i} className="h-20 rounded-2xl ss-shimmer" style={{ background: 'rgba(255,255,255,0.03)' }} />)}</div>
+    return <div className="space-y-4">{[...Array(5)].map((_, i) => <div key={i} className="h-20 rounded-2xl ss-shimmer" style={{ background: 'var(--ss-glass-card-bg)' }} />)}</div>
   }
 
   return (
@@ -128,14 +128,14 @@ export default function EleveCahierTextePage() {
           <button key={f.key} onClick={() => setFiltre(f.key)}
             className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all"
             style={{
-              background: filtre === f.key ? 'rgba(213,0,249,0.12)' : 'rgba(255,255,255,0.04)',
-              color: filtre === f.key ? '#A78BFA' : '#94A3B8',
-              border: `1px solid ${filtre === f.key ? 'rgba(213,0,249,0.3)' : 'rgba(255,255,255,0.08)'}`,
+              background: filtre === f.key ? 'rgba(213,0,249,0.12)' : 'var(--ss-glass-card-bg)',
+              color: filtre === f.key ? '#A78BFA' : 'var(--ss-text-muted)',
+              border: `1px solid ${filtre === f.key ? 'rgba(213,0,249,0.3)' : 'var(--ss-glass-card-hover)'}`,
             }}>
             {f.label}
             <span className="text-[10px] px-1.5 py-0.5 rounded-full" style={{
-              background: filtre === f.key ? 'rgba(213,0,249,0.2)' : 'rgba(255,255,255,0.06)',
-              color: filtre === f.key ? '#A78BFA' : '#475569',
+              background: filtre === f.key ? 'rgba(213,0,249,0.2)' : 'var(--ss-glass-card-hover)',
+              color: filtre === f.key ? '#A78BFA' : 'var(--ss-text-disabled)',
             }}>{f.count}</span>
           </button>
         ))}
@@ -143,12 +143,12 @@ export default function EleveCahierTextePage() {
 
       {/* Content */}
       {loading ? (
-        <div className="space-y-3">{[...Array(6)].map((_, i) => <div key={i} className="h-20 rounded-xl ss-shimmer" style={{ background: 'rgba(255,255,255,0.03)' }} />)}</div>
+        <div className="space-y-3">{[...Array(6)].map((_, i) => <div key={i} className="h-20 rounded-xl ss-shimmer" style={{ background: 'var(--ss-glass-card-bg)' }} />)}</div>
       ) : filtered.length === 0 ? (
-        <div className="rounded-2xl p-10 text-center" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-          <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 text-3xl" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>📭</div>
-          <p className="text-white font-semibold">Aucune entree</p>
-          <p className="text-sm mt-1" style={{ color: '#94A3B8' }}>Le cahier de texte est vide</p>
+        <div className="rounded-2xl p-10 text-center" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
+          <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 text-3xl" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>📭</div>
+          <p className="text-ss-text font-semibold">Aucune entree</p>
+          <p className="text-sm mt-1" style={{ color: 'var(--ss-text-muted)' }}>Le cahier de texte est vide</p>
         </div>
       ) : (
         <div className="space-y-6">
@@ -156,10 +156,10 @@ export default function EleveCahierTextePage() {
             <div key={date}>
               {/* Date header */}
               <div className="flex items-center gap-3 mb-3">
-                <span className="text-xs font-bold uppercase tracking-wider" style={{ color: '#94A3B8' }}>
+                <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--ss-text-muted)' }}>
                   {new Date(date).toLocaleDateString('fr-SN', { weekday: 'long', day: 'numeric', month: 'long' })}
                 </span>
-                <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.06)' }} />
+                <div className="flex-1 h-px" style={{ background: 'var(--ss-glass-card-hover)' }} />
               </div>
 
               {/* Entries */}
@@ -173,9 +173,9 @@ export default function EleveCahierTextePage() {
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: `${color}15`, color }}>
                           {isDevoir ? 'Devoir' : 'Cours'}
                         </span>
-                        <span className="text-sm font-semibold text-white">{item.matiere_nom}</span>
+                        <span className="text-sm font-semibold text-ss-text">{item.matiere_nom}</span>
                       </div>
-                      <p className="text-sm leading-relaxed" style={{ color: '#94A3B8' }}>{item.contenu}</p>
+                      <p className="text-sm leading-relaxed" style={{ color: 'var(--ss-text-muted)' }}>{item.contenu}</p>
                     </div>
                   )
                 })}

@@ -406,9 +406,9 @@ export function getDemoRoleCookie(): string | null {
  * En production Supabase, renvoie false → aucun cookie démo n'est pris en compte.
  */
 export function isDemoAllowedClient(): boolean {
-  // Doit correspondre EXACTEMENT à `isDemoAllowed()` dans src/proxy.ts :
-  // le démo n'est actif QUE si Supabase n'est pas configuré. Aucun flag
-  // d'environnement ne peut réactiver le démo en production.
+  // DOIT correspondre EXACTEMENT à `isDemoAllowed()` dans src/proxy.ts :
+  // le démo est actif si NEXT_PUBLIC_DEMO_MODE=true OU si Supabase n'est pas configuré.
+  if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true') return true
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? ''
   const supabaseReady =

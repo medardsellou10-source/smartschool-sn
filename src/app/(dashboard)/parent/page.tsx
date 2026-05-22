@@ -1,9 +1,10 @@
-﻿'use client'
+'use client'
 
 import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { useOffline } from '@/hooks/useOffline'
+import { OnboardingFlow } from '@/components/parent/OnboardingFlow'
 import { formatFCFA } from '@/lib/utils'
 import { formatCFA, relativeTime, getInitials } from '@/lib/format'
 import Link from 'next/link'
@@ -21,10 +22,19 @@ interface DashboardData {
   presenceAujourdhui: boolean | null
 }
 
+const ONBOARDING_KEY = 'ss_demo_parent_onboarded_v1'
+
 export default function ParentDashboard() {
   const { user, loading: userLoading } = useUser()
   const { isOffline, lastSync, cacheData, getCachedData } = useOffline()
   const supabase = createClient()
+
+  // WAED #7 — Guard de première connexion
+  const [onboarded, setOnboarded] = useState<boolean | null>(null)
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    setOnboarded(window.localStorage.getItem(ONBOARDING_KEY) === '1')
+  }, [])
 
   const [enfants, setEnfants] = useState<Enfant[]>([])
   const [selectedEnfant, setSelectedEnfant] = useState<string>('')
@@ -118,11 +128,24 @@ export default function ParentDashboard() {
 
   const enfantActuel = enfants.find(e => e.id === selectedEnfant)
 
-  if (userLoading) {
+  if (userLoading || onboarded === null) {
     return (
       <div className="space-y-4">
-        {[...Array(4)].map((_, i) => <div key={i} className="h-24 rounded-2xl ss-shimmer" style={{ background: 'rgba(255,255,255,0.03)' }} />)}
+        {[...Array(4)].map((_, i) => <div key={i} className="h-24 rounded-2xl ss-shimmer" style={{ background: 'var(--ss-glass-card-bg)' }} />)}
       </div>
+    )
+  }
+
+  // WAED #7 — Wizard de première connexion
+  if (!onboarded) {
+    return (
+      <OnboardingFlow
+        parentPrenom={user?.prenom}
+        onComplete={() => {
+          if (typeof window !== 'undefined') window.localStorage.setItem(ONBOARDING_KEY, '1')
+          setOnboarded(true)
+        }}
+      />
     )
   }
 
@@ -148,7 +171,7 @@ export default function ParentDashboard() {
             <button
               onClick={() => setGradeAlert(null)}
               aria-label="Fermer la notification"
-              className="shrink-0 w-7 h-7 flex items-center justify-center rounded-full text-sm font-bold transition-colors hover:bg-white/10"
+              className="shrink-0 w-7 h-7 flex items-center justify-center rounded-full text-sm font-bold transition-colors hover:bg-ss-text/10"
               style={{ color: '#22C55E' }}
             >
               ×
@@ -164,7 +187,7 @@ export default function ParentDashboard() {
           <span className="text-xl">📵</span>
           <div>
             <p className="text-sm font-bold" style={{ color: '#FBBF24' }}>Mode hors-ligne</p>
-            <p className="text-xs" style={{ color: '#475569' }}>
+            <p className="text-xs" style={{ color: 'var(--ss-text-disabled)' }}>
               Données {lastSync ? relativeTime(lastSync) : 'jamais synchronisé'}
             </p>
           </div>
@@ -178,19 +201,19 @@ export default function ParentDashboard() {
           backdropFilter: 'blur(16px)',
           WebkitBackdropFilter: 'blur(16px)',
           border: '1px solid rgba(0, 229, 255, 0.15)',
-          boxShadow: '0 4px 32px rgba(0, 229, 255, 0.08), inset 0 1px 0 rgba(255,255,255,0.05)',
+          boxShadow: '0 4px 32px rgba(0, 229, 255, 0.08), inset 0 1px 0 var(--ss-glass-card-bg)',
         }}>
         {/* Lueur cyan en haut à droite */}
         <div className="absolute top-0 right-0 w-32 h-32 rounded-full opacity-20 pointer-events-none"
           style={{ background: 'radial-gradient(circle, #38BDF8 0%, transparent 70%)', filter: 'blur(20px)' }} />
-        <span className="text-xs font-bold tracking-widest uppercase text-[#94A3B8]">
+        <span className="text-xs font-bold tracking-widest uppercase text-ss-text-secondary">
           ✦ Espace Parent
         </span>
-        <h1 className="text-2xl font-black text-white mt-1"
+        <h1 className="text-2xl font-black text-ss-text mt-1"
           style={{ textShadow: '0 2px 12px rgba(0,0,0,0.5)' }}>
           Bonjour, {user?.prenom} 👋
         </h1>
-        <p className="text-xs mt-1" style={{ color: 'rgba(148,163,184,0.8)' }}>
+        <p className="text-xs mt-1" style={{ color: 'var(--ss-text-secondary)' }}>
           Suivi scolaire en temps réel
         </p>
       </div>
@@ -202,9 +225,9 @@ export default function ParentDashboard() {
             <button key={e.id} onClick={() => setSelectedEnfant(e.id)}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all min-h-[44px]"
               style={{
-                background: selectedEnfant === e.id ? 'rgba(0,229,255,0.12)' : 'rgba(255,255,255,0.04)',
-                border: `1px solid ${selectedEnfant === e.id ? 'rgba(0,229,255,0.4)' : 'rgba(255,255,255,0.08)'}`,
-                color: selectedEnfant === e.id ? '#38BDF8' : '#94A3B8',
+                background: selectedEnfant === e.id ? 'rgba(0,229,255,0.12)' : 'var(--ss-glass-card-bg)',
+                border: `1px solid ${selectedEnfant === e.id ? 'rgba(0,229,255,0.4)' : 'var(--ss-border)'}`,
+                color: selectedEnfant === e.id ? '#38BDF8' : 'var(--ss-text-secondary)',
               }}>
               <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
                 style={{ background: 'rgba(0,229,255,0.2)', color: '#38BDF8' }}>
@@ -220,7 +243,7 @@ export default function ParentDashboard() {
       {enfantActuel && (
         <div className="flex items-center gap-4 p-4 rounded-2xl"
           style={{
-            background: 'rgba(2, 6, 23, 0.55)',
+            background: 'var(--ss-glass-dark-bg)',
             backdropFilter: 'blur(16px)',
             WebkitBackdropFilter: 'blur(16px)',
             border: '1px solid rgba(0,229,255,0.12)',
@@ -231,8 +254,8 @@ export default function ParentDashboard() {
             {getInitials(enfantActuel.prenom, enfantActuel.nom)}
           </div>
           <div className="flex-1 min-w-0">
-            <h2 className="text-base font-black text-white truncate">{enfantActuel.prenom} {enfantActuel.nom}</h2>
-            <p className="text-sm" style={{ color: '#94A3B8' }}>{enfantActuel.classe_nom}</p>
+            <h2 className="text-base font-black text-ss-text truncate">{enfantActuel.prenom} {enfantActuel.nom}</h2>
+            <p className="text-sm" style={{ color: 'var(--ss-text-secondary)' }}>{enfantActuel.classe_nom}</p>
           </div>
           {data?.presenceAujourdhui !== null && (
             <div className="shrink-0 flex flex-col items-center gap-1">
@@ -252,7 +275,7 @@ export default function ParentDashboard() {
       {/* Tuiles de données */}
       {loading ? (
         <div className="grid grid-cols-2 gap-3">
-          {[...Array(4)].map((_, i) => <div key={i} className="h-28 rounded-2xl ss-shimmer" style={{ background: 'rgba(255,255,255,0.03)' }} />)}
+          {[...Array(4)].map((_, i) => <div key={i} className="h-28 rounded-2xl ss-shimmer" style={{ background: 'var(--ss-glass-card-bg)' }} />)}
         </div>
       ) : data && (
         <div className="grid grid-cols-2 gap-3">
@@ -267,10 +290,10 @@ export default function ParentDashboard() {
               boxShadow: `0 4px 20px ${data.derniereMoyenne !== null && data.derniereMoyenne >= 10 ? 'rgba(0,230,118,0.08)' : 'rgba(255,23,68,0.08)'}`,
             }}>
             <span className="text-2xl mb-2">📊</span>
-            <p className="text-2xl font-black text-white">
+            <p className="text-2xl font-black text-ss-text">
               {data.derniereMoyenne !== null ? `${data.derniereMoyenne.toFixed(1)}/20` : '—'}
             </p>
-            <p className="text-xs mt-1 font-medium" style={{ color: 'rgba(148,163,184,0.9)' }}>Moyenne générale</p>
+            <p className="text-xs mt-1 font-medium" style={{ color: 'var(--ss-text-secondary)' }}>Moyenne générale</p>
           </Link>
 
           {/* Absences */}
@@ -284,8 +307,8 @@ export default function ParentDashboard() {
               boxShadow: `0 4px 20px ${data.absencesMois > 0 ? 'rgba(255,23,68,0.08)' : 'rgba(0,230,118,0.08)'}`,
             }}>
             <span className="text-2xl mb-2">📅</span>
-            <p className="text-2xl font-black text-white">{data.absencesMois}</p>
-            <p className="text-xs mt-1 font-medium" style={{ color: 'rgba(148,163,184,0.9)' }}>Absences ce mois</p>
+            <p className="text-2xl font-black text-ss-text">{data.absencesMois}</p>
+            <p className="text-xs mt-1 font-medium" style={{ color: 'var(--ss-text-secondary)' }}>Absences ce mois</p>
           </Link>
 
           {/* Paiement */}
@@ -301,13 +324,13 @@ export default function ParentDashboard() {
             <span className="text-2xl mb-2">💳</span>
             {data.soldeDu > 0 ? (
               <>
-                <p className="text-xl font-black leading-tight text-white">{formatFCFA(data.soldeDu)}</p>
-                <p className="text-xs mt-1" style={{ color: '#94A3B8' }}>{data.factuteEnRetard ? '⚠ En retard !' : 'Solde dû'}</p>
+                <p className="text-xl font-black leading-tight text-ss-text">{formatFCFA(data.soldeDu)}</p>
+                <p className="text-xs mt-1" style={{ color: 'var(--ss-text-secondary)' }}>{data.factuteEnRetard ? '⚠ En retard !' : 'Solde dû'}</p>
               </>
             ) : (
               <>
-                <p className="text-xl font-black text-white">À jour ✓</p>
-                <p className="text-xs mt-1" style={{ color: '#475569' }}>Tout est à jour</p>
+                <p className="text-xl font-black text-ss-text">À jour ✓</p>
+                <p className="text-xs mt-1" style={{ color: 'var(--ss-text-disabled)' }}>Tout est à jour</p>
               </>
             )}
           </Link>
@@ -323,10 +346,10 @@ export default function ParentDashboard() {
               boxShadow: '0 4px 20px rgba(167,139,250,0.08)',
             }}>
             <span className="text-2xl mb-2">💬</span>
-            <p className="text-2xl font-black text-white">{data.messagesNonLus}</p>
-            <p className="text-xs mt-1" style={{ color: '#475569' }}>Messages non lus</p>
+            <p className="text-2xl font-black text-ss-text">{data.messagesNonLus}</p>
+            <p className="text-xs mt-1" style={{ color: 'var(--ss-text-disabled)' }}>Messages non lus</p>
             {data.messagesNonLus > 0 && (
-              <span className="absolute top-3 right-3 w-5 h-5 text-white text-[9px] font-black rounded-full flex items-center justify-center"
+              <span className="absolute top-3 right-3 w-5 h-5 text-ss-text text-[9px] font-black rounded-full flex items-center justify-center"
                 style={{ background: '#F87171', boxShadow: '0 0 8px rgba(255,23,68,0.8)' }}>
                 {data.messagesNonLus > 9 ? '9+' : data.messagesNonLus}
               </span>
@@ -339,29 +362,29 @@ export default function ParentDashboard() {
       {data && data.activites.length > 0 && (
         <div className="rounded-2xl p-5"
           style={{
-            background: 'rgba(2, 6, 23, 0.50)',
+            background: 'var(--ss-bg-card)',
             backdropFilter: 'blur(18px)',
             WebkitBackdropFilter: 'blur(18px)',
             border: '1px solid rgba(0, 229, 255, 0.10)',
             boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
           }}>
-          <h3 className="text-xs font-bold tracking-widest uppercase mb-4 text-[#94A3B8]">
+          <h3 className="text-xs font-bold tracking-widest uppercase mb-4 text-ss-text-secondary">
             ✦ Activité récente
           </h3>
           <div className="space-y-3">
             {data.activites.map(a => {
               const typeColors: Record<string, string> = { note: '#38BDF8', absence: '#F87171', paiement: '#22C55E', message: '#A78BFA' }
               const typeIcons: Record<string, string> = { note: '📝', absence: '🔴', paiement: '💳', message: '💬' }
-              const color = typeColors[a.type] || '#94A3B8'
+              const color = typeColors[a.type] || 'var(--ss-text-muted)'
               return (
                 <div key={a.id} className="flex items-center gap-3 p-3 rounded-xl"
                   style={{ background: `${color}08`, border: `1px solid ${color}20` }}>
                   <span className="text-lg shrink-0">{typeIcons[a.type]}</span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-white truncate">{a.titre}</p>
-                    {a.detail && <p className="text-xs truncate" style={{ color: '#475569' }}>{a.detail}</p>}
+                    <p className="text-sm font-semibold text-ss-text truncate">{a.titre}</p>
+                    {a.detail && <p className="text-xs truncate" style={{ color: 'var(--ss-text-disabled)' }}>{a.detail}</p>}
                   </div>
-                  <span className="text-xs shrink-0" style={{ color: '#475569' }}>
+                  <span className="text-xs shrink-0" style={{ color: 'var(--ss-text-disabled)' }}>
                     {new Date(a.date).toLocaleDateString('fr-SN', { day: 'numeric', month: 'short' })}
                   </span>
                 </div>

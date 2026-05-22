@@ -1,387 +1,202 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import { useUser } from '@/hooks/useUser'
-import { isDemoMode, DEMO_ELEVES, DEMO_CLASSES } from '@/lib/demo-data'
+/**
+ * WAED #6 — Page éditeur de cartes scolaires (Directeur).
+ *  - 4 onglets de vues commutables (Standard / Compacte / Numérique / A4)
+ *  - Preview live à gauche · contrôles couleurs / champs / mention à droite
+ *  - Sauvegarde par template (localStorage en démo)
+ */
+
+import { useEffect, useMemo, useState } from 'react'
+import { CreditCard, Save, RotateCcw, Printer } from 'lucide-react'
 import { PageHeader } from '@/components/dashboard/PageHeader'
-import { CreditCard, Printer, Settings as SettingsIcon } from 'lucide-react'
+import { useUser } from '@/hooks/useUser'
+import { Cartes, type CarteConfig, type TypeVue } from '@/lib/demo/cartes-store'
+import { CarteScolaire, type EleveCarte, type EcoleCarte } from '@/components/carte/CarteScolaire'
 
-interface Eleve {
-  id: string
-  nom: string
-  prenom: string
-  matricule: string
-  date_naissance: string
-  classe_id: string
-  classe_nom?: string
-  classe_niveau?: string
-  photo_url?: string | null
+const TYPE_LABELS: Record<TypeVue, { label: string; sub: string }> = {
+  standard:      { label: 'CR80 Standard',  sub: '85.6 × 53.98 mm — physique' },
+  compacte:      { label: 'Compacte',       sub: '40 × 80 mm — bracelet' },
+  numerique:     { label: 'Numérique',      sub: 'Apple / Google Wallet' },
+  imprimable_a4: { label: 'Imprimable A4',  sub: '8 cartes / page' },
 }
 
-interface Classe {
-  id: string
-  nom: string
-  niveau: string
+const FIELD_OPTIONS = [
+  { id: 'nom',              label: 'Nom' },
+  { id: 'prenom',           label: 'Prénom' },
+  { id: 'matricule',        label: 'Matricule' },
+  { id: 'classe',           label: 'Classe' },
+  { id: 'annee',            label: 'Année scolaire' },
+  { id: 'photo',            label: 'Photo' },
+  { id: 'telephone_parent', label: 'Téléphone parent' },
+  { id: 'qr_code',          label: 'QR code' },
+  { id: 'mention_legale',   label: 'Mention légale' },
+] as const
+
+const SAMPLE_ELEVE: EleveCarte = {
+  id: 'demo-001',
+  nom: 'Diallo',
+  prenom: 'Awa',
+  matricule: 'LYCE-001-6E-2026-0001',
+  classe: '6e A',
+  annee: '2025-2026',
+  telephone_parent: '+221 77 123 45 67',
 }
 
-interface Ecole {
-  id: string
-  nom: string
-  ville: string
-}
-
-// Couleurs pour les avatars
-const AVATAR_COLORS = [
-  'bg-blue-600', 'bg-emerald-600', 'bg-violet-600', 'bg-amber-600',
-  'bg-rose-600', 'bg-cyan-600', 'bg-indigo-600', 'bg-teal-600',
-  'bg-orange-600', 'bg-pink-600',
-]
-
-function getAvatarColor(id: string) {
-  let hash = 0
-  for (let i = 0; i < id.length; i++) hash = id.charCodeAt(i) + ((hash << 5) - hash)
-  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length]
-}
-
-function buildQrUrl(data: object) {
-  const json = JSON.stringify(data)
-  return `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(json)}`
-}
-
-export default function CartesScolairesPage() {
-  const { user, loading: userLoading } = useUser()
-  const [eleves, setEleves] = useState<Eleve[]>([])
-  const [classes, setClasses] = useState<Classe[]>([])
-  const [ecole, setEcole] = useState<Ecole | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [selectedClasse, setSelectedClasse] = useState<string>('')
-  const [search, setSearch] = useState('')
-  const [generated, setGenerated] = useState(false)
-
-  const ecoleId = user?.ecole_id
-
-  const loadData = useCallback(async () => {
-    if (!ecoleId) return
-    setLoading(true)
-
-    if (isDemoMode()) {
-      const demoClasses = DEMO_CLASSES.map(c => ({ id: c.id, nom: c.nom, niveau: c.niveau }))
-      const demoEleves: Eleve[] = DEMO_ELEVES.map(e => {
-        const cl = DEMO_CLASSES.find(c => c.id === e.classe_id)
-        return {
-          id: e.id,
-          nom: e.nom,
-          prenom: e.prenom,
-          matricule: e.matricule,
-          date_naissance: e.date_naissance,
-          classe_id: e.classe_id,
-          classe_nom: cl ? cl.nom : '',
-          classe_niveau: cl ? cl.niveau : '',
-          photo_url: null,
-        }
-      })
-      setClasses(demoClasses)
-      setEleves(demoEleves)
-      setEcole({ id: 'ecole-demo-001', nom: 'Lycee Blaise Diagne', ville: 'Dakar' })
-      setLoading(false)
-      return
-    }
-
-    const supabase = createClient()
-    const [elevesRes, classesRes, ecoleRes] = await Promise.all([
-      (supabase.from('eleves') as any)
-        .select('id, nom, prenom, matricule, date_naissance, classe_id, photo_url, classes(nom, niveau)')
-        .eq('ecole_id', ecoleId)
-        .eq('actif', true)
-        .order('nom', { ascending: true }),
-      supabase
-        .from('classes')
-        .select('id, nom, niveau')
-        .eq('ecole_id', ecoleId)
-        .order('niveau', { ascending: true }),
-      (supabase.from('ecoles') as any)
-        .select('id, nom, ville')
-        .eq('id', ecoleId)
-        .single(),
-    ])
-
-    const rawEleves = (elevesRes.data || []) as any[]
-    setEleves(
-      rawEleves.map((e: any) => ({
-        id: e.id,
-        nom: e.nom,
-        prenom: e.prenom,
-        matricule: e.matricule,
-        date_naissance: e.date_naissance,
-        classe_id: e.classe_id,
-        classe_nom: e.classes?.nom ?? '',
-        classe_niveau: e.classes?.niveau ?? '',
-        photo_url: e.photo_url,
-      }))
-    )
-    setClasses((classesRes.data || []) as Classe[])
-    if (ecoleRes.data) {
-      setEcole(ecoleRes.data as Ecole)
-    }
-    setLoading(false)
-  }, [ecoleId])
+export default function AdminCartesPage() {
+  const { user, loading } = useUser()
+  const [active, setActive] = useState<TypeVue>('standard')
+  const [config, setConfig] = useState<CarteConfig | null>(null)
+  const [saved, setSaved] = useState<number | null>(null)
 
   useEffect(() => {
-    loadData()
-  }, [loadData])
+    if (!user) return
+    setConfig(Cartes.get(active))
+  }, [user, active])
 
-  // Filtrage
-  const filteredEleves = eleves.filter(e => {
-    const matchClasse = !selectedClasse || e.classe_id === selectedClasse
-    const matchSearch =
-      !search ||
-      `${e.prenom} ${e.nom}`.toLowerCase().includes(search.toLowerCase()) ||
-      e.matricule.toLowerCase().includes(search.toLowerCase())
-    return matchClasse && matchSearch
-  })
+  const ecole: EcoleCarte = useMemo(
+    () => ({ nom: 'Lycée Cheikh Anta Diop' }),
+    [],
+  )
 
-  const handlePrint = () => {
-    window.print()
+  if (loading || !config) {
+    return <div className="space-y-3">{[...Array(3)].map((_, i) => <div key={i} className="h-32 rounded-2xl bg-white/[0.03] ss-shimmer" />)}</div>
   }
 
-  const handleGenerateAll = () => {
-    setGenerated(true)
+  function update<K extends keyof CarteConfig>(key: K, value: CarteConfig[K]) {
+    setConfig(prev => (prev ? { ...prev, [key]: value } : prev))
   }
 
-  const ecoleNom = ecole?.nom ?? 'SmartSchool SN'
-
-  if (userLoading) {
-    return (
-      <div>
-        <div className="h-8 w-56 bg-ss-bg-secondary rounded-lg ss-shimmer mb-6" />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="h-64 bg-ss-bg-secondary rounded-xl ss-shimmer" />
-          ))}
-        </div>
-      </div>
-    )
+  function toggleField(field: 'champs_recto' | 'champs_verso', id: string) {
+    if (!config) return
+    const cur = config[field]
+    const next = cur.includes(id) ? cur.filter(f => f !== id) : [...cur, id]
+    update(field, next)
   }
-
-  if (!ecoleId) return null
 
   return (
-    <>
-      <div className="space-y-6">
-        <div className="no-print">
-          <PageHeader
-            title="Cartes Scolaires Numériques"
-            description="Génération et impression des cartes d'identité scolaire."
-            icon={CreditCard}
-            accent="info"
-            actions={
-              <>
-                <button
-                  onClick={handleGenerateAll}
-                  className="flex items-center gap-2 bg-ss-info text-[#020617] font-semibold text-sm px-4 py-2.5 rounded-xl hover:opacity-90 transition-opacity cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ss-info focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617]"
-                >
-                  <SettingsIcon size={16} />
-                  Générer toutes les cartes
-                </button>
-                <button
-                  onClick={handlePrint}
-                  className="flex items-center gap-2 bg-ss-green text-[#020617] font-semibold text-sm px-4 py-2.5 rounded-xl hover:opacity-90 transition-opacity cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ss-green focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617]"
-                >
-                  <Printer size={16} />
-                  Imprimer
-                </button>
-              </>
-            }
-          />
-        </div>
+    <div className="space-y-5">
+      <PageHeader
+        title="Cartes scolaires — Templates"
+        description="Configurez les 4 vues officielles de votre établissement. Aperçu en direct à gauche."
+        icon={CreditCard}
+        accent="info"
+      />
 
-        {/* Filtres */}
-        <div className="flex flex-col sm:flex-row gap-3 no-print">
-          <div className="flex-1">
-            <input
-              type="text"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="Rechercher un eleve (nom, prenom, matricule)..."
-              className="w-full bg-ss-bg-secondary border border-ss-border text-ss-text rounded-xl px-4 py-2.5 text-sm placeholder:text-ss-text-muted focus:outline-none focus:ring-2 focus:ring-ss-cyan/40"
-            />
-          </div>
-          <select
-            value={selectedClasse}
-            onChange={e => setSelectedClasse(e.target.value)}
-            className="bg-ss-bg-secondary border border-ss-border text-ss-text rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ss-cyan/40 min-w-[200px]"
+      {/* Onglets vues */}
+      <div className="flex flex-wrap gap-2">
+        {(Object.keys(TYPE_LABELS) as TypeVue[]).map(t => (
+          <button
+            key={t}
+            type="button"
+            onClick={() => setActive(t)}
+            className={[
+              'flex flex-col items-start rounded-xl border px-3 py-2 text-left transition-all',
+              active === t
+                ? 'border-cyan-400/50 bg-cyan-400/15'
+                : 'border-ss-text/10 bg-ss-text/5 hover:bg-ss-text/10',
+            ].join(' ')}
           >
-            <option value="">Toutes les classes</option>
-            {classes.map(c => (
-              <option key={c.id} value={c.id}>
-                {c.niveau} {c.nom}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Stats */}
-        <div className="no-print">
-          <p className="text-sm text-ss-text-muted">
-            {filteredEleves.length} carte{filteredEleves.length > 1 ? 's' : ''} a afficher
-            {selectedClasse && ` pour la classe selectionnee`}
-          </p>
-        </div>
-
-        {/* Grille des cartes */}
-        {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="h-64 bg-ss-bg-secondary rounded-xl ss-shimmer" />
-            ))}
-          </div>
-        ) : filteredEleves.length === 0 ? (
-          <div className="text-center py-16">
-            <p className="text-ss-text-muted text-lg">Aucun eleve trouve</p>
-            <p className="text-ss-text-muted text-sm mt-1">
-              Essayez de modifier vos filtres de recherche.
-            </p>
-          </div>
-        ) : (
-          <div className="print-area grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredEleves.map(eleve => (
-              <StudentCard
-                key={eleve.id}
-                eleve={eleve}
-                ecoleNom={ecoleNom}
-                ecoleId={ecoleId}
-                generated={generated}
-              />
-            ))}
-          </div>
-        )}
+            <span className="text-xs font-bold text-ss-text">{TYPE_LABELS[t].label}</span>
+            <span className="text-[10px] text-ss-text-secondary">{TYPE_LABELS[t].sub}</span>
+          </button>
+        ))}
       </div>
-    </>
+
+      <div className="grid gap-5 lg:grid-cols-[1fr_320px]">
+        <section className="glass-card flex min-h-[360px] items-center justify-center rounded-2xl border border-ss-text/10 bg-ss-text/5 p-6">
+          <CarteScolaire
+            eleve={SAMPLE_ELEVE}
+            ecole={ecole}
+            type_vue={active}
+            config={config}
+          />
+        </section>
+
+        <aside className="glass-card flex flex-col gap-4 rounded-2xl border border-ss-text/10 p-4">
+          <h2 className="text-sm font-bold uppercase tracking-wider text-ss-text-secondary">Couleurs</h2>
+          <ColorRow label="Fond"   value={config.couleur_fond}   onChange={v => update('couleur_fond', v)} />
+          <ColorRow label="Texte"  value={config.couleur_texte}  onChange={v => update('couleur_texte', v)} />
+          <ColorRow label="Accent" value={config.couleur_accent} onChange={v => update('couleur_accent', v)} />
+
+          <h2 className="text-sm font-bold uppercase tracking-wider text-ss-text-secondary mt-2">Champs au recto</h2>
+          <div className="grid grid-cols-2 gap-1.5">
+            {FIELD_OPTIONS.map(f => (
+              <label key={f.id} className="flex items-center gap-2 text-[11px] text-ss-text-secondary">
+                <input
+                  type="checkbox"
+                  checked={config.champs_recto.includes(f.id)}
+                  onChange={() => toggleField('champs_recto', f.id)}
+                />
+                {f.label}
+              </label>
+            ))}
+          </div>
+
+          <h2 className="text-sm font-bold uppercase tracking-wider text-ss-text-secondary mt-2">Mention légale</h2>
+          <textarea
+            rows={3}
+            value={config.mention_legale}
+            onChange={e => update('mention_legale', e.target.value)}
+            className="rounded-lg border border-ss-text/10 bg-ss-text/5 p-2 text-xs text-ss-text"
+          />
+
+          <div className="mt-2 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                Cartes.save(active, config)
+                setSaved(Date.now())
+              }}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-500 px-3 py-2 text-xs font-bold text-ss-text hover:bg-emerald-400"
+            >
+              <Save className="h-3.5 w-3.5" aria-hidden /> Sauvegarder
+            </button>
+            <button
+              type="button"
+              onClick={() => setConfig(Cartes.reset(active))}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-ss-text/10 bg-ss-text/5 px-3 py-2 text-xs font-bold text-ss-text-secondary hover:bg-ss-text/10"
+            >
+              <RotateCcw className="h-3.5 w-3.5" aria-hidden /> Réinitialiser
+            </button>
+            <button
+              type="button"
+              onClick={() => window.print()}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-ss-text/10 bg-ss-text/5 px-3 py-2 text-xs font-bold text-ss-text-secondary hover:bg-ss-text/10"
+            >
+              <Printer className="h-3.5 w-3.5" aria-hidden /> Imprimer
+            </button>
+          </div>
+
+          {saved && (
+            <p className="text-[11px] text-emerald-300">
+              ✓ Template <strong>{TYPE_LABELS[active].label}</strong> sauvegardé.
+            </p>
+          )}
+        </aside>
+      </div>
+    </div>
   )
 }
 
-/* ─── Composant Carte Scolaire ─── */
-
-function StudentCard({
-  eleve,
-  ecoleNom,
-  ecoleId,
-  generated,
-}: {
-  eleve: Eleve
-  ecoleNom: string
-  ecoleId: string
-  generated: boolean
-}) {
-  const initials = `${eleve.prenom[0] ?? ''}${eleve.nom[0] ?? ''}`.toUpperCase()
-  const avatarColor = getAvatarColor(eleve.id)
-  const classeLabel = eleve.classe_niveau
-    ? `${eleve.classe_niveau} ${eleve.classe_nom}`
-    : eleve.classe_nom ?? ''
-
-  const qrData = {
-    id: eleve.id,
-    matricule: eleve.matricule,
-    ecole: ecoleId,
-    nom: `${eleve.prenom} ${eleve.nom}`,
-  }
-  const qrUrl = buildQrUrl(qrData)
-
+function ColorRow({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
   return (
-    <div
-      className="student-card bg-white rounded-2xl shadow-lg overflow-hidden"
-      style={{ aspectRatio: '85.6 / 53.98' }}
-    >
-      {/* Bande tricolore senegalaise */}
-      <div className="flex h-2">
-        <div className="flex-1 bg-[#00853F]" />
-        <div className="flex-1 bg-[#FDEF42]" />
-        <div className="flex-1 bg-[#E31B23]" />
-      </div>
-
-      {/* Contenu de la carte */}
-      <div className="px-4 py-2 flex flex-col h-[calc(100%-8px)] justify-between">
-        {/* Nom de l'ecole */}
-        <div className="text-center">
-          <h3 className="text-xs font-bold text-gray-800 uppercase tracking-wide leading-tight">
-            {ecoleNom}
-          </h3>
-          <p className="text-[9px] text-gray-500 font-medium uppercase tracking-widest">
-            Carte Scolaire Numerique
-          </p>
-        </div>
-
-        {/* Zone principale: avatar + infos */}
-        <div className="flex items-center gap-3 flex-1 py-1">
-          {/* Avatar */}
-          <div className="shrink-0">
-            {eleve.photo_url ? (
-              <img
-                src={eleve.photo_url}
-                alt={`${eleve.prenom} ${eleve.nom}`}
-                className="w-14 h-14 rounded-full object-cover border-2 border-gray-200"
-              />
-            ) : (
-              <div
-                className={`w-14 h-14 rounded-full flex items-center justify-center ${avatarColor} border-2 border-white shadow-md`}
-              >
-                <span className="text-white font-bold text-lg">{initials}</span>
-              </div>
-            )}
-          </div>
-
-          {/* Infos eleve */}
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-bold text-gray-900 truncate">
-              {eleve.prenom} {eleve.nom}
-            </p>
-            <div className="mt-0.5 space-y-0.5">
-              <p className="text-[10px] text-gray-600">
-                <span className="font-semibold text-gray-700">Matricule:</span>{' '}
-                {eleve.matricule}
-              </p>
-              <p className="text-[10px] text-gray-600">
-                <span className="font-semibold text-gray-700">Classe:</span>{' '}
-                {classeLabel}
-              </p>
-              <p className="text-[10px] text-gray-600">
-                <span className="font-semibold text-gray-700">Annee:</span>{' '}
-                2025-2026
-              </p>
-            </div>
-          </div>
-
-          {/* QR Code */}
-          <div className="shrink-0">
-            {generated ? (
-              <img
-                src={qrUrl}
-                alt="QR Code"
-                width={56}
-                height={56}
-                className="rounded"
-              />
-            ) : (
-              <div className="w-14 h-14 bg-gray-100 rounded flex items-center justify-center">
-                <span className="text-[8px] text-gray-400 text-center leading-tight">
-                  QR Code
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Pied de carte */}
-        <div className="flex items-center justify-between border-t border-gray-200 pt-1">
-          <p className="text-[8px] text-gray-400">
-            Republique du Senegal
-          </p>
-          <p className="text-[8px] text-gray-400 font-medium">
-            SmartSchool SN
-          </p>
-        </div>
-      </div>
-    </div>
+    <label className="flex items-center justify-between gap-3 text-xs text-ss-text-secondary">
+      <span>{label}</span>
+      <span className="flex items-center gap-2">
+        <input
+          type="color"
+          value={value}
+          onChange={e => onChange(e.target.value)}
+          className="h-7 w-10 cursor-pointer rounded border border-ss-text/10 bg-transparent"
+        />
+        <input
+          type="text"
+          value={value}
+          onChange={e => onChange(e.target.value)}
+          className="w-20 rounded border border-ss-text/10 bg-ss-text/5 px-2 py-1 font-mono text-[11px] text-ss-text"
+        />
+      </span>
+    </label>
   )
 }

@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useEffect, useState, useMemo } from 'react'
 import { useUser } from '@/hooks/useUser'
@@ -280,11 +280,11 @@ export default function PaiementsPage() {
 
   const debiteurs = useMemo(() => data.filter(d => d.solde > 0).sort((a, b) => b.solde - a.solde), [data])
 
-  const glassStyle = { background: 'rgba(2,6,23,0.82)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.10)' }
+  const glassStyle = { background: 'var(--ss-surface-elevated)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid var(--ss-glass-border)' }
 
   if (userLoading || loading) return (
     <div className="p-6 animate-pulse space-y-3">
-      {[...Array(8)].map((_, i) => <div key={i} className="h-16 rounded-2xl bg-white/5" />)}
+      {[...Array(8)].map((_, i) => <div key={i} className="h-16 rounded-2xl bg-ss-text/5" />)}
     </div>
   )
 
@@ -298,8 +298,8 @@ export default function PaiementsPage() {
     <div className="space-y-6 pb-24 lg:pb-6 animate-fade-in">
       {/* Toast */}
       {toast && (
-        <div className="fixed top-4 right-4 z-50 px-5 py-3 rounded-2xl text-sm font-semibold text-white shadow-xl max-w-xs"
-          style={{ background: 'rgba(2,6,23,0.98)', border: '1px solid rgba(0,230,118,0.5)', backdropFilter: 'blur(24px)' }}>
+        <div className="fixed top-4 right-4 z-50 px-5 py-3 rounded-2xl text-sm font-semibold text-ss-text shadow-xl max-w-xs"
+          style={{ background: 'var(--ss-surface-elevated)', border: '1px solid rgba(0,230,118,0.5)', backdropFilter: 'blur(24px)' }}>
           {toast}
         </div>
       )}
@@ -307,10 +307,10 @@ export default function PaiementsPage() {
       {/* En-tête */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-ss-text flex items-center gap-2">
             <span style={{ color: ACCENT }}>💳</span> Comptabilité Scolarité
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-ss-text-muted mt-1">
             {data.length} élèves · Année {tarifs.annee} · Taux recouvrement{' '}
             <span style={{ color: kpis.taux >= 80 ? GREEN : kpis.taux >= 50 ? GOLD : RED }} className="font-bold">{kpis.taux}%</span>
           </p>
@@ -334,7 +334,7 @@ export default function PaiementsPage() {
           <div key={label} className="rounded-2xl p-5" style={{ ...glassStyle, border: `1px solid ${color}25` }}>
             <div className="flex items-center gap-2 mb-2">
               <span>{icon}</span>
-              <span className="text-xs text-slate-400 uppercase tracking-wide">{label}</span>
+              <span className="text-xs text-ss-text-muted uppercase tracking-wide">{label}</span>
             </div>
             <p className="text-xl font-black" style={{ color }}>{val}</p>
           </div>
@@ -343,11 +343,11 @@ export default function PaiementsPage() {
 
       {/* Barre de progression globale */}
       <div className="rounded-2xl p-5 print:hidden" style={glassStyle}>
-        <div className="flex justify-between text-xs text-slate-400 mb-2">
+        <div className="flex justify-between text-xs text-ss-text-muted mb-2">
           <span>Progression du recouvrement</span>
-          <span className="font-semibold text-white">{fmt(kpis.totalEncaisse)} / {fmt(kpis.totalAttendu)}</span>
+          <span className="font-semibold text-ss-text">{fmt(kpis.totalEncaisse)} / {fmt(kpis.totalAttendu)}</span>
         </div>
-        <div className="h-4 rounded-full bg-white/5 overflow-hidden">
+        <div className="h-4 rounded-full bg-ss-text/5 overflow-hidden">
           <div className="h-full rounded-full transition-all duration-700"
             style={{ width: `${kpis.taux}%`, background: `linear-gradient(90deg, ${GREEN}, ${ACCENT})` }} />
         </div>
@@ -360,13 +360,13 @@ export default function PaiementsPage() {
             const p = pct(encaisse, attendu)
             const c = p >= 80 ? GREEN : p >= 50 ? GOLD : RED
             return (
-              <div key={label} className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.04)' }}>
-                <p className="text-xs text-slate-400 mb-1">Scolarité {label}</p>
+              <div key={label} className="rounded-xl p-3" style={{ background: 'var(--ss-glass-card-bg)' }}>
+                <p className="text-xs text-ss-text-muted mb-1">Scolarité {label}</p>
                 <p className="text-sm font-bold" style={{ color: c }}>{p}%</p>
-                <div className="h-1.5 rounded-full bg-white/10 mt-1 overflow-hidden">
+                <div className="h-1.5 rounded-full bg-ss-text/10 mt-1 overflow-hidden">
                   <div className="h-full rounded-full" style={{ width: `${p}%`, background: c }} />
                 </div>
-                <p className="text-xs text-slate-500 mt-1">{fmt(encaisse)}</p>
+                <p className="text-xs text-ss-text-muted mt-1">{fmt(encaisse)}</p>
               </div>
             )
           })}
@@ -387,7 +387,7 @@ export default function PaiementsPage() {
               style={{ ...glassStyle, border: `1px solid ${s.color}30` }}
               onClick={() => setFiltreStatut(k === filtreStatut ? 'all' : k)}>
               <p className="text-3xl font-black" style={{ color: s.color }}>{n}</p>
-              <p className="text-xs font-semibold text-slate-400 mt-1">{icon} {label}</p>
+              <p className="text-xs font-semibold text-ss-text-muted mt-1">{icon} {label}</p>
             </div>
           )
         })}
@@ -400,7 +400,7 @@ export default function PaiementsPage() {
             className="px-4 py-2 rounded-xl text-sm font-semibold capitalize transition-all"
             style={vue === v
               ? { background: ACCENT, color: '#020617' }
-              : { background: 'rgba(255,255,255,0.06)', color: '#94A3B8', border: '1px solid rgba(255,255,255,0.1)' }}>
+              : { background: 'var(--ss-glass-card-hover)', color: 'var(--ss-text-muted)', border: '1px solid var(--ss-glass-border)' }}>
             {v === 'tableau' ? '📋 Tableau' : v === 'debiteurs' ? `🤝 Familles à accompagner (${debiteurs.length})` : '📊 Rapport'}
           </button>
         ))}
@@ -412,27 +412,27 @@ export default function PaiementsPage() {
           <div className="flex flex-wrap gap-3 print:hidden">
             <input type="text" placeholder="🔍 Rechercher élève ou matricule…" value={search}
               onChange={e => setSearch(e.target.value)}
-              className="flex-1 min-w-48 px-4 py-2 rounded-xl text-sm text-white bg-white/5 border border-white/10 outline-none placeholder-slate-500" />
+              className="flex-1 min-w-48 px-4 py-2 rounded-xl text-sm text-ss-text bg-ss-text/5 border border-ss-text/10 outline-none placeholder-slate-500" />
             <select value={filtreClasse} onChange={e => setFiltreClasse(e.target.value)}
-              className="px-4 py-2 rounded-xl text-sm text-white bg-white/5 border border-white/10 outline-none">
+              className="px-4 py-2 rounded-xl text-sm text-ss-text bg-ss-text/5 border border-ss-text/10 outline-none">
               <option value="all">Toutes les classes</option>
               {classes.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
             </select>
             <select value={filtreStatut} onChange={e => setFiltreStatut(e.target.value)}
-              className="px-4 py-2 rounded-xl text-sm text-white bg-white/5 border border-white/10 outline-none">
+              className="px-4 py-2 rounded-xl text-sm text-ss-text bg-ss-text/5 border border-ss-text/10 outline-none">
               <option value="all">Tous statuts</option>
               {Object.entries(STATUT_MAP).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
             </select>
           </div>
-          <p className="text-xs text-slate-500 print:hidden">{filtered.length} élève(s) affiché(s)</p>
+          <p className="text-xs text-ss-text-muted print:hidden">{filtered.length} élève(s) affiché(s)</p>
 
           <div className="rounded-2xl overflow-hidden" style={glassStyle}>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.03)' }}>
+                  <tr style={{ borderBottom: '1px solid var(--ss-glass-card-hover)', background: 'var(--ss-glass-card-bg)' }}>
                     {['Élève', 'Classe', 'Inscr.', 'T1', 'T2', 'T3', 'Act.', 'Total dû', 'Payé', 'Solde', 'Statut', ''].map(h => (
-                      <th key={h} className="px-3 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider whitespace-nowrap">{h}</th>
+                      <th key={h} className="px-3 py-3 text-left text-xs font-semibold text-ss-text-muted uppercase tracking-wider whitespace-nowrap">{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -441,16 +441,16 @@ export default function PaiementsPage() {
                     const s = STATUT_MAP[row.statut] ?? STATUT_MAP.impaye
                     const tick = (paid: boolean) => <span style={{ color: paid ? GREEN : RED, fontWeight: 700 }}>{paid ? '✓' : '✗'}</span>
                     return (
-                      <tr key={i} className="hover:bg-white/5 transition-colors"
-                        style={i < filtered.length - 1 ? { borderBottom: '1px solid rgba(255,255,255,0.04)' } : {}}>
-                        <td className="px-3 py-3 font-semibold text-white whitespace-nowrap">{row.prenom} {row.nom}</td>
-                        <td className="px-3 py-3 text-slate-400 whitespace-nowrap">{classeNom(row)}</td>
+                      <tr key={i} className="hover:bg-ss-text/5 transition-colors"
+                        style={i < filtered.length - 1 ? { borderBottom: '1px solid var(--ss-glass-card-bg)' } : {}}>
+                        <td className="px-3 py-3 font-semibold text-ss-text whitespace-nowrap">{row.prenom} {row.nom}</td>
+                        <td className="px-3 py-3 text-ss-text-muted whitespace-nowrap">{classeNom(row)}</td>
                         <td className="px-3 py-3 text-center">{tick(row.inscriptionPayee)}</td>
                         <td className="px-3 py-3 text-center">{tick(row.t1Paye)}</td>
                         <td className="px-3 py-3 text-center">{tick(row.t2Paye)}</td>
                         <td className="px-3 py-3 text-center">{tick(row.t3Paye)}</td>
                         <td className="px-3 py-3 text-center">{tick(row.activitesPayees)}</td>
-                        <td className="px-3 py-3 text-slate-300 whitespace-nowrap">{fmt(row.totalDu)}</td>
+                        <td className="px-3 py-3 text-ss-text-secondary whitespace-nowrap">{fmt(row.totalDu)}</td>
                         <td className="px-3 py-3 font-semibold whitespace-nowrap" style={{ color: GREEN }}>{fmt(row.totalPaye)}</td>
                         <td className="px-3 py-3 font-bold whitespace-nowrap" style={{ color: row.solde > 0 ? RED : GREEN }}>
                           {row.solde > 0 ? `−${fmt(row.solde)}` : '—'}
@@ -483,11 +483,11 @@ export default function PaiementsPage() {
           <div className="rounded-2xl p-4" style={{ ...glassStyle, border: `1px solid ${PURPLE}30` }}>
             <div className="flex items-center gap-2 mb-1">
               <span className="text-lg">🤝</span>
-              <p className="text-sm font-semibold text-white">
+              <p className="text-sm font-semibold text-ss-text">
                 {debiteurs.length} familles à accompagner — Solde en attente : <span style={{ color: ORANGE }}>{fmt(debiteurs.reduce((s, d) => s + d.solde, 0))}</span>
               </p>
             </div>
-            <p className="text-xs text-slate-400">Triés par montant en attente · La Pause Empathique suspend les relances temporairement</p>
+            <p className="text-xs text-ss-text-muted">Triés par montant en attente · La Pause Empathique suspend les relances temporairement</p>
             {data.filter(d => d.statut === 'pause_empathique').length > 0 && (
               <p className="text-xs font-semibold mt-2" style={{ color: PURPLE }}>
                 💚 {data.filter(d => d.statut === 'pause_empathique').length} famille(s) accompagnée(s) ce trimestre
@@ -499,11 +499,11 @@ export default function PaiementsPage() {
             const isPaused = row.statut === 'pause_empathique'
             return (
               <div key={i} className="rounded-2xl p-4 flex items-center gap-4 flex-wrap transition-all" style={{ ...glassStyle, border: isPaused ? `1px solid ${PURPLE}40` : undefined }}>
-                <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black text-white"
+                <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black text-ss-text"
                   style={{ background: `${s.color}30` }}>#{i + 1}</div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-white">{row.prenom} {row.nom}</p>
-                  <p className="text-xs text-slate-400">{classeNom(row)} · {row.matricule}</p>
+                  <p className="font-semibold text-ss-text">{row.prenom} {row.nom}</p>
+                  <p className="text-xs text-ss-text-muted">{classeNom(row)} · {row.matricule}</p>
                   {isPaused && row.pauseMotif && (
                     <p className="text-[10px] mt-1 font-medium" style={{ color: PURPLE }}>
                       💚 Pause : {row.pauseMotif}{row.pauseDuree ? ` · ${row.pauseDuree}` : ''}
@@ -512,7 +512,7 @@ export default function PaiementsPage() {
                 </div>
                 <div className="text-right">
                   <p className="text-lg font-black" style={{ color: isPaused ? PURPLE : ORANGE }}>−{fmt(row.solde)}</p>
-                  <p className="text-xs text-slate-400">{fmt(row.totalPaye)} payé / {fmt(row.totalDu)}</p>
+                  <p className="text-xs text-ss-text-muted">{fmt(row.totalPaye)} payé / {fmt(row.totalDu)}</p>
                 </div>
                 <span className="px-2 py-1 rounded-lg text-xs font-semibold" style={{ background: s.bg, color: s.color }}>{s.label}</span>
                 <div className="flex gap-2 flex-wrap">
@@ -563,10 +563,10 @@ export default function PaiementsPage() {
       {vue === 'rapport' && (
         <div className="space-y-5">
           <div className="rounded-2xl p-6" style={glassStyle}>
-            <h2 className="text-lg font-bold text-white mb-4">Rapport de Recouvrement — {tarifs.annee}</h2>
+            <h2 className="text-lg font-bold text-ss-text mb-4">Rapport de Recouvrement — {tarifs.annee}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <p className="text-sm font-semibold text-slate-300 mb-3">Répartition par statut</p>
+                <p className="text-sm font-semibold text-ss-text-secondary mb-3">Répartition par statut</p>
                 {Object.entries(STATUT_MAP).map(([k, s]) => {
                   const nb = data.filter(d => d.statut === k).length
                   const p = pct(nb, data.length)
@@ -574,9 +574,9 @@ export default function PaiementsPage() {
                     <div key={k} className="mb-3">
                       <div className="flex justify-between text-xs mb-1">
                         <span style={{ color: s.color }}>{s.label}</span>
-                        <span className="text-slate-300">{nb} élèves ({p}%)</span>
+                        <span className="text-ss-text-secondary">{nb} élèves ({p}%)</span>
                       </div>
-                      <div className="h-2 rounded-full bg-white/10 overflow-hidden">
+                      <div className="h-2 rounded-full bg-ss-text/10 overflow-hidden">
                         <div className="h-full rounded-full" style={{ width: `${p}%`, background: s.color }} />
                       </div>
                     </div>
@@ -584,7 +584,7 @@ export default function PaiementsPage() {
                 })}
               </div>
               <div className="space-y-3">
-                <p className="text-sm font-semibold text-slate-300">Taux de collecte par poste</p>
+                <p className="text-sm font-semibold text-ss-text-secondary">Taux de collecte par poste</p>
                 {[
                   { label: 'Frais inscription', n: data.filter(d => d.inscriptionPayee).length },
                   { label: 'Scolarité T1',      n: data.filter(d => d.t1Paye).length },
@@ -596,8 +596,8 @@ export default function PaiementsPage() {
                   const c = p >= 80 ? GREEN : p >= 50 ? GOLD : RED
                   return (
                     <div key={label} className="flex items-center gap-3">
-                      <span className="text-xs text-slate-400 w-32 shrink-0">{label}</span>
-                      <div className="flex-1 h-2 rounded-full bg-white/10 overflow-hidden">
+                      <span className="text-xs text-ss-text-muted w-32 shrink-0">{label}</span>
+                      <div className="flex-1 h-2 rounded-full bg-ss-text/10 overflow-hidden">
                         <div className="h-full rounded-full" style={{ width: `${p}%`, background: c }} />
                       </div>
                       <span className="text-xs font-bold w-10 text-right" style={{ color: c }}>{p}%</span>
@@ -608,12 +608,12 @@ export default function PaiementsPage() {
             </div>
 
             {/* Tableau récapitulatif financier */}
-            <div className="mt-6 rounded-xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
+            <div className="mt-6 rounded-xl overflow-hidden" style={{ border: '1px solid var(--ss-glass-card-hover)' }}>
               <table className="w-full text-sm">
                 <thead>
-                  <tr style={{ background: 'rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+                  <tr style={{ background: 'var(--ss-glass-card-bg)', borderBottom: '1px solid var(--ss-glass-card-hover)' }}>
                     {['Ligne budgétaire', 'Attendu', 'Encaissé', 'Solde', 'Taux'].map(h => (
-                      <th key={h} className="px-4 py-2 text-left text-xs text-slate-400 font-semibold uppercase">{h}</th>
+                      <th key={h} className="px-4 py-2 text-left text-xs text-ss-text-muted font-semibold uppercase">{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -629,9 +629,9 @@ export default function PaiementsPage() {
                     const t = pct(encaisse, attendu)
                     const c = t >= 80 ? GREEN : t >= 50 ? GOLD : RED
                     return (
-                      <tr key={label} style={i < arr.length - 1 ? { borderBottom: '1px solid rgba(255,255,255,0.04)' } : {}}>
-                        <td className="px-4 py-3 text-slate-300 font-medium">{label}</td>
-                        <td className="px-4 py-3 text-slate-400">{fmt(attendu)}</td>
+                      <tr key={label} style={i < arr.length - 1 ? { borderBottom: '1px solid var(--ss-glass-card-bg)' } : {}}>
+                        <td className="px-4 py-3 text-ss-text-secondary font-medium">{label}</td>
+                        <td className="px-4 py-3 text-ss-text-muted">{fmt(attendu)}</td>
                         <td className="px-4 py-3 font-semibold" style={{ color: GREEN }}>{fmt(encaisse)}</td>
                         <td className="px-4 py-3 font-semibold" style={{ color: solde > 0 ? RED : GREEN }}>
                           {solde > 0 ? `−${fmt(solde)}` : '—'}
@@ -640,9 +640,9 @@ export default function PaiementsPage() {
                       </tr>
                     )
                   })}
-                  <tr style={{ background: 'rgba(255,255,255,0.04)', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-                    <td className="px-4 py-3 font-bold text-white">TOTAL</td>
-                    <td className="px-4 py-3 font-bold text-white">{fmt(kpis.totalAttendu)}</td>
+                  <tr style={{ background: 'var(--ss-glass-card-bg)', borderTop: '1px solid var(--ss-glass-border)' }}>
+                    <td className="px-4 py-3 font-bold text-ss-text">TOTAL</td>
+                    <td className="px-4 py-3 font-bold text-ss-text">{fmt(kpis.totalAttendu)}</td>
                     <td className="px-4 py-3 font-bold" style={{ color: GREEN }}>{fmt(kpis.totalEncaisse)}</td>
                     <td className="px-4 py-3 font-bold" style={{ color: RED }}>−{fmt(kpis.soldeGlobal)}</td>
                     <td className="px-4 py-3 font-black text-xl" style={{ color: kpis.taux >= 80 ? GREEN : kpis.taux >= 50 ? GOLD : RED }}>{kpis.taux}%</td>
@@ -657,16 +657,16 @@ export default function PaiementsPage() {
       {/* ── MODAL DÉTAIL ── */}
       {detailRow && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: 'rgba(2,6,23,0.92)', backdropFilter: 'blur(12px)' }}
+          style={{ background: 'var(--ss-surface-elevated)', backdropFilter: 'blur(12px)' }}
           onClick={e => e.target === e.currentTarget && setDetailRow(null)}>
           <div className="w-full max-w-lg rounded-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto"
-            style={{ background: 'rgba(15,23,42,0.99)', border: '1px solid rgba(255,255,255,0.15)' }}>
+            style={{ background: 'rgba(15,23,42,0.99)', border: '1px solid var(--ss-glass-border)' }}>
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-xl font-bold text-white">{detailRow.prenom} {detailRow.nom}</h3>
-                <p className="text-xs text-slate-400">{detailRow.matricule} · {classeNom(detailRow)}</p>
+                <h3 className="text-xl font-bold text-ss-text">{detailRow.prenom} {detailRow.nom}</h3>
+                <p className="text-xs text-ss-text-muted">{detailRow.matricule} · {classeNom(detailRow)}</p>
               </div>
-              <button onClick={() => setDetailRow(null)} className="text-slate-400 hover:text-white text-xl">✕</button>
+              <button onClick={() => setDetailRow(null)} className="text-ss-text-muted hover:text-ss-text text-xl">✕</button>
             </div>
 
             {/* Résumé financier */}
@@ -676,8 +676,8 @@ export default function PaiementsPage() {
                 { label: 'Payé',      val: fmt(detailRow.totalPaye),  color: GREEN },
                 { label: 'Solde',     val: detailRow.solde > 0 ? `−${fmt(detailRow.solde)}` : '—', color: detailRow.solde > 0 ? RED : GREEN },
               ].map(({ label, val, color }) => (
-                <div key={label} className="rounded-xl p-3 text-center" style={{ background: 'rgba(255,255,255,0.05)' }}>
-                  <p className="text-xs text-slate-400 mb-1">{label}</p>
+                <div key={label} className="rounded-xl p-3 text-center" style={{ background: 'var(--ss-glass-card-bg)' }}>
+                  <p className="text-xs text-ss-text-muted mb-1">{label}</p>
                   <p className="font-bold text-sm" style={{ color }}>{val}</p>
                 </div>
               ))}
@@ -685,7 +685,7 @@ export default function PaiementsPage() {
 
             {/* Postes de paiement */}
             <div className="space-y-2">
-              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Détail par poste</p>
+              <p className="text-xs font-semibold text-ss-text-muted uppercase tracking-wide">Détail par poste</p>
               {[
                 { label: 'Frais inscription',  paid: detailRow.inscriptionPayee, montant: tarifs.frais_inscription },
                 { label: 'Scolarité T1',       paid: detailRow.t1Paye,           montant: tarifs.scolarite_t1 },
@@ -694,10 +694,10 @@ export default function PaiementsPage() {
                 { label: 'Frais activités',    paid: detailRow.activitesPayees,  montant: tarifs.frais_activites },
               ].map(({ label, paid, montant }) => (
                 <div key={label} className="flex items-center justify-between rounded-lg px-3 py-2"
-                  style={{ background: 'rgba(255,255,255,0.04)' }}>
-                  <span className="text-sm text-slate-300">{label}</span>
+                  style={{ background: 'var(--ss-glass-card-bg)' }}>
+                  <span className="text-sm text-ss-text-secondary">{label}</span>
                   <div className="flex items-center gap-3">
-                    <span className="text-sm text-slate-400">{fmt(montant)}</span>
+                    <span className="text-sm text-ss-text-muted">{fmt(montant)}</span>
                     <span className="text-sm font-bold" style={{ color: paid ? GREEN : ORANGE }}>
                       {paid ? '✓ Payé' : '⏳ En attente'}
                     </span>
@@ -709,13 +709,13 @@ export default function PaiementsPage() {
             {/* Historique des versements */}
             {detailRow.lignes.length > 0 && (
               <div className="space-y-2">
-                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Historique des versements</p>
+                <p className="text-xs font-semibold text-ss-text-muted uppercase tracking-wide">Historique des versements</p>
                 {detailRow.lignes.map((l, i) => (
                   <div key={i} className="flex items-center justify-between rounded-lg px-3 py-2"
                     style={{ background: 'rgba(0,230,118,0.06)', border: '1px solid rgba(0,230,118,0.15)' }}>
                     <div>
-                      <p className="text-sm font-semibold text-white">{fmt(l.montant)}</p>
-                      <p className="text-xs text-slate-400">{l.date} · {l.methode} · {l.reference}</p>
+                      <p className="text-sm font-semibold text-ss-text">{fmt(l.montant)}</p>
+                      <p className="text-xs text-ss-text-muted">{l.date} · {l.methode} · {l.reference}</p>
                     </div>
                     <span className="text-xs px-2 py-1 rounded-lg" style={{ background: 'rgba(0,230,118,0.15)', color: GREEN }}>Reçu</span>
                   </div>
@@ -744,7 +744,7 @@ export default function PaiementsPage() {
                 ) : (
                   <div className="rounded-xl p-3 text-center" style={{ background: `${PURPLE}10`, border: `1px solid ${PURPLE}25` }}>
                     <p className="text-xs font-bold" style={{ color: PURPLE }}>💚 Pause Empathique active</p>
-                    {detailRow.pauseMotif && <p className="text-[10px] text-slate-400 mt-0.5">{detailRow.pauseMotif}{detailRow.pauseDuree ? ` · ${detailRow.pauseDuree}` : ''}</p>}
+                    {detailRow.pauseMotif && <p className="text-[10px] text-ss-text-muted mt-0.5">{detailRow.pauseMotif}{detailRow.pauseDuree ? ` · ${detailRow.pauseDuree}` : ''}</p>}
                   </div>
                 )}
               </div>
@@ -756,7 +756,7 @@ export default function PaiementsPage() {
       {/* ── MODAL PAUSE EMPATHIQUE ── */}
       {pauseModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: 'rgba(2,6,23,0.92)', backdropFilter: 'blur(12px)' }}
+          style={{ background: 'var(--ss-surface-elevated)', backdropFilter: 'blur(12px)' }}
           onClick={e => e.target === e.currentTarget && setPauseModal(null)}>
           <div className="w-full max-w-md rounded-2xl p-6 space-y-5 max-h-[90vh] overflow-y-auto"
             style={{ background: 'rgba(15,23,42,0.99)', border: `1px solid ${PURPLE}30` }}>
@@ -769,41 +769,41 @@ export default function PaiementsPage() {
                   <span className="text-lg">💚</span>
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-white">Pause Empathique</h3>
-                  <p className="text-xs text-slate-400">Suspendre les relances avec bienveillance</p>
+                  <h3 className="text-lg font-bold text-ss-text">Pause Empathique</h3>
+                  <p className="text-xs text-ss-text-muted">Suspendre les relances avec bienveillance</p>
                 </div>
               </div>
-              <button onClick={() => setPauseModal(null)} className="text-slate-400 hover:text-white text-xl">✕</button>
+              <button onClick={() => setPauseModal(null)} className="text-ss-text-muted hover:text-ss-text text-xl">✕</button>
             </div>
 
             {/* Famille concernée */}
-            <div className="rounded-xl p-3 flex items-center gap-3" style={{ background: 'rgba(255,255,255,0.04)' }}>
-              <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black text-white"
+            <div className="rounded-xl p-3 flex items-center gap-3" style={{ background: 'var(--ss-glass-card-bg)' }}>
+              <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black text-ss-text"
                 style={{ background: `${ORANGE}30`, color: ORANGE }}>
                 {pauseModal.prenom[0]}
               </div>
               <div>
-                <p className="text-sm font-semibold text-white">{pauseModal.prenom} {pauseModal.nom}</p>
-                <p className="text-xs text-slate-400">{classeNom(pauseModal)} · Solde : <span style={{ color: ORANGE }}>−{fmt(pauseModal.solde)}</span></p>
+                <p className="text-sm font-semibold text-ss-text">{pauseModal.prenom} {pauseModal.nom}</p>
+                <p className="text-xs text-ss-text-muted">{classeNom(pauseModal)} · Solde : <span style={{ color: ORANGE }}>−{fmt(pauseModal.solde)}</span></p>
               </div>
             </div>
 
             {/* Principe */}
             <div className="rounded-xl p-3 text-xs" style={{ background: `${PURPLE}08`, border: `1px solid ${PURPLE}20` }}>
               <p style={{ color: PURPLE }} className="font-semibold mb-1">💡 Principe</p>
-              <p className="text-slate-400 leading-relaxed">
-                L&apos;enfant <strong className="text-white">reste en classe normalement</strong>. Les relances automatiques (SMS, WhatsApp) sont suspendues pendant la durée choisie. Le discernement humain prime sur l&apos;automatisme.
+              <p className="text-ss-text-muted leading-relaxed">
+                L&apos;enfant <strong className="text-ss-text">reste en classe normalement</strong>. Les relances automatiques (SMS, WhatsApp) sont suspendues pendant la durée choisie. Le discernement humain prime sur l&apos;automatisme.
               </p>
             </div>
 
             {/* Motif obligatoire */}
             <div>
-              <label className="block text-sm font-semibold text-white mb-2">Motif <span className="text-red-400">*</span></label>
+              <label className="block text-sm font-semibold text-ss-text mb-2">Motif <span className="text-red-400">*</span></label>
               <select
                 value={pauseMotif}
                 onChange={e => setPauseMotif(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl text-sm text-white outline-none"
-                style={{ background: 'rgba(255,255,255,0.06)', border: `1px solid ${pauseMotif ? `${PURPLE}40` : 'rgba(255,255,255,0.12)'}` }}>
+                className="w-full px-4 py-3 rounded-xl text-sm text-ss-text outline-none"
+                style={{ background: 'var(--ss-glass-card-hover)', border: `1px solid ${pauseMotif ? `${PURPLE}40` : 'var(--ss-glass-border)'}` }}>
                 <option value="">— Choisir un motif —</option>
                 <option value="Difficulté financière temporaire">💰 Difficulté financière temporaire</option>
                 <option value="Décès dans la famille">🕊️ Décès dans la famille</option>
@@ -817,14 +817,14 @@ export default function PaiementsPage() {
                   placeholder="Précisez le motif..."
                   value={pauseAutreMotif}
                   onChange={e => setPauseAutreMotif(e.target.value)}
-                  className="w-full mt-2 px-4 py-3 rounded-xl text-sm text-white outline-none placeholder-slate-500"
-                  style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)' }} />
+                  className="w-full mt-2 px-4 py-3 rounded-xl text-sm text-ss-text outline-none placeholder-slate-500"
+                  style={{ background: 'var(--ss-glass-card-hover)', border: '1px solid var(--ss-glass-border)' }} />
               )}
             </div>
 
             {/* Durée */}
             <div>
-              <label className="block text-sm font-semibold text-white mb-2">Durée de la pause</label>
+              <label className="block text-sm font-semibold text-ss-text mb-2">Durée de la pause</label>
               <div className="grid grid-cols-2 gap-2">
                 {[
                   { value: '2_semaines', label: '2 semaines', icon: '📅' },
@@ -838,7 +838,7 @@ export default function PaiementsPage() {
                     className="px-3 py-2.5 rounded-xl text-xs font-semibold transition-all text-left flex items-center gap-2"
                     style={pauseDuree === d.value
                       ? { background: `${PURPLE}20`, color: PURPLE, border: `1px solid ${PURPLE}50` }
-                      : { background: 'rgba(255,255,255,0.04)', color: '#94A3B8', border: '1px solid rgba(255,255,255,0.08)' }}>
+                      : { background: 'var(--ss-glass-card-bg)', color: 'var(--ss-text-muted)', border: '1px solid var(--ss-glass-card-hover)' }}>
                     <span>{d.icon}</span> {d.label}
                   </button>
                 ))}
@@ -848,8 +848,8 @@ export default function PaiementsPage() {
             {/* Actions */}
             <div className="flex gap-3 pt-1">
               <button onClick={() => setPauseModal(null)}
-                className="flex-1 py-3 rounded-xl text-sm font-semibold text-slate-400 transition-all"
-                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                className="flex-1 py-3 rounded-xl text-sm font-semibold text-ss-text-muted transition-all"
+                style={{ background: 'var(--ss-glass-card-hover)', border: '1px solid var(--ss-glass-border)' }}>
                 Annuler
               </button>
               <button
@@ -879,7 +879,7 @@ export default function PaiementsPage() {
                 className="flex-1 py-3 rounded-xl text-sm font-bold transition-all disabled:opacity-40 flex items-center justify-center gap-2"
                 style={{ background: PURPLE, color: '#fff', border: `1px solid ${PURPLE}` }}>
                 {savingPause ? (
-                  <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span className="inline-block w-4 h-4 border-2 border-ss-text/30 border-t-white rounded-full animate-spin" />
                 ) : '💚 Activer la pause'}
               </button>
             </div>

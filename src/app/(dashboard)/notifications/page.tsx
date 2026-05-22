@@ -37,9 +37,9 @@ export default function NotificationsPage() {
       {/* En-tête */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-white">Notifications</h1>
+          <h1 className="text-xl font-bold text-ss-text">Notifications</h1>
           {unreadCount > 0 && (
-            <p className="text-sm text-[#94A3B8] mt-0.5">{unreadCount} non lue{unreadCount > 1 ? 's' : ''}</p>
+            <p className="text-sm text-[var(--ss-text-muted)] mt-0.5">{unreadCount} non lue{unreadCount > 1 ? 's' : ''}</p>
           )}
         </div>
         {unreadCount > 0 && (
@@ -57,8 +57,8 @@ export default function NotificationsPage() {
       {notifs.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 gap-3 text-center">
           <span className="text-5xl">🔔</span>
-          <p className="text-[#94A3B8] text-sm">Aucune notification pour l'instant.</p>
-          <p className="text-[#475569] text-xs">Les notes, absences et paiements apparaîtront ici en temps réel.</p>
+          <p className="text-[var(--ss-text-muted)] text-sm">Aucune notification pour l'instant.</p>
+          <p className="text-[var(--ss-text-disabled)] text-xs">Les notes, absences et paiements apparaîtront ici en temps réel.</p>
         </div>
       ) : (
         <div className="space-y-2">
@@ -66,9 +66,9 @@ export default function NotificationsPage() {
             const colors = PRIORITY_COLORS[n.priorite] ?? PRIORITY_COLORS[3]
             const icon = TYPE_ICONS[n.type_notif] ?? TYPE_ICONS.default
             const rowStyle = {
-              background: n.lu ? 'rgba(255,255,255,0.02)' : colors.bg,
-              border: `1px solid ${n.lu ? 'rgba(255,255,255,0.05)' : colors.border + '40'}`,
-              borderLeft: `3px solid ${n.lu ? 'rgba(255,255,255,0.08)' : colors.border}`,
+              background: n.lu ? 'var(--ss-glass-card-bg)' : colors.bg,
+              border: `1px solid ${n.lu ? 'var(--ss-glass-card-bg)' : colors.border + '40'}`,
+              borderLeft: `3px solid ${n.lu ? 'var(--ss-glass-card-hover)' : colors.border}`,
             }
             const rowClass = 'flex gap-3 p-4 rounded-2xl cursor-pointer transition-all hover:opacity-90 active:scale-[0.99]'
             const inner = (
@@ -76,12 +76,12 @@ export default function NotificationsPage() {
                 <span className="text-2xl shrink-0 mt-0.5">{icon}</span>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-start justify-between gap-2">
-                    <p className={`text-sm font-semibold leading-snug ${n.lu ? 'text-[#94A3B8]' : 'text-white'}`}>
+                    <p className={`text-sm font-semibold leading-snug ${n.lu ? 'text-[var(--ss-text-muted)]' : 'text-ss-text'}`}>
                       {n.titre}
                     </p>
-                    <span className="text-[10px] text-[#475569] shrink-0 mt-0.5">{timeAgo(n.created_at)}</span>
+                    <span className="text-[10px] text-[var(--ss-text-disabled)] shrink-0 mt-0.5">{timeAgo(n.created_at)}</span>
                   </div>
-                  <p className="text-xs text-[#64748B] mt-1 leading-relaxed">{n.contenu}</p>
+                  <p className="text-xs text-[var(--ss-text-muted)] mt-1 leading-relaxed">{n.contenu}</p>
                 </div>
                 {!n.lu && (
                   <div className="w-2 h-2 rounded-full bg-[#38BDF8] shrink-0 mt-1.5" />

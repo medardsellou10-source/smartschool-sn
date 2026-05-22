@@ -8,10 +8,10 @@ export default function DashboardLoading() {
       {/* En-tête de page */}
       <div className="flex items-center justify-between">
         <div className="space-y-2">
-          <div className="h-7 w-56 rounded-lg bg-white/5" />
+          <div className="h-7 w-56 rounded-lg bg-ss-text/5" />
           <div className="h-4 w-80 rounded bg-white/[0.03]" />
         </div>
-        <div className="h-9 w-28 rounded-xl bg-white/5" />
+        <div className="h-9 w-28 rounded-xl bg-ss-text/5" />
       </div>
 
       {/* Rangée de stat cards */}
@@ -20,7 +20,7 @@ export default function DashboardLoading() {
           <div
             key={i}
             className="h-24 rounded-2xl bg-white/[0.03]"
-            style={{ border: '1px solid rgba(255,255,255,0.04)' }}
+            style={{ border: '1px solid var(--ss-glass-card-bg)' }}
           />
         ))}
       </div>
@@ -29,16 +29,16 @@ export default function DashboardLoading() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div
           className="lg:col-span-2 h-72 rounded-2xl bg-white/[0.03]"
-          style={{ border: '1px solid rgba(255,255,255,0.04)' }}
+          style={{ border: '1px solid var(--ss-glass-card-bg)' }}
         />
         <div
           className="h-72 rounded-2xl bg-white/[0.03]"
-          style={{ border: '1px solid rgba(255,255,255,0.04)' }}
+          style={{ border: '1px solid var(--ss-glass-card-bg)' }}
         />
       </div>
 
       {/* Indicateur discret en bas */}
-      <div className="flex items-center justify-center gap-2 pt-2 text-[11px] text-[#475569]">
+      <div className="flex items-center justify-center gap-2 pt-2 text-[11px] text-[var(--ss-text-disabled)]">
         <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E] animate-pulse" />
         Chargement…
       </div>

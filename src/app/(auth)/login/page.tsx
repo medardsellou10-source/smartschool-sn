@@ -233,12 +233,10 @@ function LoginContent() {
       </div>
 
       <div className="min-h-screen relative flex items-center justify-center px-4 overflow-hidden bg-ss-bg">
-        {/* Vidéo background */}
         <div className="absolute inset-0 z-0">
-          <video autoPlay muted loop playsInline className="w-full h-full object-cover object-center">
-            <source src="/video/bg-login.mp4" type="video/mp4" />
-          </video>
-          <div className="absolute inset-0 bg-gradient-to-br from-[#020617]/92 via-[#020617]/80 to-[#0B1120]/90" />
+          <div className="absolute inset-0 bg-gradient-to-br from-ss-bg via-ss-bg-secondary to-ss-bg" />
+          <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full blur-[120px] opacity-20" style={{ background: '#22C55E' }} />
+          <div className="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] rounded-full blur-[100px] opacity-15" style={{ background: '#38BDF8' }} />
         </div>
 
         <div className="w-full max-w-md relative z-10">
@@ -268,16 +266,16 @@ function LoginContent() {
                     key={r.role}
                     onClick={() => handleDemoLogin(r.role, ROLE_HOME[r.role])}
                     className="w-full flex items-center gap-4 p-4 rounded-xl transition-all text-left group min-h-[64px]"
-                    style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = `${r.color}40`; e.currentTarget.style.background = `${r.color}08` }}
-                    onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'; e.currentTarget.style.background = 'rgba(255,255,255,0.03)' }}
+                    style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-border)' }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = `${r.color}40`; e.currentTarget.style.background = `${r.color}12` }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--ss-glass-border)'; e.currentTarget.style.background = 'var(--ss-glass-card-bg)' }}
                   >
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
                       style={{ background: `${r.color}12` }}>
                       <r.Icon size={20} style={{ color: r.color }} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-ss-text font-semibold text-sm group-hover:text-white transition-colors">{r.label}</p>
+                      <p className="text-ss-text font-semibold text-sm transition-colors">{r.label}</p>
                       <p className="text-ss-text-muted text-xs mt-0.5">{r.desc}</p>
                     </div>
                     <span className="text-ss-text-disabled group-hover:text-ss-text-secondary transition-colors">→</span>
@@ -312,7 +310,7 @@ function LoginContent() {
               {/* Formulaire connexion */}
               <form onSubmit={handleLogin} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-white/80 mb-1.5">
+                  <label className="block text-sm font-medium text-ss-text-secondary mb-1.5">
                     Adresse email
                   </label>
                   <input
@@ -322,12 +320,12 @@ function LoginContent() {
                     required
                     placeholder="votre.email@ecole.sn"
                     autoComplete="email"
-                    className="w-full px-4 py-3 rounded-xl text-sm text-white bg-white/5 border border-white/10 placeholder:text-white/30 focus:outline-none focus:border-ss-green/50 focus:bg-white/10 transition-all"
+                    className="w-full px-4 py-3 rounded-xl text-sm text-ss-text bg-ss-bg-secondary border border-ss-border placeholder:text-ss-text-disabled focus:outline-none focus:border-ss-green/60 focus:ring-2 focus:ring-ss-green/20 transition-all"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-white/80 mb-1.5">
+                  <label className="block text-sm font-medium text-ss-text-secondary mb-1.5">
                     Mot de passe
                   </label>
                   <div className="relative">
@@ -338,12 +336,12 @@ function LoginContent() {
                       required
                       placeholder="Votre mot de passe"
                       autoComplete="current-password"
-                      className="w-full px-4 py-3 pr-12 rounded-xl text-sm text-white bg-white/5 border border-white/10 placeholder:text-white/30 focus:outline-none focus:border-ss-green/50 focus:bg-white/10 transition-all"
+                      className="w-full px-4 py-3 pr-12 rounded-xl text-sm text-ss-text bg-ss-bg-secondary border border-ss-border placeholder:text-ss-text-disabled focus:outline-none focus:border-ss-green/60 focus:ring-2 focus:ring-ss-green/20 transition-all"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(v => !v)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70 transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-ss-text-muted hover:text-ss-text transition-colors"
                       tabIndex={-1}
                     >
                       {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -373,10 +371,10 @@ function LoginContent() {
 
               {/* Message inscription désactivée */}
               <div className="mt-5 pt-5 text-center"
-                style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                style={{ borderTop: '1px solid var(--ss-border)' }}>
                 <p className="text-xs text-ss-text-muted">
                   Pas encore de compte ?{' '}
-                  <span className="text-white/60">
+                  <span className="text-ss-text-secondary">
                     Contactez l&apos;administration de votre établissement pour obtenir vos identifiants.
                   </span>
                 </p>
@@ -384,7 +382,7 @@ function LoginContent() {
             </div>
           )}
 
-          <p className="text-center text-white/40 text-xs mt-6">
+          <p className="text-center text-ss-text-muted text-xs mt-6">
             SmartSchool SN v2.0 &copy; 2025-2026 — Données chiffrées · Hébergement EU
           </p>
         </div>
@@ -396,8 +394,8 @@ function LoginContent() {
               <div className="w-12 h-12 bg-ss-green/12 rounded-full flex items-center justify-center mx-auto mb-4">
                 <ShieldCheck size={24} className="text-ss-green" />
               </div>
-              <h3 className="text-white text-lg font-bold text-center mb-2">Authentification 2FA</h3>
-              <p className="text-white/50 text-sm text-center mb-6">
+              <h3 className="text-ss-text text-lg font-bold text-center mb-2">Authentification 2FA</h3>
+              <p className="text-ss-text-muted text-sm text-center mb-6">
                 Saisissez le code à 6 chiffres de votre application d&apos;authentification.
                 <br /><span className="text-ss-green text-xs">(Démo : n&apos;importe quel code à 6 chiffres)</span>
               </p>
@@ -409,13 +407,13 @@ function LoginContent() {
                   required
                   placeholder="000000"
                   maxLength={6}
-                  className="w-full px-4 py-4 rounded-xl text-white bg-white/5 border border-white/10 text-center tracking-[0.75em] font-mono text-xl focus:outline-none focus:border-ss-green/50 focus:bg-white/10 placeholder:text-white/30 placeholder:tracking-[0.5em] transition-all mb-4"
+                  className="w-full px-4 py-4 rounded-xl text-ss-text bg-ss-bg-secondary border border-ss-border text-center tracking-[0.75em] font-mono text-xl focus:outline-none focus:border-ss-green/60 focus:ring-2 focus:ring-ss-green/20 placeholder:text-ss-text-disabled placeholder:tracking-[0.5em] transition-all mb-4"
                 />
                 <div className="flex gap-3">
                   <button
                     type="button"
                     onClick={() => setShow2FA(false)}
-                    className="flex-1 px-4 py-2.5 rounded-xl border border-white/10 text-white/80 hover:bg-white/5 transition"
+                    className="flex-1 px-4 py-2.5 rounded-xl border border-ss-border text-ss-text-secondary hover:bg-ss-bg-secondary transition"
                   >
                     Annuler
                   </button>

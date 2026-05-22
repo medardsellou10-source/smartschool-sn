@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useEffect, useState, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -103,7 +103,7 @@ function calcBadges(notes: NoteEval[]): Badge[] {
 
 // ── Couleur par note ───────────────────────────────────────────
 function noteColor(note: number | null): string {
-  if (note === null) return '#94A3B8'
+  if (note === null) return 'var(--ss-text-muted)'
   if (note >= 16) return '#FBBF24'
   if (note >= 14) return '#22C55E'
   if (note >= 10) return '#38BDF8'
@@ -139,7 +139,7 @@ function getCurrentTrimestre() {
 function ScoreBar({ note, max = 20, couleur }: { note: number; max?: number; couleur: string }) {
   const pct = Math.min(100, (note / max) * 100)
   return (
-    <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+    <div className="w-full h-2 bg-ss-text/10 rounded-full overflow-hidden">
       <div
         className="h-full rounded-full transition-all duration-700"
         style={{ width: `${pct}%`, background: couleur }}
@@ -156,7 +156,7 @@ function NoteCard({ note, onLeaderboard }: { note: NoteEval; onLeaderboard: (n: 
   return (
     <div
       className="relative rounded-2xl border overflow-hidden transition-all duration-300 hover:scale-[1.01] hover:shadow-lg cursor-pointer"
-      style={{ borderColor: `${couleur}30`, background: `linear-gradient(135deg, rgba(2,6,23,0.95) 0%, ${couleur}08 100%)` }}
+      style={{ borderColor: `${couleur}30`, background: `linear-gradient(135deg, var(--ss-surface-elevated) 0%, ${couleur}08 100%)` }}
       onClick={() => onLeaderboard(note)}
     >
       {/* Barre couleur top */}
@@ -229,7 +229,7 @@ function NoteCard({ note, onLeaderboard }: { note: NoteEval; onLeaderboard: (n: 
 
         {/* Remarque prof */}
         {note.remarqueProf && (
-          <div className="mt-3 bg-white/5 rounded-xl p-3 border border-white/10">
+          <div className="mt-3 bg-ss-text/5 rounded-xl p-3 border border-ss-text/10">
             <p className="text-[11px] text-ss-text-muted mb-0.5">💬 Observation du professeur</p>
             <p className="text-xs text-ss-text italic">"{note.remarqueProf}"</p>
           </div>
@@ -270,7 +270,7 @@ function LeaderboardPanel({ note, onClose }: { note: NoteEval; onClose: () => vo
               { label: 'Meilleure', val: `${note.classeMax.toFixed(1)}/20` },
               { label: 'Participants', val: `${note.totalEleves}` },
             ].map(s => (
-              <div key={s.label} className="bg-white/5 rounded-xl p-3 text-center">
+              <div key={s.label} className="bg-ss-text/5 rounded-xl p-3 text-center">
                 <p className="text-sm font-bold text-ss-text">{s.val}</p>
                 <p className="text-[10px] text-ss-text-muted">{s.label}</p>
               </div>
@@ -282,7 +282,7 @@ function LeaderboardPanel({ note, onClose }: { note: NoteEval; onClose: () => vo
             {note.leaderboard.map((entry, i) => (
               <div
                 key={i}
-                className={`flex items-center gap-3 rounded-xl p-3 transition-all ${entry.isSelf ? 'border' : 'bg-white/3'}`}
+                className={`flex items-center gap-3 rounded-xl p-3 transition-all ${entry.isSelf ? 'border' : 'bg-ss-text/3'}`}
                 style={entry.isSelf ? { background: `${couleur}15`, borderColor: `${couleur}40` } : {}}
               >
                 <span className="w-8 text-center text-sm font-bold">
@@ -563,7 +563,7 @@ export default function EleveNotesPage() {
             onClick={() => setSelectedMatiere('all')}
             className={`shrink-0 text-xs px-4 py-2 rounded-xl border transition-all font-medium ${
               selectedMatiere === 'all'
-                ? 'bg-white/10 border-white/30 text-ss-text'
+                ? 'bg-ss-text/10 border-ss-text/30 text-ss-text'
                 : 'border-ss-border text-ss-text-muted hover:border-ss-border-hover'
             }`}
           >
@@ -577,7 +577,7 @@ export default function EleveNotesPage() {
               style={
                 selectedMatiere === m.id
                   ? { background: `${m.couleur}20`, borderColor: `${m.couleur}40`, color: m.couleur }
-                  : { borderColor: 'rgba(255,255,255,0.1)', color: '#94A3B8' }
+                  : { borderColor: 'var(--ss-glass-border)', color: 'var(--ss-text-muted)' }
               }
             >
               {m.nom} ({notes.filter(n => n.matiereId === m.id).length})

@@ -246,7 +246,7 @@ export default function ParentCantinePage() {
                         }`}>
                           {jour}
                           {isToday && (
-                            <span className="ml-2 text-xs font-medium bg-[#00853F] text-white px-2 py-0.5 rounded-full">
+                            <span className="ml-2 text-xs font-medium bg-[#00853F] text-ss-text px-2 py-0.5 rounded-full">
                               Aujourd&apos;hui
                             </span>
                           )}

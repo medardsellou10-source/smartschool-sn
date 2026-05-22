@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -43,24 +43,24 @@ export default function CertificatsPage() {
     load()
   }, [user])
 
-  if (userLoading || loading) return <div className="p-6 animate-pulse space-y-4">{[...Array(5)].map((_, i) => <div key={i} className="h-20 rounded-xl bg-white/5" />)}</div>
+  if (userLoading || loading) return <div className="p-6 animate-pulse space-y-4">{[...Array(5)].map((_, i) => <div key={i} className="h-20 rounded-xl bg-ss-text/5" />)}</div>
 
   return (
     <div className="space-y-6 pb-24 lg:pb-6 animate-fade-in">
       {toast && (
-        <div className="fixed top-4 right-4 z-50 px-5 py-3 rounded-2xl text-sm font-semibold text-white shadow-xl"
-          style={{ background: 'rgba(2,6,23,0.96)', border: `1px solid ${ACCENT}60`, backdropFilter: 'blur(24px)', maxWidth: '340px' }}>
+        <div className="fixed top-4 right-4 z-50 px-5 py-3 rounded-2xl text-sm font-semibold text-ss-text shadow-xl"
+          style={{ background: 'var(--ss-surface-elevated)', border: `1px solid ${ACCENT}60`, backdropFilter: 'blur(24px)', maxWidth: '340px' }}>
           <span style={{ color: ACCENT }}>ℹ️</span> {toast}
         </div>
       )}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-extrabold text-white flex items-center gap-2">
+          <h1 className="text-2xl font-extrabold text-ss-text flex items-center gap-2">
             <span style={{ color: ACCENT }}>📜</span> Certificats & Attestations
           </h1>
-          <p className="text-sm text-slate-300 mt-1">{certificats.filter(c => c.statut === 'emis').length} documents émis cette année</p>
+          <p className="text-sm text-ss-text-secondary mt-1">{certificats.filter(c => c.statut === 'emis').length} documents émis cette année</p>
         </div>
-        <button className="px-4 py-2 rounded-xl text-sm font-semibold text-white" style={{ background: ACCENT }}
+        <button className="px-4 py-2 rounded-xl text-sm font-semibold text-ss-text" style={{ background: ACCENT }}
           onClick={() => showToast('Mode démo — Émission de document disponible avec la base de données.')}>
           + Nouveau document
         </button>
@@ -72,14 +72,14 @@ export default function CertificatsPage() {
           const count = certificats.filter(c => c.type === key).length
           return (
             <div key={key} className="rounded-2xl p-5 flex items-center gap-4"
-              style={{ background: 'rgba(2,6,23,0.82)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: `1px solid ${ACCENT}35` }}>
+              style={{ background: 'var(--ss-surface-elevated)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: `1px solid ${ACCENT}35` }}>
               <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg"
                 style={{ background: `${ACCENT}20` }}>
                 {key === 'certificat_scolarite' ? '📜' : key === 'attestation_frequentation' ? '✉️' : '📊'}
               </div>
               <div>
-                <p className="text-xs text-slate-400">{label}</p>
-                <p className="text-xl font-bold text-white">{count}</p>
+                <p className="text-xs text-ss-text-muted">{label}</p>
+                <p className="text-xl font-bold text-ss-text">{count}</p>
               </div>
             </div>
           )
@@ -87,25 +87,25 @@ export default function CertificatsPage() {
       </div>
 
       {/* Liste */}
-      <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(2,6,23,0.82)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.12)' }}>
+      <div className="rounded-2xl overflow-hidden" style={{ background: 'var(--ss-surface-elevated)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid var(--ss-glass-border)' }}>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+              <tr style={{ borderBottom: '1px solid var(--ss-glass-card-hover)' }}>
                 {['Élève', 'Classe', 'Type de document', 'Demandeur', 'Date', 'Référence', 'Statut'].map(h => (
-                  <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">{h}</th>
+                  <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-ss-text-muted uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {certificats.map((cert, i) => (
-                <tr key={cert.id} className="transition-colors hover:bg-white/5"
-                  style={i < certificats.length - 1 ? { borderBottom: '1px solid rgba(255,255,255,0.04)' } : {}}>
-                  <td className="px-4 py-3 text-sm font-semibold text-white">{cert.eleve_nom}</td>
-                  <td className="px-4 py-3 text-sm text-slate-300">{cert.classe}</td>
-                  <td className="px-4 py-3 text-sm text-slate-300">{TYPE_LABEL[cert.type] || cert.type}</td>
-                  <td className="px-4 py-3 text-sm text-slate-400">{cert.demandeur}</td>
-                  <td className="px-4 py-3 text-sm text-slate-400">{new Date(cert.date_emission).toLocaleDateString('fr-FR')}</td>
+                <tr key={cert.id} className="transition-colors hover:bg-ss-text/5"
+                  style={i < certificats.length - 1 ? { borderBottom: '1px solid var(--ss-glass-card-bg)' } : {}}>
+                  <td className="px-4 py-3 text-sm font-semibold text-ss-text">{cert.eleve_nom}</td>
+                  <td className="px-4 py-3 text-sm text-ss-text-secondary">{cert.classe}</td>
+                  <td className="px-4 py-3 text-sm text-ss-text-secondary">{TYPE_LABEL[cert.type] || cert.type}</td>
+                  <td className="px-4 py-3 text-sm text-ss-text-muted">{cert.demandeur}</td>
+                  <td className="px-4 py-3 text-sm text-ss-text-muted">{new Date(cert.date_emission).toLocaleDateString('fr-FR')}</td>
                   <td className="px-4 py-3 text-xs font-mono" style={{ color: ACCENT }}>{cert.reference || '—'}</td>
                   <td className="px-4 py-3">
                     <span className="px-2 py-1 rounded-lg text-xs font-semibold"

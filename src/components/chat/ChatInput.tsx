@@ -113,7 +113,7 @@ export default function ChatInput({ onSend, isLoading, onStop, accentColor, plac
   }, [isListening])
 
   return (
-    <div className="flex items-end gap-2 p-3 bg-black/30 border-t border-white/10">
+    <div className="flex items-end gap-2 p-3 bg-black/30 border-t border-ss-text/10">
       {/* Bouton micro */}
       {speechSupported && !isLoading && (
         <button
@@ -121,12 +121,12 @@ export default function ChatInput({ onSend, isLoading, onStop, accentColor, plac
           className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
             isListening
               ? 'animate-pulse'
-              : 'hover:bg-white/5'
+              : 'hover:bg-ss-text/5'
           }`}
           style={{
             backgroundColor: isListening ? `${accentColor}30` : 'transparent',
-            color: isListening ? accentColor : 'rgba(255,255,255,0.4)',
-            border: `1px solid ${isListening ? accentColor : 'rgba(255,255,255,0.1)'}`,
+            color: isListening ? accentColor : 'var(--ss-glass-border)',
+            border: `1px solid ${isListening ? accentColor : 'var(--ss-glass-border)'}`,
             boxShadow: isListening ? `0 0 12px ${accentColor}40` : 'none',
           }}
           title={isListening ? 'Arrêter le micro' : 'Parler'}
@@ -158,7 +158,7 @@ export default function ChatInput({ onSend, isLoading, onStop, accentColor, plac
         onKeyDown={handleKeyDown}
         placeholder={isListening ? '🎤 Parlez maintenant...' : (placeholder || 'Écris ton message...')}
         rows={1}
-        className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/30 resize-none focus:outline-none focus:border-white/30 transition-colors"
+        className="flex-1 bg-ss-text/5 border border-ss-text/10 rounded-xl px-4 py-2.5 text-sm text-ss-text placeholder-white/30 resize-none focus:outline-none focus:border-ss-text/30 transition-colors"
         style={{
           maxHeight: '120px',
           borderColor: isListening ? accentColor : undefined,
@@ -184,8 +184,8 @@ export default function ChatInput({ onSend, isLoading, onStop, accentColor, plac
           className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all disabled:opacity-30"
           style={{
             backgroundColor: input.trim() ? `${accentColor}30` : 'transparent',
-            color: input.trim() ? accentColor : 'rgba(255,255,255,0.3)',
-            border: `1px solid ${input.trim() ? `${accentColor}50` : 'rgba(255,255,255,0.1)'}`,
+            color: input.trim() ? accentColor : 'var(--ss-glass-border)',
+            border: `1px solid ${input.trim() ? `${accentColor}50` : 'var(--ss-glass-border)'}`,
           }}
           title="Envoyer"
         >

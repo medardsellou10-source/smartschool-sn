@@ -6,6 +6,8 @@ import Link from 'next/link'
 import { Suspense } from 'react'
 import { getRolesForType, TYPE_META, type TypeEtablissement } from '@/lib/school-roles'
 import { Building, Book, Landmark, Baby, GraduationCap, MapPin, Trophy, Shield, Rocket, Check, Lock, ShieldCheck, Eye, EyeOff, Smartphone, CreditCard, ChevronDown, CheckCircle2 } from 'lucide-react'
+import { usePays } from '@/hooks/usePays'
+import { PaysSelector } from '@/components/layout/PaysSelector'
 
 const PLANS = [
   { id: 'basique', nom: 'Basique', icon: <Shield className="w-5 h-5" />, couleur: '#22C55E', prix: 25000, desc: "Jusqu'à 200 élèves, 5 classes" },
@@ -13,11 +15,19 @@ const PLANS = [
   { id: 'etablissement', nom: 'Établissement', icon: <GraduationCap className="w-5 h-5" />, couleur: '#FBBF24', prix: 100000, desc: "Jusqu'à 1 500 élèves, illimité" },
 ]
 
-const REGIONS = [
+// WAED-CI #5 — Régions par pays
+const REGIONS_SN = [
   'Dakar', 'Thiès', 'Saint-Louis', 'Diourbel', 'Fatick',
   'Kaolack', 'Kolda', 'Louga', 'Matam', 'Sédhiou',
   'Tambacounda', 'Ziguinchor', 'Kaffrine', 'Kédougou',
 ]
+const REGIONS_CI = [
+  'Abidjan — Cocody', 'Abidjan — Plateau', 'Abidjan — Yopougon', 'Abidjan — Abobo',
+  'Abidjan — Marcory', 'Abidjan — Treichville', 'Abidjan — Koumassi', 'Abidjan — Adjamé',
+  'Yamoussoukro', 'Bouaké', 'San Pedro', 'Daloa', 'Korhogo', 'Man',
+  'Abengourou', 'Odienné', 'Séguéla', 'Gagnoa',
+]
+const REGIONS = REGIONS_SN // legacy fallback (page reste rétrocompatible)
 const TYPES = [
   { v: 'prive',        l: 'École privée laïque',          badge: <Building className="w-4 h-4" /> },
   { v: 'franco_arabe', l: 'Franco-arabe / Islamique',     badge: <Landmark className="w-4 h-4" /> },
@@ -107,6 +117,10 @@ function InscriptionForm() {
   const searchParams = useSearchParams()
   const planParam = searchParams.get('plan') || 'standard'
 
+  // WAED-CI #5 — Pays actif
+  const { pays, config, isCI, formatTelephone } = usePays()
+  const regionsAvail = isCI ? REGIONS_CI : REGIONS_SN
+
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -114,7 +128,7 @@ function InscriptionForm() {
   // Étape 1 — École
   const [nomEcole, setNomEcole] = useState('')
   const [typeEtab, setTypeEtab] = useState('prive')
-  const [region, setRegion] = useState('Dakar')
+  const [region, setRegion] = useState(isCI ? 'Abidjan — Cocody' : 'Dakar')
   const [ville, setVille] = useState('')
   const [nbEleves, setNbEleves] = useState('')
   const [telephone, setTelephone] = useState('')
@@ -134,7 +148,8 @@ function InscriptionForm() {
   const [facturation, setFacturation] = useState<'mensuel' | 'annuel'>('mensuel')
 
   // Étape 4 — Paiement
-  const [methodePaiement, setMethodePaiement] = useState<'essai' | 'wave' | 'orange_money'>('essai')
+  // WAED-CI #6 — Méthodes de paiement multi-pays (Wave SN, MTN MoMo / Moov / OM CI)
+  const [methodePaiement, setMethodePaiement] = useState<'essai' | 'wave' | 'orange_money' | 'mtn_momo' | 'moov_money'>('essai')
   const [numTel, setNumTel] = useState('')
 
   const planInfo = PLANS.find(p => p.id === planChoisi) || PLANS[1]
@@ -170,7 +185,7 @@ function InscriptionForm() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ecole: { nom: nomEcole, type_etablissement: typeEtab, region, ville, telephone, site_web: siteWeb, nb_eleves: nbEleves },
+          ecole: { nom: nomEcole, type_etablissement: typeEtab, pays, region, ville, telephone, site_web: siteWeb, nb_eleves: nbEleves },
           admin: { prenom: adminPrenom, nom: adminNom, email: adminEmail, telephone: adminTel, mot_de_passe: adminMdp },
           abonnement: { plan_id: planChoisi, mode_facturation: facturation, methode_paiement: methodePaiement },
         }),
@@ -263,10 +278,28 @@ function InscriptionForm() {
                 <p className="text-sm" style={{ color: 'rgba(255,255,255,0.35)' }}>Étape 1/4 — Informations de l'école</p>
               </div>
 
+              {/* WAED-CI #5 — Sélecteur de pays premium */}
+              <div
+                className="rounded-2xl p-4"
+                style={{
+                  background: `${config.couleurPrimaire}10`,
+                  border: `1px solid ${config.couleurPrimaire}38`,
+                }}
+              >
+                <p className={labelClass} style={labelStyle}>Pays de votre établissement *</p>
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <PaysSelector variant="pill" />
+                  <span className="text-[11px] text-white/60">
+                    {config.drapeau} {config.ministere} · {config.indicatif}
+                  </span>
+                </div>
+              </div>
+
               <div>
                 <label className={labelClass} style={labelStyle}>Nom de l'établissement *</label>
                 <input value={nomEcole} onChange={e => setNomEcole(e.target.value)}
-                  placeholder="Lycée Al-Azhar" className={inputClass} style={inputStyle}
+                  placeholder={isCI ? 'Lycée Classique d\'Abidjan' : 'Lycée Al-Azhar'}
+                  className={inputClass} style={inputStyle}
                   autoComplete="organization" name="school-name" />
               </div>
 
@@ -278,10 +311,10 @@ function InscriptionForm() {
                   options={TYPES}
                 />
                 <Dropdown
-                  label="Région"
-                  value={region}
+                  label={`Région ${isCI ? '(district / commune)' : ''}`}
+                  value={regionsAvail.includes(region) ? region : regionsAvail[0]}
                   onChange={setRegion}
-                  options={REGIONS.map(r => ({ v: r, l: r }))}
+                  options={regionsAvail.map(r => ({ v: r, l: r }))}
                 />
               </div>
 
@@ -369,7 +402,7 @@ function InscriptionForm() {
                 <div>
                   <label className={labelClass} style={labelStyle}>Téléphone de l'école</label>
                   <input value={telephone} onChange={e => setTelephone(e.target.value)}
-                    placeholder="77 123 45 67" className={inputClass} style={inputStyle}
+                    placeholder={config.formatTelDisplay} className={inputClass} style={inputStyle}
                     type="tel" inputMode="tel" autoComplete="off" name="school-phone" />
                 </div>
                 <div>
@@ -572,13 +605,22 @@ function InscriptionForm() {
               ) : (
                 <div className="space-y-2">
                   <p className="text-xs uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.35)' }}>
-                    Méthode de paiement
+                    Méthode de paiement {config.drapeau} {config.nom}
                   </p>
-                  {[
-                    { id: 'wave', icon: <Smartphone className="w-5 h-5 text-blue-400" />, label: 'Wave', desc: 'Paiement instantané Wave Sénégal' },
-                    { id: 'orange_money', icon: <Smartphone className="w-5 h-5 text-orange-500" />, label: 'Orange Money', desc: 'Paiement Orange Money' },
-                    { id: 'essai', icon: <Rocket className="w-5 h-5 text-slate-400" />, label: 'Démarrer en essai gratuit', desc: 'Commencer avec 14 jours gratuits' },
-                  ].map(m => (
+                  {(isCI
+                    ? [
+                        { id: 'mtn_momo',     icon: <Smartphone className="w-5 h-5 text-yellow-400" />, label: 'MTN Mobile Money 🟡', desc: 'Paiement #1 en Côte d\'Ivoire — via CinetPay' },
+                        { id: 'orange_money', icon: <Smartphone className="w-5 h-5 text-orange-500" />, label: 'Orange Money CI 🟠',   desc: 'Paiement Orange Money Côte d\'Ivoire' },
+                        { id: 'moov_money',   icon: <Smartphone className="w-5 h-5 text-blue-400" />,   label: 'Moov Money 🔵',       desc: 'Moov Money Côte d\'Ivoire (préfixe 01)' },
+                        { id: 'wave',         icon: <Smartphone className="w-5 h-5 text-cyan-400" />,   label: 'Wave CI 🌊',           desc: 'Wave Côte d\'Ivoire (en expansion)' },
+                        { id: 'essai',        icon: <Rocket className="w-5 h-5 text-slate-400" />,     label: 'Démarrer en essai gratuit', desc: '14 jours gratuits — sans carte bancaire' },
+                      ]
+                    : [
+                        { id: 'wave',         icon: <Smartphone className="w-5 h-5 text-blue-400" />,   label: 'Wave 🌊',              desc: 'Paiement instantané Wave Sénégal' },
+                        { id: 'orange_money', icon: <Smartphone className="w-5 h-5 text-orange-500" />, label: 'Orange Money 🟠',     desc: 'Paiement Orange Money Sénégal' },
+                        { id: 'essai',        icon: <Rocket className="w-5 h-5 text-slate-400" />,     label: 'Démarrer en essai gratuit', desc: 'Commencer avec 14 jours gratuits' },
+                      ]
+                  ).map(m => (
                     <button key={m.id} type="button"
                       onClick={() => setMethodePaiement(m.id as typeof methodePaiement)}
                       className="w-full text-left rounded-xl p-3.5 transition-all"
@@ -594,13 +636,26 @@ function InscriptionForm() {
                       </div>
                     </button>
                   ))}
-                  {(methodePaiement === 'wave' || methodePaiement === 'orange_money') && (
+                  {methodePaiement !== 'essai' && (
                     <div className="pt-1">
                       <label className={labelClass} style={labelStyle}>
-                        Numéro {methodePaiement === 'wave' ? 'Wave' : 'Orange Money'}
+                        Numéro {methodePaiement === 'mtn_momo' ? 'MTN MoMo'
+                              : methodePaiement === 'moov_money' ? 'Moov Money'
+                              : methodePaiement === 'wave' ? 'Wave'
+                              : 'Orange Money'} ({config.indicatif})
                       </label>
-                      <input value={numTel} onChange={e => setNumTel(e.target.value)}
-                        placeholder="77 XXX XX XX" className={inputClass} style={inputStyle} />
+                      <input
+                        value={numTel}
+                        onChange={e => setNumTel(e.target.value)}
+                        placeholder={config.formatTelDisplay}
+                        className={inputClass}
+                        style={inputStyle}
+                        type="tel"
+                        inputMode="tel"
+                      />
+                      <p className="mt-1 text-[11px] text-white/50">
+                        Format attendu : <span className="font-mono">{config.formatTelDisplay}</span>
+                      </p>
                     </div>
                   )}
                 </div>

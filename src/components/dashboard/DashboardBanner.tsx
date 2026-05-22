@@ -62,7 +62,7 @@ export function DashboardBanner({
       style={{
         background: bgImage
           ? undefined
-          : `linear-gradient(135deg, rgba(2,6,23,0.95) 0%, rgba(2,6,23,0.88) 60%, rgba(2,6,23,0.95) 100%)`,
+          : `linear-gradient(135deg, var(--ss-bg-card) 0%, var(--ss-bg-secondary) 60%, var(--ss-bg-card) 100%)`,
         border: `1px solid ${accent}30`,
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
@@ -81,7 +81,7 @@ export function DashboardBanner({
           <div
             className="absolute inset-0"
             style={{
-              background: `linear-gradient(135deg, rgba(2,6,23,0.95) 0%, rgba(2,6,23,0.7) 100%)`,
+              background: `linear-gradient(135deg, var(--ss-surface-elevated) 0%, var(--ss-surface-elevated) 100%)`,
             }}
           />
         </>
@@ -123,7 +123,7 @@ export function DashboardBanner({
               </div>
             )}
             <div className="min-w-0">
-              <h1 className="text-xl sm:text-2xl font-extrabold text-white truncate">
+              <h1 className={`text-xl sm:text-2xl font-extrabold truncate ${bgImage ? 'text-ss-text' : 'text-ss-text'}`}>
                 Bonjour{displayName ? `, ${displayName}` : ''}
               </h1>
               {(subtitle || ecoleNom) && (

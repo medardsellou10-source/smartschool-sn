@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -181,18 +181,18 @@ export default function AbonnementPage() {
     actif:    { label: 'Actif',         color: '#22C55E', bg: 'rgba(0,230,118,0.1)' },
     expire:   { label: 'Expiré',        color: '#F87171', bg: 'rgba(255,23,68,0.1)' },
     suspendu: { label: 'Suspendu',      color: '#FBBF24', bg: 'rgba(255,214,0,0.1)' },
-    annule:   { label: 'Annulé',        color: '#94A3B8', bg: 'rgba(148,163,184,0.1)' },
+    annule:   { label: 'Annulé',        color: 'var(--ss-text-muted)', bg: 'rgba(148,163,184,0.1)' },
   }
 
-  const glassStyle = { background: 'rgba(2,6,23,0.7)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.08)' }
+  const glassStyle = { background: 'var(--ss-surface-elevated)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid var(--ss-glass-card-hover)' }
 
   if (loading || userLoading) {
     return (
       <div className="space-y-6">
-        <div className="h-8 w-64 bg-white/5 rounded-lg animate-pulse" />
-        <div className="h-40 bg-white/5 rounded-2xl animate-pulse" />
+        <div className="h-8 w-64 bg-ss-text/5 rounded-lg animate-pulse" />
+        <div className="h-40 bg-ss-text/5 rounded-2xl animate-pulse" />
         <div className="grid grid-cols-3 gap-4">
-          {[0,1,2].map(i => <div key={i} className="h-64 bg-white/5 rounded-2xl animate-pulse" />)}
+          {[0,1,2].map(i => <div key={i} className="h-64 bg-ss-text/5 rounded-2xl animate-pulse" />)}
         </div>
       </div>
     )
@@ -202,8 +202,8 @@ export default function AbonnementPage() {
     <div className="space-y-8 pb-12 animate-fade-in">
       {/* Toast */}
       {toast && (
-        <div className="fixed top-4 right-4 z-50 px-5 py-3 rounded-2xl text-sm font-semibold text-white shadow-xl max-w-sm"
-          style={{ background: 'rgba(2,6,23,0.98)', border: `1px solid #00E57660`, backdropFilter: 'blur(24px)' }}>
+        <div className="fixed top-4 right-4 z-50 px-5 py-3 rounded-2xl text-sm font-semibold text-ss-text shadow-xl max-w-sm"
+          style={{ background: 'var(--ss-surface-elevated)', border: `1px solid #00E57660`, backdropFilter: 'blur(24px)' }}>
           ✅ {toast}
         </div>
       )}
@@ -218,13 +218,13 @@ export default function AbonnementPage() {
       {/* Abonnement actuel */}
       {abonnement && planActuel && (
         <div className="rounded-2xl p-6"
-          style={{ background: `linear-gradient(135deg, ${planActuel.couleur}10, rgba(2,6,23,0.9))`, border: `1px solid ${planActuel.couleur}30` }}>
+          style={{ background: `linear-gradient(135deg, ${planActuel.couleur}10, var(--ss-surface-elevated))`, border: `1px solid ${planActuel.couleur}30` }}>
           <div className="flex items-start justify-between flex-wrap gap-4">
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <span className="text-3xl">{planActuel.emoji}</span>
                 <div>
-                  <h2 className="text-xl font-black text-white">Plan {planActuel.nom}</h2>
+                  <h2 className="text-xl font-black text-ss-text">Plan {planActuel.nom}</h2>
                   <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full"
                     style={{ background: statutConfig[abonnement.statut].bg, color: statutConfig[abonnement.statut].color }}>
                     <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: statutConfig[abonnement.statut].color }} />
@@ -232,7 +232,7 @@ export default function AbonnementPage() {
                   </span>
                 </div>
               </div>
-              <div className="flex flex-wrap gap-4 text-sm text-slate-400 mt-3">
+              <div className="flex flex-wrap gap-4 text-sm text-ss-text-muted mt-3">
                 <span>📅 Début : {formatDate(abonnement.date_debut)}</span>
                 <span>⏳ Fin : {formatDate(abonnement.date_fin)}</span>
               </div>
@@ -241,7 +241,7 @@ export default function AbonnementPage() {
               <div className="text-4xl font-black" style={{ color: urgence ? '#F87171' : planActuel.couleur }}>
                 {joursRestants}j
               </div>
-              <div className="text-xs text-slate-400">restants</div>
+              <div className="text-xs text-ss-text-muted">restants</div>
               {urgence && joursRestants > 0 && (
                 <div className="text-xs text-red-400 mt-1 font-semibold">⚠️ Renouveler maintenant</div>
               )}
@@ -249,11 +249,11 @@ export default function AbonnementPage() {
           </div>
 
           <div className="mt-5">
-            <div className="flex justify-between text-xs text-slate-400 mb-1.5">
+            <div className="flex justify-between text-xs text-ss-text-muted mb-1.5">
               <span>Progression du cycle (30 jours)</span>
               <span>{joursRestants} jours restants</span>
             </div>
-            <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
+            <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--ss-glass-card-hover)' }}>
               <div className="h-full rounded-full transition-all"
                 style={{
                   width: `${Math.min(100, (joursRestants / 30) * 100)}%`,
@@ -280,8 +280,8 @@ export default function AbonnementPage() {
             </button>
             <button
               onClick={() => showToast('Vos factures sont disponibles — activé avec le paiement réel.')}
-              className="px-5 py-2.5 rounded-xl font-bold text-sm text-slate-400 hover:text-white transition-colors"
-              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
+              className="px-5 py-2.5 rounded-xl font-bold text-sm text-ss-text-muted hover:text-ss-text transition-colors"
+              style={{ background: 'var(--ss-glass-card-hover)', border: '1px solid var(--ss-glass-border)' }}>
               📄 Voir les factures
             </button>
           </div>
@@ -291,7 +291,7 @@ export default function AbonnementPage() {
       {/* Nouveautés */}
       <div>
         <div className="flex items-center gap-3 mb-4">
-          <h2 className="text-lg font-bold text-white">🚀 Nouvelles fonctionnalités (2025-2026)</h2>
+          <h2 className="text-lg font-bold text-ss-text">🚀 Nouvelles fonctionnalités (2025-2026)</h2>
           <span className="px-2.5 py-1 rounded-full text-xs font-bold"
             style={{ background: 'rgba(0,229,255,0.15)', color: '#38BDF8' }}>8 NOUVELLES</span>
         </div>
@@ -301,7 +301,7 @@ export default function AbonnementPage() {
               <div className="flex items-start justify-between gap-2 mb-2">
                 <div className="flex items-center gap-2">
                   <span className="text-xl">{icon}</span>
-                  <p className="font-semibold text-white text-sm leading-snug">{titre}</p>
+                  <p className="font-semibold text-ss-text text-sm leading-snug">{titre}</p>
                 </div>
                 <span className="shrink-0 text-[9px] font-bold px-2 py-0.5 rounded-full"
                   style={{
@@ -312,7 +312,7 @@ export default function AbonnementPage() {
                   {plan}
                 </span>
               </div>
-              <p className="text-xs text-slate-400 leading-relaxed">{desc}</p>
+              <p className="text-xs text-ss-text-muted leading-relaxed">{desc}</p>
             </div>
           ))}
         </div>
@@ -320,7 +320,7 @@ export default function AbonnementPage() {
 
       {/* Plans disponibles */}
       <div>
-        <h2 className="text-lg font-bold text-white mb-4">Changer de plan</h2>
+        <h2 className="text-lg font-bold text-ss-text mb-4">Changer de plan</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {plans.map(plan => {
             const estActuel = plan.id === abonnement?.plan_id
@@ -328,8 +328,8 @@ export default function AbonnementPage() {
               <div key={plan.id}
                 className="rounded-2xl p-5 flex flex-col transition-all hover:-translate-y-1"
                 style={{
-                  background: estActuel ? `${plan.couleur}08` : 'rgba(255,255,255,0.03)',
-                  border: estActuel ? `2px solid ${plan.couleur}50` : '1px solid rgba(255,255,255,0.08)',
+                  background: estActuel ? `${plan.couleur}08` : 'var(--ss-glass-card-bg)',
+                  border: estActuel ? `2px solid ${plan.couleur}50` : '1px solid var(--ss-glass-card-hover)',
                 }}>
                 {estActuel && (
                   <div className="text-center mb-3">
@@ -340,20 +340,20 @@ export default function AbonnementPage() {
                 )}
                 <div className="flex items-center gap-2 mb-3">
                   <span className="text-2xl">{plan.emoji}</span>
-                  <div className="font-bold text-white">{plan.nom}</div>
+                  <div className="font-bold text-ss-text">{plan.nom}</div>
                 </div>
                 <div className="mb-1">
                   <span className="text-2xl font-black" style={{ color: plan.couleur }}>
                     {plan.prix_mensuel.toLocaleString('fr-SN')}
                   </span>
-                  <span className="text-slate-400 text-sm"> FCFA/mois</span>
+                  <span className="text-ss-text-muted text-sm"> FCFA/mois</span>
                 </div>
-                <div className="text-xs text-slate-500 mb-4">
+                <div className="text-xs text-ss-text-muted mb-4">
                   ou {plan.prix_annuel.toLocaleString('fr-SN')} FCFA/an (−{Math.round((1 - plan.prix_annuel / (plan.prix_mensuel * 12)) * 100)}%)
                 </div>
                 <ul className="space-y-1.5 flex-1 mb-4">
                   {plan.fonctionnalites.map(f => (
-                    <li key={f} className="flex items-start gap-1.5 text-xs text-slate-400">
+                    <li key={f} className="flex items-start gap-1.5 text-xs text-ss-text-muted">
                       <span style={{ color: plan.couleur }} className="mt-0.5 shrink-0">✓</span> {f}
                     </li>
                   ))}
@@ -366,7 +366,7 @@ export default function AbonnementPage() {
                   className="w-full py-2.5 rounded-xl font-bold text-sm transition-all hover:opacity-90"
                   style={estActuel
                     ? { background: `${plan.couleur}15`, color: plan.couleur, border: `1px solid ${plan.couleur}30` }
-                    : { background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.1)' }
+                    : { background: 'var(--ss-glass-card-hover)', color: 'var(--ss-glass-border)', border: '1px solid var(--ss-glass-border)' }
                   }>
                   {estActuel ? '✓ Plan actuel' : `Choisir ${plan.nom} →`}
                 </button>
@@ -382,8 +382,8 @@ export default function AbonnementPage() {
         <div className="flex items-center gap-4">
           <span className="text-3xl">🏆</span>
           <div>
-            <div className="font-bold text-white">Réseau Scolaire — Multi-établissements</div>
-            <div className="text-sm text-slate-400">Tableau de bord consolidé, accès multi-campus, SLA 99.9%, support dédié</div>
+            <div className="font-bold text-ss-text">Réseau Scolaire — Multi-établissements</div>
+            <div className="text-sm text-ss-text-muted">Tableau de bord consolidé, accès multi-campus, SLA 99.9%, support dédié</div>
           </div>
         </div>
         <a href="mailto:contact@smartschool.sn"
@@ -395,7 +395,7 @@ export default function AbonnementPage() {
 
       {/* Méthodes de paiement */}
       <div className="rounded-2xl p-5" style={glassStyle}>
-        <h3 className="font-bold text-white mb-4">Méthodes de paiement acceptées</h3>
+        <h3 className="font-bold text-ss-text mb-4">Méthodes de paiement acceptées</h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
             { icon: '🌊', label: 'Wave Sénégal',   desc: 'Transfert instantané' },
@@ -404,17 +404,17 @@ export default function AbonnementPage() {
             { icon: '🏦', label: 'Virement bancaire', desc: 'SGBS · CBAO · BHS' },
           ].map(m => (
             <div key={m.label} className="rounded-xl p-3 text-center"
-              style={{ background: 'rgba(255,255,255,0.04)' }}>
+              style={{ background: 'var(--ss-glass-card-bg)' }}>
               <div className="text-2xl mb-1">{m.icon}</div>
-              <div className="text-xs font-bold text-white">{m.label}</div>
-              <div className="text-xs text-slate-400">{m.desc}</div>
+              <div className="text-xs font-bold text-ss-text">{m.label}</div>
+              <div className="text-xs text-ss-text-muted">{m.desc}</div>
             </div>
           ))}
         </div>
-        <p className="text-xs text-slate-400 mt-4">
+        <p className="text-xs text-ss-text-muted mt-4">
           Renouvellement & upgrade :{' '}
           <a href="mailto:billing@smartschool.sn" className="text-cyan-400 hover:underline">billing@smartschool.sn</a>
-          {' '}· WhatsApp : <span className="text-white font-semibold">+221 77 000 00 00</span>
+          {' '}· WhatsApp : <span className="text-ss-text font-semibold">+221 77 000 00 00</span>
         </p>
       </div>
     </div>

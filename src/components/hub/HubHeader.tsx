@@ -1,63 +1,61 @@
 'use client'
 
-import { Search, X } from 'lucide-react'
-import { GamificationBadge } from './GamificationBadge'
+/**
+ * HubHeader — barre de recherche live + badge gamification
+ */
 
-interface Props {
+import { Search, X, PlaySquare } from 'lucide-react'
+import { GamificationBadge } from './GamificationBadge'
+import { useProgress } from '@/hooks/useProgress'
+
+interface HubHeaderProps {
   query: string
-  onQueryChange: (q: string) => void
-  title?: string
-  subtitle?: string
-  rightSlot?: React.ReactNode
+  onQuery: (q: string) => void
 }
 
-export function HubHeader({ query, onQueryChange, title = 'SmartSchool Hub', subtitle, rightSlot }: Props) {
+export function HubHeader({ query, onQuery }: HubHeaderProps) {
+  const { xpState } = useProgress()
+
   return (
-    <header className="sticky top-0 z-20 mb-4 -mx-4 border-b border-white/5 bg-[var(--color-ss-bg)]/85 px-4 py-3 backdrop-blur-xl sm:-mx-6 sm:px-6">
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div className="min-w-0">
-          <h1 className="text-lg font-bold text-[var(--color-ss-text)] sm:text-xl">
-            {title}
-          </h1>
-          {subtitle && (
-            <p className="mt-0.5 truncate text-xs text-[var(--color-ss-text-secondary)]">
-              {subtitle}
-            </p>
+    <header className="flex flex-wrap items-center justify-between gap-3">
+      {/* Logo + titre */}
+      <div className="flex items-center gap-2.5">
+        <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500/30 to-indigo-500/30">
+          <PlaySquare className="h-5 w-5 text-purple-300" aria-hidden />
+        </span>
+        <div>
+          <h1 className="text-lg font-black text-ss-text">SmartSchool Hub</h1>
+          <p className="text-[10px] text-ss-text-secondary">Cours vidéo · BFEM &amp; BAC</p>
+        </div>
+      </div>
+
+      {/* Recherche + XP */}
+      <div className="flex flex-1 items-center justify-end gap-3 min-w-0">
+        {/* Recherche live */}
+        <div className="flex flex-1 max-w-sm items-center gap-2 rounded-xl border border-ss-text/10 bg-white/[0.04] px-3 py-2">
+          <Search className="h-4 w-4 shrink-0 text-ss-text-secondary" aria-hidden />
+          <input
+            type="search"
+            value={query}
+            onChange={e => onQuery(e.target.value)}
+            placeholder="Rechercher une leçon, un prof…"
+            className="flex-1 bg-transparent text-sm text-ss-text outline-none placeholder:text-ss-text-secondary"
+            aria-label="Rechercher une leçon"
+          />
+          {query && (
+            <button
+              type="button"
+              onClick={() => onQuery('')}
+              className="shrink-0 text-ss-text-secondary hover:text-ss-text"
+              aria-label="Effacer la recherche"
+            >
+              <X className="h-3.5 w-3.5" aria-hidden />
+            </button>
           )}
         </div>
 
-        <div className="flex items-center gap-2 md:gap-3">
-          {/* Barre de recherche */}
-          <div className="relative flex-1 md:w-80 md:flex-initial">
-            <Search
-              aria-hidden
-              className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-[var(--color-ss-text-muted)]"
-            />
-            <input
-              type="search"
-              value={query}
-              onChange={e => onQueryChange(e.target.value)}
-              placeholder="Rechercher une leçon, un prof…"
-              aria-label="Rechercher une leçon"
-              className="w-full rounded-full border border-white/10 bg-[var(--color-ss-bg-card)] py-2 pr-9 pl-9 text-sm text-[var(--color-ss-text)] placeholder:text-[var(--color-ss-text-muted)] focus:border-[var(--color-ss-purple)] focus:outline-none"
-            />
-            {query && (
-              <button
-                type="button"
-                onClick={() => onQueryChange('')}
-                aria-label="Effacer la recherche"
-                className="absolute top-1/2 right-2 -translate-y-1/2 rounded-full p-1 text-[var(--color-ss-text-muted)] hover:bg-white/10 hover:text-white"
-              >
-                <X className="h-4 w-4" aria-hidden />
-              </button>
-            )}
-          </div>
-
-          <div className="hidden sm:block">
-            <GamificationBadge />
-          </div>
-          {rightSlot}
-        </div>
+        {/* Gamification */}
+        <GamificationBadge xpState={xpState} />
       </div>
     </header>
   )

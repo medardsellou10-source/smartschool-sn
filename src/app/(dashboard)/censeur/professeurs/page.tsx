@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -13,7 +13,7 @@ const STATUT_STYLE: Record<string, { bg: string; color: string; label: string }>
   a_heure:      { bg: 'rgba(0,230,118,0.15)',  color: '#22C55E', label: 'À l\'heure' },
   retard_leger: { bg: 'rgba(255,214,0,0.15)',  color: '#FBBF24', label: 'Léger retard' },
   retard_grave: { bg: 'rgba(255,23,68,0.15)',  color: '#F87171', label: 'Retard grave' },
-  absent:       { bg: 'rgba(100,116,139,0.15)', color: '#64748B', label: 'Absent' },
+  absent:       { bg: 'rgba(100,116,139,0.15)', color: 'var(--ss-text-muted)', label: 'Absent' },
 }
 
 export default function ProfesseursCenseurPage() {
@@ -64,7 +64,7 @@ export default function ProfesseursCenseurPage() {
     load()
   }, [user])
 
-  if (userLoading || loading) return <div className="p-6 animate-pulse space-y-3">{[...Array(8)].map((_, i) => <div key={i} className="h-14 rounded-xl bg-white/5" />)}</div>
+  if (userLoading || loading) return <div className="p-6 animate-pulse space-y-3">{[...Array(8)].map((_, i) => <div key={i} className="h-14 rounded-xl bg-ss-text/5" />)}</div>
 
   const presents = profsData.filter(p => p.statut !== 'absent').length
 
@@ -82,20 +82,20 @@ export default function ProfesseursCenseurPage() {
         {Object.entries(STATUT_STYLE).map(([key, s]) => (
           <div key={key} className="rounded-2xl p-4 text-center"
             style={{ background: s.bg, border: `1px solid ${s.color}30` }}>
-            <p className="text-2xl font-black text-white">{profsData.filter(p => p.statut === key).length}</p>
+            <p className="text-2xl font-black text-ss-text">{profsData.filter(p => p.statut === key).length}</p>
             <p className="text-xs font-semibold mt-1" style={{ color: s.color }}>{s.label}</p>
           </div>
         ))}
       </div>
 
       {/* Liste */}
-      <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(2,6,23,0.82)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.12)' }}>
+      <div className="rounded-2xl overflow-hidden" style={{ background: 'var(--ss-surface-elevated)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid var(--ss-glass-border)' }}>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+              <tr style={{ borderBottom: '1px solid var(--ss-glass-card-hover)' }}>
                 {['Professeur', 'Matière', "Heure d'arrivée", 'Statut'].map(h => (
-                  <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">{h}</th>
+                  <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-ss-text-muted uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
             </thead>
@@ -103,13 +103,13 @@ export default function ProfesseursCenseurPage() {
               {profsData.map((prof, i) => {
                 const s = STATUT_STYLE[prof.statut] || STATUT_STYLE.absent
                 return (
-                  <tr key={prof.id} className="hover:bg-white/5 transition-colors"
-                    style={i < profsData.length - 1 ? { borderBottom: '1px solid rgba(255,255,255,0.04)' } : {}}>
+                  <tr key={prof.id} className="hover:bg-ss-text/5 transition-colors"
+                    style={i < profsData.length - 1 ? { borderBottom: '1px solid var(--ss-glass-card-bg)' } : {}}>
                     <td className="px-4 py-3">
-                      <p className="text-sm font-semibold text-white">{prof.prenom} {prof.nom}</p>
+                      <p className="text-sm font-semibold text-ss-text">{prof.prenom} {prof.nom}</p>
                     </td>
-                    <td className="px-4 py-3 text-sm text-slate-400">{prof.matiere}</td>
-                    <td className="px-4 py-3 text-sm font-mono text-slate-300">{prof.heure}</td>
+                    <td className="px-4 py-3 text-sm text-ss-text-muted">{prof.matiere}</td>
+                    <td className="px-4 py-3 text-sm font-mono text-ss-text-secondary">{prof.heure}</td>
                     <td className="px-4 py-3">
                       <span className="px-2 py-1 rounded-lg text-xs font-semibold" style={{ background: s.bg, color: s.color }}>{s.label}</span>
                     </td>

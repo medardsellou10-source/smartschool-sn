@@ -90,7 +90,7 @@ export default function ProfesseursPage() {
         icon={UserSquare2}
         accent="info"
         actions={
-          <div className="flex items-center gap-3 text-sm px-3 py-2 rounded-xl bg-white/5 border border-white/10">
+          <div className="flex items-center gap-3 text-sm px-3 py-2 rounded-xl bg-ss-text/5 border border-ss-text/10">
             <span className="text-ss-green font-semibold">{totalActifs} actif{totalActifs > 1 ? 's' : ''}</span>
             <span className="text-ss-text-muted">/</span>
             <span className="text-ss-text-muted">{totalInactifs} inactif{totalInactifs > 1 ? 's' : ''}</span>

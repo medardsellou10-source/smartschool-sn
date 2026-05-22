@@ -31,7 +31,7 @@ export function CookieConsentBanner() {
         <div className="flex-1 space-y-2">
           <div className="flex items-center gap-2">
             <span className="text-xl">🍪</span>
-            <h3 className="font-bold text-gray-900 dark:text-white">Confidentialité et Cookies (Loi n°2008-12)</h3>
+            <h3 className="font-bold text-gray-900 dark:text-ss-text">Confidentialité et Cookies (Loi n°2008-12)</h3>
           </div>
           <p className="text-sm text-gray-600 dark:text-gray-400">
             Conformément à la législation sénégalaise sur la protection des données personnelles (Loi n°2008-12), 
@@ -42,13 +42,13 @@ export function CookieConsentBanner() {
         <div className="flex items-center gap-3 w-full md:w-auto shrink-0 justify-end md:justify-start">
           <button
             onClick={handleDecline}
-            className="px-4 py-2 text-sm font-medium rounded-xl text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            className="px-4 py-2 text-sm font-medium rounded-xl text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-ss-text hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
           >
             Refuser
           </button>
           <button
             onClick={handleAccept}
-            className="px-6 py-2.5 text-sm font-bold rounded-xl bg-[#00853F] text-white hover:opacity-90 shadow-lg shadow-[#00853F]/20 transition-all hover:-translate-y-0.5"
+            className="px-6 py-2.5 text-sm font-bold rounded-xl bg-[#00853F] text-ss-text hover:opacity-90 shadow-lg shadow-[#00853F]/20 transition-all hover:-translate-y-0.5"
           >
             Accepter tout
           </button>

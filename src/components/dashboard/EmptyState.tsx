@@ -48,7 +48,7 @@ export function EmptyState({
   }
 
   const ctaClass =
-    'mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617]'
+    'mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-ss-bg'
 
   return (
     <div
@@ -58,8 +58,8 @@ export function EmptyState({
       <div
         className={`${compact ? 'w-11 h-11' : 'w-14 h-14'} rounded-2xl flex items-center justify-center mb-3`}
         style={{
-          background: 'rgba(255,255,255,0.04)',
-          border: '1px solid rgba(255,255,255,0.07)',
+          background: 'var(--ss-glass-card-bg)',
+          border: '1px solid var(--ss-border)',
         }}
         aria-hidden="true"
       >

@@ -455,7 +455,7 @@ export default function ParentTransportPage() {
             <div className="flex gap-3">
               <a
                 href={`tel:${vehicule.chauffeur_telephone}`}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold bg-[#00853F] text-white hover:bg-[#00853F]/90 transition-colors min-h-[48px] active:scale-[0.98]"
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold bg-[#00853F] text-ss-text hover:bg-[#00853F]/90 transition-colors min-h-[48px] active:scale-[0.98]"
               >
                 <span>📞</span> Appeler le chauffeur
               </a>
@@ -463,7 +463,7 @@ export default function ParentTransportPage() {
                 href={`https://wa.me/${vehicule.chauffeur_telephone.replace(/[^0-9]/g, '')}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold bg-[#25D366] text-white hover:bg-[#25D366]/90 transition-colors min-h-[48px] active:scale-[0.98]"
+                className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold bg-[#25D366] text-ss-text hover:bg-[#25D366]/90 transition-colors min-h-[48px] active:scale-[0.98]"
               >
                 <span>📱</span> WhatsApp
               </a>

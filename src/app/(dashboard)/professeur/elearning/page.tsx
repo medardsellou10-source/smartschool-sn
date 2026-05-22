@@ -5,6 +5,21 @@ import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { PageHeader } from '@/components/dashboard/PageHeader'
 import { Laptop } from 'lucide-react'
+import { isDemoMode } from '@/lib/demo-data'
+import {
+  listCours as demoListCours,
+  upsertCours as demoUpsertCours,
+  removeCours as demoRemoveCours,
+  listDevoirs as demoListDevoirs,
+  upsertDevoir as demoUpsertDevoir,
+  removeDevoir as demoRemoveDevoir,
+  listClassesVirtuelles as demoListCV,
+  upsertClasseVirtuelle as demoUpsertCV,
+  removeClasseVirtuelle as demoRemoveCV,
+  updateClasseVirtuelleStatut as demoUpdateCVStatut,
+  demoMatieresPourProf,
+  demoClassesPourProf,
+} from '@/lib/demo/elearning-store'
 
 // ── Types ───────────────────────────────────────────────────────
 type TabKey = 'cours' | 'devoirs' | 'classes_virtuelles'
@@ -199,6 +214,10 @@ export default function ProfesseurElearningPage() {
   // ── Load data ─────────────────────────────────────────────────
   const loadMatieres = useCallback(async () => {
     if (!ecoleId) return
+    if (isDemoMode()) {
+      setMatieres(demoMatieresPourProf() as Matiere[])
+      return
+    }
     const supabase = createClient()
     const { data } = await (supabase.from('matieres') as any)
       .select('id, nom')
@@ -209,16 +228,24 @@ export default function ProfesseurElearningPage() {
 
   const loadClasses = useCallback(async () => {
     if (!ecoleId) return
+    if (isDemoMode()) {
+      setClasses(demoClassesPourProf(profId || '') as Classe[])
+      return
+    }
     const supabase = createClient()
     const { data } = await (supabase.from('classes') as any)
       .select('id, nom, niveau')
       .eq('ecole_id', ecoleId)
       .order('niveau')
     setClasses((data || []) as Classe[])
-  }, [ecoleId])
+  }, [ecoleId, profId])
 
   const loadCours = useCallback(async () => {
     if (!ecoleId || !profId) return
+    if (isDemoMode()) {
+      setCours(demoListCours() as Cours[])
+      return
+    }
     const supabase = createClient()
     const { data } = await (supabase.from('cours') as any)
       .select('*, matieres(nom), classes(nom, niveau)')
@@ -236,6 +263,10 @@ export default function ProfesseurElearningPage() {
 
   const loadDevoirs = useCallback(async () => {
     if (!ecoleId || !profId) return
+    if (isDemoMode()) {
+      setDevoirs(demoListDevoirs() as Devoir[])
+      return
+    }
     const supabase = createClient()
     const { data } = await (supabase.from('devoirs') as any)
       .select('*, matieres(nom), classes(nom, niveau)')
@@ -264,6 +295,10 @@ export default function ProfesseurElearningPage() {
 
   const loadClassesVirtuelles = useCallback(async () => {
     if (!ecoleId || !profId) return
+    if (isDemoMode()) {
+      setClassesVirtuelles(demoListCV() as ClasseVirtuelle[])
+      return
+    }
     const supabase = createClient()
     const { data } = await (supabase.from('classes_virtuelles') as any)
       .select('*, matieres(nom), classes(nom, niveau)')
@@ -281,6 +316,13 @@ export default function ProfesseurElearningPage() {
 
   const loadSoumissions = useCallback(async (devoirId: string) => {
     setLoadingSoumissions(true)
+    if (isDemoMode()) {
+      setSoumissions([])
+      setGradingNotes({})
+      setGradingComments({})
+      setLoadingSoumissions(false)
+      return
+    }
     const supabase = createClient()
     const { data } = await (supabase.from('soumissions_devoirs') as any)
       .select('*, eleves(nom, prenom)')
@@ -355,6 +397,26 @@ export default function ProfesseurElearningPage() {
   const saveCours = async () => {
     if (!fcTitre.trim() || !fcMatiereId || !fcClasseId) { setError('Veuillez remplir tous les champs obligatoires.'); return }
     setSaving(true); setError('')
+
+    if (isDemoMode()) {
+      demoUpsertCours({
+        id: editId ?? undefined,
+        titre: fcTitre.trim(),
+        description: fcDescription.trim(),
+        type: fcType,
+        contenu: fcContenu.trim() || null,
+        fichier_url: null,
+        fichier_type: null,
+        visible: true,
+        matiere_id: fcMatiereId,
+        classe_id: fcClasseId,
+      })
+      await loadCours()
+      setSaving(false)
+      setShowModal(false); resetForm()
+      return
+    }
+
     const supabase = createClient()
     const payload = {
       ecole_id: ecoleId,
@@ -382,6 +444,25 @@ export default function ProfesseurElearningPage() {
   const saveDevoir = async () => {
     if (!fdTitre.trim() || !fdMatiereId || !fdClasseId || !fdDateLimite) { setError('Veuillez remplir tous les champs obligatoires.'); return }
     setSaving(true); setError('')
+
+    if (isDemoMode()) {
+      demoUpsertDevoir({
+        id: editId ?? undefined,
+        titre: fdTitre.trim(),
+        description: fdDescription.trim(),
+        date_limite: new Date(fdDateLimite).toISOString(),
+        points_max: parseInt(fdPointsMax) || 20,
+        fichier_url: null,
+        actif: true,
+        matiere_id: fdMatiereId,
+        classe_id: fdClasseId,
+      })
+      await loadDevoirs()
+      setSaving(false)
+      setShowModal(false); resetForm()
+      return
+    }
+
     const supabase = createClient()
     const payload = {
       ecole_id: ecoleId,
@@ -409,6 +490,25 @@ export default function ProfesseurElearningPage() {
   const saveClasseVirtuelle = async () => {
     if (!fvTitre.trim() || !fvMatiereId || !fvClasseId || !fvDateHeure) { setError('Veuillez remplir tous les champs obligatoires.'); return }
     setSaving(true); setError('')
+
+    if (isDemoMode()) {
+      demoUpsertCV({
+        id: editId ?? undefined,
+        titre: fvTitre.trim(),
+        description: fvDescription.trim(),
+        date_heure: new Date(fvDateHeure).toISOString(),
+        duree_minutes: parseInt(fvDuree) || 60,
+        lien_reunion: fvLienReunion,
+        statut: 'planifie',
+        matiere_id: fvMatiereId,
+        classe_id: fvClasseId,
+      })
+      await loadClassesVirtuelles()
+      setSaving(false)
+      setShowModal(false); resetForm()
+      return
+    }
+
     const supabase = createClient()
     const payload = {
       ecole_id: ecoleId,
@@ -437,6 +537,7 @@ export default function ProfesseurElearningPage() {
   // ── Delete handlers ──
   const deleteCours = async (id: string) => {
     if (!confirm('Supprimer ce cours ?')) return
+    if (isDemoMode()) { demoRemoveCours(id); await loadCours(); return }
     const supabase = createClient()
     await (supabase.from('cours') as any).delete().eq('id', id)
     await loadCours()
@@ -444,6 +545,7 @@ export default function ProfesseurElearningPage() {
 
   const deleteDevoir = async (id: string) => {
     if (!confirm('Supprimer ce devoir ?')) return
+    if (isDemoMode()) { demoRemoveDevoir(id); await loadDevoirs(); return }
     const supabase = createClient()
     await (supabase.from('devoirs') as any).delete().eq('id', id)
     await loadDevoirs()
@@ -451,6 +553,7 @@ export default function ProfesseurElearningPage() {
 
   const deleteClasseVirtuelle = async (id: string) => {
     if (!confirm('Supprimer cette classe virtuelle ?')) return
+    if (isDemoMode()) { demoRemoveCV(id); await loadClassesVirtuelles(); return }
     const supabase = createClient()
     await (supabase.from('classes_virtuelles') as any).delete().eq('id', id)
     await loadClassesVirtuelles()
@@ -458,6 +561,12 @@ export default function ProfesseurElearningPage() {
 
   // ── Demarrer classe virtuelle ──
   const demarrerClasse = async (cv: ClasseVirtuelle) => {
+    if (isDemoMode()) {
+      demoUpdateCVStatut(cv.id, 'en_cours')
+      window.open(cv.lien_reunion, '_blank')
+      await loadClassesVirtuelles()
+      return
+    }
     const supabase = createClient()
     await (supabase.from('classes_virtuelles') as any)
       .update({ statut: 'en_cours' })
@@ -531,7 +640,7 @@ export default function ProfesseurElearningPage() {
             onClick={() => { setOnglet(tab.key); setSelectedDevoirId(null) }}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-colors min-h-[44px] ${
               onglet === tab.key
-                ? 'bg-[#00853F] text-white'
+                ? 'bg-[#00853F] text-ss-text'
                 : 'bg-ss-bg-secondary text-ss-text-secondary hover:bg-ss-bg-card'
             }`}
           >
@@ -548,7 +657,7 @@ export default function ProfesseurElearningPage() {
             <h2 className="text-lg font-semibold text-ss-text">Mes cours ({cours.length})</h2>
             <button
               onClick={() => openModal('cours')}
-              className="px-4 py-2.5 rounded-xl text-sm font-medium bg-[#00853F] text-white hover:bg-[#00853F]/90 transition min-h-[44px]"
+              className="px-4 py-2.5 rounded-xl text-sm font-medium bg-[#00853F] text-ss-text hover:bg-[#00853F]/90 transition min-h-[44px]"
             >
               + Ajouter un cours
             </button>
@@ -605,7 +714,7 @@ export default function ProfesseurElearningPage() {
             <h2 className="text-lg font-semibold text-ss-text">Devoirs ({devoirs.length})</h2>
             <button
               onClick={() => openModal('devoir')}
-              className="px-4 py-2.5 rounded-xl text-sm font-medium bg-[#00853F] text-white hover:bg-[#00853F]/90 transition min-h-[44px]"
+              className="px-4 py-2.5 rounded-xl text-sm font-medium bg-[#00853F] text-ss-text hover:bg-[#00853F]/90 transition min-h-[44px]"
             >
               + Creer un devoir
             </button>
@@ -754,7 +863,7 @@ export default function ProfesseurElearningPage() {
                           />
                           <button
                             onClick={() => corrigerSoumission(s.id)}
-                            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-[#00853F] text-white hover:bg-[#00853F]/90 transition"
+                            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-[#00853F] text-ss-text hover:bg-[#00853F]/90 transition"
                           >
                             Corriger
                           </button>
@@ -776,7 +885,7 @@ export default function ProfesseurElearningPage() {
             <h2 className="text-lg font-semibold text-ss-text">Classes virtuelles ({classesVirtuelles.length})</h2>
             <button
               onClick={() => openModal('classe_virtuelle')}
-              className="px-4 py-2.5 rounded-xl text-sm font-medium bg-[#00853F] text-white hover:bg-[#00853F]/90 transition min-h-[44px]"
+              className="px-4 py-2.5 rounded-xl text-sm font-medium bg-[#00853F] text-ss-text hover:bg-[#00853F]/90 transition min-h-[44px]"
             >
               + Planifier une classe
             </button>
@@ -817,7 +926,7 @@ export default function ProfesseurElearningPage() {
                     {cv.statut === 'planifie' && (
                       <button
                         onClick={() => demarrerClasse(cv)}
-                        className="px-3 py-1.5 rounded-lg text-xs font-medium bg-[#00853F] text-white hover:bg-[#00853F]/90 transition"
+                        className="px-3 py-1.5 rounded-lg text-xs font-medium bg-[#00853F] text-ss-text hover:bg-[#00853F]/90 transition"
                       >
                         Demarrer maintenant
                       </button>
@@ -1029,7 +1138,7 @@ export default function ProfesseurElearningPage() {
                   else saveClasseVirtuelle()
                 }}
                 disabled={saving}
-                className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium bg-[#00853F] text-white hover:bg-[#00853F]/90 transition disabled:opacity-50 min-h-[44px]"
+                className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium bg-[#00853F] text-ss-text hover:bg-[#00853F]/90 transition disabled:opacity-50 min-h-[44px]"
               >
                 {saving ? 'Enregistrement...' : (editId ? 'Modifier' : 'Enregistrer')}
               </button>

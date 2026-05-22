@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -46,25 +46,25 @@ export default function InscriptionsPage() {
 
   const filtered = filtre === 'tous' ? inscriptions : inscriptions.filter(i => i.statut === filtre)
 
-  if (userLoading || loading) return <div className="p-6 animate-pulse space-y-4">{[...Array(5)].map((_, i) => <div key={i} className="h-16 rounded-xl bg-white/5" />)}</div>
+  if (userLoading || loading) return <div className="p-6 animate-pulse space-y-4">{[...Array(5)].map((_, i) => <div key={i} className="h-16 rounded-xl bg-ss-text/5" />)}</div>
 
   return (
     <div className="space-y-6 pb-24 lg:pb-6 animate-fade-in">
       {toast && (
-        <div className="fixed top-4 right-4 z-50 px-5 py-3 rounded-2xl text-sm font-semibold text-white shadow-xl"
-          style={{ background: 'rgba(2,6,23,0.96)', border: `1px solid ${ACCENT}60`, backdropFilter: 'blur(24px)', maxWidth: '340px' }}>
+        <div className="fixed top-4 right-4 z-50 px-5 py-3 rounded-2xl text-sm font-semibold text-ss-text shadow-xl"
+          style={{ background: 'var(--ss-surface-elevated)', border: `1px solid ${ACCENT}60`, backdropFilter: 'blur(24px)', maxWidth: '340px' }}>
           <span style={{ color: ACCENT }}>ℹ️</span> {toast}
         </div>
       )}
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-extrabold text-white flex items-center gap-2">
+          <h1 className="text-2xl font-extrabold text-ss-text flex items-center gap-2">
             <span style={{ color: ACCENT }}>📝</span> Inscriptions
           </h1>
-          <p className="text-sm text-slate-300 mt-1">{inscriptions.length} élèves enregistrés — Année 2025-2026</p>
+          <p className="text-sm text-ss-text-secondary mt-1">{inscriptions.length} élèves enregistrés — Année 2025-2026</p>
         </div>
-        <button className="px-4 py-2 rounded-xl text-sm font-semibold text-white"
+        <button className="px-4 py-2 rounded-xl text-sm font-semibold text-ss-text"
           style={{ background: ACCENT }}
           onClick={() => showToast('Mode démo — Formulaire d\'inscription disponible avec la base de données.')}>
           + Nouvelle inscription
@@ -76,20 +76,20 @@ export default function InscriptionsPage() {
         {(['tous', 'valide', 'en_attente', 'incomplet'] as const).map(f => (
           <button key={f} onClick={() => setFiltre(f)}
             className="px-4 py-2 rounded-xl text-sm font-semibold transition-all"
-            style={filtre === f ? { background: ACCENT, color: 'white' } : { background: 'rgba(255,255,255,0.05)', color: '#94A3B8', border: '1px solid rgba(255,255,255,0.1)' }}>
+            style={filtre === f ? { background: ACCENT, color: 'white' } : { background: 'var(--ss-glass-card-bg)', color: 'var(--ss-text-muted)', border: '1px solid var(--ss-glass-border)' }}>
             {f === 'tous' ? 'Tous' : f === 'valide' ? 'Validées' : f === 'en_attente' ? 'En attente' : 'Incomplets'}
           </button>
         ))}
       </div>
 
       {/* Tableau */}
-      <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(2,6,23,0.82)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.12)' }}>
+      <div className="rounded-2xl overflow-hidden" style={{ background: 'var(--ss-surface-elevated)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid var(--ss-glass-border)' }}>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+              <tr style={{ borderBottom: '1px solid var(--ss-glass-card-hover)' }}>
                 {['Élève', 'Classe', 'Type', 'Date', 'Dossier', 'Statut', 'Actions'].map(h => (
-                  <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">{h}</th>
+                  <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-ss-text-muted uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
             </thead>
@@ -97,19 +97,19 @@ export default function InscriptionsPage() {
               {filtered.map((insc, i) => {
                 const s = STATUT_STYLE[insc.statut] || STATUT_STYLE.en_attente
                 return (
-                  <tr key={insc.id} className="transition-colors hover:bg-white/5"
-                    style={i < filtered.length - 1 ? { borderBottom: '1px solid rgba(255,255,255,0.04)' } : {}}>
+                  <tr key={insc.id} className="transition-colors hover:bg-ss-text/5"
+                    style={i < filtered.length - 1 ? { borderBottom: '1px solid var(--ss-glass-card-bg)' } : {}}>
                     <td className="px-4 py-3">
-                      <p className="text-sm font-semibold text-white">{insc.prenom} {insc.nom}</p>
+                      <p className="text-sm font-semibold text-ss-text">{insc.prenom} {insc.nom}</p>
                     </td>
-                    <td className="px-4 py-3 text-sm text-slate-300">{insc.classe}</td>
+                    <td className="px-4 py-3 text-sm text-ss-text-secondary">{insc.classe}</td>
                     <td className="px-4 py-3">
                       <span className="px-2 py-1 rounded-lg text-xs font-semibold"
                         style={{ background: insc.type === 'reinscription' ? 'rgba(0,229,255,0.15)' : 'rgba(255,109,0,0.15)', color: insc.type === 'reinscription' ? '#38BDF8' : ACCENT }}>
                         {insc.type === 'reinscription' ? 'Réinscription' : 'Inscription'}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-sm text-slate-400">{new Date(insc.date).toLocaleDateString('fr-FR')}</td>
+                    <td className="px-4 py-3 text-sm text-ss-text-muted">{new Date(insc.date).toLocaleDateString('fr-FR')}</td>
                     <td className="px-4 py-3">
                       <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${insc.dossier_complet ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
                         {insc.dossier_complet ? '✓' : '✗'}

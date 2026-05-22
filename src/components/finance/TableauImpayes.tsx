@@ -220,7 +220,7 @@ export function TableauImpayes({ impayes, onRefresh }: TableauImpayesProps) {
             <button
               onClick={handleEspeces}
               disabled={saving || montantEsp <= 0}
-              className="w-full bg-ss-green text-white py-3 rounded-xl font-bold text-sm min-h-[48px] hover:bg-ss-green/80 disabled:opacity-50 transition-colors"
+              className="w-full bg-ss-green text-ss-text py-3 rounded-xl font-bold text-sm min-h-[48px] hover:bg-ss-green/80 disabled:opacity-50 transition-colors"
             >
               {saving ? 'Enregistrement...' : `Enregistrer ${formatFCFA(montantEsp)}`}
             </button>

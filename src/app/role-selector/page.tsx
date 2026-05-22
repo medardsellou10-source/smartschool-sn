@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { DEMO_USERS } from '@/lib/demo-data'
+import { usePays } from '@/hooks/usePays'
+import { PaysSelector } from '@/components/layout/PaysSelector'
 
 import { Shield, BookOpen, Eye, Users, GraduationCap, ClipboardList, Briefcase, CheckCircle } from 'lucide-react'
 
@@ -165,6 +167,8 @@ const ROLES = [
 export default function RoleSelectorPage() {
   const [hovered, setHovered] = useState('')
   const [loading, setLoading] = useState('')
+  // WAED-CI #9 — pays démo actif (Sénégal / Côte d'Ivoire)
+  const { config, isCI } = usePays()
 
   function handleSelectRole(roleKey: string, href: string) {
     setLoading(roleKey)
@@ -175,14 +179,9 @@ export default function RoleSelectorPage() {
   }
 
   return (
-    <div className="min-h-screen relative flex flex-col items-center justify-center px-4 py-10 overflow-hidden">
-      {/* ── Fond vidéo ── */}
+    <div className="min-h-screen relative flex flex-col items-center justify-center px-4 py-10 overflow-hidden bg-ss-bg">
       <div className="absolute inset-0">
-        <video autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover">
-          <source src="/video/bg-role-classroom.mp4" type="video/mp4" />
-        </video>
-        <div className="absolute inset-0" style={{ background: 'rgba(2,6,23,0.85)' }} />
-        {/* Blobs de couleur ambiant */}
+        <div className="absolute inset-0 bg-gradient-to-b from-ss-bg via-ss-bg-secondary to-ss-bg" />
         <div className="blob absolute" style={{
           top: '-10%', left: '-5%', width: '500px', height: '500px',
           borderRadius: '50%',
@@ -217,16 +216,26 @@ export default function RoleSelectorPage() {
             <span className="text-white font-black text-xl tracking-tighter">SS</span>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl font-black text-white mb-2 tracking-tight"
-            style={{ textShadow: '0 0 60px rgba(0,229,255,0.3)' }}>
-            SmartSchool SN
+          <h1 className="text-4xl sm:text-5xl font-black text-ss-text mb-2 tracking-tight"
+            style={{ textShadow: `0 0 60px ${config.couleurPrimaire}55` }}>
+            WAED — SmartSchool {config.drapeau}
           </h1>
 
           <div className="flex items-center justify-center gap-2 mt-3">
-            <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-            <p className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.45)' }}>
-              Choisissez votre espace · Mode démo actif
+            <div
+              className="w-1.5 h-1.5 rounded-full animate-pulse"
+              style={{ background: config.couleurPrimaire }}
+            />
+            <p className="text-sm font-medium text-ss-text-secondary">
+              {isCI
+                ? 'Mode démo Abidjan — Lycée Cocody (données fictives)'
+                : 'Mode démo Dakar — Lycée Cheikh Anta Diop (données fictives)'}
             </p>
+          </div>
+
+          {/* WAED-CI #9 — Sélecteur pays démo */}
+          <div className="mt-4 flex justify-center">
+            <PaysSelector variant="pill" />
           </div>
         </div>
 
@@ -245,16 +254,16 @@ export default function RoleSelectorPage() {
                 className="fade-up relative rounded-2xl text-left transition-all duration-300 focus:outline-none overflow-hidden group"
                 style={{
                   animationDelay: `${0.07 + i * 0.05}s`,
-                  background: isHovered ? `rgba(2,6,23,0.95)` : 'rgba(8,14,35,0.75)',
+                  background: isHovered ? 'var(--ss-surface-elevated)' : 'var(--ss-glass-bg)',
                   border: isHovered
                     ? `1px solid ${role.color}60`
-                    : '1px solid rgba(255,255,255,0.07)',
+                    : '1px solid var(--ss-glass-border)',
                   backdropFilter: 'blur(28px)',
                   WebkitBackdropFilter: 'blur(28px)',
                   transform: isHovered ? 'translateY(-5px) scale(1.02)' : 'translateY(0) scale(1)',
                   boxShadow: isHovered
-                    ? `0 20px 60px rgba(0,0,0,0.6), 0 0 30px ${role.glow}`
-                    : '0 4px 20px rgba(0,0,0,0.4)',
+                    ? `0 20px 60px var(--ss-hover-shadow), 0 0 30px ${role.glow}`
+                    : '0 4px 20px var(--ss-hover-shadow)',
                 }}
               >
                 {/* Barre colorée en haut */}
@@ -277,9 +286,9 @@ export default function RoleSelectorPage() {
                   <div className="flex items-start justify-between mb-4">
                     <div className="w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300"
                       style={{
-                        background: isHovered ? `${role.color}20` : 'rgba(255,255,255,0.06)',
-                        border: isHovered ? `1px solid ${role.color}50` : '1px solid rgba(255,255,255,0.08)',
-                        color: isHovered ? role.color : 'rgba(255,255,255,0.7)',
+                        background: isHovered ? `${role.color}20` : 'var(--ss-glass-card-bg)',
+                        border: isHovered ? `1px solid ${role.color}50` : '1px solid var(--ss-glass-border)',
+                        color: isHovered ? role.color : 'var(--color-ss-text-secondary)',
                         boxShadow: isHovered ? `0 0 16px ${role.glow}` : 'none',
                       }}>
                       {role.icon}
@@ -290,16 +299,16 @@ export default function RoleSelectorPage() {
                   </div>
 
                   {/* Titre */}
-                  <h3 className="font-extrabold text-base text-white leading-tight mb-0.5 transition-all duration-200"
-                    style={{ color: isHovered ? role.color : 'white' }}>
+                  <h3 className="font-extrabold text-base leading-tight mb-0.5 transition-all duration-200"
+                    style={{ color: isHovered ? role.color : 'var(--color-ss-text)' }}>
                     {role.titre}
                   </h3>
-                  <p className="text-[11px] font-medium mb-3" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                  <p className="text-[11px] font-medium mb-3 text-ss-text-muted">
                     {role.sous_titre}
                   </p>
 
                   {/* Description */}
-                  <p className="text-[11px] leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                  <p className="text-[11px] leading-relaxed mb-4 text-ss-text-secondary">
                     {role.description}
                   </p>
 
@@ -308,9 +317,9 @@ export default function RoleSelectorPage() {
                     {role.badges.map(badge => (
                       <span key={badge} className="text-[10px] px-1.5 py-0.5 rounded-md font-semibold transition-all duration-200"
                         style={{
-                          background: isHovered ? `${role.color}18` : 'rgba(255,255,255,0.05)',
-                          border: isHovered ? `1px solid ${role.color}35` : '1px solid rgba(255,255,255,0.08)',
-                          color: isHovered ? role.color : 'rgba(255,255,255,0.4)',
+                          background: isHovered ? `${role.color}18` : 'var(--ss-glass-card-bg)',
+                          border: isHovered ? `1px solid ${role.color}35` : '1px solid var(--ss-glass-border)',
+                          color: isHovered ? role.color : 'var(--color-ss-text-muted)',
                         }}>
                         {badge}
                       </span>
@@ -319,13 +328,13 @@ export default function RoleSelectorPage() {
 
                   {/* Footer */}
                   <div className="flex items-center justify-between pt-3"
-                    style={{ borderTop: `1px solid ${isHovered ? role.color + '20' : 'rgba(255,255,255,0.06)'}` }}>
-                    <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.25)' }}>
+                    style={{ borderTop: `1px solid ${isHovered ? role.color + '20' : 'var(--ss-glass-border)'}` }}>
+                    <span className="text-[10px] text-ss-text-disabled">
                       {role.user.prenom} {role.user.nom}
                     </span>
 
                     <div className="flex items-center gap-1 text-[11px] font-bold transition-all duration-200"
-                      style={{ color: isLoading ? 'rgba(255,255,255,0.3)' : isHovered ? role.color : 'rgba(255,255,255,0.55)' }}>
+                      style={{ color: isLoading ? 'var(--color-ss-text-disabled)' : isHovered ? role.color : 'var(--color-ss-text-secondary)' }}>
                       {isLoading ? (
                         <>
                           <span className="w-3 h-3 rounded-full border-2 border-t-transparent animate-spin"
@@ -352,11 +361,11 @@ export default function RoleSelectorPage() {
         {/* ── Notice bas de page ── */}
         <div className="mt-8 fade-up flex items-center justify-center gap-3" style={{ animationDelay: '0.55s' }}>
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
-            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-border)' }}>
             <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-            <span className="text-[11px] font-semibold" style={{ color: 'rgba(255,255,255,0.5)' }}>MODE DÉMO</span>
+            <span className="text-[11px] font-semibold text-ss-text-muted">MODE DÉMO</span>
           </div>
-          <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.25)' }}>
+          <p className="text-[11px] text-ss-text-disabled">
             Navigation complète · Données fictives
           </p>
         </div>

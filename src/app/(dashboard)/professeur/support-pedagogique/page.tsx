@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState, useMemo } from 'react'
 import { useUser } from '@/hooks/useUser'
@@ -489,7 +489,7 @@ function toggleCorr(){
   }
 
   if (userLoading) {
-    return <div className="space-y-4">{[...Array(4)].map((_, i) => <div key={i} className="h-28 rounded-2xl ss-shimmer" style={{ background: 'rgba(255,255,255,0.03)' }} />)}</div>
+    return <div className="space-y-4">{[...Array(4)].map((_, i) => <div key={i} className="h-28 rounded-2xl ss-shimmer" style={{ background: 'var(--ss-glass-card-bg)' }} />)}</div>
   }
 
   return (
@@ -497,15 +497,15 @@ function toggleCorr(){
 
       {/* ── Bannière ── */}
       <div className="relative rounded-2xl overflow-hidden min-h-[130px]">
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, rgba(2,6,23,0.98) 0%, rgba(0,30,60,0.9) 50%, rgba(2,6,23,0.98) 100%)' }} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, var(--ss-surface-elevated) 0%, rgba(0,30,60,0.9) 50%, var(--ss-surface-elevated) 100%)' }} />
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(0,229,255,0.1) 50px, rgba(0,229,255,0.1) 51px), repeating-linear-gradient(0deg, transparent, transparent 50px, rgba(0,229,255,0.1) 50px, rgba(0,229,255,0.1) 51px)' }} />
         <div className="relative px-6 py-5">
           <div className="flex items-center gap-2 mb-1">
             <div className="w-2 h-2 rounded-full bg-[#38BDF8] animate-pulse" />
-            <span className="text-[#94A3B8] text-xs font-semibold tracking-wider uppercase">Support Pedagogique</span>
+            <span className="text-[var(--ss-text-muted)] text-xs font-semibold tracking-wider uppercase">Support Pedagogique</span>
           </div>
-          <h1 className="text-2xl font-black text-white">Programme Officiel MEN</h1>
-          <p className="text-sm mt-1" style={{ color: '#94A3B8' }}>
+          <h1 className="text-2xl font-black text-ss-text">Programme Officiel MEN</h1>
+          <p className="text-sm mt-1" style={{ color: 'var(--ss-text-muted)' }}>
             Curriculum conforme au Ministere de l&apos;Education Nationale du Senegal
           </p>
         </div>
@@ -514,7 +514,7 @@ function toggleCorr(){
       {/* ── Sélecteurs ── */}
       <div className="flex flex-wrap gap-3">
         <select value={selectedNiveau} onChange={e => setSelectedNiveau(e.target.value)}
-          className="px-3 py-2 rounded-xl text-sm font-semibold text-white"
+          className="px-3 py-2 rounded-xl text-sm font-semibold text-ss-text"
           style={{ background: 'rgba(0,229,255,0.1)', border: '1px solid rgba(0,229,255,0.3)', outline: 'none' }}>
           <optgroup label="College">
             {NIVEAUX_COLLEGE.map(n => <option key={n} value={n}>{n}</option>)}
@@ -526,7 +526,7 @@ function toggleCorr(){
 
         {NIVEAUX_LYCEE.includes(selectedNiveau) && selectedNiveau !== 'Seconde' && (
           <select value={selectedSerie} onChange={e => setSelectedSerie(e.target.value)}
-            className="px-3 py-2 rounded-xl text-sm font-semibold text-white"
+            className="px-3 py-2 rounded-xl text-sm font-semibold text-ss-text"
             style={{ background: 'rgba(213,0,249,0.1)', border: '1px solid rgba(213,0,249,0.3)', outline: 'none' }}>
             {SERIES_LYCEE.map(s => <option key={s} value={s}>Serie {s}</option>)}
           </select>
@@ -534,7 +534,7 @@ function toggleCorr(){
 
         {(activeTab === 'modules' || activeTab === 'suivi') && (
           <select value={selectedMatiere} onChange={e => setSelectedMatiere(e.target.value)}
-            className="px-3 py-2 rounded-xl text-sm font-semibold text-white"
+            className="px-3 py-2 rounded-xl text-sm font-semibold text-ss-text"
             style={{ background: 'rgba(0,230,118,0.1)', border: '1px solid rgba(0,230,118,0.3)', outline: 'none' }}>
             {grille?.matieres.map(m => <option key={m.matiere} value={m.matiere}>{m.matiere}</option>) || <option>--</option>}
           </select>
@@ -548,7 +548,7 @@ function toggleCorr(){
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all duration-200"
             style={activeTab === tab.id
               ? { background: 'rgba(0,229,255,0.15)', color: '#38BDF8', border: '1px solid rgba(0,229,255,0.3)' }
-              : { background: 'rgba(255,255,255,0.03)', color: '#94A3B8', border: '1px solid rgba(255,255,255,0.07)' }}>
+              : { background: 'var(--ss-glass-card-bg)', color: 'var(--ss-text-muted)', border: '1px solid var(--ss-glass-card-hover)' }}>
             <span>{tab.icon}</span> {tab.label}
           </button>
         ))}
@@ -558,34 +558,34 @@ function toggleCorr(){
       {/* TAB: Grille Horaire Hebdomadaire                         */}
       {/* ══════════════════════════════════════════════════════════ */}
       {activeTab === 'grille' && grille && (
-        <div className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-          <h2 className="text-sm font-bold text-[#94A3B8] uppercase tracking-wider mb-4">
+        <div className="rounded-2xl p-5" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
+          <h2 className="text-sm font-bold text-[var(--ss-text-muted)] uppercase tracking-wider mb-4">
             Grille Horaire — {grille.niveau}{grille.serie ? ` ${grille.serie}` : ''}
           </h2>
           <div className="overflow-x-auto">
             <table className="w-full text-sm border-collapse">
               <thead>
                 <tr>
-                  <th className="text-left py-3 px-4 font-bold text-[#94A3B8] text-xs uppercase tracking-wider" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>Matiere</th>
-                  <th className="text-center py-3 px-4 font-bold text-[#94A3B8] text-xs uppercase tracking-wider" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>Heures/Sem</th>
-                  <th className="text-center py-3 px-4 font-bold text-[#94A3B8] text-xs uppercase tracking-wider" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>Coeff</th>
-                  <th className="text-center py-3 px-4 font-bold text-[#94A3B8] text-xs uppercase tracking-wider" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>Heures/An</th>
+                  <th className="text-left py-3 px-4 font-bold text-[var(--ss-text-muted)] text-xs uppercase tracking-wider" style={{ borderBottom: '1px solid var(--ss-glass-border)' }}>Matiere</th>
+                  <th className="text-center py-3 px-4 font-bold text-[var(--ss-text-muted)] text-xs uppercase tracking-wider" style={{ borderBottom: '1px solid var(--ss-glass-border)' }}>Heures/Sem</th>
+                  <th className="text-center py-3 px-4 font-bold text-[var(--ss-text-muted)] text-xs uppercase tracking-wider" style={{ borderBottom: '1px solid var(--ss-glass-border)' }}>Coeff</th>
+                  <th className="text-center py-3 px-4 font-bold text-[var(--ss-text-muted)] text-xs uppercase tracking-wider" style={{ borderBottom: '1px solid var(--ss-glass-border)' }}>Heures/An</th>
                 </tr>
               </thead>
               <tbody>
                 {grille.matieres.map((m, idx) => {
                   const color = MATIERE_COLORS[m.matiere] || '#38BDF8'
                   return (
-                    <tr key={m.matiere} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}
+                    <tr key={m.matiere} style={{ borderBottom: '1px solid var(--ss-glass-card-bg)' }}
                       className="transition-colors duration-150 hover:bg-white/[0.02]">
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-3">
                           <div className="w-1.5 h-8 rounded-full shrink-0" style={{ background: color }} />
-                          <span className="font-semibold text-white">{m.matiere}</span>
+                          <span className="font-semibold text-ss-text">{m.matiere}</span>
                         </div>
                       </td>
                       <td className="text-center py-3 px-4">
-                        <span className="font-black text-lg text-white">{m.heures_hebdo}h</span>
+                        <span className="font-black text-lg text-ss-text">{m.heures_hebdo}h</span>
                       </td>
                       <td className="text-center py-3 px-4">
                         <span className="px-2.5 py-1 rounded-full text-xs font-bold"
@@ -593,7 +593,7 @@ function toggleCorr(){
                           x{m.coefficient}
                         </span>
                       </td>
-                      <td className="text-center py-3 px-4 font-semibold" style={{ color: '#94A3B8' }}>
+                      <td className="text-center py-3 px-4 font-semibold" style={{ color: 'var(--ss-text-muted)' }}>
                         {m.heures_hebdo * 30}h
                       </td>
                     </tr>
@@ -604,10 +604,10 @@ function toggleCorr(){
                 <tr style={{ borderTop: '2px solid rgba(0,229,255,0.3)' }}>
                   <td className="py-3 px-4 font-black text-[#38BDF8]">TOTAL</td>
                   <td className="text-center py-3 px-4 font-black text-xl text-[#38BDF8]">{grille.total_heures}h</td>
-                  <td className="text-center py-3 px-4 font-bold text-[#94A3B8]">
+                  <td className="text-center py-3 px-4 font-bold text-[var(--ss-text-muted)]">
                     {grille.matieres.reduce((s, m) => s + m.coefficient, 0)}
                   </td>
-                  <td className="text-center py-3 px-4 font-bold text-[#94A3B8]">{grille.total_heures * 30}h</td>
+                  <td className="text-center py-3 px-4 font-bold text-[var(--ss-text-muted)]">{grille.total_heures * 30}h</td>
                 </tr>
               </tfoot>
             </table>
@@ -616,8 +616,8 @@ function toggleCorr(){
       )}
 
       {!grille && activeTab === 'grille' && (
-        <div className="rounded-2xl p-8 text-center" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-          <p className="text-[#94A3B8]">Grille horaire non disponible pour cette selection</p>
+        <div className="rounded-2xl p-8 text-center" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
+          <p className="text-[var(--ss-text-muted)]">Grille horaire non disponible pour cette selection</p>
         </div>
       )}
 
@@ -635,13 +635,13 @@ function toggleCorr(){
           </div>
 
           {/* Liste des programmes */}
-          <div className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-            <h2 className="text-sm font-bold text-[#94A3B8] uppercase tracking-wider mb-4">
+          <div className="rounded-2xl p-5" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
+            <h2 className="text-sm font-bold text-[var(--ss-text-muted)] uppercase tracking-wider mb-4">
               Planning Annuel — {selectedNiveau}{selectedSerie ? ` ${selectedSerie}` : ''}
             </h2>
 
             {allProgrammes.length === 0 ? (
-              <p className="text-[#94A3B8] text-center py-8">Aucun programme detaille disponible pour cette selection. Les programmes sont en cours d&apos;ajout.</p>
+              <p className="text-[var(--ss-text-muted)] text-center py-8">Aucun programme detaille disponible pour cette selection. Les programmes sont en cours d&apos;ajout.</p>
             ) : (
               <div className="space-y-4">
                 {allProgrammes.map(prog => {
@@ -656,8 +656,8 @@ function toggleCorr(){
                             {prog.heures_hebdo}h
                           </div>
                           <div>
-                            <h3 className="font-bold text-white">{prog.matiere}</h3>
-                            <p className="text-xs" style={{ color: '#94A3B8' }}>Coeff {prog.coefficient} · {prog.heures_annuelles}h/an · {prog.modules.length} modules</p>
+                            <h3 className="font-bold text-ss-text">{prog.matiere}</h3>
+                            <p className="text-xs" style={{ color: 'var(--ss-text-muted)' }}>Coeff {prog.coefficient} · {prog.heures_annuelles}h/an · {prog.modules.length} modules</p>
                           </div>
                         </div>
                       </div>
@@ -670,7 +670,7 @@ function toggleCorr(){
                             <div key={mod.id} className="shrink-0 rounded-lg px-2 py-1.5 text-center"
                               style={{ width: `${width}%`, minWidth: '80px', background: `${color}${10 + idx * 5}`, border: `1px solid ${color}25` }}>
                               <p className="text-[9px] font-bold truncate" style={{ color }}>{mod.titre}</p>
-                              <p className="text-[8px]" style={{ color: '#475569' }}>{mod.duree_heures}h</p>
+                              <p className="text-[8px]" style={{ color: 'var(--ss-text-disabled)' }}>{mod.duree_heures}h</p>
                             </div>
                           )
                         })}
@@ -692,15 +692,15 @@ function toggleCorr(){
           {programme ? (
             <>
               {/* En-tête programme */}
-              <div className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+              <div className="rounded-2xl p-5" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
                 <div className="flex items-center gap-3 mb-2">
                   <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
                     style={{ background: `${MATIERE_COLORS[programme.matiere] || '#38BDF8'}15`, border: `1px solid ${MATIERE_COLORS[programme.matiere] || '#38BDF8'}30` }}>
                     📖
                   </div>
                   <div>
-                    <h2 className="text-xl font-black text-white">{programme.matiere}</h2>
-                    <p className="text-sm" style={{ color: '#94A3B8' }}>
+                    <h2 className="text-xl font-black text-ss-text">{programme.matiere}</h2>
+                    <p className="text-sm" style={{ color: 'var(--ss-text-muted)' }}>
                       {programme.niveau}{programme.serie ? ` ${programme.serie}` : ''} · Coeff {programme.coefficient} · {programme.heures_hebdo}h/sem · {programme.heures_annuelles}h/an
                     </p>
                   </div>
@@ -714,22 +714,22 @@ function toggleCorr(){
                 const modPct = Math.round((modLeconsFaites / mod.lecons.length) * 100)
                 return (
                   <div key={mod.id} className="rounded-2xl overflow-hidden"
-                    style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                    style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
                     {/* Header module */}
                     <div className="p-4 flex items-center justify-between"
-                      style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                      style={{ borderBottom: '1px solid var(--ss-glass-card-hover)' }}>
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-lg flex items-center justify-center font-black text-sm"
                           style={{ background: `${color}15`, color, border: `1px solid ${color}30` }}>
                           {mod.numero}
                         </div>
                         <div>
-                          <h3 className="font-bold text-white text-sm">{mod.titre}</h3>
-                          <p className="text-xs" style={{ color: '#94A3B8' }}>{mod.duree_heures}h · {mod.lecons.length} lecons</p>
+                          <h3 className="font-bold text-ss-text text-sm">{mod.titre}</h3>
+                          <p className="text-xs" style={{ color: 'var(--ss-text-muted)' }}>{mod.duree_heures}h · {mod.lecons.length} lecons</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="w-20 h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                        <div className="w-20 h-2 rounded-full overflow-hidden" style={{ background: 'var(--ss-glass-card-hover)' }}>
                           <div className="h-full rounded-full transition-all duration-500" style={{ width: `${modPct}%`, background: color }} />
                         </div>
                         <span className="text-xs font-bold" style={{ color }}>{modPct}%</span>
@@ -748,16 +748,16 @@ function toggleCorr(){
                               className="w-6 h-6 rounded-md shrink-0 flex items-center justify-center transition-all duration-200"
                               style={done
                                 ? { background: `${color}30`, border: `2px solid ${color}`, color }
-                                : { background: 'transparent', border: '2px solid rgba(255,255,255,0.15)' }}>
+                                : { background: 'transparent', border: '2px solid var(--ss-glass-border)' }}>
                               {done && <span className="text-xs">&#10003;</span>}
                             </button>
                             <span className="text-lg shrink-0">{TYPE_ICONS[lecon.type] || '📖'}</span>
                             <div className="flex-1 min-w-0">
-                              <p className={`text-sm font-semibold text-white ${done ? 'line-through' : ''}`}>{lecon.titre}</p>
+                              <p className={`text-sm font-semibold text-ss-text ${done ? 'line-through' : ''}`}>{lecon.titre}</p>
                               <div className="flex items-center gap-2 mt-0.5">
                                 <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
                                   style={{ background: `${typeColor}15`, color: typeColor }}>{lecon.type.toUpperCase()}</span>
-                                <span className="text-[10px]" style={{ color: '#475569' }}>{lecon.duree_heures}h</span>
+                                <span className="text-[10px]" style={{ color: 'var(--ss-text-disabled)' }}>{lecon.duree_heures}h</span>
                               </div>
                             </div>
                           </div>
@@ -769,11 +769,11 @@ function toggleCorr(){
               })}
             </>
           ) : (
-            <div className="rounded-2xl p-8 text-center" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <div className="rounded-2xl p-8 text-center" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
               <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-3 text-3xl mx-auto"
-                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>📭</div>
-              <p className="text-[#94A3B8] text-sm">Programme detaille non encore disponible pour <strong className="text-white">{selectedMatiere}</strong> en {selectedNiveau}{selectedSerie ? ` ${selectedSerie}` : ''}.</p>
-              <p className="text-[#475569] text-xs mt-2">Les programmes sont progressivement ajoutes pour toutes les matieres.</p>
+                style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>📭</div>
+              <p className="text-[var(--ss-text-muted)] text-sm">Programme detaille non encore disponible pour <strong className="text-ss-text">{selectedMatiere}</strong> en {selectedNiveau}{selectedSerie ? ` ${selectedSerie}` : ''}.</p>
+              <p className="text-[var(--ss-text-disabled)] text-xs mt-2">Les programmes sont progressivement ajoutes pour toutes les matieres.</p>
             </div>
           )}
         </div>
@@ -801,18 +801,18 @@ function toggleCorr(){
               }}>
               <span className="text-2xl">{alerteRetard.type === 'danger' ? '🚨' : alerteRetard.type === 'warning' ? '⚠️' : '✅'}</span>
               <div>
-                <p className="text-sm font-bold text-white">
+                <p className="text-sm font-bold text-ss-text">
                   {alerteRetard.type === 'danger' ? 'Alerte Retard' : alerteRetard.type === 'warning' ? 'Attention' : 'Dans les temps'}
                 </p>
-                <p className="text-xs" style={{ color: '#94A3B8' }}>{alerteRetard.msg}</p>
+                <p className="text-xs" style={{ color: 'var(--ss-text-muted)' }}>{alerteRetard.msg}</p>
               </div>
             </div>
           )}
 
           {/* Barre de progression globale */}
           {programme && (
-            <div className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-              <h2 className="text-sm font-bold text-[#94A3B8] uppercase tracking-wider mb-4">Progression par module</h2>
+            <div className="rounded-2xl p-5" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
+              <h2 className="text-sm font-bold text-[var(--ss-text-muted)] uppercase tracking-wider mb-4">Progression par module</h2>
               <div className="space-y-3">
                 {programme.modules.map(mod => {
                   const color = MATIERE_COLORS[programme.matiere] || '#38BDF8'
@@ -823,15 +823,15 @@ function toggleCorr(){
                       <div className="w-6 text-center font-black text-xs" style={{ color }}>{mod.numero}</div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-1">
-                          <p className="text-xs font-semibold text-white truncate">{mod.titre}</p>
-                          <span className="text-[10px] font-bold" style={{ color: '#94A3B8' }}>{modFait}/{mod.lecons.length}</span>
+                          <p className="text-xs font-semibold text-ss-text truncate">{mod.titre}</p>
+                          <span className="text-[10px] font-bold" style={{ color: 'var(--ss-text-muted)' }}>{modFait}/{mod.lecons.length}</span>
                         </div>
-                        <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                        <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: 'var(--ss-glass-card-hover)' }}>
                           <div className="h-full rounded-full transition-all duration-500"
                             style={{ width: `${modPct}%`, background: modPct === 100 ? '#22C55E' : color }} />
                         </div>
                       </div>
-                      <span className="text-xs font-bold w-10 text-right" style={{ color: modPct === 100 ? '#22C55E' : '#94A3B8' }}>
+                      <span className="text-xs font-bold w-10 text-right" style={{ color: modPct === 100 ? '#22C55E' : 'var(--ss-text-muted)' }}>
                         {modPct}%
                       </span>
                     </div>
@@ -842,8 +842,8 @@ function toggleCorr(){
           )}
 
           {!programme && (
-            <div className="rounded-2xl p-8 text-center" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-              <p className="text-[#94A3B8]">Selectionnez une matiere dont le programme est disponible pour voir le suivi.</p>
+            <div className="rounded-2xl p-8 text-center" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
+              <p className="text-[var(--ss-text-muted)]">Selectionnez une matiere dont le programme est disponible pour voir le suivi.</p>
             </div>
           )}
         </div>
@@ -856,12 +856,12 @@ function toggleCorr(){
         <div className="space-y-4">
           {PLANNING_SEMESTRIEL.map(sem => (
             <div key={sem.semestre} className="rounded-2xl p-5"
-              style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+              style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-sm font-bold text-[#94A3B8] uppercase tracking-wider">
+                <h2 className="text-sm font-bold text-[var(--ss-text-muted)] uppercase tracking-wider">
                   {sem.semestre === 1 ? '1er' : '2eme'} Semestre
                 </h2>
-                <div className="flex items-center gap-2 text-xs" style={{ color: '#475569' }}>
+                <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--ss-text-disabled)' }}>
                   <span>{new Date(sem.debut).toLocaleDateString('fr-SN', { day: 'numeric', month: 'short' })}</span>
                   <span>→</span>
                   <span>{new Date(sem.fin).toLocaleDateString('fr-SN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
@@ -874,7 +874,7 @@ function toggleCorr(){
               {/* Timeline visuelle */}
               <div className="space-y-2">
                 {sem.periodes.map((p, idx) => {
-                  const typeColor = p.type === 'cours' ? '#22C55E' : p.type === 'evaluation' ? '#F87171' : p.type === 'revision' ? '#FBBF24' : '#94A3B8'
+                  const typeColor = p.type === 'cours' ? '#22C55E' : p.type === 'evaluation' ? '#F87171' : p.type === 'revision' ? '#FBBF24' : 'var(--ss-text-muted)'
                   const typeIcon = p.type === 'cours' ? '📖' : p.type === 'evaluation' ? '📋' : p.type === 'revision' ? '🔄' : '🏖️'
                   const semCount = p.fin_semaine - p.debut_semaine + 1
                   const isCurrent = semaineActuelle >= (sem.semestre === 1 ? p.debut_semaine : p.debut_semaine + 18) &&
@@ -882,14 +882,14 @@ function toggleCorr(){
                   return (
                     <div key={idx} className="flex items-center gap-3 p-3 rounded-xl transition-all duration-150"
                       style={{
-                        background: isCurrent ? `${typeColor}10` : 'rgba(255,255,255,0.02)',
-                        border: `1px solid ${isCurrent ? typeColor + '30' : 'rgba(255,255,255,0.05)'}`,
+                        background: isCurrent ? `${typeColor}10` : 'var(--ss-glass-card-bg)',
+                        border: `1px solid ${isCurrent ? typeColor + '30' : 'var(--ss-glass-card-bg)'}`,
                       }}>
                       <div className="w-1 h-10 rounded-full shrink-0" style={{ background: typeColor }} />
                       <span className="text-lg shrink-0">{typeIcon}</span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-white">{p.nom}</p>
-                        <p className="text-xs" style={{ color: '#475569' }}>
+                        <p className="text-sm font-semibold text-ss-text">{p.nom}</p>
+                        <p className="text-xs" style={{ color: 'var(--ss-text-disabled)' }}>
                           Semaines {p.debut_semaine}–{p.fin_semaine} · {semCount} semaine{semCount > 1 ? 's' : ''}
                         </p>
                       </div>
@@ -913,7 +913,7 @@ function toggleCorr(){
               { label: 'Cours', color: '#22C55E', icon: '📖' },
               { label: 'Evaluation', color: '#F87171', icon: '📋' },
               { label: 'Revision', color: '#FBBF24', icon: '🔄' },
-              { label: 'Vacances', color: '#94A3B8', icon: '🏖️' },
+              { label: 'Vacances', color: 'var(--ss-text-muted)', icon: '🏖️' },
             ].map(l => (
               <div key={l.label} className="flex items-center gap-1.5 text-xs" style={{ color: l.color }}>
                 <span>{l.icon}</span>
@@ -934,10 +934,10 @@ function toggleCorr(){
           <div className="rounded-2xl p-5" style={{ background: 'linear-gradient(135deg, rgba(0,229,255,0.08) 0%, rgba(0,230,118,0.05) 100%)', border: '1px solid rgba(0,229,255,0.2)' }}>
             <div className="flex items-center justify-between flex-wrap gap-3">
               <div>
-                <h2 className="text-xl font-black text-white">
+                <h2 className="text-xl font-black text-ss-text">
                   Semaine <span style={{ color: '#38BDF8' }}>S{semaineActuelle}</span> — Année 2025-2026
                 </h2>
-                <p className="text-sm mt-1" style={{ color: '#94A3B8' }}>
+                <p className="text-sm mt-1" style={{ color: 'var(--ss-text-muted)' }}>
                   {selectedNiveau}{selectedSerie && NIVEAUX_LYCEE.includes(selectedNiveau) && selectedNiveau !== 'Seconde' ? ` Série ${selectedSerie}` : ''} · {allProgrammes.length} matière{allProgrammes.length > 1 ? 's' : ''} disponibles
                 </p>
               </div>
@@ -950,8 +950,8 @@ function toggleCorr(){
           </div>
 
           {allProgrammes.length === 0 ? (
-            <div className="rounded-2xl p-10 text-center" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-              <p className="text-[#94A3B8]">Aucun programme disponible pour cette selection.</p>
+            <div className="rounded-2xl p-10 text-center" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
+              <p className="text-[var(--ss-text-muted)]">Aucun programme disponible pour cette selection.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -961,17 +961,17 @@ function toggleCorr(){
                 const alertIcon = retard === 'danger' ? '🚨' : retard === 'warning' ? '⚠️' : '✅'
                 return (
                   <div key={`${prog.matiere}-${prog.serie}`} className="rounded-2xl overflow-hidden"
-                    style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid ${color}18` }}>
+                    style={{ background: 'var(--ss-glass-card-bg)', border: `1px solid ${color}18` }}>
 
                     {/* Header matière */}
-                    <div className="px-4 py-3 flex items-center gap-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', background: `${color}06` }}>
+                    <div className="px-4 py-3 flex items-center gap-3" style={{ borderBottom: '1px solid var(--ss-glass-card-hover)', background: `${color}06` }}>
                       <div className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm shrink-0"
                         style={{ background: `${color}15`, color, border: `1px solid ${color}30` }}>
                         {prog.heures_hebdo}h
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-bold text-white text-sm truncate">{prog.matiere}</h3>
-                        <p className="text-[10px]" style={{ color: '#94A3B8' }}>
+                        <h3 className="font-bold text-ss-text text-sm truncate">{prog.matiere}</h3>
+                        <p className="text-[10px]" style={{ color: 'var(--ss-text-muted)' }}>
                           Coeff {prog.coefficient} · {heuresFaites}h/{prog.heures_annuelles}h · {pct}%
                         </p>
                       </div>
@@ -980,7 +980,7 @@ function toggleCorr(){
 
                     {/* Progression bar */}
                     <div className="px-4 pt-3">
-                      <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                      <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--ss-glass-card-hover)' }}>
                         <div className="h-full rounded-full transition-all duration-500"
                           style={{ width: `${pct}%`, background: pct >= 90 ? '#22C55E' : pct >= 60 ? color : alertColor }} />
                       </div>
@@ -990,14 +990,14 @@ function toggleCorr(){
                     <div className="p-4">
                       {progression ? (
                         <div>
-                          <p className="text-[10px] font-bold uppercase tracking-wider mb-2" style={{ color: '#475569' }}>
+                          <p className="text-[10px] font-bold uppercase tracking-wider mb-2" style={{ color: 'var(--ss-text-disabled)' }}>
                             Leçon prévue cette semaine
                           </p>
                           <div className="rounded-xl p-3" style={{ background: `${color}08`, border: `1px solid ${color}20` }}>
                             <div className="flex items-start gap-2">
                               <span className="text-lg shrink-0">{TYPE_ICONS[progression.lecon.type] || '📖'}</span>
                               <div className="min-w-0">
-                                <p className="text-sm font-bold text-white leading-snug">{progression.lecon.titre}</p>
+                                <p className="text-sm font-bold text-ss-text leading-snug">{progression.lecon.titre}</p>
                                 <p className="text-[10px] mt-1" style={{ color }}>
                                   {progression.module.titre} · Module {progression.module.numero}
                                 </p>
@@ -1006,7 +1006,7 @@ function toggleCorr(){
                                     style={{ background: `${TYPE_COLORS[progression.lecon.type] || color}15`, color: TYPE_COLORS[progression.lecon.type] || color }}>
                                     {progression.lecon.type.toUpperCase()}
                                   </span>
-                                  <span className="text-[10px]" style={{ color: '#475569' }}>{progression.lecon.duree_heures}h</span>
+                                  <span className="text-[10px]" style={{ color: 'var(--ss-text-disabled)' }}>{progression.lecon.duree_heures}h</span>
                                 </div>
                               </div>
                             </div>
@@ -1016,7 +1016,7 @@ function toggleCorr(){
                                 {progression.lecon.objectifs.slice(0, 2).map((obj, i) => (
                                   <div key={i} className="flex items-start gap-1.5">
                                     <span className="text-[8px] mt-1 shrink-0" style={{ color }}>▶</span>
-                                    <p className="text-[10px]" style={{ color: '#94A3B8' }}>{obj}</p>
+                                    <p className="text-[10px]" style={{ color: 'var(--ss-text-muted)' }}>{obj}</p>
                                   </div>
                                 ))}
                               </div>
@@ -1049,7 +1049,7 @@ function toggleCorr(){
                           className="mt-3 w-full py-2 rounded-xl text-xs font-bold transition-all duration-200"
                           style={leconsValidees.has(progression.lecon.id)
                             ? { background: `${color}15`, color, border: `1px solid ${color}30` }
-                            : { background: 'rgba(255,255,255,0.04)', color: '#94A3B8', border: '1px solid rgba(255,255,255,0.08)' }}>
+                            : { background: 'var(--ss-glass-card-bg)', color: 'var(--ss-text-muted)', border: '1px solid var(--ss-glass-card-hover)' }}>
                           {leconsValidees.has(progression.lecon.id) ? '✓ Leçon validée' : 'Cocher comme fait'}
                         </button>
                       )}
@@ -1067,12 +1067,12 @@ function toggleCorr(){
                 <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg"
                   style={{ background: 'rgba(213,0,249,0.12)', border: '1px solid rgba(213,0,249,0.25)' }}>📋</div>
                 <div>
-                  <h3 className="font-bold text-white text-sm">Résumé hebdomadaire pour les élèves</h3>
-                  <p className="text-xs" style={{ color: '#94A3B8' }}>Partagez ce planning avec vos classes</p>
+                  <h3 className="font-bold text-ss-text text-sm">Résumé hebdomadaire pour les élèves</h3>
+                  <p className="text-xs" style={{ color: 'var(--ss-text-muted)' }}>Partagez ce planning avec vos classes</p>
                 </div>
               </div>
-              <div className="rounded-xl p-4" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', fontFamily: 'monospace' }}>
-                <p className="text-xs font-bold text-white mb-2">
+              <div className="rounded-xl p-4" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)', fontFamily: 'monospace' }}>
+                <p className="text-xs font-bold text-ss-text mb-2">
                   PLANNING SEMAINE S{semaineActuelle} — {selectedNiveau}{selectedSerie && NIVEAUX_LYCEE.includes(selectedNiveau) && selectedNiveau !== 'Seconde' ? ` Série ${selectedSerie}` : ''}
                 </p>
                 {planningDeLaSemaine.slice(0, 6).map(({ prog, progression }) => (
@@ -1080,7 +1080,7 @@ function toggleCorr(){
                     <span className="text-[10px] font-bold w-32 shrink-0" style={{ color: MATIERE_COLORS[prog.matiere] || '#38BDF8' }}>
                       {prog.matiere.substring(0, 14).padEnd(14)}
                     </span>
-                    <span className="text-[10px]" style={{ color: '#94A3B8' }}>
+                    <span className="text-[10px]" style={{ color: 'var(--ss-text-muted)' }}>
                       {progression ? `→ ${progression.lecon.titre}` : '→ Révisions finales'}
                     </span>
                   </div>
@@ -1112,14 +1112,14 @@ function toggleCorr(){
                   onClick={() => setFiltreTypeRes(t)}
                   className="rounded-xl p-3 text-center transition-all duration-200"
                   style={{
-                    background: filtreTypeRes === t ? `${color}15` : 'rgba(255,255,255,0.03)',
-                    border: `1px solid ${filtreTypeRes === t ? color + '40' : 'rgba(255,255,255,0.07)'}`,
+                    background: filtreTypeRes === t ? `${color}15` : 'var(--ss-glass-card-bg)',
+                    border: `1px solid ${filtreTypeRes === t ? color + '40' : 'var(--ss-glass-card-hover)'}`,
                   }}>
                   <span className="text-lg block">{icon}</span>
-                  <span className="text-xs font-bold block mt-1" style={{ color: filtreTypeRes === t ? color : '#94A3B8' }}>
+                  <span className="text-xs font-bold block mt-1" style={{ color: filtreTypeRes === t ? color : 'var(--ss-text-muted)' }}>
                     {label}
                   </span>
-                  <span className="text-[10px] font-black" style={{ color: filtreTypeRes === t ? color : '#475569' }}>
+                  <span className="text-[10px] font-black" style={{ color: filtreTypeRes === t ? color : 'var(--ss-text-disabled)' }}>
                     {count}
                   </span>
                 </button>
@@ -1129,9 +1129,9 @@ function toggleCorr(){
 
           {/* Liste ressources */}
           {ressources.length === 0 ? (
-            <div className="rounded-2xl p-10 text-center" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <div className="rounded-2xl p-10 text-center" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
               <span className="text-3xl block mb-3">📭</span>
-              <p className="text-[#94A3B8] text-sm">Aucune ressource disponible pour cette sélection.</p>
+              <p className="text-[var(--ss-text-muted)] text-sm">Aucune ressource disponible pour cette sélection.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -1142,29 +1142,29 @@ function toggleCorr(){
                 const matiereColor = MATIERE_COLORS[res.matiere] || '#38BDF8'
                 return (
                   <div key={res.id} className="rounded-xl overflow-hidden transition-all duration-200 hover:scale-[1.01]"
-                    style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid ${color}18` }}>
+                    style={{ background: 'var(--ss-glass-card-bg)', border: `1px solid ${color}18` }}>
                     <div className="px-4 py-3 flex items-center gap-3" style={{ borderBottom: `1px solid ${color}10`, background: `${color}05` }}>
                       <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0"
                         style={{ background: `${color}15`, border: `1px solid ${color}30` }}>
                         {icon}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-bold text-white leading-snug truncate">{res.titre}</p>
+                        <p className="text-sm font-bold text-ss-text leading-snug truncate">{res.titre}</p>
                         <div className="flex items-center gap-2 mt-0.5">
                           <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
                             style={{ background: `${color}15`, color }}>{label}</span>
                           <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full"
                             style={{ background: `${matiereColor}10`, color: matiereColor }}>{res.matiere}</span>
                           {res.annee && (
-                            <span className="text-[10px]" style={{ color: '#475569' }}>{res.annee}</span>
+                            <span className="text-[10px]" style={{ color: 'var(--ss-text-disabled)' }}>{res.annee}</span>
                           )}
                         </div>
                       </div>
                     </div>
                     <div className="px-4 py-3">
-                      <p className="text-xs text-[#94A3B8] leading-relaxed">{res.description}</p>
+                      <p className="text-xs text-[var(--ss-text-muted)] leading-relaxed">{res.description}</p>
                       {res.source && (
-                        <p className="text-[10px] mt-2 font-semibold" style={{ color: '#475569' }}>
+                        <p className="text-[10px] mt-2 font-semibold" style={{ color: 'var(--ss-text-disabled)' }}>
                           Source : {res.source}
                         </p>
                       )}
@@ -1178,7 +1178,7 @@ function toggleCorr(){
                         <button
                           onClick={() => handleApercu(res)}
                           className="px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-200 hover:opacity-80 active:scale-95 cursor-pointer"
-                          style={{ background: 'rgba(255,255,255,0.06)', color: '#CBD5E1', border: '1px solid rgba(255,255,255,0.1)' }}>
+                          style={{ background: 'var(--ss-glass-card-hover)', color: 'var(--ss-text-secondary)', border: '1px solid var(--ss-glass-border)' }}>
                           👁 Aperçu
                         </button>
                       </div>
@@ -1194,8 +1194,8 @@ function toggleCorr(){
             style={{ background: 'rgba(0,229,255,0.05)', border: '1px solid rgba(0,229,255,0.15)' }}>
             <span className="text-xl shrink-0 mt-0.5">💡</span>
             <div>
-              <p className="text-sm font-bold text-white">Ressources accessibles aux élèves</p>
-              <p className="text-xs mt-1" style={{ color: '#94A3B8' }}>
+              <p className="text-sm font-bold text-ss-text">Ressources accessibles aux élèves</p>
+              <p className="text-xs mt-1" style={{ color: 'var(--ss-text-muted)' }}>
                 Ces ressources (annales, fiches de révision, exercices interactifs et TP virtuels) sont également
                 disponibles dans l&apos;espace élève sous &ldquo;E-learning&rdquo;. Encouragez vos élèves à les utiliser
                 pour réviser et s&apos;entraîner au BAC / BFEM.

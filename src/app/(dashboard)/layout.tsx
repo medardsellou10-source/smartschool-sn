@@ -4,6 +4,7 @@ import { BottomNav } from '@/components/layout/BottomNav'
 import { RealtimeNotif } from '@/components/dashboard/RealtimeNotif'
 import { RegisterSW } from '@/components/pwa/RegisterSW'
 import ChatWidget from '@/components/chat/ChatWidget'
+import { ImpersonationBanner } from '@/components/admin/ImpersonationBanner'
 
 // Pas de force-dynamic : le shell du dashboard est statique, seul le contenu est dynamique
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -11,6 +12,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <div data-dashboard className="flex h-screen bg-ss-bg">
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+        <ImpersonationBanner />
         <Navbar />
         <main className="flex-1 overflow-y-auto p-4 lg:p-6 pb-20 lg:pb-6 overscroll-contain">
           {children}

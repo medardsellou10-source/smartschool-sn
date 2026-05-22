@@ -20,7 +20,7 @@ const ACCENT_MAP: Record<PageHeaderAccent, { color: string; bg: string; border: 
   danger:  { color: '#F87171', bg: 'rgba(248,113,113,0.12)', border: 'rgba(248,113,113,0.25)' },
   purple:  { color: '#A78BFA', bg: 'rgba(167,139,250,0.12)', border: 'rgba(167,139,250,0.25)' },
   gold:    { color: '#FBBF24', bg: 'rgba(251,191,36,0.12)',  border: 'rgba(251,191,36,0.25)' },
-  neutral: { color: '#94A3B8', bg: 'rgba(148,163,184,0.10)', border: 'rgba(148,163,184,0.20)' },
+  neutral: { color: 'var(--ss-text-muted)', bg: 'rgba(148,163,184,0.10)', border: 'rgba(148,163,184,0.20)' },
 }
 
 interface PageHeaderProps {

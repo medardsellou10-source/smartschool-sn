@@ -25,7 +25,7 @@ export function FactureCard({ eleveNom, montant, type, statut, date }: FactureCa
     <div className="bg-white rounded-xl border border-slate-200 p-4 flex items-center justify-between">
       <div>
         <p className="font-semibold text-slate-800">{eleveNom}</p>
-        <p className="text-sm text-slate-500">{type} · {date}</p>
+        <p className="text-sm text-ss-text-muted">{type} · {date}</p>
       </div>
       <div className="text-right">
         <p className="font-bold text-slate-800">{formatFCFA(montant)}</p>

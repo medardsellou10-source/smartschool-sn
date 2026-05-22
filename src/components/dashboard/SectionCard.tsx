@@ -50,16 +50,16 @@ export function SectionCard({
     <section
       className={`rounded-2xl overflow-hidden ${className}`}
       style={{
-        background: 'rgba(15,23,42,0.60)',
+        background: 'var(--ss-glass-bg)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
-        border: '1px solid rgba(255,255,255,0.06)',
+        border: '1px solid var(--ss-border)',
       }}
     >
       {hasHeader && (
         <header
           className={`flex items-start justify-between gap-3 flex-wrap ${dense ? 'px-4 py-3' : 'px-4 sm:px-5 py-3.5 sm:py-4'}`}
-          style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}
+          style={{ borderBottom: '1px solid var(--ss-border)' }}
         >
           <div className="flex items-start gap-2.5 min-w-0 flex-1">
             {Icon && (

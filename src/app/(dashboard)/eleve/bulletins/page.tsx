@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useEffect, useState, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -104,7 +104,7 @@ export default function EleveBulletinsPage() {
   const mention = useMemo(() => moyenneGenerale !== null ? getMention(moyenneGenerale) : null, [moyenneGenerale])
 
   if (userLoading) {
-    return <div className="space-y-4">{[...Array(4)].map((_, i) => <div key={i} className="h-28 rounded-2xl ss-shimmer" style={{ background: 'rgba(255,255,255,0.03)' }} />)}</div>
+    return <div className="space-y-4">{[...Array(4)].map((_, i) => <div key={i} className="h-28 rounded-2xl ss-shimmer" style={{ background: 'var(--ss-glass-card-bg)' }} />)}</div>
   }
 
   return (
@@ -115,13 +115,13 @@ export default function EleveBulletinsPage() {
         icon={FileText}
         accent="purple"
         actions={
-          <div className="flex items-center gap-1 p-1 rounded-xl" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
+          <div className="flex items-center gap-1 p-1 rounded-xl" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
             {[1, 2, 3].map(t => (
               <button key={t} onClick={() => setTrimestre(t)}
                 className="px-4 py-2 rounded-lg text-sm font-bold transition-all"
                 style={{
                   background: trimestre === t ? 'rgba(213,0,249,0.15)' : 'transparent',
-                  color: trimestre === t ? '#A78BFA' : '#94A3B8',
+                  color: trimestre === t ? '#A78BFA' : 'var(--ss-text-muted)',
                   border: trimestre === t ? '1px solid rgba(213,0,249,0.3)' : '1px solid transparent',
                 }}>
                 T{t}
@@ -133,23 +133,23 @@ export default function EleveBulletinsPage() {
 
       {/* Bulletin */}
       {loading ? (
-        <div className="space-y-3">{[...Array(8)].map((_, i) => <div key={i} className="h-14 rounded-xl ss-shimmer" style={{ background: 'rgba(255,255,255,0.03)' }} />)}</div>
+        <div className="space-y-3">{[...Array(8)].map((_, i) => <div key={i} className="h-14 rounded-xl ss-shimmer" style={{ background: 'var(--ss-glass-card-bg)' }} />)}</div>
       ) : moyennes.length === 0 ? (
-        <div className="rounded-2xl p-10 text-center" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-          <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 text-3xl" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>📭</div>
-          <p className="text-white font-semibold">Aucun bulletin disponible</p>
-          <p className="text-sm mt-1" style={{ color: '#94A3B8' }}>Le bulletin du trimestre {trimestre} n&apos;est pas encore disponible</p>
+        <div className="rounded-2xl p-10 text-center" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
+          <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 text-3xl" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>📭</div>
+          <p className="text-ss-text font-semibold">Aucun bulletin disponible</p>
+          <p className="text-sm mt-1" style={{ color: 'var(--ss-text-muted)' }}>Le bulletin du trimestre {trimestre} n&apos;est pas encore disponible</p>
         </div>
       ) : (
         <>
           {/* Table */}
-          <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          <div className="rounded-2xl overflow-hidden" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
             {/* Table header */}
-            <div className="grid grid-cols-12 gap-2 px-5 py-3" style={{ background: 'rgba(255,255,255,0.03)', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-              <div className="col-span-5 text-xs font-bold uppercase tracking-wider" style={{ color: '#475569' }}>Matiere</div>
-              <div className="col-span-2 text-xs font-bold uppercase tracking-wider text-center" style={{ color: '#475569' }}>Coeff</div>
-              <div className="col-span-2 text-xs font-bold uppercase tracking-wider text-center" style={{ color: '#475569' }}>Moyenne</div>
-              <div className="col-span-3 text-xs font-bold uppercase tracking-wider text-right" style={{ color: '#475569' }}>Appreciation</div>
+            <div className="grid grid-cols-12 gap-2 px-5 py-3" style={{ background: 'var(--ss-glass-card-bg)', borderBottom: '1px solid var(--ss-glass-card-hover)' }}>
+              <div className="col-span-5 text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--ss-text-disabled)' }}>Matiere</div>
+              <div className="col-span-2 text-xs font-bold uppercase tracking-wider text-center" style={{ color: 'var(--ss-text-disabled)' }}>Coeff</div>
+              <div className="col-span-2 text-xs font-bold uppercase tracking-wider text-center" style={{ color: 'var(--ss-text-disabled)' }}>Moyenne</div>
+              <div className="col-span-3 text-xs font-bold uppercase tracking-wider text-right" style={{ color: 'var(--ss-text-disabled)' }}>Appreciation</div>
             </div>
 
             {/* Rows */}
@@ -157,16 +157,16 @@ export default function EleveBulletinsPage() {
               const noteColor = m.moyenne >= 14 ? '#22C55E' : m.moyenne >= 10 ? '#FBBF24' : '#F87171'
               return (
                 <div key={idx} className="grid grid-cols-12 gap-2 px-5 py-3 items-center"
-                  style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                  <div className="col-span-5 text-sm font-semibold text-white truncate">{m.matiere_nom}</div>
-                  <div className="col-span-2 text-sm text-center" style={{ color: '#94A3B8' }}>{m.coeff}</div>
+                  style={{ borderBottom: '1px solid var(--ss-glass-card-bg)' }}>
+                  <div className="col-span-5 text-sm font-semibold text-ss-text truncate">{m.matiere_nom}</div>
+                  <div className="col-span-2 text-sm text-center" style={{ color: 'var(--ss-text-muted)' }}>{m.coeff}</div>
                   <div className="col-span-2 text-center">
                     <span className="text-sm font-black px-2 py-0.5 rounded-md"
                       style={{ background: `${noteColor}15`, color: noteColor }}>
                       {m.moyenne.toFixed(1)}
                     </span>
                   </div>
-                  <div className="col-span-3 text-xs text-right" style={{ color: '#94A3B8' }}>{getAppreciation(m.moyenne)}</div>
+                  <div className="col-span-3 text-xs text-right" style={{ color: 'var(--ss-text-muted)' }}>{getAppreciation(m.moyenne)}</div>
                 </div>
               )
             })}
@@ -174,34 +174,34 @@ export default function EleveBulletinsPage() {
 
           {/* Summary card */}
           <div className="rounded-2xl p-6" style={{
-            background: mention ? `${mention.color}08` : 'rgba(255,255,255,0.03)',
-            border: `1px solid ${mention ? `${mention.color}20` : 'rgba(255,255,255,0.07)'}`,
+            background: mention ? `${mention.color}08` : 'var(--ss-glass-card-bg)',
+            border: `1px solid ${mention ? `${mention.color}20` : 'var(--ss-glass-card-hover)'}`,
           }}>
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center gap-5">
                 {/* Moyenne */}
                 <div className="text-center">
-                  <p className="text-xs uppercase tracking-wider mb-1" style={{ color: '#94A3B8' }}>Moyenne Generale</p>
+                  <p className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--ss-text-muted)' }}>Moyenne Generale</p>
                   <p className="text-4xl font-black" style={{ color: mention?.color || '#fff' }}>
                     {moyenneGenerale !== null ? moyenneGenerale.toFixed(2) : '--'}
-                    <span className="text-lg font-bold" style={{ color: '#475569' }}>/20</span>
+                    <span className="text-lg font-bold" style={{ color: 'var(--ss-text-disabled)' }}>/20</span>
                   </p>
                 </div>
                 {/* Divider */}
-                <div className="w-px h-16" style={{ background: 'rgba(255,255,255,0.1)' }} />
+                <div className="w-px h-16" style={{ background: 'var(--ss-glass-border)' }} />
                 {/* Rang */}
                 <div className="text-center">
-                  <p className="text-xs uppercase tracking-wider mb-1" style={{ color: '#94A3B8' }}>Rang</p>
-                  <p className="text-3xl font-black text-white">
+                  <p className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--ss-text-muted)' }}>Rang</p>
+                  <p className="text-3xl font-black text-ss-text">
                     {rang !== null ? rang : '--'}
-                    <span className="text-sm font-bold" style={{ color: '#475569' }}>{rang === 1 ? 'er' : 'e'}</span>
+                    <span className="text-sm font-bold" style={{ color: 'var(--ss-text-disabled)' }}>{rang === 1 ? 'er' : 'e'}</span>
                   </p>
                 </div>
               </div>
               {/* Mention */}
               {mention && (
                 <div className="px-5 py-2.5 rounded-xl" style={{ background: `${mention.color}15`, border: `1px solid ${mention.color}30` }}>
-                  <p className="text-xs uppercase tracking-wider mb-0.5" style={{ color: '#94A3B8' }}>Mention</p>
+                  <p className="text-xs uppercase tracking-wider mb-0.5" style={{ color: 'var(--ss-text-muted)' }}>Mention</p>
                   <p className="text-lg font-black" style={{ color: mention.color }}>{mention.label}</p>
                 </div>
               )}

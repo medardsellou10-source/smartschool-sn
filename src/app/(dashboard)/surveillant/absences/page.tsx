@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState, useMemo, useCallback, useEffect } from 'react'
 import { useUser } from '@/hooks/useUser'
@@ -244,13 +244,13 @@ export default function AbsencesPage() {
           onClick={() => setOnglet('appels')}
           className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all min-h-[44px] ${
             onglet === 'appels'
-              ? 'bg-[#7C4DFF] text-white shadow-md'
+              ? 'bg-[#7C4DFF] text-ss-text shadow-md'
               : 'text-ss-text-secondary hover:text-ss-text'
           }`}
         >
           📬 Appels reçus
           {totalAbsentsNonNotifies > 0 && (
-            <span className="bg-ss-red text-white text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center">
+            <span className="bg-ss-red text-ss-text text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center">
               {totalAbsentsNonNotifies}
             </span>
           )}
@@ -259,7 +259,7 @@ export default function AbsencesPage() {
           onClick={() => setOnglet('saisie')}
           className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all min-h-[44px] ${
             onglet === 'saisie'
-              ? 'bg-[#7C4DFF] text-white shadow-md'
+              ? 'bg-[#7C4DFF] text-ss-text shadow-md'
               : 'text-ss-text-secondary hover:text-ss-text'
           }`}
         >
@@ -359,7 +359,7 @@ export default function AbsencesPage() {
                                   />
                                   <button
                                     onClick={() => handleNotifier(appel, eleve)}
-                                    className="shrink-0 bg-[#7C4DFF] text-white text-xs font-bold px-4 py-2 rounded-lg min-h-[36px] hover:bg-[#7C4DFF]/80 transition-colors"
+                                    className="shrink-0 bg-[#7C4DFF] text-ss-text text-xs font-bold px-4 py-2 rounded-lg min-h-[36px] hover:bg-[#7C4DFF]/80 transition-colors"
                                   >
                                     Notifier
                                   </button>
@@ -380,7 +380,7 @@ export default function AbsencesPage() {
                         <div className="px-4 py-3 border-t border-ss-border">
                           <button
                             onClick={() => handleNotifierTous(appel)}
-                            className="w-full py-3 rounded-xl font-bold text-sm min-h-[48px] text-white transition-all"
+                            className="w-full py-3 rounded-xl font-bold text-sm min-h-[48px] text-ss-text transition-all"
                             style={{ background: 'linear-gradient(135deg, #7C4DFF, #16A34A)' }}
                           >
                             Notifier tous les parents ({nonNotifies.length})
@@ -492,7 +492,7 @@ export default function AbsencesPage() {
                       onClick={handleSave}
                       disabled={saving || saved}
                       className={`w-full py-3 rounded-xl font-bold text-sm min-h-[48px] transition-colors ${
-                        saved ? 'bg-ss-green/20 text-ss-green' : 'bg-ss-green text-white hover:bg-ss-green/80 disabled:opacity-50'
+                        saved ? 'bg-ss-green/20 text-ss-green' : 'bg-ss-green text-ss-text hover:bg-ss-green/80 disabled:opacity-50'
                       }`}
                     >
                       {saving ? 'Enregistrement...' : saved ? 'Enregistré !' : 'Enregistrer les présences'}

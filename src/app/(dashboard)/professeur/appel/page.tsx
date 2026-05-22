@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -278,7 +278,7 @@ export default function AppelPage() {
               <p className="text-sm font-bold" style={{ color: '#16A34A' }}>
                 ✓ Transmis au Surveillant Général
               </p>
-              <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.45)' }}>
+              <p className="text-xs mt-1" style={{ color: 'var(--ss-glass-border)' }}>
                 Il sera notifié et contactera les parents
               </p>
             </div>
@@ -390,9 +390,9 @@ export default function AppelPage() {
                       onClick={() => toggleStatut(eleve.id, s)}
                       className={`text-xs px-2 py-1.5 rounded-lg font-medium transition ${
                         eleve.statut === s
-                          ? s === 'present' ? 'bg-[#00853F] text-white'
-                            : s === 'absent' ? 'bg-red-500 text-white'
-                            : 'bg-yellow-500 text-white'
+                          ? s === 'present' ? 'bg-[#00853F] text-ss-text'
+                            : s === 'absent' ? 'bg-red-500 text-ss-text'
+                            : 'bg-yellow-500 text-ss-text'
                           : 'bg-ss-bg-card text-ss-text-muted hover:opacity-80'
                       }`}>
                       {s === 'present' ? '✓ Présent' : s === 'absent' ? '✗ Absent' : '⏰ Retard'}
@@ -416,7 +416,7 @@ export default function AppelPage() {
           <button
             onClick={validerAppel}
             disabled={submitting}
-            className="w-full bg-[#00853F] text-white font-semibold py-4 rounded-xl text-base hover:bg-[#00853F]/90 transition disabled:opacity-50">
+            className="w-full bg-[#00853F] text-ss-text font-semibold py-4 rounded-xl text-base hover:bg-[#00853F]/90 transition disabled:opacity-50">
             {submitting
               ? 'Validation en cours...'
               : `Valider l'appel (${stats.absents} absent${stats.absents > 1 ? 's' : ''}, ${stats.retards} retard${stats.retards > 1 ? 's' : ''})`

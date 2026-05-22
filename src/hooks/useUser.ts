@@ -30,6 +30,15 @@ function roleFromPath(pathname: string): string {
 }
 
 function getDemoUser(pathname: string): Utilisateur {
+  // WAED #1 — si une impersonification est active, elle gagne sur toutes
+  // les autres résolutions de rôle (le banner orange permet d'en sortir).
+  if (typeof window !== 'undefined') {
+    const imp = window.localStorage.getItem('ss_impersonate_user')
+    if (imp && (DEMO_USERS as Record<string, unknown>)[imp]) {
+      return (DEMO_USERS as Record<string, Utilisateur>)[imp]
+    }
+  }
+
   const pathRole = roleFromPath(pathname)
   let role: string
 

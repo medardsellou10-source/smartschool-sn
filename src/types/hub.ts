@@ -1,8 +1,5 @@
 /**
- * Types du module SmartSchool Hub (v1 MVP)
- *
- * v1 : données mockées, gamification en localStorage.
- * v2 (différé) : persistance Supabase (tables lessons, lesson_progress, xp_events).
+ * Types — SmartSchool Hub (module pédagogique vidéo-first)
  */
 
 export type SubjectId =
@@ -25,7 +22,7 @@ export type NiveauId =
   | 'terminale'
 
 export interface LessonResource {
-  kind: 'pdf' | 'quiz' | 'exercices' | 'annale'
+  kind: 'pdf' | 'quiz' | 'exercices'
   title: string
   url: string
 }
@@ -42,8 +39,7 @@ export interface Lesson {
   subject: SubjectId
   niveau: NiveauId
   teacher: { name: string; avatarUrl?: string }
-  /** URL vidéo : YouTube (embed) ou Vimeo (embed). */
-  videoUrl: string
+  videoUrl: string        // YouTube ou Vimeo embed URL
   durationSec: number
   thumbnailUrl: string
   views: number
@@ -51,39 +47,18 @@ export interface Lesson {
   isTrending?: boolean
   resources?: LessonResource[]
   chapters?: LessonChapter[]
-  /** ISO date — utile pour tri "nouveauté". */
-  createdAt: string
 }
 
 export interface LessonProgress {
   lastPositionSec: number
-  durationSec: number
-  /** ISO date si la leçon est terminée (≥ 90 %). */
-  completedAt?: string
-  /** ISO date du premier visionnage. */
-  firstStartedAt?: string
+  completedAt?: string    // ISO date si ≥ 90 % visionné
 }
 
 export interface XpState {
   xp: number
   streakDays: number
-  /** ISO date (YYYY-MM-DD) de la dernière activité. */
-  lastActivityAt: string
-  /** IDs des badges débloqués. */
+  lastActivityAt: string  // ISO date
   badges: string[]
-}
-
-export interface SubjectMeta {
-  id: SubjectId
-  label: string
-  color: string
-  iconName: string
-}
-
-export interface NiveauMeta {
-  id: NiveauId
-  label: string
-  cycle: 'college' | 'lycee'
 }
 
 export interface HubFilters {

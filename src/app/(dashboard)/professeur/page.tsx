@@ -140,7 +140,7 @@ export default function ProfesseurDashboard() {
   if (userLoading) {
     return (
       <div className="space-y-4">
-        {[...Array(4)].map((_, i) => <div key={i} className="h-28 rounded-2xl ss-shimmer" style={{ background: 'rgba(255,255,255,0.03)' }} />)}
+        {[...Array(4)].map((_, i) => <div key={i} className="h-28 rounded-2xl ss-shimmer" style={{ background: 'var(--ss-glass-card-bg)' }} />)}
       </div>
     )
   }
@@ -156,14 +156,14 @@ export default function ProfesseurDashboard() {
           aria-hidden="true"
           className="absolute inset-0 w-full h-full object-cover"
         />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, rgba(2,6,23,0.95) 0%, rgba(2,6,23,0.6) 100%)' }} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, var(--ss-surface-elevated) 0%, var(--ss-surface-elevated) 100%)' }} />
         <div className="relative px-6 py-5">
           <div className="flex items-center gap-2 mb-1">
-            <div className="w-2 h-2 rounded-full bg-[#22C55E] animate-pulse" />
-            <span className="text-[#94A3B8] text-xs font-semibold tracking-wider uppercase">Espace Professeur</span>
+            <div className="w-2 h-2 rounded-full bg-ss-green animate-pulse" />
+            <span className="text-[var(--ss-text-muted)] text-xs font-semibold tracking-wider uppercase">Espace Professeur</span>
           </div>
-          <h1 className="text-2xl font-black text-white">Bonjour, {user?.prenom} {user?.nom}</h1>
-          <p className="text-sm mt-1" style={{ color: '#94A3B8' }}>
+          <h1 className="text-2xl font-black text-ss-text">Bonjour, {user?.prenom} {user?.nom}</h1>
+          <p className="text-sm mt-1" style={{ color: 'var(--ss-text-muted)' }}>
             {JOUR_LABELS[jourSemaine] || 'Aujourd\'hui'} — {today.toLocaleDateString('fr-SN', { day: 'numeric', month: 'long', year: 'numeric' })}
           </p>
         </div>
@@ -183,8 +183,8 @@ export default function ProfesseurDashboard() {
       </div>
 
       {/* ── Actions rapides ── */}
-      <div className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-        <h2 className="text-sm font-bold text-[#94A3B8] uppercase tracking-wider mb-4">Actions rapides</h2>
+      <div className="rounded-2xl p-5" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-border)' }}>
+        <h2 className="text-sm font-bold text-ss-text-secondary uppercase tracking-wider mb-4">Actions rapides</h2>
         <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
           {[
             { href: '/professeur/appel',    Icon: ClipboardList, label: "Faire l'appel",    color: '#00853F' },
@@ -195,7 +195,7 @@ export default function ProfesseurDashboard() {
             { href: '/professeur/messages', Icon: MessageSquare, label: 'Messagerie',       color: '#FF6D00' },
           ].map(a => (
             <Link key={a.href} href={a.href}
-              className="group flex flex-col items-center gap-2 p-4 rounded-xl text-center transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617]"
+              className="group flex flex-col items-center gap-2 p-4 rounded-xl text-center transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-ss-bg"
               style={{ background: `${a.color}12`, border: `1px solid ${a.color}30` }}>
               <span
                 className="w-10 h-10 rounded-xl flex items-center justify-center"
@@ -204,16 +204,16 @@ export default function ProfesseurDashboard() {
               >
                 <a.Icon size={20} style={{ color: a.color }} />
               </span>
-              <span className="text-xs font-semibold leading-tight text-white">{a.label}</span>
+              <span className="text-xs font-semibold leading-tight text-ss-text">{a.label}</span>
             </Link>
           ))}
         </div>
       </div>
 
       {/* ── Emploi du temps du jour ── */}
-      <div className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+      <div className="rounded-2xl p-5" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-border)' }}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-bold text-[#94A3B8] uppercase tracking-wider">
+          <h2 className="text-sm font-bold text-ss-text-secondary uppercase tracking-wider">
             Planning — {JOUR_LABELS[jourSemaine] || 'Aujourd\'hui'}
           </h2>
           <span className="text-xs px-2 py-1 rounded-full"
@@ -224,7 +224,7 @@ export default function ProfesseurDashboard() {
 
         {dataLoading ? (
           <div className="space-y-3">
-            {[...Array(2)].map((_, i) => <div key={i} className="h-16 rounded-xl ss-shimmer" style={{ background: 'rgba(255,255,255,0.03)' }} />)}
+            {[...Array(2)].map((_, i) => <div key={i} className="h-16 rounded-xl ss-shimmer" style={{ background: 'var(--ss-glass-card-bg)' }} />)}
           </div>
         ) : coursAujourdhui.length === 0 ? (
           <EmptyState
@@ -246,18 +246,18 @@ export default function ProfesseurDashboard() {
                 <div key={cours.id}
                   className="flex items-center gap-4 p-4 rounded-xl transition-all duration-200"
                   style={{
-                    background: isCurrent ? `${color}12` : 'rgba(255,255,255,0.03)',
-                    border: `1px solid ${isCurrent ? color + '40' : 'rgba(255,255,255,0.07)'}`,
+                    background: isCurrent ? `${color}12` : 'var(--ss-glass-card-bg)',
+                    border: `1px solid ${isCurrent ? color + '40' : 'var(--ss-border)'}`,
                     opacity: isPast && !isCurrent ? 0.65 : 1,
                   }}>
                   <div className="w-1 h-12 rounded-full shrink-0" style={{ background: color }} />
                   <div className="w-16 shrink-0 text-center">
-                    <p className="text-sm font-black text-white">{cours.heure_debut}</p>
-                    <p className="text-xs" style={{ color: '#475569' }}>{cours.heure_fin}</p>
+                    <p className="text-sm font-black text-ss-text">{cours.heure_debut}</p>
+                    <p className="text-xs text-ss-text-disabled">{cours.heure_fin}</p>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-white truncate">{cours.matiere_nom}</p>
-                    <p className="text-xs mt-0.5" style={{ color: '#94A3B8' }}>{cours.classe_nom}{cours.salle && ` · ${cours.salle}`}</p>
+                    <p className="text-sm font-bold text-ss-text truncate">{cours.matiere_nom}</p>
+                    <p className="text-xs mt-0.5 text-ss-text-secondary">{cours.classe_nom}{cours.salle && ` · ${cours.salle}`}</p>
                   </div>
                   {isCurrent && (
                     <span className="text-[10px] font-bold px-2 py-1 rounded-full shrink-0 flex items-center gap-1"

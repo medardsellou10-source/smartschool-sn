@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useEffect, useState, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -208,7 +208,7 @@ export default function EleveDashboard() {
   }, [emploiTemps])
 
   if (userLoading) {
-    return <div className="space-y-4">{[...Array(5)].map((_, i) => <div key={i} className="h-28 rounded-2xl ss-shimmer" style={{ background: 'rgba(255,255,255,0.03)' }} />)}</div>
+    return <div className="space-y-4">{[...Array(5)].map((_, i) => <div key={i} className="h-28 rounded-2xl ss-shimmer" style={{ background: 'var(--ss-glass-card-bg)' }} />)}</div>
   }
 
   const moyColor = moyenneGenerale !== null ? (moyenneGenerale >= 14 ? '#22C55E' : moyenneGenerale >= 10 ? '#FBBF24' : '#F87171') : '#38BDF8'
@@ -219,7 +219,7 @@ export default function EleveDashboard() {
       {/* ── Bannière élève ── */}
       <div className="relative rounded-2xl overflow-hidden min-h-[140px]">
         <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1200&q=80" alt="" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, rgba(2,6,23,0.95) 0%, rgba(2,6,23,0.55) 100%)' }} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, var(--ss-surface-elevated) 0%, var(--ss-surface-elevated) 100%)' }} />
         <div className="relative px-6 py-5 flex items-end gap-4">
           {/* Avatar */}
           <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-xl font-black shrink-0"
@@ -227,16 +227,17 @@ export default function EleveDashboard() {
             {getInitials(eleve?.prenom, eleve?.nom)}
           </div>
           <div>
-            <span className="text-xs font-semibold tracking-wider uppercase text-[#94A3B8]">Mon Espace</span>
-            <h1 className="text-2xl font-black text-white">{eleve?.prenom ?? ''} {eleve?.nom ?? ''}</h1>
-            <p className="text-sm mt-0.5" style={{ color: '#94A3B8' }}>{eleve?.classe_nom ?? '—'}{eleve?.matricule && <> · <span style={{ color: '#475569' }}>{eleve.matricule}</span></>}</p>
+            {/* Bannière sur photo : textes clairs fixes (independants du theme) */}
+            <span className="text-xs font-semibold tracking-wider uppercase text-ss-text-secondary">Mon Espace</span>
+            <h1 className="text-2xl font-black text-ss-text">{eleve?.prenom ?? ''} {eleve?.nom ?? ''}</h1>
+            <p className="text-sm mt-0.5 text-ss-text-secondary">{eleve?.classe_nom ?? '—'}{eleve?.matricule && <> · <span className="text-ss-text-secondary">{eleve.matricule}</span></>}</p>
           </div>
         </div>
       </div>
 
       {/* ── Stats ── */}
       {loading ? (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">{[...Array(4)].map((_, i) => <div key={i} className="h-28 rounded-2xl ss-shimmer" style={{ background: 'rgba(255,255,255,0.03)' }} />)}</div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">{[...Array(4)].map((_, i) => <div key={i} className="h-28 rounded-2xl ss-shimmer" style={{ background: 'var(--ss-glass-card-bg)' }} />)}</div>
       ) : (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <StatCard title="Moyenne générale" value={moyenneGenerale !== null ? `${moyenneGenerale.toFixed(1)}/20` : '--'} subtitle={`Trimestre ${getCurrentTrimestre()}`} icon={BarChart3} color={moyenneGenerale !== null ? (moyenneGenerale >= 10 ? 'green' : 'red') : 'cyan'} />
@@ -247,8 +248,8 @@ export default function EleveDashboard() {
       )}
 
       {/* ── Actions rapides ── */}
-      <div className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-        <h2 className="text-sm font-bold text-[#94A3B8] uppercase tracking-wider mb-4">Actions rapides</h2>
+      <div className="rounded-2xl p-5" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-border)' }}>
+        <h2 className="text-sm font-bold text-ss-text-secondary uppercase tracking-wider mb-4">Actions rapides</h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {([
             { href: '/eleve/bulletins',    Icon: FileText,    label: 'Mes Bulletins',        color: '#A78BFA' },
@@ -264,21 +265,21 @@ export default function EleveDashboard() {
                 style={{ background: `${a.color}1a`, border: `1px solid ${a.color}40` }}>
                 <a.Icon size={20} style={{ color: a.color }} />
               </span>
-              <span className="text-xs font-semibold leading-tight text-white">{a.label}</span>
+              <span className="text-xs font-semibold leading-tight text-ss-text">{a.label}</span>
             </Link>
           ))}
         </div>
       </div>
 
       {/* ── Notes récentes ── */}
-      <div className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-        <h2 className="text-sm font-bold text-[#94A3B8] uppercase tracking-wider mb-4">Notes récentes</h2>
+      <div className="rounded-2xl p-5" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-border)' }}>
+        <h2 className="text-sm font-bold text-ss-text-secondary uppercase tracking-wider mb-4">Notes récentes</h2>
         {loading ? (
-          <div className="space-y-2">{[...Array(4)].map((_, i) => <div key={i} className="h-10 rounded-xl ss-shimmer" style={{ background: 'rgba(255,255,255,0.03)' }} />)}</div>
+          <div className="space-y-2">{[...Array(4)].map((_, i) => <div key={i} className="h-10 rounded-xl ss-shimmer" style={{ background: 'var(--ss-glass-card-bg)' }} />)}</div>
         ) : notesRecentes.length === 0 ? (
           <div className="flex flex-col items-center py-8 text-center">
-            <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}><Inbox size={22} className="text-slate-500" /></div>
-            <p className="text-sm" style={{ color: '#94A3B8' }}>Aucune note enregistrée</p>
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-border)' }}><Inbox size={22} className="text-ss-text-muted" /></div>
+            <p className="text-sm" style={{ color: 'var(--ss-text-secondary)' }}>Aucune note enregistrée</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -287,18 +288,18 @@ export default function EleveDashboard() {
               const typeColor = n.type === 'composition' ? '#F87171' : '#00853F'
               return (
                 <div key={n.id} className="flex items-center gap-3 p-3 rounded-xl"
-                  style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-border)' }}>
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-lg shrink-0"
                     style={{ background: `${noteColor}15`, border: `1px solid ${noteColor}30`, color: noteColor }}>
                     {n.valeur}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-white truncate">{n.matiere_nom}</p>
+                    <p className="text-sm font-semibold text-ss-text truncate">{n.matiere_nom}</p>
                     <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: `${typeColor}15`, color: typeColor }}>{n.type}</span>
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="text-sm font-black text-white">{n.valeur}/20</p>
-                    <p className="text-[10px]" style={{ color: '#475569' }}>{n.date_eval ? new Date(n.date_eval).toLocaleDateString('fr-SN', { day: 'numeric', month: 'short' }) : '--'}</p>
+                    <p className="text-sm font-black text-ss-text">{n.valeur}/20</p>
+                    <p className="text-[10px]" style={{ color: 'var(--ss-text-disabled)' }}>{n.date_eval ? new Date(n.date_eval).toLocaleDateString('fr-SN', { day: 'numeric', month: 'short' }) : '--'}</p>
                   </div>
                 </div>
               )
@@ -308,23 +309,23 @@ export default function EleveDashboard() {
       </div>
 
       {/* ── Emploi du temps ── */}
-      <div className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-        <h2 className="text-sm font-bold text-[#94A3B8] uppercase tracking-wider mb-4">Emploi du temps</h2>
-        {loading ? <div className="h-64 rounded-xl ss-shimmer" style={{ background: 'rgba(255,255,255,0.03)' }} />
+      <div className="rounded-2xl p-5" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-border)' }}>
+        <h2 className="text-sm font-bold text-ss-text-secondary uppercase tracking-wider mb-4">Emploi du temps</h2>
+        {loading ? <div className="h-64 rounded-xl ss-shimmer" style={{ background: 'var(--ss-glass-card-bg)' }} />
         : emploiTemps.length === 0 ? (
           <div className="flex flex-col items-center py-8 text-center">
-            <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}><Inbox size={22} className="text-slate-500" /></div>
-            <p className="text-sm" style={{ color: '#94A3B8' }}>Emploi du temps non disponible</p>
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-border)' }}><Inbox size={22} className="text-ss-text-muted" /></div>
+            <p className="text-sm" style={{ color: 'var(--ss-text-secondary)' }}>Emploi du temps non disponible</p>
           </div>
         ) : (
           <div className="overflow-x-auto scrollbar-hide">
             <table className="w-full text-xs border-collapse min-w-[400px]">
               <thead>
                 <tr>
-                  <th className="py-2 px-1 text-left font-medium w-12" style={{ color: '#475569' }}>Heure</th>
+                  <th className="py-2 px-1 text-left font-medium w-12" style={{ color: 'var(--ss-text-disabled)' }}>Heure</th>
                   {[1,2,3,4,5,6].map(j => (
                     <th key={j} className="py-2 px-1 font-bold text-center"
-                      style={{ color: j === jourSemaine ? '#A78BFA' : '#475569', background: j === jourSemaine ? 'rgba(213,0,249,0.05)' : 'transparent' }}>
+                      style={{ color: j === jourSemaine ? '#A78BFA' : 'var(--ss-text-disabled)', background: j === jourSemaine ? 'rgba(213,0,249,0.05)' : 'transparent' }}>
                       {JOUR_LABELS[j].slice(0, 3)}
                     </th>
                   ))}
@@ -332,8 +333,8 @@ export default function EleveDashboard() {
               </thead>
               <tbody>
                 {HEURES_SLOTS.map(h => (
-                  <tr key={h} style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
-                    <td className="py-1.5 px-1 font-mono text-[10px]" style={{ color: '#475569' }}>{h}</td>
+                  <tr key={h} style={{ borderTop: '1px solid var(--ss-border)' }}>
+                    <td className="py-1.5 px-1 font-mono text-[10px]" style={{ color: 'var(--ss-text-disabled)' }}>{h}</td>
                     {[1,2,3,4,5,6].map(j => {
                       const cours = emploiParJour[j]?.find(c => c.heure_debut <= h && c.heure_fin > h)
                       const isStart = cours?.heure_debut === h
@@ -343,7 +344,7 @@ export default function EleveDashboard() {
                           {cours && isStart && (
                             <div className="rounded-md px-1 py-1 text-center" style={{ background: `${color}12`, border: `1px solid ${color}25` }}>
                               <p className="font-bold truncate text-[9px] leading-tight" style={{ color }}>{cours.matiere_nom}</p>
-                              {cours.salle && <p className="text-[8px] leading-tight" style={{ color: '#475569' }}>{cours.salle}</p>}
+                              {cours.salle && <p className="text-[8px] leading-tight" style={{ color: 'var(--ss-text-disabled)' }}>{cours.salle}</p>}
                             </div>
                           )}
                         </td>
@@ -360,13 +361,13 @@ export default function EleveDashboard() {
       {/* ── Absences + Cahier ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Absences */}
-        <div className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-          <h2 className="text-sm font-bold text-[#94A3B8] uppercase tracking-wider mb-4">Absences récentes</h2>
-          {loading ? <div className="space-y-2">{[...Array(3)].map((_, i) => <div key={i} className="h-12 rounded-xl ss-shimmer" style={{ background: 'rgba(255,255,255,0.03)' }} />)}</div>
+        <div className="rounded-2xl p-5" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-border)' }}>
+          <h2 className="text-sm font-bold text-ss-text-secondary uppercase tracking-wider mb-4">Absences récentes</h2>
+          {loading ? <div className="space-y-2">{[...Array(3)].map((_, i) => <div key={i} className="h-12 rounded-xl ss-shimmer" style={{ background: 'var(--ss-glass-card-bg)' }} />)}</div>
           : absences.length === 0 ? (
             <div className="flex flex-col items-center py-8 text-center">
               <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-2" style={{ background: 'rgba(0,230,118,0.1)', border: '1px solid rgba(0,230,118,0.2)' }}><CheckCircle2 size={20} style={{ color: '#22C55E' }} /></div>
-              <p className="text-sm" style={{ color: '#94A3B8' }}>Aucune absence</p>
+              <p className="text-sm" style={{ color: 'var(--ss-text-secondary)' }}>Aucune absence</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -375,8 +376,8 @@ export default function EleveDashboard() {
                   style={{ background: a.justifiee ? 'rgba(0,230,118,0.05)' : 'rgba(255,23,68,0.05)', border: `1px solid ${a.justifiee ? 'rgba(0,230,118,0.15)' : 'rgba(255,23,68,0.15)'}` }}>
                   <div className="w-2 h-2 rounded-full shrink-0" style={{ background: a.justifiee ? '#22C55E' : '#F87171', boxShadow: `0 0 6px ${a.justifiee ? '#22C55E' : '#F87171'}` }} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-white truncate">{a.matiere_nom}</p>
-                    <p className="text-xs" style={{ color: '#94A3B8' }}>{new Date(a.date_absence).toLocaleDateString('fr-SN', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                    <p className="text-sm font-semibold text-ss-text truncate">{a.matiere_nom}</p>
+                    <p className="text-xs" style={{ color: 'var(--ss-text-secondary)' }}>{new Date(a.date_absence).toLocaleDateString('fr-SN', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
                   </div>
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: a.justifiee ? 'rgba(0,230,118,0.15)' : 'rgba(255,23,68,0.15)', color: a.justifiee ? '#22C55E' : '#F87171' }}>
                     {a.justifiee ? 'Justifiée' : 'Non justifiée'}
@@ -388,13 +389,13 @@ export default function EleveDashboard() {
         </div>
 
         {/* Cahier de texte */}
-        <div className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-          <h2 className="text-sm font-bold text-[#94A3B8] uppercase tracking-wider mb-4">Cahier de texte</h2>
-          {loading ? <div className="space-y-2">{[...Array(3)].map((_, i) => <div key={i} className="h-16 rounded-xl ss-shimmer" style={{ background: 'rgba(255,255,255,0.03)' }} />)}</div>
+        <div className="rounded-2xl p-5" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-border)' }}>
+          <h2 className="text-sm font-bold text-ss-text-secondary uppercase tracking-wider mb-4">Cahier de texte</h2>
+          {loading ? <div className="space-y-2">{[...Array(3)].map((_, i) => <div key={i} className="h-16 rounded-xl ss-shimmer" style={{ background: 'var(--ss-glass-card-bg)' }} />)}</div>
           : cahierTexte.length === 0 ? (
             <div className="flex flex-col items-center py-8 text-center">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-2" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}><Inbox size={20} className="text-slate-500" /></div>
-              <p className="text-sm" style={{ color: '#94A3B8' }}>Aucune entrée</p>
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-2" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-border)' }}><Inbox size={20} className="text-ss-text-muted" /></div>
+              <p className="text-sm" style={{ color: 'var(--ss-text-secondary)' }}>Aucune entrée</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -406,11 +407,11 @@ export default function EleveDashboard() {
                     <div className="flex items-center justify-between mb-1">
                       <div className="flex items-center gap-2">
                         <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: `${color}15`, color }}>{isDevoir ? 'Devoir' : 'Cours'}</span>
-                        <span className="text-xs font-semibold text-white">{c.matiere_nom}</span>
+                        <span className="text-xs font-semibold text-ss-text">{c.matiere_nom}</span>
                       </div>
-                      <span className="text-[10px]" style={{ color: '#475569' }}>{new Date(c.date_cours).toLocaleDateString('fr-SN', { day: 'numeric', month: 'short' })}</span>
+                      <span className="text-[10px]" style={{ color: 'var(--ss-text-disabled)' }}>{new Date(c.date_cours).toLocaleDateString('fr-SN', { day: 'numeric', month: 'short' })}</span>
                     </div>
-                    <p className="text-xs leading-relaxed line-clamp-2" style={{ color: '#94A3B8' }}>{c.contenu}</p>
+                    <p className="text-xs leading-relaxed line-clamp-2" style={{ color: 'var(--ss-text-secondary)' }}>{c.contenu}</p>
                   </div>
                 )
               })}

@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -19,7 +19,7 @@ const STATUT_PALETTE: Record<string, { bg: string; color: string }> = {
   a_heure:     { bg: 'rgba(0,230,118,0.25)',  color: '#22C55E' },
   retard_leger:{ bg: 'rgba(255,214,0,0.25)',  color: '#FBBF24' },
   retard_grave:{ bg: 'rgba(255,23,68,0.25)',  color: '#F87171' },
-  absent:      { bg: 'rgba(100,116,139,0.25)', color: '#64748B' },
+  absent:      { bg: 'rgba(100,116,139,0.25)', color: 'var(--ss-text-muted)' },
 }
 const JOUR_LABELS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam']
 
@@ -91,7 +91,7 @@ export default function SurveillantDashboard() {
   const heatmapDates = [...new Set(heatmap.map(c => c.jour))].sort()
   const formatH = (iso: string) => { try { return new Date(iso).toLocaleTimeString('fr-SN', { hour: '2-digit', minute: '2-digit' }) } catch { return iso } }
 
-  if (userLoading) return <div className="space-y-4">{[...Array(4)].map((_, i) => <div key={i} className="h-28 rounded-2xl ss-shimmer" style={{ background: 'rgba(255,255,255,0.03)' }} />)}</div>
+  if (userLoading) return <div className="space-y-4">{[...Array(4)].map((_, i) => <div key={i} className="h-28 rounded-2xl ss-shimmer" style={{ background: 'var(--ss-glass-card-bg)' }} />)}</div>
 
   return (
     <div className="space-y-5 pb-24 lg:pb-6 animate-fade-in">
@@ -99,33 +99,34 @@ export default function SurveillantDashboard() {
       {/* Bannière */}
       <div className="relative rounded-2xl overflow-hidden min-h-[120px]">
         <img src="https://images.unsplash.com/photo-1568992687947-868a62a9f521?auto=format&fit=crop&w=1200&q=80" alt="Surveillance" className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, rgba(2,6,23,0.95) 0%, rgba(2,6,23,0.6) 100%)' }} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, var(--ss-surface-elevated) 0%, var(--ss-surface-elevated) 100%)' }} />
         <div className="relative px-6 py-5">
           <div className="flex items-center gap-2 mb-1">
             <span className="w-2 h-2 rounded-full bg-[#FBBF24] animate-pulse" />
-            <span className="text-xs font-semibold tracking-wider uppercase text-[#94A3B8]">Espace Surveillant</span>
+            {/* Bannière sur photo : textes clairs fixes */}
+            <span className="text-xs font-semibold tracking-wider uppercase text-ss-text-secondary">Espace Surveillant</span>
           </div>
-          <h1 className="text-2xl font-black text-white">Surveillance & Discipline</h1>
+          <h1 className="text-2xl font-black text-ss-text">Surveillance & Discipline</h1>
         </div>
       </div>
 
       {/* Appels reçus */}
-      <div className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+      <div className="rounded-2xl p-5" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-border)' }}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-bold text-[#94A3B8] uppercase tracking-wider">Appels reçus</h2>
+          <h2 className="text-sm font-bold text-ss-text-secondary uppercase tracking-wider">Appels reçus</h2>
           <span className="text-xs font-bold px-2 py-1 rounded-full" style={{ background: 'rgba(0,229,255,0.12)', color: '#38BDF8', border: '1px solid rgba(0,229,255,0.2)' }}>
             {appelsRecents.filter(a => !a.lu_le).length} nouveau(x)
           </span>
         </div>
         <div className="space-y-2">
           {appelsRecents.length === 0
-            ? <p className="text-sm text-center py-4" style={{ color: '#475569' }}>Aucun appel reçu aujourd'hui</p>
+            ? <p className="text-sm text-center py-4" style={{ color: 'var(--ss-text-disabled)' }}>Aucun appel reçu aujourd'hui</p>
             : appelsRecents.map(a => (
               <div key={a.id} className="flex items-center justify-between p-3 rounded-xl"
-                style={{ background: !a.lu_le ? 'rgba(0,229,255,0.06)' : 'rgba(255,255,255,0.03)', border: `1px solid ${!a.lu_le ? 'rgba(0,229,255,0.2)' : 'rgba(255,255,255,0.07)'}` }}>
+                style={{ background: !a.lu_le ? 'rgba(0,229,255,0.06)' : 'var(--ss-glass-card-bg)', border: `1px solid ${!a.lu_le ? 'rgba(0,229,255,0.2)' : 'var(--ss-border)'}` }}>
                 <div>
-                  <p className="text-sm font-semibold text-white">{a.titre}</p>
-                  <p className="text-xs mt-0.5" style={{ color: '#94A3B8' }}>{a.contenu}</p>
+                  <p className="text-sm font-semibold text-ss-text">{a.titre}</p>
+                  <p className="text-xs mt-0.5" style={{ color: 'var(--ss-text-secondary)' }}>{a.contenu}</p>
                 </div>
                 {!a.lu_le && (
                   <button onClick={() => {
@@ -153,7 +154,7 @@ export default function SurveillantDashboard() {
             className="flex flex-col items-center gap-2 p-4 rounded-xl text-center transition-all duration-200 hover:scale-105 active:scale-95"
             style={{ background: `${a.color}12`, border: `1px solid ${a.color}30` }}>
             <span className="text-2xl">{a.icon}</span>
-            <span className="text-xs font-semibold leading-tight text-white">{a.label}</span>
+            <span className="text-xs font-semibold leading-tight text-ss-text">{a.label}</span>
           </Link>
         ))}
       </div>
@@ -167,18 +168,18 @@ export default function SurveillantDashboard() {
       </div>
 
       {/* Retards graves live */}
-      <div className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+      <div className="rounded-2xl p-5" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-border)' }}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-bold text-[#94A3B8] uppercase tracking-wider flex items-center gap-2">
+          <h2 className="text-sm font-bold text-ss-text-secondary uppercase tracking-wider flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[#F87171] animate-pulse" />
             Retards graves — Temps réel
           </h2>
-          <span className="text-xs" style={{ color: '#475569' }}>{retardsGraves.length} alerte(s)</span>
+          <span className="text-xs" style={{ color: 'var(--ss-text-disabled)' }}>{retardsGraves.length} alerte(s)</span>
         </div>
         {retardsGraves.length === 0 ? (
           <div className="flex flex-col items-center py-8 text-center">
             <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3 text-2xl" style={{ background: 'rgba(0,230,118,0.1)', border: '1px solid rgba(0,230,118,0.2)' }}>✅</div>
-            <p className="text-sm" style={{ color: '#94A3B8' }}>Aucun retard grave aujourd'hui</p>
+            <p className="text-sm" style={{ color: 'var(--ss-text-secondary)' }}>Aucun retard grave aujourd'hui</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -189,12 +190,12 @@ export default function SurveillantDashboard() {
                   {r.prof?.photo_url ? <img src={r.prof.photo_url} alt="" className="w-full h-full object-cover" /> : r.prof ? `${r.prof.prenom[0]}${r.prof.nom[0]}` : '?'}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-white truncate">{r.prof ? `${r.prof.prenom} ${r.prof.nom}` : 'Professeur'}</p>
-                  <p className="text-xs" style={{ color: '#94A3B8' }}>Arrivée {formatH(r.heure_arrivee)}</p>
+                  <p className="text-sm font-bold text-ss-text truncate">{r.prof ? `${r.prof.prenom} ${r.prof.nom}` : 'Professeur'}</p>
+                  <p className="text-xs" style={{ color: 'var(--ss-text-secondary)' }}>Arrivée {formatH(r.heure_arrivee)}</p>
                 </div>
                 <div className="text-right shrink-0">
-                  <span className="text-sm font-black text-white">+{r.minutes_retard} min</span>
-                  {r.alerte_envoyee && <p className="text-[10px]" style={{ color: '#475569' }}>SMS envoyé</p>}
+                  <span className="text-sm font-black text-ss-text">+{r.minutes_retard} min</span>
+                  {r.alerte_envoyee && <p className="text-[10px]" style={{ color: 'var(--ss-text-disabled)' }}>SMS envoyé</p>}
                 </div>
               </div>
             ))}
@@ -203,27 +204,27 @@ export default function SurveillantDashboard() {
       </div>
 
       {/* Absences non justifiées */}
-      <div className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+      <div className="rounded-2xl p-5" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-border)' }}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-bold text-[#94A3B8] uppercase tracking-wider">Absences non justifiées</h2>
-          <span className="text-xs" style={{ color: '#475569' }}>{absences.length}</span>
+          <h2 className="text-sm font-bold text-ss-text-secondary uppercase tracking-wider">Absences non justifiées</h2>
+          <span className="text-xs" style={{ color: 'var(--ss-text-disabled)' }}>{absences.length}</span>
         </div>
         {absences.length === 0 ? (
           <div className="flex flex-col items-center py-8 text-center">
             <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3 text-2xl" style={{ background: 'rgba(0,230,118,0.1)', border: '1px solid rgba(0,230,118,0.2)' }}>📋</div>
-            <p className="text-sm" style={{ color: '#94A3B8' }}>Toutes les absences sont justifiées</p>
+            <p className="text-sm" style={{ color: 'var(--ss-text-secondary)' }}>Toutes les absences sont justifiées</p>
           </div>
         ) : (
           <div className="space-y-2">
             {absences.slice(0, 20).map(a => (
-              <div key={a.id} className="flex items-center gap-3 p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+              <div key={a.id} className="flex items-center gap-3 p-3 rounded-xl" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-border)' }}>
                 <div className="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold shrink-0"
                   style={{ background: 'rgba(255,214,0,0.1)', border: '1px solid rgba(255,214,0,0.2)', color: '#FBBF24' }}>
                   {a.eleve ? `${a.eleve.prenom[0]}${a.eleve.nom[0]}` : '?'}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-white truncate">{a.eleve ? `${a.eleve.prenom} ${a.eleve.nom}` : `Élève #${a.eleve_id.slice(0, 6)}`}</p>
-                  <p className="text-xs" style={{ color: '#94A3B8' }}>{new Date(a.date_absence).toLocaleDateString('fr-SN', { day: '2-digit', month: 'short' })}{a.motif && ` · ${a.motif}`}</p>
+                  <p className="text-sm font-semibold text-ss-text truncate">{a.eleve ? `${a.eleve.prenom} ${a.eleve.nom}` : `Élève #${a.eleve_id.slice(0, 6)}`}</p>
+                  <p className="text-xs" style={{ color: 'var(--ss-text-secondary)' }}>{new Date(a.date_absence).toLocaleDateString('fr-SN', { day: '2-digit', month: 'short' })}{a.motif && ` · ${a.motif}`}</p>
                 </div>
                 <button
                   className="text-xs font-bold px-3 py-2 rounded-lg shrink-0 min-h-[44px] transition-all"
@@ -247,23 +248,23 @@ export default function SurveillantDashboard() {
 
       {/* Heatmap */}
       {profs.length > 0 && heatmapDates.length > 0 && (
-        <div className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-          <h2 className="text-sm font-bold text-[#94A3B8] uppercase tracking-wider mb-4">Pointages — 7 derniers jours</h2>
+        <div className="rounded-2xl p-5" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-border)' }}>
+          <h2 className="text-sm font-bold text-ss-text-secondary uppercase tracking-wider mb-4">Pointages — 7 derniers jours</h2>
           <div className="overflow-x-auto scrollbar-hide">
             <table className="w-full min-w-[400px]">
               <thead>
                 <tr>
-                  <th className="text-left text-xs pb-3 pr-3" style={{ color: '#475569' }}>Professeur</th>
-                  {heatmapDates.map(d => { const day = new Date(d); const idx = (day.getDay() + 6) % 7; return <th key={d} className="text-center text-xs pb-3 px-1 w-10" style={{ color: '#475569' }}>{JOUR_LABELS[idx] || '?'}<br/><span className="text-[10px]">{day.getDate()}</span></th> })}
+                  <th className="text-left text-xs pb-3 pr-3" style={{ color: 'var(--ss-text-disabled)' }}>Professeur</th>
+                  {heatmapDates.map(d => { const day = new Date(d); const idx = (day.getDay() + 6) % 7; return <th key={d} className="text-center text-xs pb-3 px-1 w-10" style={{ color: 'var(--ss-text-disabled)' }}>{JOUR_LABELS[idx] || '?'}<br/><span className="text-[10px]">{day.getDate()}</span></th> })}
                 </tr>
               </thead>
               <tbody>
                 {profs.map(p => (
                   <tr key={p.id}>
-                    <td className="text-xs text-white py-1.5 pr-3 truncate max-w-[120px]">{p.prenom} {p.nom}</td>
+                    <td className="text-xs text-ss-text py-1.5 pr-3 truncate max-w-[120px]">{p.prenom} {p.nom}</td>
                     {heatmapDates.map(d => {
                       const cell = heatmap.find(c => c.prof_id === p.id && c.jour === d)
-                      const pal = cell?.statut ? STATUT_PALETTE[cell.statut] : { bg: 'rgba(255,255,255,0.05)', color: 'transparent' }
+                      const pal = cell?.statut ? STATUT_PALETTE[cell.statut] : { bg: 'var(--ss-glass-card-hover)', color: 'transparent' }
                       return <td key={d} className="text-center py-1.5 px-0.5"><div className="w-8 h-8 mx-auto rounded-lg transition-opacity hover:opacity-100 opacity-80 cursor-default" style={{ background: pal.bg }} title={`${p.prenom} ${p.nom} — ${cell?.statut?.replace('_', ' ') || 'Non pointé'}`} /></td>
                     })}
                   </tr>
@@ -271,10 +272,10 @@ export default function SurveillantDashboard() {
               </tbody>
             </table>
           </div>
-          <div className="flex flex-wrap gap-4 mt-4 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+          <div className="flex flex-wrap gap-4 mt-4 pt-4" style={{ borderTop: '1px solid var(--ss-border)' }}>
             {[{ label: "À l'heure", key: 'a_heure' }, { label: 'Retard léger', key: 'retard_leger' }, { label: 'Retard grave', key: 'retard_grave' }].map(l => {
               const pal = STATUT_PALETTE[l.key]
-              return <div key={l.key} className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm" style={{ background: pal.bg }} /><span className="text-xs" style={{ color: '#475569' }}>{l.label}</span></div>
+              return <div key={l.key} className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm" style={{ background: pal.bg }} /><span className="text-xs" style={{ color: 'var(--ss-text-disabled)' }}>{l.label}</span></div>
             })}
           </div>
         </div>

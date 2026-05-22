@@ -10,7 +10,7 @@ import { isDemoMode, DEMO_BUDGET, DEMO_INVENTAIRE } from '@/lib/demo-data'
 import { formatCFA, formatCFACompact } from '@/lib/format'
 
 const ACCENT = '#2DD4BF'
-const CARD = { background: 'rgba(2,6,23,0.80)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.10)' }
+const CARD = { background: 'var(--ss-glass-dark-bg)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid var(--ss-border)' }
 
 interface BudgetData {
   annee: string
@@ -96,9 +96,9 @@ export default function IntendantDashboard() {
   if (userLoading || loading) {
     return (
       <div className="space-y-6 p-6 animate-pulse">
-        <div className="h-40 rounded-2xl bg-white/5" />
+        <div className="h-40 rounded-2xl bg-[var(--ss-glass-card-bg)]" />
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          {[...Array(4)].map((_, i) => <div key={i} className="h-32 rounded-2xl bg-white/5" />)}
+          {[...Array(4)].map((_, i) => <div key={i} className="h-32 rounded-2xl bg-[var(--ss-glass-card-bg)]" />)}
         </div>
       </div>
     )
@@ -113,7 +113,7 @@ export default function IntendantDashboard() {
 
       {/* Bannière Hero */}
       <div className="relative rounded-2xl overflow-hidden min-h-[160px] flex items-end"
-        style={{ background: `linear-gradient(135deg, rgba(2,6,23,0.95) 0%, rgba(0,20,30,0.88) 60%, rgba(2,6,23,0.95) 100%)`, border: `1px solid ${ACCENT}30`, backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
+        style={{ background: `linear-gradient(135deg, var(--ss-bg-card) 0%, var(--ss-bg-secondary) 60%, var(--ss-bg-card) 100%)`, border: `1px solid ${ACCENT}30`, backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
         <div className="absolute inset-0"
           style={{ background: `radial-gradient(ellipse at 70% 50%, ${ACCENT}18 0%, transparent 65%)` }} />
         <div className="relative z-10 p-6 lg:p-8 w-full flex items-center justify-between">
@@ -124,7 +124,7 @@ export default function IntendantDashboard() {
                 💼
               </div>
               <div>
-                <h1 className="text-xl sm:text-2xl font-extrabold text-white">
+                <h1 className="text-xl sm:text-2xl font-extrabold text-ss-text">
                   Bonjour, {user?.prenom} {user?.nom}
                 </h1>
                 <p className="text-base font-semibold mt-0.5" style={{ color: ACCENT }}>
@@ -132,13 +132,13 @@ export default function IntendantDashboard() {
                 </p>
               </div>
             </div>
-            <p className="text-sm text-slate-300">
+            <p className="text-sm text-ss-text-secondary">
               Finances {budget?.annee} · {new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
             </p>
           </div>
           <div className="hidden lg:flex gap-2">
             <Link href="/intendant/paiements"
-              className="px-5 py-2.5 rounded-xl text-sm font-bold text-white transition-all hover:opacity-85"
+              className="px-5 py-2.5 rounded-xl text-sm font-bold text-ss-text transition-all hover:opacity-85"
               style={{ background: ACCENT, boxShadow: `0 4px 20px ${ACCENT}50` }}>
               Voir les paiements
             </Link>
@@ -184,13 +184,13 @@ export default function IntendantDashboard() {
 
         {/* Lignes budgétaires */}
         <div className="xl:col-span-2 rounded-2xl p-6" style={CARD}>
-          <h2 className="text-lg font-bold text-white mb-5 flex items-center gap-2">
+          <h2 className="text-lg font-bold text-ss-text mb-5 flex items-center gap-2">
             <span style={{ color: ACCENT }}>📊</span> Lignes budgétaires {budget?.annee}
           </h2>
           {!budget || budget.lignes.length === 0 ? (
             <div className="flex flex-col items-center py-8 text-center">
               <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3 text-2xl" style={{ background: `${ACCENT}15`, border: `1px solid ${ACCENT}25` }}>📋</div>
-              <p className="text-sm" style={{ color: '#94A3B8' }}>Aucune facture enregistrée</p>
+              <p className="text-sm text-ss-text-secondary">Aucune facture enregistrée</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -200,13 +200,13 @@ export default function IntendantDashboard() {
                 return (
                   <div key={lig.id}>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-semibold text-white">{lig.categorie}</span>
-                      <div className="flex items-center gap-4 text-sm text-slate-300">
+                      <span className="text-sm font-semibold text-ss-text">{lig.categorie}</span>
+                      <div className="flex items-center gap-4 text-sm text-ss-text-secondary">
                         <span>{formatCFA(lig.depense)} / {formatCFA(lig.budget)}</span>
                         <span className="font-bold text-base" style={{ color: barColor }}>{pct}%</span>
                       </div>
                     </div>
-                    <div className="h-2.5 rounded-full bg-white/10 overflow-hidden"
+                    <div className="h-2.5 rounded-full bg-[var(--ss-border)] overflow-hidden"
                       role="progressbar"
                       aria-valuenow={pct}
                       aria-valuemin={0}
@@ -224,7 +224,7 @@ export default function IntendantDashboard() {
 
         {/* Navigation rapide */}
         <div className="rounded-2xl p-6" style={CARD}>
-          <h2 className="text-lg font-bold text-white mb-5 flex items-center gap-2">
+          <h2 className="text-lg font-bold text-ss-text mb-5 flex items-center gap-2">
             <span style={{ color: ACCENT }}>⚡</span> Navigation rapide
           </h2>
           <div className="space-y-3">
@@ -238,18 +238,18 @@ export default function IntendantDashboard() {
                 className="flex items-center gap-3 p-4 rounded-xl transition-all hover:scale-[1.02]"
                 style={{ background: `${a.color}12`, border: `1px solid ${a.color}35` }}>
                 <span className="text-2xl">{a.icon}</span>
-                <span className="text-sm font-semibold text-white">{a.label}</span>
-                <span className="ml-auto text-slate-400 text-lg">›</span>
+                <span className="text-sm font-semibold text-ss-text">{a.label}</span>
+                <span className="ml-auto text-ss-text-muted text-lg">›</span>
               </Link>
             ))}
           </div>
 
           {/* Taux de recouvrement */}
           {budget && budget.total_budget > 0 && (
-            <div className="mt-5 pt-5" style={{ borderTop: '1px solid rgba(255,255,255,0.09)' }}>
-              <p className="text-sm text-slate-300 font-semibold mb-2">Taux de recouvrement</p>
+            <div className="mt-5 pt-5" style={{ borderTop: '1px solid var(--ss-border)' }}>
+              <p className="text-sm text-ss-text-secondary font-semibold mb-2">Taux de recouvrement</p>
               <div className="flex items-center gap-3">
-                <div className="flex-1 h-2 rounded-full bg-white/10 overflow-hidden"
+                <div className="flex-1 h-2 rounded-full bg-[var(--ss-border)] overflow-hidden"
                   role="progressbar"
                   aria-valuenow={pctDepense}
                   aria-valuemin={0}

@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -45,8 +45,8 @@ const BOTTOM_MENUS: Record<string, BottomItem[]> = {
     { href: '/professeur',                label: 'Accueil',  icon: HomeIcon },
     { href: '/professeur/appel',          label: 'Appel',    icon: ClipIcon },
     { href: '/professeur/notes',          label: 'Notes',    icon: PencilIcon },
-    { href: '/professeur/hub',            label: 'Hub',      icon: MonitorIcon },
     { href: '/professeur/cahier',         label: 'Cahier',   icon: BookIcon },
+    { href: '/professeur/elearning',      label: 'E-Learning', icon: MonitorIcon },
   ],
   surveillant: [
     { href: '/surveillant', label: 'Accueil', icon: HomeIcon },
@@ -62,7 +62,7 @@ const BOTTOM_MENUS: Record<string, BottomItem[]> = {
   eleve: [
     { href: '/eleve',               label: 'Accueil',   icon: HomeIcon },
     { href: '/eleve/notes',         label: 'Notes',     icon: ChartIcon },
-    { href: '/eleve/hub',           label: 'Hub',       icon: MonitorIcon },
+    { href: '/eleve/elearning',     label: 'E-Learning',icon: MonitorIcon },
     { href: '/eleve/correction',    label: 'Correction',icon: RobotIcon },
     { href: '/eleve/emploi-temps',  label: 'Planning',  icon: ClipIcon },
   ],
@@ -129,10 +129,10 @@ export function BottomNav() {
       <div
         className="flex items-center rounded-2xl overflow-hidden"
         style={{
-          background: 'rgba(11,17,32,0.95)',
+          background: 'var(--ss-glass-dark-bg)',
           backdropFilter: 'blur(24px)',
-          border: '1px solid rgba(255,255,255,0.08)',
-          boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04)',
+          border: '1px solid var(--ss-border)',
+          boxShadow: '0 20px 60px var(--ss-hover-shadow), 0 0 0 1px var(--ss-border)',
         }}
       >
         {items.map((item) => {
@@ -144,7 +144,7 @@ export function BottomNav() {
               onClick={handleTap}
               className={cn(
                 'flex-1 flex flex-col items-center justify-center py-3 min-h-[60px] relative transition-all duration-200',
-                isActive ? 'text-white' : 'text-[#475569] hover:text-[#94A3B8] active:scale-90'
+                isActive ? 'text-ss-text' : 'text-ss-text-disabled hover:text-ss-text-secondary active:scale-90'
               )}
             >
               {/* Fond actif */}
@@ -167,7 +167,7 @@ export function BottomNav() {
 
               {/* Badge */}
               {item.badge && item.badge > 0 && (
-                <span className="absolute top-2 right-1/4 w-4 h-4 text-white text-[9px] font-bold rounded-full flex items-center justify-center"
+                <span className="absolute top-2 right-1/4 w-4 h-4 text-ss-text text-[9px] font-bold rounded-full flex items-center justify-center"
                   style={{ background: '#F87171' }}>
                   {item.badge > 9 ? '9+' : item.badge}
                 </span>

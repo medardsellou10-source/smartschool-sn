@@ -869,11 +869,11 @@ export default function CantinePage() {
                   <button
                     onClick={handleValiderPointage}
                     disabled={saving}
-                    className="flex items-center gap-2 bg-[#00853F] text-white font-medium text-sm px-6 py-3 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
+                    className="flex items-center gap-2 bg-[#00853F] text-ss-text font-medium text-sm px-6 py-3 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
                   >
                     {saving ? (
                       <>
-                        <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        <span className="w-4 h-4 border-2 border-ss-text/30 border-t-white rounded-full animate-spin" />
                         Enregistrement...
                       </>
                     ) : (
@@ -1022,11 +1022,11 @@ export default function CantinePage() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex-1 flex items-center justify-center gap-2 bg-[#00853F] text-white font-medium text-sm px-4 py-2.5 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
+                  className="flex-1 flex items-center justify-center gap-2 bg-[#00853F] text-ss-text font-medium text-sm px-4 py-2.5 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
                 >
                   {saving ? (
                     <>
-                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span className="w-4 h-4 border-2 border-ss-text/30 border-t-white rounded-full animate-spin" />
                       Enregistrement...
                     </>
                   ) : (

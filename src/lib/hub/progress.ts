@@ -1,56 +1,56 @@
 /**
- * Helpers localStorage pour la progression des leçons et l'état XP.
- * Tout est safe côté SSR : `typeof window` vérifié partout.
+ * Helpers localStorage — progression vidéo + XP + streak
+ * Clés : ss_hub_progress_v1, ss_hub_xp_v1
  */
 
 import type { LessonProgress, XpState } from '@/types/hub'
 
-const PROGRESS_KEY = 'ss_hub_progress_v1'
-const XP_KEY = 'ss_hub_xp_v1'
+const KEY_PROGRESS = 'ss_hub_progress_v1'
+const KEY_XP       = 'ss_hub_xp_v1'
 
-function safeGet<T>(key: string, fallback: T): T {
-  if (typeof window === 'undefined') return fallback
+// ── Progress ────────────────────────────────────────────────────────────────
+
+function getAllProgress(): Record<string, LessonProgress> {
+  if (typeof window === 'undefined') return {}
   try {
-    const raw = window.localStorage.getItem(key)
-    if (!raw) return fallback
-    return JSON.parse(raw) as T
+    return JSON.parse(localStorage.getItem(KEY_PROGRESS) ?? '{}')
   } catch {
-    return fallback
+    return {}
   }
 }
 
-function safeSet(key: string, value: unknown) {
-  if (typeof window === 'undefined') return
-  try {
-    window.localStorage.setItem(key, JSON.stringify(value))
-  } catch {
-    /* quota exceeded → ignore silencieux */
-  }
-}
-
-// ── Progression par leçon ───────────────────────────────────────────────────
-
-export function getAllProgress(): Record<string, LessonProgress> {
-  return safeGet<Record<string, LessonProgress>>(PROGRESS_KEY, {})
-}
-
-export function getLessonProgress(lessonId: string): LessonProgress | null {
+export function getProgress(lessonId: string): LessonProgress | null {
   return getAllProgress()[lessonId] ?? null
 }
 
-export function saveLessonProgress(lessonId: string, progress: LessonProgress) {
+export function saveProgress(lessonId: string, progress: LessonProgress): void {
+  if (typeof window === 'undefined') return
   const all = getAllProgress()
   all[lessonId] = progress
-  safeSet(PROGRESS_KEY, all)
+  localStorage.setItem(KEY_PROGRESS, JSON.stringify(all))
 }
 
-export function computeProgressPercent(p: LessonProgress | null): number {
-  if (!p || p.durationSec <= 0) return 0
-  if (p.completedAt) return 100
-  return Math.min(100, Math.round((p.lastPositionSec / p.durationSec) * 100))
+export function markCompleted(lessonId: string, durationSec: number): void {
+  const current = getProgress(lessonId)
+  saveProgress(lessonId, {
+    lastPositionSec: durationSec,
+    completedAt: current?.completedAt ?? new Date().toISOString(),
+  })
 }
 
-// ── XP & streaks ────────────────────────────────────────────────────────────
+export function isCompleted(lessonId: string): boolean {
+  return Boolean(getProgress(lessonId)?.completedAt)
+}
+
+export function resetProgress(): void {
+  if (typeof window === 'undefined') return
+  localStorage.removeItem(KEY_PROGRESS)
+}
+
+// ── XP & Streak ─────────────────────────────────────────────────────────────
+
+const XP_STARTED   = 5
+const XP_COMPLETED = 10
 
 const DEFAULT_XP: XpState = {
   xp: 0,
@@ -59,68 +59,99 @@ const DEFAULT_XP: XpState = {
   badges: [],
 }
 
-function todayISODate(): string {
-  return new Date().toISOString().slice(0, 10)
-}
-
-function yesterdayISODate(): string {
-  return new Date(Date.now() - 86_400_000).toISOString().slice(0, 10)
-}
-
-export function getXpState(): XpState {
-  return safeGet<XpState>(XP_KEY, DEFAULT_XP)
-}
-
-function setXpState(state: XpState) {
-  safeSet(XP_KEY, state)
-}
-
-/**
- * Gagne de l'XP et met à jour le streak.
- * @returns nouvel état XP
- */
-export function awardXp(amount: number, badgeToUnlock?: string): XpState {
-  const current = getXpState()
-  const today = todayISODate()
-
-  let streakDays = current.streakDays
-  if (current.lastActivityAt === today) {
-    // déjà actif aujourd'hui : pas de changement de streak
-  } else if (current.lastActivityAt === yesterdayISODate()) {
-    streakDays = current.streakDays + 1
-  } else {
-    streakDays = 1
+export function getXp(): XpState {
+  if (typeof window === 'undefined') return { ...DEFAULT_XP }
+  try {
+    const raw = localStorage.getItem(KEY_XP)
+    if (!raw) return { ...DEFAULT_XP }
+    return { ...DEFAULT_XP, ...JSON.parse(raw) }
+  } catch {
+    return { ...DEFAULT_XP }
   }
-
-  const badges = [...current.badges]
-  if (badgeToUnlock && !badges.includes(badgeToUnlock)) {
-    badges.push(badgeToUnlock)
-  }
-
-  const next: XpState = {
-    xp: current.xp + amount,
-    streakDays,
-    lastActivityAt: today,
-    badges,
-  }
-  setXpState(next)
-  return next
 }
 
-export function resetProgress() {
+function saveXp(state: XpState): void {
   if (typeof window === 'undefined') return
-  window.localStorage.removeItem(PROGRESS_KEY)
-  window.localStorage.removeItem(XP_KEY)
+  localStorage.setItem(KEY_XP, JSON.stringify(state))
 }
 
-// ── Règles de gamification ──────────────────────────────────────────────────
+function isSameDay(a: Date, b: Date): boolean {
+  return a.getFullYear() === b.getFullYear()
+    && a.getMonth() === b.getMonth()
+    && a.getDate() === b.getDate()
+}
 
-export const XP_REWARDS = {
-  START_LESSON: 5,
-  COMPLETE_LESSON: 10,
-} as const
+function isYesterday(date: Date, today: Date): boolean {
+  const yesterday = new Date(today)
+  yesterday.setDate(yesterday.getDate() - 1)
+  return isSameDay(date, yesterday)
+}
 
-/** Calcule le palier (niveau 1, 2, 3…) à partir du total XP. */
-export function xpLevel(xp: number): number {
-  return Math.floor(Math.sqrt(xp / 50)) + 1
+function updateStreak(state: XpState): XpState {
+  const now = new Date()
+  const last = state.lastActivityAt ? new Date(state.lastActivityAt) : null
+
+  if (!last) return { ...state, streakDays: 1, lastActivityAt: now.toISOString() }
+  if (isSameDay(last, now)) return state           // déjà actif aujourd'hui
+  if (isYesterday(last, now)) {
+    return { ...state, streakDays: state.streakDays + 1, lastActivityAt: now.toISOString() }
+  }
+  // streak cassé
+  return { ...state, streakDays: 1, lastActivityAt: now.toISOString() }
+}
+
+function computeBadges(state: XpState, completedIds: string[]): string[] {
+  const badges = new Set(state.badges)
+
+  if (state.streakDays >= 7) badges.add('Taalibé assidu 🔥')
+  if (state.xp >= 100)       badges.add('Cent XP 💯')
+  if (state.xp >= 200)       badges.add('Bicentenaire 🏆')
+
+  // badges matières — nécessite de passer les leçons complétées
+  // calculés en dehors (on reçoit juste les ids)
+  if (completedIds.length >= 5)  badges.add('Élève appliqué 📚')
+  if (completedIds.length >= 10) badges.add('Grand lettré 🎓')
+
+  return Array.from(badges)
+}
+
+/** À appeler quand l'élève démarre une vidéo (une fois par leçon/24h) */
+export function trackStarted(lessonId: string): XpState {
+  const state = updateStreak(getXp())
+  const prog  = getProgress(lessonId)
+
+  // Récompense uniquement si pas déjà démarrée dans les 24h
+  const alreadyStarted = prog && prog.lastPositionSec > 0
+    && (Date.now() - new Date(state.lastActivityAt).getTime()) < 24 * 3600 * 1000
+  if (alreadyStarted) { saveXp(state); return state }
+
+  const updated: XpState = { ...state, xp: state.xp + XP_STARTED }
+  updated.badges = computeBadges(updated, Object.keys(getAllProgress()))
+  saveXp(updated)
+  return updated
+}
+
+/** À appeler quand la leçon est terminée (≥ 90 %) */
+export function trackCompleted(lessonId: string, durationSec: number): XpState {
+  markCompleted(lessonId, durationSec)
+  const state = updateStreak(getXp())
+  const all   = getAllProgress()
+
+  // Récompense uniquement si pas déjà complétée avant
+  const wasCompleted = Boolean(all[lessonId]?.completedAt)
+    && all[lessonId].completedAt !== new Date().toISOString().slice(0, 10)
+
+  const xpGain = wasCompleted ? 0 : XP_COMPLETED
+  const updated: XpState = { ...state, xp: state.xp + xpGain }
+  const completedIds = Object.entries(all)
+    .filter(([, v]) => Boolean(v.completedAt))
+    .map(([k]) => k)
+  updated.badges = computeBadges(updated, completedIds)
+  saveXp(updated)
+  return updated
+}
+
+export function resetXp(): void {
+  if (typeof window === 'undefined') return
+  localStorage.removeItem(KEY_XP)
 }

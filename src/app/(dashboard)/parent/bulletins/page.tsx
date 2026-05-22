@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useEffect, useState, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -244,7 +244,7 @@ export default function BulletinsPage() {
             onClick={() => setTrimestre(t)}
             className={`flex-1 py-2.5 rounded-xl text-sm font-semibold min-h-[44px] transition-colors ${
               trimestre === t
-                ? 'bg-ss-cyan text-white'
+                ? 'bg-ss-cyan text-ss-text'
                 : 'bg-ss-bg-secondary text-ss-text-secondary border border-ss-border'
             }`}
           >
@@ -361,7 +361,7 @@ export default function BulletinsPage() {
             <button
               onClick={handleDownloadBulletin}
               disabled={downloading || !selectedEnfant}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-[#00853F] text-white rounded-xl font-semibold hover:bg-[#00853F]/90 disabled:opacity-50 transition text-sm min-h-[48px]"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-[#00853F] text-ss-text rounded-xl font-semibold hover:bg-[#00853F]/90 disabled:opacity-50 transition text-sm min-h-[48px]"
             >
               {downloading ? (
                 <>

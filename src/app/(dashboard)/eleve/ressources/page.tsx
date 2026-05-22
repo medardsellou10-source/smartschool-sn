@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState, useMemo } from 'react'
 import { useUser } from '@/hooks/useUser'
@@ -352,14 +352,14 @@ function answer(qi,ci){
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   body{background:#020617;font-family:'Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;height:100vh;overflow:hidden}
-  .topbar{display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(2,6,23,0.95);border-bottom:1px solid rgba(255,255,255,0.1);flex-shrink:0}
+  .topbar{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--ss-surface-elevated);border-bottom:1px solid var(--ss-glass-border);flex-shrink:0}
   .title{color:#fff;font-size:0.95em;font-weight:700;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .badge{padding:3px 10px;border-radius:10px;font-size:0.75em;font-weight:700;background:rgba(255,255,255,0.08);color:#94A3B8;white-space:nowrap}
+  .badge{padding:3px 10px;border-radius:10px;font-size:0.75em;font-weight:700;background:var(--ss-glass-card-hover);color:var(--ss-text-muted);white-space:nowrap}
   .badge-diff{padding:3px 10px;border-radius:10px;font-size:0.75em;font-weight:700;background:${DIFF_COLOR[sim.difficulte]}20;color:${DIFF_COLOR[sim.difficulte]};white-space:nowrap}
-  .btn{padding:6px 14px;border-radius:8px;font-size:0.8em;font-weight:700;border:none;cursor:pointer;background:rgba(255,255,255,0.08);color:#CBD5E1;transition:background .15s;white-space:nowrap}
-  .btn:hover{background:rgba(255,255,255,0.15)}
+  .btn{padding:6px 14px;border-radius:8px;font-size:0.8em;font-weight:700;border:none;cursor:pointer;background:var(--ss-glass-card-hover);color:var(--ss-text-secondary);transition:background .15s;white-space:nowrap}
+  .btn:hover{background:var(--ss-glass-border)}
   iframe{flex:1;border:none;width:100%;display:block}
-  .themes{display:flex;gap:6px;flex-wrap:wrap;padding:8px 16px;background:rgba(2,6,23,0.9);border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0}
+  .themes{display:flex;gap:6px;flex-wrap:wrap;padding:8px 16px;background:var(--ss-surface-elevated);border-bottom:1px solid var(--ss-glass-card-hover);flex-shrink:0}
   .theme-tag{padding:2px 8px;border-radius:6px;font-size:0.7em;font-weight:600;background:rgba(167,139,250,0.1);color:#A78BFA}
 </style></head><body>
 <div class="topbar">
@@ -379,7 +379,7 @@ function answer(qi,ci){
   }
 
   if (userLoading) {
-    return <div className="space-y-4">{[...Array(4)].map((_, i) => <div key={i} className="h-28 rounded-2xl ss-shimmer" style={{ background: 'rgba(255,255,255,0.03)' }} />)}</div>
+    return <div className="space-y-4">{[...Array(4)].map((_, i) => <div key={i} className="h-28 rounded-2xl ss-shimmer" style={{ background: 'var(--ss-glass-card-bg)' }} />)}</div>
   }
 
   return (
@@ -387,15 +387,15 @@ function answer(qi,ci){
 
       {/* ── Bannière ── */}
       <div className="relative rounded-2xl overflow-hidden min-h-[160px]">
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, rgba(2,6,23,0.98) 0%, rgba(40,0,60,0.9) 50%, rgba(2,6,23,0.98) 100%)' }} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, var(--ss-surface-elevated) 0%, rgba(40,0,60,0.9) 50%, var(--ss-surface-elevated) 100%)' }} />
         <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(213,0,249,0.3) 0%, transparent 50%), radial-gradient(circle at 80% 50%, rgba(0,229,255,0.3) 0%, transparent 50%)' }} />
         <div className="relative px-6 py-6">
           <div className="flex items-center gap-2 mb-1">
             <div className="w-2 h-2 rounded-full bg-[#A78BFA] animate-pulse" />
-            <span className="text-[#94A3B8] text-xs font-semibold tracking-wider uppercase">Espace Ressources</span>
+            <span className="text-[var(--ss-text-muted)] text-xs font-semibold tracking-wider uppercase">Espace Ressources</span>
           </div>
-          <h1 className="text-2xl font-black text-white">Ressources en Ligne</h1>
-          <p className="text-sm mt-1 max-w-xl" style={{ color: '#94A3B8' }}>
+          <h1 className="text-2xl font-black text-ss-text">Ressources en Ligne</h1>
+          <p className="text-sm mt-1 max-w-xl" style={{ color: 'var(--ss-text-muted)' }}>
             Annales BAC, cours video, TP virtuels, exercices interactifs, fiches de revision et tutorat.
             Tout pour reussir au Senegal.
           </p>
@@ -410,11 +410,11 @@ function answer(qi,ci){
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200"
                   style={isActive
                     ? { background: '#3B82F6', color: '#fff' }
-                    : { background: 'rgba(255,255,255,0.07)', color: '#94A3B8', border: '1px solid rgba(255,255,255,0.1)' }}>
+                    : { background: 'var(--ss-glass-card-hover)', color: 'var(--ss-text-muted)', border: '1px solid var(--ss-glass-border)' }}>
                   <span>{meta.icon}</span>
                   <span>{meta.label}</span>
                   <span className="ml-1 px-1.5 py-0.5 rounded-full text-[10px]"
-                    style={{ background: isActive ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)' }}>
+                    style={{ background: isActive ? 'var(--ss-glass-border)' : 'var(--ss-glass-border)' }}>
                     {stats[type] || 0}
                   </span>
                 </button>
@@ -425,7 +425,7 @@ function answer(qi,ci){
       </div>
 
       {/* ── Toggle Catalogue / TP PhET / Programme ── */}
-      <div className="flex gap-1 p-1 rounded-xl" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+      <div className="flex gap-1 p-1 rounded-xl" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
         {[
           { key: 'catalogue', label: '📚 Ressources' },
           { key: 'phet',      label: `🔬 TP Virtuels (${PHET_STATS.total})` },
@@ -435,7 +435,7 @@ function answer(qi,ci){
             className="flex-1 px-3 py-2 rounded-lg text-xs font-semibold transition-all duration-200 whitespace-nowrap"
             style={activeSection === tab.key
               ? { background: '#3B82F6', color: '#fff' }
-              : { color: '#94A3B8' }}>
+              : { color: 'var(--ss-text-muted)' }}>
             {tab.label}
           </button>
         ))}
@@ -451,9 +451,9 @@ function answer(qi,ci){
             <div className="relative flex-1 min-w-[200px]">
               <input type="text" placeholder="Rechercher une ressource..."
                 value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-2.5 pl-9 rounded-xl text-sm text-white placeholder-[#475569]"
-                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', outline: 'none' }} />
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-[#64748B]">🔍</span>
+                className="w-full px-4 py-2.5 pl-9 rounded-xl text-sm text-ss-text placeholder-[var(--ss-text-disabled)]"
+                style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-border)', outline: 'none' }} />
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-[var(--ss-text-muted)]">🔍</span>
             </div>
             {[
               { value: selectedType, onChange: (v: string) => setSelectedType(v as any), options: [['all', 'Tous types'], ...ALL_TYPES.map(t => [t, `${TYPE_META[t].icon} ${TYPE_META[t].label}`])] },
@@ -462,8 +462,8 @@ function answer(qi,ci){
               { value: selectedSerie, onChange: (v: string) => setSelectedSerie(v), options: [['all', 'Toutes séries'], ...SERIES_LYCEE.map(s => [s, `Série ${s}`])] },
             ].map((sel, i) => (
               <select key={i} value={sel.value} onChange={e => sel.onChange(e.target.value)}
-                className="px-3 py-2.5 rounded-xl text-sm text-[#CBD5E1]"
-                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', outline: 'none' }}>
+                className="px-3 py-2.5 rounded-xl text-sm text-[var(--ss-text-secondary)]"
+                style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-border)', outline: 'none' }}>
                 {sel.options.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
               </select>
             ))}
@@ -471,7 +471,7 @@ function answer(qi,ci){
 
             {/* Résultats stats */}
           <div className="flex items-center justify-between px-1">
-            <p className="text-sm font-semibold text-[#94A3B8]">
+            <p className="text-sm font-semibold text-[var(--ss-text-muted)]">
               {filteredRessources.length} ressource{filteredRessources.length > 1 ? 's' : ''} trouvee{filteredRessources.length > 1 ? 's' : ''}
             </p>
             {selectedType !== 'all' && (
@@ -488,13 +488,13 @@ function answer(qi,ci){
             if (items.length === 0) return null
             return (
               <div key={type} className="rounded-2xl p-5"
-                style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
                 {/* En-tête de section */}
-                <div className="flex items-center gap-3 mb-4 pb-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                <div className="flex items-center gap-3 mb-4 pb-3" style={{ borderBottom: '1px solid var(--ss-glass-card-hover)' }}>
                   <span className="text-xl">{meta.icon}</span>
                   <div>
-                    <h2 className="text-sm font-bold text-white">{meta.label}</h2>
-                    <p className="text-xs text-[#64748B]">{meta.description}</p>
+                    <h2 className="text-sm font-bold text-ss-text">{meta.label}</h2>
+                    <p className="text-xs text-[var(--ss-text-muted)]">{meta.description}</p>
                   </div>
                   <span className="ml-auto px-2.5 py-1 rounded-full text-xs font-bold bg-[#3B82F6]/10 text-[#3B82F6]">
                     {items.length}
@@ -507,17 +507,17 @@ function answer(qi,ci){
                     const externalUrl = getResourceUrl(res)
                     return (
                       <div key={res.id} className="rounded-xl p-4 flex flex-col group transition-all duration-200 hover:shadow-lg"
-                        style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                        style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
                         <div className="flex items-start gap-3 flex-1">
                           <span className="text-xl shrink-0 mt-0.5">{meta.icon}</span>
                           <div className="min-w-0 flex-1">
-                            <h3 className="text-sm font-semibold text-white line-clamp-2 leading-snug">{res.titre}</h3>
-                            <p className="text-xs mt-1 line-clamp-2 text-[#94A3B8]">{res.description}</p>
+                            <h3 className="text-sm font-semibold text-ss-text line-clamp-2 leading-snug">{res.titre}</h3>
+                            <p className="text-xs mt-1 line-clamp-2 text-[var(--ss-text-muted)]">{res.description}</p>
                             <div className="flex flex-wrap gap-1 mt-2">
-                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-[#94A3B8]">{res.matiere}</span>
-                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-[#94A3B8]">{res.niveau}</span>
-                              {res.serie && <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-[#94A3B8]">Série {res.serie}</span>}
-                              {res.annee && <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-[#94A3B8]">{res.annee}</span>}
+                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-ss-text/5 text-[var(--ss-text-muted)]">{res.matiere}</span>
+                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-ss-text/5 text-[var(--ss-text-muted)]">{res.niveau}</span>
+                              {res.serie && <span className="text-[10px] px-1.5 py-0.5 rounded bg-ss-text/5 text-[var(--ss-text-muted)]">Série {res.serie}</span>}
+                              {res.annee && <span className="text-[10px] px-1.5 py-0.5 rounded bg-ss-text/5 text-[var(--ss-text-muted)]">{res.annee}</span>}
                               {hasNative && <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#22C55E]/10 text-[#22C55E] font-semibold">● Natif</span>}
                             </div>
                           </div>
@@ -526,7 +526,7 @@ function answer(qi,ci){
                         <div className="mt-3 flex gap-2">
                           <button
                             onClick={() => handleOuvrirRessource(res)}
-                            className="flex-1 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-150 hover:opacity-90 active:scale-95 cursor-pointer text-white"
+                            className="flex-1 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-150 hover:opacity-90 active:scale-95 cursor-pointer text-ss-text"
                             style={{ background: '#3B82F6' }}>
                             {res.type === 'video' ? '▶ Vidéo' : res.type === 'tp_virtuel' ? '🔬 TP' : res.type === 'annale' ? '📝 Annale' : res.type === 'exercice' ? '✏️ Quiz' : res.type === 'resume' ? '📄 Cours' : '💬 Rejoindre'}
                           </button>
@@ -534,7 +534,7 @@ function answer(qi,ci){
                             <button
                               onClick={() => window.open(externalUrl, '_blank', 'noopener,noreferrer')}
                               className="px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all duration-150 hover:opacity-90 active:scale-95 cursor-pointer"
-                              style={{ background: 'rgba(255,255,255,0.06)', color: '#94A3B8', border: '1px solid rgba(255,255,255,0.1)' }}
+                              style={{ background: 'var(--ss-glass-card-hover)', color: 'var(--ss-text-muted)', border: '1px solid var(--ss-glass-border)' }}
                               title="Ouvrir sur le site externe">
                               🔗
                             </button>
@@ -549,11 +549,11 @@ function answer(qi,ci){
           })}
 
           {filteredRessources.length === 0 && (
-            <div className="rounded-2xl p-12 text-center" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <div className="rounded-2xl p-12 text-center" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
               <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-3 text-3xl mx-auto"
-                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>🔍</div>
-              <p className="text-[#94A3B8] text-sm font-semibold">Aucune ressource trouvee</p>
-              <p className="text-[#475569] text-xs mt-1">Essayez de modifier vos filtres ou votre recherche.</p>
+                style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>🔍</div>
+              <p className="text-[var(--ss-text-muted)] text-sm font-semibold">Aucune ressource trouvee</p>
+              <p className="text-[var(--ss-text-disabled)] text-xs mt-1">Essayez de modifier vos filtres ou votre recherche.</p>
             </div>
           )}
         </div>
@@ -569,13 +569,13 @@ function answer(qi,ci){
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0" style={{ background: 'rgba(61,90,254,0.2)', border: '1px solid rgba(61,90,254,0.4)' }}>🔬</div>
               <div>
-                <h2 className="text-base font-bold text-white">PhET Interactive Simulations</h2>
-                <p className="text-sm mt-0.5" style={{ color: '#94A3B8' }}>
+                <h2 className="text-base font-bold text-ss-text">PhET Interactive Simulations</h2>
+                <p className="text-sm mt-0.5" style={{ color: 'var(--ss-text-muted)' }}>
                   {PHET_STATS.total} simulations scientifiques — University of Colorado · Licence CC BY 4.0
                 </p>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {Object.entries(PHET_STATS.parMatiere).map(([m, n]) => (
-                    <span key={m} className="text-[11px] px-2 py-0.5 rounded-full font-semibold" style={{ background: 'rgba(255,255,255,0.07)', color: '#CBD5E1' }}>
+                    <span key={m} className="text-[11px] px-2 py-0.5 rounded-full font-semibold" style={{ background: 'var(--ss-glass-card-hover)', color: 'var(--ss-text-secondary)' }}>
                       {m} ({n})
                     </span>
                   ))}
@@ -588,12 +588,12 @@ function answer(qi,ci){
           <div className="flex flex-wrap gap-2">
             <input type="text" placeholder="Rechercher une simulation..."
               value={phetSearch} onChange={e => setPhetSearch(e.target.value)}
-              className="flex-1 min-w-[180px] px-4 py-2.5 rounded-xl text-sm text-white placeholder-[#475569]"
-              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', outline: 'none' }} />
+              className="flex-1 min-w-[180px] px-4 py-2.5 rounded-xl text-sm text-ss-text placeholder-[var(--ss-text-disabled)]"
+              style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-border)', outline: 'none' }} />
             {/* Niveau */}
             <select value={phetNiveau} onChange={e => setPhetNiveau(e.target.value)}
-              className="px-3 py-2.5 rounded-xl text-sm text-[#CBD5E1]"
-              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', outline: 'none' }}>
+              className="px-3 py-2.5 rounded-xl text-sm text-[var(--ss-text-secondary)]"
+              style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-border)', outline: 'none' }}>
               <option value="all">Tous niveaux</option>
               <option value="3e">Classe de 3e</option>
               <option value="2nde">2nde</option>
@@ -602,8 +602,8 @@ function answer(qi,ci){
             </select>
             {/* Matière */}
             <select value={phetMatiere} onChange={e => setPhetMatiere(e.target.value)}
-              className="px-3 py-2.5 rounded-xl text-sm text-[#CBD5E1]"
-              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', outline: 'none' }}>
+              className="px-3 py-2.5 rounded-xl text-sm text-[var(--ss-text-secondary)]"
+              style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-border)', outline: 'none' }}>
               <option value="all">Toutes matières</option>
               <option value="Mathématiques">Mathématiques</option>
               <option value="Physique">Physique</option>
@@ -612,8 +612,8 @@ function answer(qi,ci){
             </select>
             {/* Difficulté */}
             <select value={phetDifficulte} onChange={e => setPhetDifficulte(e.target.value)}
-              className="px-3 py-2.5 rounded-xl text-sm text-[#CBD5E1]"
-              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', outline: 'none' }}>
+              className="px-3 py-2.5 rounded-xl text-sm text-[var(--ss-text-secondary)]"
+              style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-border)', outline: 'none' }}>
               <option value="all">Toutes difficultés</option>
               <option value="decouverte">Découverte</option>
               <option value="intermediaire">Intermédiaire</option>
@@ -622,14 +622,14 @@ function answer(qi,ci){
           </div>
 
           {/* Résultat count */}
-          <p className="text-sm font-semibold text-[#94A3B8] px-1">
+          <p className="text-sm font-semibold text-[var(--ss-text-muted)] px-1">
             {filteredPhet.length} simulation{filteredPhet.length > 1 ? 's' : ''} trouvée{filteredPhet.length > 1 ? 's' : ''}
           </p>
 
           {/* Grille simulations */}
           {filteredPhet.length === 0 ? (
-            <div className="rounded-2xl p-12 text-center" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-              <p className="text-[#94A3B8] text-sm font-semibold">Aucune simulation pour ces filtres</p>
+            <div className="rounded-2xl p-12 text-center" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
+              <p className="text-[var(--ss-text-muted)] text-sm font-semibold">Aucune simulation pour ces filtres</p>
               <button onClick={() => { setPhetNiveau('all'); setPhetMatiere('all'); setPhetSearch('') }}
                 className="text-xs font-bold text-[#A78BFA] hover:underline mt-2">
                 Réinitialiser
@@ -649,29 +649,29 @@ function answer(qi,ci){
                 if (sims.length === 0) return null
                 const mc = MATIERE_COLOR[mat]
                 return (
-                  <div key={mat} className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid ${mc}25` }}>
+                  <div key={mat} className="rounded-2xl p-5" style={{ background: 'var(--ss-glass-card-bg)', border: `1px solid ${mc}25` }}>
                     <div className="flex items-center gap-3 mb-4 pb-3" style={{ borderBottom: `1px solid ${mc}20` }}>
                       <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm shrink-0" style={{ background: `${mc}20`, color: mc, fontWeight: 700 }}>
                         {mat === 'Mathématiques' ? 'π' : mat === 'Physique' ? '⚡' : mat === 'Chimie' ? '⚗' : '🌿'}
                       </div>
                       <div>
-                        <h3 className="text-sm font-bold text-white">{mat}</h3>
-                        <p className="text-xs" style={{ color: '#64748B' }}>{sims.length} simulation{sims.length > 1 ? 's' : ''}</p>
+                        <h3 className="text-sm font-bold text-ss-text">{mat}</h3>
+                        <p className="text-xs" style={{ color: 'var(--ss-text-muted)' }}>{sims.length} simulation{sims.length > 1 ? 's' : ''}</p>
                       </div>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                       {sims.map(sim => (
                         <div key={sim.id} className="rounded-xl p-4 flex flex-col gap-3 transition-all duration-200"
-                          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                          style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
                           <div>
                             <div className="flex items-start justify-between gap-2 mb-1">
-                              <h4 className="text-sm font-semibold text-white leading-snug">{sim.titre}</h4>
+                              <h4 className="text-sm font-semibold text-ss-text leading-snug">{sim.titre}</h4>
                               <span className="text-[10px] px-2 py-0.5 rounded-full font-bold shrink-0"
                                 style={{ background: `${DIFF_COLOR[sim.difficulte]}15`, color: DIFF_COLOR[sim.difficulte] }}>
                                 {DIFF_LABEL[sim.difficulte]}
                               </span>
                             </div>
-                            <p className="text-xs text-[#94A3B8] line-clamp-2 mt-1">{sim.description}</p>
+                            <p className="text-xs text-[var(--ss-text-muted)] line-clamp-2 mt-1">{sim.description}</p>
                             <div className="flex flex-wrap gap-1 mt-2">
                               {sim.themes.slice(0, 3).map(t => (
                                 <span key={t} className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: `${mc}10`, color: mc }}>
@@ -681,21 +681,21 @@ function answer(qi,ci){
                             </div>
                             <div className="flex flex-wrap gap-1 mt-1.5">
                               {sim.niveaux.slice(0, 3).map(n => (
-                                <span key={n} className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-[#64748B]">{n}</span>
+                                <span key={n} className="text-[10px] px-1.5 py-0.5 rounded bg-ss-text/5 text-[var(--ss-text-muted)]">{n}</span>
                               ))}
                             </div>
                           </div>
                           <div className="flex gap-2">
                             <button
                               onClick={() => ouvrirPhet(sim)}
-                              className="flex-1 py-2 rounded-lg text-xs font-bold transition-all hover:opacity-90 active:scale-95 text-white"
+                              className="flex-1 py-2 rounded-lg text-xs font-bold transition-all hover:opacity-90 active:scale-95 text-ss-text"
                               style={{ background: mc }}>
                               ▶ Lancer le TP
                             </button>
                             <button
                               onClick={() => window.open(sim.embedUrl, '_blank', 'noopener,noreferrer')}
                               className="px-3 py-2 rounded-lg text-xs font-bold hover:opacity-90 active:scale-95"
-                              style={{ background: 'rgba(255,255,255,0.06)', color: '#94A3B8', border: '1px solid rgba(255,255,255,0.1)' }}
+                              style={{ background: 'var(--ss-glass-card-hover)', color: 'var(--ss-text-muted)', border: '1px solid var(--ss-glass-border)' }}
                               title="Ouvrir en plein écran">
                               ↗
                             </button>
@@ -727,15 +727,15 @@ function answer(qi,ci){
           {/* Filtres niveau */}
           <div className="flex flex-wrap gap-2">
             <select value={selectedNiveau} onChange={e => setSelectedNiveau(e.target.value)}
-              className="px-3 py-2 rounded-xl text-sm text-[#CBD5E1]"
-              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', outline: 'none' }}>
+              className="px-3 py-2 rounded-xl text-sm text-[var(--ss-text-secondary)]"
+              style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-border)', outline: 'none' }}>
               <option value="all">Tous niveaux</option>
               {[...NIVEAUX_COLLEGE, ...NIVEAUX_LYCEE].map(n => <option key={n} value={n}>{n}</option>)}
             </select>
             {NIVEAUX_LYCEE.includes(selectedNiveau) && selectedNiveau !== 'Seconde' && (
               <select value={selectedSerie} onChange={e => setSelectedSerie(e.target.value)}
-                className="px-3 py-2 rounded-xl text-sm text-[#CBD5E1]"
-                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', outline: 'none' }}>
+                className="px-3 py-2 rounded-xl text-sm text-[var(--ss-text-secondary)]"
+                style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-border)', outline: 'none' }}>
                 <option value="all">Toutes séries</option>
                 {SERIES_LYCEE.map(s => <option key={s} value={s}>Série {s}</option>)}
               </select>
@@ -751,17 +751,17 @@ function answer(qi,ci){
 
             return (
               <div key={`${prog.matiere}-${prog.niveau}-${prog.serie}`} className="rounded-2xl overflow-hidden"
-                style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
                 {/* Header */}
-                <div className="p-4 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                <div className="p-4 flex items-center justify-between" style={{ borderBottom: '1px solid var(--ss-glass-card-hover)' }}>
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm"
                       style={{ background: `${color}15`, color, border: `1px solid ${color}30` }}>
                       {prog.heures_hebdo}h
                     </div>
                     <div>
-                      <h3 className="font-bold text-white">{prog.matiere}</h3>
-                      <p className="text-xs" style={{ color: '#94A3B8' }}>
+                      <h3 className="font-bold text-ss-text">{prog.matiere}</h3>
+                      <p className="text-xs" style={{ color: 'var(--ss-text-muted)' }}>
                         {prog.niveau}{prog.serie ? ` ${prog.serie}` : ''} · {prog.modules.length} modules · {prog.heures_annuelles}h
                       </p>
                     </div>
@@ -783,16 +783,16 @@ function answer(qi,ci){
                           style={{ background: `${color}15`, color }}>
                           {mod.numero}
                         </div>
-                        <p className="text-sm font-semibold text-white flex-1">{mod.titre}</p>
-                        <span className="text-xs" style={{ color: '#475569' }}>{mod.duree_heures}h · {mod.lecons.length} lecons</span>
+                        <p className="text-sm font-semibold text-ss-text flex-1">{mod.titre}</p>
+                        <span className="text-xs" style={{ color: 'var(--ss-text-disabled)' }}>{mod.duree_heures}h · {mod.lecons.length} lecons</span>
                       </div>
                       {/* Mini liste leçons */}
                       <div className="ml-9 space-y-1">
                         {mod.lecons.slice(0, 4).map(l => (
                           <div key={l.id} className="flex items-center gap-2">
                             <span className="w-1 h-1 rounded-full shrink-0" style={{ background: color }} />
-                            <p className="text-xs text-[#94A3B8] truncate">{l.titre}</p>
-                            <span className="text-[9px] ml-auto shrink-0" style={{ color: '#475569' }}>{l.duree_heures}h</span>
+                            <p className="text-xs text-[var(--ss-text-muted)] truncate">{l.titre}</p>
+                            <span className="text-[9px] ml-auto shrink-0" style={{ color: 'var(--ss-text-disabled)' }}>{l.duree_heures}h</span>
                           </div>
                         ))}
                         {mod.lecons.length > 4 && (
@@ -805,8 +805,8 @@ function answer(qi,ci){
               </div>
             )
           }) : (
-            <div className="rounded-2xl p-8 text-center" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-              <p className="text-[#94A3B8]">Aucun programme detaille pour cette selection.</p>
+            <div className="rounded-2xl p-8 text-center" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
+              <p className="text-[var(--ss-text-muted)]">Aucun programme detaille pour cette selection.</p>
             </div>
           )}
         </div>

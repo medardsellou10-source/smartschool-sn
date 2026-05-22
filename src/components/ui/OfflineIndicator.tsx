@@ -44,8 +44,8 @@ export function OfflineIndicator() {
     <div 
       className={`fixed top-0 left-0 right-0 z-[99999] py-1 px-4 text-center text-xs font-medium transition-colors duration-300 ${
         isOnline 
-          ? 'bg-ss-green text-white' 
-          : 'bg-ss-gold text-white'
+          ? 'bg-ss-green text-ss-text' 
+          : 'bg-ss-gold text-ss-text'
       }`}
     >
       {isOnline ? (

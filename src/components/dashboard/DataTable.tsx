@@ -89,8 +89,8 @@ export function DataTable<T>({
                     className={`${alignClass(col.align)} ${hideClass(col.hideBelow)} px-3 sm:px-4 py-3 text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-ss-text-muted whitespace-nowrap`}
                     style={{
                       width: col.width,
-                      borderBottom: '1px solid rgba(255,255,255,0.06)',
-                      background: 'rgba(15,23,42,0.35)',
+                      borderBottom: '1px solid var(--ss-border)',
+                      background: 'var(--ss-glass-card-bg)',
                     }}
                   >
                     {col.header}
@@ -107,7 +107,7 @@ export function DataTable<T>({
                         <td
                           key={col.key}
                           className={`${hideClass(col.hideBelow)} px-3 sm:px-4 py-3`}
-                          style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}
+                          style={{ borderBottom: '1px solid var(--ss-border)' }}
                         >
                           <div className="h-4 rounded ss-shimmer" />
                         </td>
@@ -131,7 +131,7 @@ export function DataTable<T>({
                               }
                             : undefined
                         }
-                        className={`transition-colors ${clickable ? 'cursor-pointer hover:bg-white/[0.03] focus-visible:outline-none focus-visible:bg-white/[0.05]' : ''}`}
+                        className={`transition-colors ${clickable ? 'cursor-pointer hover:bg-[var(--ss-glass-card-bg)] focus-visible:outline-none focus-visible:bg-[var(--ss-glass-card-hover)]' : ''}`}
                       >
                         {renderRow
                           ? renderRow(row, index)
@@ -139,7 +139,7 @@ export function DataTable<T>({
                               <td
                                 key={col.key}
                                 className={`${alignClass(col.align)} ${hideClass(col.hideBelow)} px-3 sm:px-4 py-3 text-ss-text align-middle`}
-                                style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}
+                                style={{ borderBottom: '1px solid var(--ss-border)' }}
                               >
                                 {col.cell(row)}
                               </td>

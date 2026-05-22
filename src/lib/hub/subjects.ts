@@ -1,42 +1,38 @@
 /**
- * Matières & niveaux du système éducatif sénégalais (collège + lycée).
- * Les couleurs réutilisent les tokens --color-ss-* existants ou fallback hex.
+ * Matières SN — palette couleurs + icônes Lucide
  */
 
-import type { NiveauMeta, SubjectMeta, SubjectId, NiveauId } from '@/types/hub'
+import type { SubjectId } from '@/types/hub'
+
+export interface SubjectMeta {
+  id: SubjectId
+  label: string
+  color: string    // couleur hex
+  bg: string       // fond avec opacité
+  iconName: string // nom de l'icône Lucide (import dynamique dans composants)
+}
 
 export const SUBJECTS: SubjectMeta[] = [
-  { id: 'maths',    label: 'Mathématiques',     color: 'var(--color-ss-info)',   iconName: 'Sigma' },
-  { id: 'svt',      label: 'SVT',               color: 'var(--color-ss-green)',  iconName: 'Leaf' },
-  { id: 'pc',       label: 'Physique-Chimie',   color: '#818CF8',                iconName: 'Atom' },
-  { id: 'philo',    label: 'Philosophie',       color: 'var(--color-ss-warn)',   iconName: 'BrainCircuit' },
-  { id: 'hg',       label: 'Histoire-Géo',      color: '#FB923C',                iconName: 'Globe' },
-  { id: 'francais', label: 'Français',          color: 'var(--color-ss-danger)', iconName: 'BookOpen' },
-  { id: 'anglais',  label: 'Anglais',           color: '#60A5FA',                iconName: 'Languages' },
-  { id: 'arabe',    label: 'Arabe',             color: '#2DD4BF',                iconName: 'ScrollText' },
+  { id: 'maths',    label: 'Mathématiques', color: '#38BDF8', bg: 'rgba(56,189,248,0.12)',  iconName: 'Sigma'       },
+  { id: 'svt',      label: 'SVT',           color: '#22C55E', bg: 'rgba(34,197,94,0.12)',   iconName: 'Leaf'        },
+  { id: 'pc',       label: 'Phys-Chimie',   color: '#6366F1', bg: 'rgba(99,102,241,0.12)',  iconName: 'Atom'        },
+  { id: 'philo',    label: 'Philosophie',   color: '#FBBF24', bg: 'rgba(251,191,36,0.12)',  iconName: 'BrainCircuit'},
+  { id: 'hg',       label: 'Hist-Géo',      color: '#F97316', bg: 'rgba(249,115,22,0.12)',  iconName: 'Globe'       },
+  { id: 'francais', label: 'Français',      color: '#F87171', bg: 'rgba(248,113,113,0.12)', iconName: 'BookOpen'    },
+  { id: 'anglais',  label: 'Anglais',       color: '#60A5FA', bg: 'rgba(96,165,250,0.12)',  iconName: 'Languages'   },
+  { id: 'arabe',    label: 'Arabe',         color: '#2DD4BF', bg: 'rgba(45,212,191,0.12)',  iconName: 'ScrollText'  },
 ]
 
-export const NIVEAUX: NiveauMeta[] = [
-  { id: '6e',        label: '6ème',      cycle: 'college' },
-  { id: '5e',        label: '5ème',      cycle: 'college' },
-  { id: '4e',        label: '4ème',      cycle: 'college' },
-  { id: '3e',        label: '3ème',      cycle: 'college' },
-  { id: 'seconde',   label: 'Seconde',   cycle: 'lycee' },
-  { id: 'premiere',  label: 'Première',  cycle: 'lycee' },
-  { id: 'terminale', label: 'Terminale', cycle: 'lycee' },
+export const SUBJECT_MAP: Record<SubjectId, SubjectMeta> = Object.fromEntries(
+  SUBJECTS.map(s => [s.id, s]),
+) as Record<SubjectId, SubjectMeta>
+
+export const NIVEAUX: { id: string; label: string }[] = [
+  { id: '6e',        label: '6ème'       },
+  { id: '5e',        label: '5ème'       },
+  { id: '4e',        label: '4ème'       },
+  { id: '3e',        label: '3ème / BFEM'},
+  { id: 'seconde',   label: 'Seconde'    },
+  { id: 'premiere',  label: 'Première'   },
+  { id: 'terminale', label: 'Terminale / BAC' },
 ]
-
-export function getSubject(id: SubjectId): SubjectMeta {
-  return SUBJECTS.find(s => s.id === id) ?? SUBJECTS[0]
-}
-
-export function getNiveau(id: NiveauId): NiveauMeta {
-  return NIVEAUX.find(n => n.id === id) ?? NIVEAUX[0]
-}
-
-/** Pour l'UI : examen d'État selon le niveau. */
-export function getExamBadge(niveau: NiveauId): 'BFEM' | 'BAC' | null {
-  if (niveau === '3e') return 'BFEM'
-  if (niveau === 'terminale') return 'BAC'
-  return null
-}

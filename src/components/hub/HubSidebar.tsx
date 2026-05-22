@@ -1,81 +1,90 @@
 'use client'
 
-import Link from 'next/link'
-import { BookMarked, FlaskConical, Home, Library, PlayCircle, Trophy, UserCircle } from 'lucide-react'
-import { usePathname } from 'next/navigation'
+/**
+ * HubSidebar — menu latéral rétractable
+ */
 
-interface Item {
+import { useState } from 'react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import {
+  Home, BookMarked, FlaskConical, ScrollText, Trophy,
+  ChevronLeft, ChevronRight,
+} from 'lucide-react'
+
+interface NavItem {
+  href: string
   label: string
-  href: string | null
-  icon: React.ElementType
+  icon: typeof Home
   disabled?: boolean
 }
 
-function makeItems(basePath: string): Item[] {
-  return [
-    { label: 'Accueil',         href: basePath,              icon: Home },
-    { label: 'Mes cours',       href: null,                  icon: PlayCircle, disabled: true },
-    { label: 'Annales & devoirs', href: null,                icon: BookMarked, disabled: true },
-    { label: 'TP virtuels',     href: null,                  icon: FlaskConical, disabled: true },
-    { label: 'Bibliothèque',    href: null,                  icon: Library,    disabled: true },
-    { label: 'Classement',      href: null,                  icon: Trophy,     disabled: true },
-    { label: 'Profil',          href: null,                  icon: UserCircle, disabled: true },
-  ]
+interface HubSidebarProps {
+  basePath: string  // ex: '/eleve/hub'
 }
 
-interface Props {
-  hubBasePath: string
-}
-
-export function HubSidebar({ hubBasePath }: Props) {
+export function HubSidebar({ basePath }: HubSidebarProps) {
+  const [collapsed, setCollapsed] = useState(false)
   const pathname = usePathname()
-  const items = makeItems(hubBasePath)
+
+  const NAV: NavItem[] = [
+    { href: basePath,                 label: 'Accueil',    icon: Home        },
+    { href: `${basePath}?filter=mes`, label: 'Mes cours',  icon: BookMarked  },
+    { href: `${basePath}?filter=tp`,  label: 'TP virtuels', icon: FlaskConical, disabled: true },
+    { href: `${basePath}?filter=ann`, label: 'Annales',    icon: ScrollText  },
+    { href: `${basePath}?filter=cls`, label: 'Classement', icon: Trophy, disabled: true },
+  ]
 
   return (
     <aside
-      aria-label="Navigation Hub"
-      className="hidden w-56 shrink-0 border-r border-white/5 py-4 pr-4 lg:block"
+      className={`hidden md:flex flex-col transition-all duration-300 ${
+        collapsed ? 'w-14' : 'w-52'
+      }`}
     >
-      <nav className="flex flex-col gap-1">
-        {items.map(item => {
-          const Icon = item.icon
-          const active = item.href && pathname === item.href
-          const base =
-            'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition focus-visible:ring-2 focus-visible:ring-[var(--color-ss-purple)] focus-visible:outline-none'
-
-          if (item.disabled) {
-            return (
-              <span
-                key={item.label}
-                className={`${base} cursor-not-allowed text-[var(--color-ss-text-disabled)]`}
-                aria-disabled="true"
-                title="Bientôt disponible"
-              >
-                <Icon className="h-4 w-4" aria-hidden />
-                {item.label}
-                <span className="ml-auto text-[10px] uppercase tracking-wide text-[var(--color-ss-text-muted)]">
-                  Bientôt
-                </span>
-              </span>
-            )
+      <div className="sticky top-20 flex flex-col gap-1 rounded-2xl border border-white/[0.06] bg-white/[0.03] p-2 backdrop-blur-xl">
+        {/* Toggle */}
+        <button
+          type="button"
+          onClick={() => setCollapsed(c => !c)}
+          className="mb-1 flex h-8 w-full items-center justify-end px-1 text-ss-text-secondary hover:text-ss-text-secondary transition-colors"
+          aria-label={collapsed ? 'Ouvrir le menu' : 'Réduire le menu'}
+        >
+          {collapsed
+            ? <ChevronRight className="h-4 w-4" aria-hidden />
+            : <ChevronLeft className="h-4 w-4" aria-hidden />
           }
+        </button>
 
+        {NAV.map(item => {
+          const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
           return (
             <Link
-              key={item.label}
-              href={item.href!}
-              className={`${base} ${
-                active
-                  ? 'bg-[var(--color-ss-purple)]/15 text-[var(--color-ss-purple)]'
-                  : 'text-[var(--color-ss-text-secondary)] hover:bg-white/5 hover:text-white'
-              }`}
+              key={item.href}
+              href={item.disabled ? '#' : item.href}
+              aria-disabled={item.disabled}
+              aria-label={item.label}
+              className={[
+                'flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-[12px] font-semibold transition-colors',
+                isActive
+                  ? 'bg-purple-500/20 text-purple-200'
+                  : 'text-ss-text-secondary hover:bg-white/[0.06] hover:text-ss-text',
+                item.disabled ? 'pointer-events-none opacity-40' : '',
+              ].join(' ')}
+              title={collapsed ? item.label : undefined}
             >
-              <Icon className="h-4 w-4" aria-hidden />
-              {item.label}
+              <item.icon className="h-4 w-4 shrink-0" aria-hidden />
+              {!collapsed && (
+                <span className="truncate">
+                  {item.label}
+                  {item.disabled && (
+                    <span className="ml-1 text-[9px] text-ss-text-secondary">(bientôt)</span>
+                  )}
+                </span>
+              )}
             </Link>
           )
         })}
-      </nav>
+      </div>
     </aside>
   )
 }

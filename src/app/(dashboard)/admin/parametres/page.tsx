@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -231,10 +231,10 @@ export default function ParametresPage() {
   if (userLoading || loading) {
     return (
       <div>
-        <div className="h-8 w-48 rounded-lg ss-shimmer mb-6" style={{ background: 'rgba(255,255,255,0.03)' }} />
+        <div className="h-8 w-48 rounded-lg ss-shimmer mb-6" style={{ background: 'var(--ss-glass-card-bg)' }} />
         <div className="space-y-4">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-40 rounded-xl ss-shimmer" style={{ background: 'rgba(255,255,255,0.03)' }} />
+            <div key={i} className="h-40 rounded-xl ss-shimmer" style={{ background: 'var(--ss-glass-card-bg)' }} />
           ))}
         </div>
       </div>
@@ -272,14 +272,14 @@ export default function ParametresPage() {
 
       {/* ── IDENTITÉ VISUELLE ── */}
       <div className="rounded-2xl overflow-hidden"
-        style={{ border: `1px solid ${accentColor}30`, background: `linear-gradient(135deg, ${accentColor}05, rgba(2,6,23,0.8))` }}>
+        style={{ border: `1px solid ${accentColor}30`, background: `linear-gradient(135deg, ${accentColor}05, var(--ss-surface-elevated))` }}>
 
         {/* En-tête avec preview */}
         <div className="p-5" style={{ borderBottom: `1px solid ${accentColor}20` }}>
           <div className="flex items-center justify-between flex-wrap gap-3 mb-5">
             <div>
-              <h2 className="text-base font-bold text-white">Identité Visuelle</h2>
-              <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.4)' }}>
+              <h2 className="text-base font-bold text-ss-text">Identité Visuelle</h2>
+              <p className="text-xs mt-0.5" style={{ color: 'var(--ss-glass-border)' }}>
                 Logo, couleurs et slogan affichés sur tout le tableau de bord
               </p>
             </div>
@@ -300,7 +300,7 @@ export default function ParametresPage() {
           <div className="rounded-xl overflow-hidden" style={{ border: `1px solid ${accentColor}25`, background: 'rgba(11,17,32,0.9)' }}>
             <div className="px-4 py-3 flex items-center gap-3" style={{ borderBottom: `1px solid ${accentColor}15` }}>
               {/* Mini logo */}
-              <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center text-xs font-black text-white shrink-0"
+              <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center text-xs font-black text-ss-text shrink-0"
                 style={{ background: brandingForm.logo_url ? 'transparent' : `linear-gradient(135deg, ${accentColor}cc, ${accentColor}55)` }}>
                 {brandingForm.logo_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -310,7 +310,7 @@ export default function ParametresPage() {
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="text-xs font-bold text-white truncate">{ecole?.nom || 'Mon École'}</div>
+                <div className="text-xs font-bold text-ss-text truncate">{ecole?.nom || 'Mon École'}</div>
                 <div className="text-[10px] truncate" style={{ color: `${accentColor}99` }}>
                   {brandingForm.slogan || 'Votre slogan ici'}
                 </div>
@@ -321,7 +321,7 @@ export default function ParametresPage() {
               <div className="h-1.5 rounded-full flex-1" style={{ background: `${accentColor}20` }} />
               <div className="h-1.5 w-12 rounded-full" style={{ background: `${accentColor}10` }} />
             </div>
-            <p className="px-4 pb-2 text-[9px]" style={{ color: 'rgba(255,255,255,0.2)' }}>Aperçu sidebar</p>
+            <p className="px-4 pb-2 text-[9px]" style={{ color: 'var(--ss-glass-border)' }}>Aperçu sidebar</p>
           </div>
         </div>
 
@@ -329,12 +329,12 @@ export default function ParametresPage() {
 
           {/* Logo */}
           <div>
-            <p className="text-xs uppercase tracking-wider mb-2 font-semibold" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            <p className="text-xs uppercase tracking-wider mb-2 font-semibold" style={{ color: 'var(--ss-glass-border)' }}>
               Logo de l'école
             </p>
             <div className="flex items-center gap-3">
-              <div className="w-16 h-16 rounded-xl overflow-hidden flex items-center justify-center shrink-0 font-black text-xl text-white"
-                style={{ background: brandingForm.logo_url ? 'rgba(255,255,255,0.06)' : `linear-gradient(135deg, ${accentColor}cc, ${accentColor}55)`, border: `1px solid ${accentColor}30` }}>
+              <div className="w-16 h-16 rounded-xl overflow-hidden flex items-center justify-center shrink-0 font-black text-xl text-ss-text"
+                style={{ background: brandingForm.logo_url ? 'var(--ss-glass-card-hover)' : `linear-gradient(135deg, ${accentColor}cc, ${accentColor}55)`, border: `1px solid ${accentColor}30` }}>
                 {brandingForm.logo_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={brandingForm.logo_url} alt="Logo" className="w-full h-full object-contain p-1" />
@@ -365,8 +365,8 @@ export default function ParametresPage() {
                   value={brandingForm.logo_url}
                   onChange={e => setBrandingForm(f => ({ ...f, logo_url: e.target.value }))}
                   placeholder="ou coller une URL…"
-                  className="w-full px-3 py-1.5 rounded-lg text-xs text-white placeholder-white/20 outline-none"
-                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' }}
+                  className="w-full px-3 py-1.5 rounded-lg text-xs text-ss-text placeholder-white/20 outline-none"
+                  style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-border)' }}
                 />
               </div>
             </div>
@@ -374,7 +374,7 @@ export default function ParametresPage() {
 
           {/* Slogan */}
           <div>
-            <p className="text-xs uppercase tracking-wider mb-2 font-semibold" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            <p className="text-xs uppercase tracking-wider mb-2 font-semibold" style={{ color: 'var(--ss-glass-border)' }}>
               Slogan / Devise
             </p>
             <textarea
@@ -382,14 +382,14 @@ export default function ParametresPage() {
               onChange={e => setBrandingForm(f => ({ ...f, slogan: e.target.value }))}
               placeholder="Ex : Excellence, Discipline, Réussite"
               rows={3}
-              className="w-full px-3 py-2.5 rounded-xl text-sm text-white placeholder-white/20 outline-none resize-none transition-all"
-              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' }}
+              className="w-full px-3 py-2.5 rounded-xl text-sm text-ss-text placeholder-white/20 outline-none resize-none transition-all"
+              style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-border)' }}
             />
           </div>
 
           {/* Couleur primaire */}
           <div>
-            <p className="text-xs uppercase tracking-wider mb-2 font-semibold" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            <p className="text-xs uppercase tracking-wider mb-2 font-semibold" style={{ color: 'var(--ss-glass-border)' }}>
               Couleur principale
             </p>
             <div className="flex flex-wrap gap-2 mb-3">
@@ -421,8 +421,8 @@ export default function ParametresPage() {
                 value={brandingForm.couleur_primaire}
                 onChange={e => setBrandingForm(f => ({ ...f, couleur_primaire: e.target.value }))}
                 maxLength={7}
-                className="flex-1 px-3 py-1.5 rounded-lg text-sm font-mono text-white outline-none"
-                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' }}
+                className="flex-1 px-3 py-1.5 rounded-lg text-sm font-mono text-ss-text outline-none"
+                style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-border)' }}
               />
               <div className="w-8 h-8 rounded-lg shrink-0" style={{ background: brandingForm.couleur_primaire }} />
             </div>
@@ -430,17 +430,17 @@ export default function ParametresPage() {
 
           {/* Image hero */}
           <div>
-            <p className="text-xs uppercase tracking-wider mb-2 font-semibold" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            <p className="text-xs uppercase tracking-wider mb-2 font-semibold" style={{ color: 'var(--ss-glass-border)' }}>
               Image d'en-tête (héro)
             </p>
             <div className="rounded-xl overflow-hidden mb-2 flex items-center justify-center"
               style={{
                 height: 80,
-                background: brandingForm.image_hero_url ? `url(${brandingForm.image_hero_url}) center/cover` : 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.08)',
+                background: brandingForm.image_hero_url ? `url(${brandingForm.image_hero_url}) center/cover` : 'var(--ss-glass-card-bg)',
+                border: '1px solid var(--ss-glass-card-hover)',
               }}>
               {!brandingForm.image_hero_url && (
-                <span className="text-xs" style={{ color: 'rgba(255,255,255,0.25)' }}>Aucune image sélectionnée</span>
+                <span className="text-xs" style={{ color: 'var(--ss-glass-border)' }}>Aucune image sélectionnée</span>
               )}
             </div>
             <input
@@ -465,17 +465,17 @@ export default function ParametresPage() {
               value={brandingForm.image_hero_url}
               onChange={e => setBrandingForm(f => ({ ...f, image_hero_url: e.target.value }))}
               placeholder="ou coller une URL d'image…"
-              className="w-full px-3 py-1.5 rounded-lg text-xs text-white placeholder-white/20 outline-none"
-              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' }}
+              className="w-full px-3 py-1.5 rounded-lg text-xs text-ss-text placeholder-white/20 outline-none"
+              style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-border)' }}
             />
           </div>
         </div>
       </div>
 
       {/* ── Informations de l'école ── */}
-      <div className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+      <div className="rounded-2xl p-5" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: '#94A3B8' }}>
+          <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: 'var(--ss-text-muted)' }}>
             Informations de l'école
           </h2>
           {!editingEcole ? (
@@ -488,7 +488,7 @@ export default function ParametresPage() {
             <div className="flex gap-2">
               <button onClick={() => { setEditingEcole(false); if (ecole) setEcoleForm({ nom: ecole.nom, region: ecole.region, ville: ecole.ville, rayon_pointage_m: ecole.rayon_pointage_m }) }}
                 className="text-xs font-bold px-3 py-1.5 rounded-lg"
-                style={{ color: '#94A3B8', border: '1px solid rgba(255,255,255,0.1)' }}>
+                style={{ color: 'var(--ss-text-muted)', border: '1px solid var(--ss-glass-border)' }}>
                 Annuler
               </button>
               <button onClick={handleSaveEcole}
@@ -518,14 +518,14 @@ export default function ParametresPage() {
               valueColor={ecole.actif ? '#22C55E' : '#F87171'} />
           </div>
         ) : (
-          <p className="text-sm" style={{ color: '#94A3B8' }}>Aucune information disponible</p>
+          <p className="text-sm" style={{ color: 'var(--ss-text-muted)' }}>Aucune information disponible</p>
         )}
       </div>
 
       {/* ── Mon compte ── */}
-      <div className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+      <div className="rounded-2xl p-5" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: '#94A3B8' }}>Mon compte</h2>
+          <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: 'var(--ss-text-muted)' }}>Mon compte</h2>
           {!editingUser ? (
             <button onClick={() => setEditingUser(true)}
               className="text-xs font-bold px-3 py-1.5 rounded-lg transition-all hover:opacity-90"
@@ -536,7 +536,7 @@ export default function ParametresPage() {
             <div className="flex gap-2">
               <button onClick={() => { setEditingUser(false); if (user) setUserForm({ nom: user.nom, prenom: user.prenom, telephone: user.telephone || '' }) }}
                 className="text-xs font-bold px-3 py-1.5 rounded-lg"
-                style={{ color: '#94A3B8', border: '1px solid rgba(255,255,255,0.1)' }}>
+                style={{ color: 'var(--ss-text-muted)', border: '1px solid var(--ss-glass-border)' }}>
                 Annuler
               </button>
               <button onClick={handleSaveUser}
@@ -562,7 +562,7 @@ export default function ParametresPage() {
               value={new Date(user.created_at).toLocaleDateString('fr-SN', { day: 'numeric', month: 'long', year: 'numeric' })} />
           </div>
         ) : (
-          <p className="text-sm" style={{ color: '#94A3B8' }}>Aucune information disponible</p>
+          <p className="text-sm" style={{ color: 'var(--ss-text-muted)' }}>Aucune information disponible</p>
         )}
       </div>
 
@@ -570,8 +570,8 @@ export default function ParametresPage() {
       <AlertesDelaiHumain demo={demo} showStatus={showStatus} />
 
       {/* ── Application ── */}
-      <div className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-        <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: '#94A3B8' }}>Application</h2>
+      <div className="rounded-2xl p-5" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
+        <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: 'var(--ss-text-muted)' }}>Application</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <InfoField label="Version" value="2.0.0" />
           <InfoField label="Mode" value={demo ? 'Démonstration' : 'Production'}
@@ -716,13 +716,13 @@ function AlertesDelaiHumain({ demo, showStatus }: { demo: boolean; showStatus: (
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="text-lg">🔔</span>
-              <h2 className="text-base font-bold text-white">Alertes & Notifications</h2>
+              <h2 className="text-base font-bold text-ss-text">Alertes & Notifications</h2>
               <span className="text-[9px] font-bold px-2 py-0.5 rounded-full"
                 style={{ background: 'rgba(0,229,255,0.15)', color: '#38BDF8', border: '1px solid rgba(0,229,255,0.3)' }}>
                 DÉLAI HUMAIN
               </span>
             </div>
-            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            <p className="text-xs" style={{ color: 'var(--ss-glass-border)' }}>
               Configurez quand les parents reçoivent chaque type de notification
             </p>
           </div>
@@ -743,7 +743,7 @@ function AlertesDelaiHumain({ demo, showStatus }: { demo: boolean; showStatus: (
           <span className="text-lg shrink-0">💡</span>
           <div>
             <p className="text-xs font-bold mb-0.5" style={{ color: '#7C4DFF' }}>Principe directeur</p>
-            <p className="text-xs italic leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
+            <p className="text-xs italic leading-relaxed" style={{ color: 'var(--ss-glass-border)' }}>
               &ldquo;Les alertes de sécurité sont instantanées. Les alertes pédagogiques respectent le temps de l&apos;apprentissage.&rdquo;
             </p>
           </div>
@@ -762,16 +762,16 @@ function AlertesDelaiHumain({ demo, showStatus }: { demo: boolean; showStatus: (
                 <p className="text-xs font-bold uppercase tracking-wider" style={{ color: meta.color }}>
                   {meta.label}
                 </p>
-                <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.3)' }}>— {meta.desc}</span>
+                <span className="text-[10px]" style={{ color: 'var(--ss-glass-border)' }}>— {meta.desc}</span>
               </div>
               <div className="space-y-2">
                 {alerts.map(alert => (
                   <div key={alert.id} className="flex items-center gap-3 p-3 rounded-xl group transition-all"
-                    style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                    style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
                     <span className="text-lg shrink-0">{alert.icon}</span>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-white">{alert.label}</p>
-                      <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.35)' }}>{alert.description}</p>
+                      <p className="text-sm font-semibold text-ss-text">{alert.label}</p>
+                      <p className="text-[10px]" style={{ color: 'var(--ss-glass-border)' }}>{alert.description}</p>
                     </div>
                     {alert.options.length === 1 ? (
                       <span className="text-[10px] font-bold px-2.5 py-1 rounded-lg shrink-0"
@@ -784,12 +784,12 @@ function AlertesDelaiHumain({ demo, showStatus }: { demo: boolean; showStatus: (
                         onChange={e => handleTimingChange(alert.id, e.target.value)}
                         className="text-xs font-semibold rounded-lg px-3 py-2 outline-none cursor-pointer shrink-0 transition-all"
                         style={{
-                          background: 'rgba(255,255,255,0.06)',
+                          background: 'var(--ss-glass-card-hover)',
                           color: meta.color,
                           border: `1px solid ${meta.color}30`,
                         }}>
                         {alert.options.map(opt => (
-                          <option key={opt.value} value={opt.value} style={{ background: '#0B1120', color: '#fff' }}>
+                          <option key={opt.value} value={opt.value} style={{ background: 'var(--ss-bg-secondary)', color: 'var(--ss-text)' }}>
                             {opt.label}
                           </option>
                         ))}
@@ -814,20 +814,20 @@ function AlertesDelaiHumain({ demo, showStatus }: { demo: boolean; showStatus: (
             <button
               onClick={() => setProfPublie(v => !v)}
               className="relative w-11 h-6 rounded-full transition-all shrink-0"
-              style={{ background: profPublie ? '#7C4DFF' : 'rgba(255,255,255,0.1)' }}>
+              style={{ background: profPublie ? '#7C4DFF' : 'var(--ss-glass-border)' }}>
               <span className="absolute w-4 h-4 rounded-full bg-white top-1 transition-all"
                 style={{ left: profPublie ? '26px' : '4px' }} />
             </button>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-white">Le prof choisit quand publier la note</p>
-              <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.4)' }}>
+              <p className="text-sm font-semibold text-ss-text">Le prof choisit quand publier la note</p>
+              <p className="text-[10px]" style={{ color: 'var(--ss-glass-border)' }}>
                 La note est saisie mais pas envoyée au parent tant que le professeur n&apos;a pas validé la publication.
               </p>
             </div>
             <span className="text-[10px] font-bold px-2 py-0.5 rounded shrink-0"
               style={profPublie
                 ? { background: 'rgba(124,77,255,0.15)', color: '#7C4DFF', border: '1px solid rgba(124,77,255,0.3)' }
-                : { background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.3)', border: '1px solid rgba(255,255,255,0.1)' }
+                : { background: 'var(--ss-glass-card-bg)', color: 'var(--ss-glass-border)', border: '1px solid var(--ss-glass-border)' }
               }>
               {profPublie ? 'Activé' : 'Désactivé'}
             </span>
@@ -844,10 +844,10 @@ function EditableField({ label, value, editing, onChange, type = 'text' }: {
   if (!editing) return <InfoField label={label} value={value} />
   return (
     <div className="space-y-1">
-      <p className="text-xs uppercase tracking-wider" style={{ color: '#94A3B8' }}>{label}</p>
+      <p className="text-xs uppercase tracking-wider" style={{ color: 'var(--ss-text-muted)' }}>{label}</p>
       <input type={type} value={value} onChange={e => onChange(e.target.value)}
-        className="w-full px-3 py-2 rounded-lg text-sm font-medium text-white outline-none transition-all focus:border-[#F87171]"
-        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }} />
+        className="w-full px-3 py-2 rounded-lg text-sm font-medium text-ss-text outline-none transition-all focus:border-[#F87171]"
+        style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-border)' }} />
     </div>
   )
 }
@@ -855,7 +855,7 @@ function EditableField({ label, value, editing, onChange, type = 'text' }: {
 function InfoField({ label, value, valueColor }: { label: string; value: string; valueColor?: string }) {
   return (
     <div className="space-y-1">
-      <p className="text-xs uppercase tracking-wider" style={{ color: '#94A3B8' }}>{label}</p>
+      <p className="text-xs uppercase tracking-wider" style={{ color: 'var(--ss-text-muted)' }}>{label}</p>
       <p className="text-sm font-medium" style={{ color: valueColor || '#fff' }}>{value}</p>
     </div>
   )

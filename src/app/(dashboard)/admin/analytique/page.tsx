@@ -275,7 +275,7 @@ export default function AnalytiquePage() {
             return (
               <div
                 key={niveau}
-                className={`${colors[niveau]} flex items-center justify-center text-xs font-bold text-white`}
+                className={`${colors[niveau]} flex items-center justify-center text-xs font-bold text-ss-text`}
                 style={{ width: `${pct}%` }}
                 title={`${niveauColors[niveau].label}: ${count} élèves (${pct.toFixed(0)}%)`}
               >
@@ -307,7 +307,7 @@ export default function AnalytiquePage() {
               onClick={() => setFiltreRisque(f.val)}
               className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
                 filtreRisque === f.val
-                  ? 'bg-[#00853F] text-white'
+                  ? 'bg-[#00853F] text-ss-text'
                   : 'text-ss-text-secondary hover:text-ss-text'
               }`}
             >

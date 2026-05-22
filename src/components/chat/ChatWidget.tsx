@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState, useRef, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
@@ -127,7 +127,7 @@ export default function ChatWidget() {
         >
           {/* Header */}
           <div
-            className="flex items-center justify-between px-4 py-3 border-b border-white/10 shrink-0 cursor-pointer"
+            className="flex items-center justify-between px-4 py-3 border-b border-ss-text/10 shrink-0 cursor-pointer"
             onClick={() => isMinimized && setIsMinimized(false)}
             style={{ background: `linear-gradient(90deg, ${accentColor}15, transparent)` }}
           >
@@ -139,9 +139,9 @@ export default function ChatWidget() {
                 🤖
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-white">SmartBot</h3>
+                <h3 className="text-sm font-semibold text-ss-text">SmartBot</h3>
                 {!isMinimized && (
-                  <p className="text-[10px] text-white/40">
+                  <p className="text-[10px] text-ss-text-secondary">
                     Assistant {ROLE_LABELS[role]} • IA
                   </p>
                 )}
@@ -152,7 +152,7 @@ export default function ChatWidget() {
               {!isMinimized && (
                 <button
                   onClick={(e) => { e.stopPropagation(); clearMessages() }}
-                  className="w-8 h-8 rounded-lg flex items-center justify-center text-white/40 hover:text-white/70 hover:bg-white/5 transition-colors"
+                  className="w-8 h-8 rounded-lg flex items-center justify-center text-ss-text-secondary hover:text-ss-text-secondary hover:bg-ss-text/5 transition-colors"
                   title="Nouvelle conversation"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -163,7 +163,7 @@ export default function ChatWidget() {
               )}
               <button
                 onClick={(e) => { e.stopPropagation(); setIsMinimized(!isMinimized) }}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-white/40 hover:text-white/70 hover:bg-white/5 transition-colors"
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-ss-text-secondary hover:text-ss-text-secondary hover:bg-ss-text/5 transition-colors"
                 title={isMinimized ? 'Agrandir' : 'Réduire'}
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -176,7 +176,7 @@ export default function ChatWidget() {
               </button>
               <button
                 onClick={(e) => { e.stopPropagation(); setIsOpen(false) }}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-white/40 hover:text-red-400 hover:bg-white/5 transition-colors"
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-ss-text-secondary hover:text-red-400 hover:bg-ss-text/5 transition-colors"
                 title="Fermer"
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -199,8 +199,8 @@ export default function ChatWidget() {
                     >
                       🤖
                     </div>
-                    <h4 className="text-white font-semibold mb-1">SmartBot</h4>
-                    <p className="text-white/40 text-xs mb-6">
+                    <h4 className="text-ss-text font-semibold mb-1">SmartBot</h4>
+                    <p className="text-ss-text-secondary text-xs mb-6">
                       Assistant IA pour {ROLE_LABELS[role]}
                     </p>
 
@@ -210,7 +210,7 @@ export default function ChatWidget() {
                         <button
                           key={i}
                           onClick={() => sendMessage(prompt)}
-                          className="w-full text-left text-xs px-4 py-2.5 rounded-xl bg-white/5 text-white/60 hover:bg-white/10 hover:text-white/80 transition-colors border border-white/5 hover:border-white/10"
+                          className="w-full text-left text-xs px-4 py-2.5 rounded-xl bg-ss-text/5 text-ss-text-secondary hover:bg-ss-text/10 hover:text-ss-text-secondary transition-colors border border-ss-text/5 hover:border-ss-text/10"
                         >
                           {prompt}
                         </button>

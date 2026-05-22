@@ -10,7 +10,7 @@ import { isDemoMode, DEMO_PROFESSEURS, DEMO_POINTAGES, DEMO_EXAMENS, DEMO_BULLET
 import { GraduationCap, BookOpen, FileCheck2, CheckCircle2, ClipboardList, CalendarDays, Zap, Award, Trophy, ChevronRight } from 'lucide-react'
 
 const ACCENT = '#818CF8'
-const CARD = { background: 'rgba(2,6,23,0.80)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.10)' }
+const CARD = { background: 'var(--ss-glass-dark-bg)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid var(--ss-border)' }
 
 function getTrimestreActuel(): 'T1' | 'T2' | 'T3' {
   const m = new Date().getMonth() + 1
@@ -178,9 +178,9 @@ export default function CenseurDashboard() {
   if (userLoading || loading) {
     return (
       <div className="space-y-6 p-6 animate-pulse">
-        <div className="h-40 rounded-2xl bg-white/5" />
+        <div className="h-40 rounded-2xl bg-[var(--ss-glass-card-bg)]" />
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          {[...Array(4)].map((_, i) => <div key={i} className="h-32 rounded-2xl bg-white/5" />)}
+          {[...Array(4)].map((_, i) => <div key={i} className="h-32 rounded-2xl bg-[var(--ss-glass-card-bg)]" />)}
         </div>
       </div>
     )
@@ -191,7 +191,7 @@ export default function CenseurDashboard() {
 
       {/* Bannière Hero */}
       <div className="relative rounded-2xl overflow-hidden min-h-[160px]"
-        style={{ background: `linear-gradient(135deg, rgba(2,6,23,0.95) 0%, rgba(10,5,30,0.88) 60%, rgba(2,6,23,0.95) 100%)`, border: `1px solid ${ACCENT}30`, backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
+        style={{ background: `linear-gradient(135deg, var(--ss-bg-card) 0%, var(--ss-bg-secondary) 60%, var(--ss-bg-card) 100%)`, border: `1px solid ${ACCENT}30`, backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
         <div className="absolute inset-0"
           style={{ background: `radial-gradient(ellipse at 70% 50%, ${ACCENT}18 0%, transparent 65%)` }} />
         <div className="relative z-10 p-6 lg:p-8 flex items-center justify-between">
@@ -203,7 +203,7 @@ export default function CenseurDashboard() {
                 <GraduationCap size={28} style={{ color: ACCENT }} />
               </div>
               <div>
-                <h1 className="text-xl sm:text-2xl font-extrabold text-white">
+                <h1 className="text-xl sm:text-2xl font-extrabold text-ss-text">
                   Bonjour, {user?.prenom} {user?.nom}
                 </h1>
                 <p className="text-base font-semibold mt-0.5" style={{ color: ACCENT }}>
@@ -211,13 +211,13 @@ export default function CenseurDashboard() {
                 </p>
               </div>
             </div>
-            <p className="text-sm text-slate-300">
+            <p className="text-sm text-ss-text-secondary">
               {new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
             </p>
           </div>
           <div className="hidden lg:flex gap-2">
             <Link href="/censeur/emplois-temps"
-              className="px-5 py-2.5 rounded-xl text-sm font-bold text-white transition-all hover:opacity-85"
+              className="px-5 py-2.5 rounded-xl text-sm font-bold text-ss-text transition-all hover:opacity-85"
               style={{ background: ACCENT, boxShadow: `0 4px 20px ${ACCENT}50` }}>
               Emplois du temps
             </Link>
@@ -259,13 +259,13 @@ export default function CenseurDashboard() {
 
         {/* Évaluations récentes */}
         <div className="xl:col-span-2 rounded-2xl p-6" style={CARD}>
-          <h2 className="text-lg font-bold text-white mb-5 flex items-center gap-2">
+          <h2 className="text-lg font-bold text-ss-text mb-5 flex items-center gap-2">
             <FileCheck2 size={18} style={{ color: ACCENT }} aria-hidden="true" /> Évaluations & Examens
           </h2>
           {examens.length === 0 ? (
             <div className="flex flex-col items-center py-8 text-center">
               <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3 text-2xl" style={{ background: `${ACCENT}15`, border: `1px solid ${ACCENT}25` }}>📋</div>
-              <p className="text-sm" style={{ color: '#94A3B8' }}>Aucune évaluation enregistrée pour ce trimestre</p>
+              <p className="text-sm text-ss-text-secondary">Aucune évaluation enregistrée pour ce trimestre</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -274,11 +274,11 @@ export default function CenseurDashboard() {
                   ? { bg: 'rgba(34,197,94,0.15)', color: '#22C55E', label: 'En cours' }
                   : exam.statut === 'planifie'
                   ? { bg: `rgba(129,140,248,0.18)`, color: ACCENT, label: 'Planifié' }
-                  : { bg: 'rgba(100,116,139,0.15)', color: '#94A3B8', label: 'Terminé' }
+                  : { bg: 'rgba(100,116,139,0.15)', color: 'var(--ss-text-muted)', label: 'Terminé' }
                 return (
                   <Link key={exam.id} href="/censeur/examens"
                     className="flex items-start gap-3 p-4 rounded-xl transition-all hover:-translate-y-0.5 hover:shadow-md"
-                    style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                    style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-border)' }}>
                     <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
                       style={{ background: `${statusStyle.color}18` }}
                       aria-hidden="true">
@@ -286,11 +286,11 @@ export default function CenseurDashboard() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
-                        <p className="text-sm font-bold text-white">{exam.titre}</p>
+                        <p className="text-sm font-bold text-ss-text">{exam.titre}</p>
                         <span className="px-2.5 py-1 rounded-lg text-xs font-bold shrink-0"
                           style={{ background: statusStyle.bg, color: statusStyle.color }}>{statusStyle.label}</span>
                       </div>
-                      <p className="text-xs text-slate-400 mt-1">
+                      <p className="text-xs text-ss-text-muted mt-1">
                         {exam.salle} · {new Date(exam.date_debut).toLocaleDateString('fr-FR')}
                         {exam.date_debut !== exam.date_fin && ` → ${new Date(exam.date_fin).toLocaleDateString('fr-FR')}`}
                       </p>
@@ -304,7 +304,7 @@ export default function CenseurDashboard() {
 
         {/* Navigation rapide */}
         <div className="rounded-2xl p-6" style={CARD}>
-          <h2 className="text-lg font-bold text-white mb-5 flex items-center gap-2">
+          <h2 className="text-lg font-bold text-ss-text mb-5 flex items-center gap-2">
             <Zap size={18} style={{ color: ACCENT }} aria-hidden="true" /> Navigation rapide
           </h2>
           <div className="space-y-3">
@@ -315,7 +315,7 @@ export default function CenseurDashboard() {
               { href: '/censeur/bulletins',     label: 'Bulletins à valider',  Icon: CheckCircle2,  color: '#38BDF8' },
             ].map((a, i) => (
               <Link key={i} href={a.href}
-                className="group flex items-center gap-3 p-4 rounded-xl transition-all hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617]"
+                className="group flex items-center gap-3 p-4 rounded-xl transition-all hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-ss-bg"
                 style={{ background: `${a.color}12`, border: `1px solid ${a.color}35` }}>
                 <span
                   className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
@@ -324,24 +324,24 @@ export default function CenseurDashboard() {
                 >
                   <a.Icon size={18} style={{ color: a.color }} />
                 </span>
-                <span className="text-sm font-semibold text-white">{a.label}</span>
-                <ChevronRight size={16} className="ml-auto text-slate-400 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                <span className="text-sm font-semibold text-ss-text">{a.label}</span>
+                <ChevronRight size={16} className="ml-auto text-ss-text-muted transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
               </Link>
             ))}
           </div>
 
           {/* Bulletins résumé */}
           {bulletinsData.length > 0 && (
-            <div className="mt-5 pt-5" style={{ borderTop: '1px solid rgba(255,255,255,0.09)' }}>
-              <p className="text-sm text-slate-300 font-semibold mb-3">Notes {trimestre} par classe</p>
+            <div className="mt-5 pt-5" style={{ borderTop: '1px solid var(--ss-border)' }}>
+              <p className="text-sm text-ss-text-secondary font-semibold mb-3">Notes {trimestre} par classe</p>
               <div className="space-y-2.5">
                 {bulletinsData.slice(0, 4).map(b => {
                   const pct = b.nb_bulletins > 0 ? Math.min(100, Math.round((b.valides / b.nb_bulletins) * 100)) : 0
                   const col = b.statut === 'valide' ? '#22C55E' : ACCENT
                   return (
                     <div key={b.id} className="flex items-center gap-2">
-                      <span className="text-xs font-semibold text-slate-300 w-24 truncate">{b.classe}</span>
-                      <div className="flex-1 h-2 rounded-full bg-white/10 overflow-hidden"
+                      <span className="text-xs font-semibold text-ss-text-secondary w-24 truncate">{b.classe}</span>
+                      <div className="flex-1 h-2 rounded-full bg-[var(--ss-border)] overflow-hidden"
                         role="progressbar"
                         aria-valuenow={pct}
                         aria-valuemin={0}

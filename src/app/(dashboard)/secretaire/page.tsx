@@ -1,220 +1,310 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
-import { createClient } from '@/lib/supabase/client'
+/**
+ * WAED #4 — Dashboard Secrétaire (Assistante de Direction).
+ * 4 sections en grille 2x2 :
+ *   1. 📋 Rapports & PV
+ *   2. 👁 Observations élèves
+ *   3. 💰 Traçabilité financière (lecture)
+ *   4. 📜 Bulletins & Attestations (workflow visa)
+ */
+
+import { useEffect, useMemo, useState } from 'react'
+import {
+  ClipboardList, Eye, Banknote, FileSignature,
+  CheckCircle2, AlertTriangle, Lock, Plus,
+} from 'lucide-react'
 import { useUser } from '@/hooks/useUser'
-import { useEcole } from '@/hooks/useEcole'
-import { StatCard } from '@/components/dashboard/StatCard'
-import Link from 'next/link'
-import { isDemoMode, DEMO_INSCRIPTIONS, DEMO_CERTIFICATS, DEMO_COURRIERS } from '@/lib/demo-data'
-import { relativeTime } from '@/lib/format'
+import { PageHeader } from '@/components/dashboard/PageHeader'
+import {
+  Rapports, Observations, Recus, Attestations,
+  type Rapport, type Observation, type RecuDemo, type Attestation as AttRow,
+} from '@/lib/demo/secretariat-store'
 
-const ACCENT = '#FF6D00'
-const CARD = { background: 'rgba(2,6,23,0.80)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.10)' }
+const TYPE_RAP_LABEL: Record<string, string> = {
+  reunion_equipe: 'Réunion équipe',
+  conseil_classe: 'Conseil de classe',
+  parent_direction: 'RDV parent / direction',
+  incident: 'Incident',
+  autre: 'Autre',
+}
 
-interface ActivityItem { text: string; time: string; type: string }
+const STATUT_RAP_STYLE: Record<string, string> = {
+  brouillon: 'border-ss-text/15 bg-ss-text/5 text-ss-text/60',
+  en_validation: 'border-amber-400/30 bg-amber-400/10 text-amber-200',
+  valide: 'border-emerald-400/30 bg-emerald-400/10 text-emerald-200',
+  archive: 'border-slate-400/20 bg-slate-400/5 text-ss-text-secondary',
+}
 
-export default function SecretaireDashboard() {
-  const { user, loading: userLoading } = useUser()
-  const { ecole } = useEcole()
-  const supabase = createClient()
-  const [stats, setStats] = useState({ inscriptions: 0, certificats: 0, dossiers: 0, courrier: 0 })
-  const [activite, setActivite] = useState<ActivityItem[]>([])
-  const [loading, setLoading] = useState(true)
+const TYPE_OBS_STYLE: Record<string, { dot: string; label: string }> = {
+  discipline:   { dot: '#F87171', label: '🛡 Discipline'    },
+  pedagogique:  { dot: '#22C55E', label: '📚 Pédagogique'   },
+  medical:      { dot: '#38BDF8', label: '🏥 Médical'       },
+  comportement: { dot: '#FBBF24', label: '🧠 Comportement'  },
+  famille:      { dot: '#A78BFA', label: '👪 Famille'        },
+  autre:        { dot: 'var(--ss-text-muted)', label: '· Autre'          },
+}
 
-  const loadDemoData = useCallback(() => {
-    if (!user) return
-    setStats({
-      inscriptions: DEMO_INSCRIPTIONS.length,
-      certificats: DEMO_CERTIFICATS.filter(c => c.statut === 'emis').length,
-      dossiers: DEMO_INSCRIPTIONS.filter(i => !i.dossier_complet).length,
-      courrier: DEMO_COURRIERS.filter(c => c.statut === 'en_attente').length,
-    })
-    setActivite([
-      { text: 'Certificat émis — Awa Diallo (Terminale S1)', time: 'il y a 20 min', type: 'cert' },
-      { text: 'Inscription validée — Fatou Ba (4ème A)', time: 'il y a 1h', type: 'insc' },
-      { text: 'Courrier reçu — MESRI Ministère', time: 'il y a 2h', type: 'courr' },
-      { text: 'Dossier incomplet — Moussa Sow', time: 'il y a 3h', type: 'warn' },
-      { text: "Attestation émise — Lamine Ndiaye (3ème A)", time: 'hier', type: 'cert' },
-    ])
-    setLoading(false)
-  }, [user])
+export default function SecretairePage() {
+  const { user, loading } = useUser()
 
-  const loadRealData = useCallback(async () => {
-    if (!user?.ecole_id) return
-    setLoading(true)
-    const ecoleId = user.ecole_id
-
-    const [elevesRes, elevesIncompletRes, notifsRes] = await Promise.all([
-      supabase.from('eleves')
-        .select('id', { count: 'exact', head: true })
-        .eq('ecole_id', ecoleId)
-        .eq('actif', true),
-      supabase.from('eleves')
-        .select('id', { count: 'exact', head: true })
-        .eq('ecole_id', ecoleId)
-        .eq('actif', true)
-        .is('photo_url', null),
-      (supabase.from('notifications') as any)
-        .select('id, titre, contenu, type_notif, created_at')
-        .eq('ecole_id', ecoleId)
-        .order('created_at', { ascending: false })
-        .limit(8),
-    ])
-
-    const totalEleves = elevesRes.count || 0
-    const dossiersIncomplets = elevesIncompletRes.count || 0
-    const notifs = (notifsRes.data || []) as any[]
-
-    setStats({
-      inscriptions: totalEleves,
-      certificats: notifs.filter(n => n.type_notif === 'certificat').length,
-      dossiers: dossiersIncomplets,
-      courrier: notifs.filter(n => n.type_notif === 'courrier' || n.type_notif === 'message').length,
-    })
-
-    const typeMap: Record<string, string> = {
-      note: 'cert', absence: 'warn', paiement: 'insc', message: 'courr',
-      certificat: 'cert', appel_valide: 'insc',
-    }
-    setActivite(notifs.slice(0, 6).map(n => ({
-      text: n.titre,
-      time: relativeTime(n.created_at),
-      type: typeMap[n.type_notif] || 'courr',
-    })))
-
-    setLoading(false)
-  }, [user, supabase])
+  const [rapports, setRapports] = useState<Rapport[]>([])
+  const [observations, setObservations] = useState<Observation[]>([])
+  const [recus, setRecus] = useState<RecuDemo[]>([])
+  const [attestations, setAttestations] = useState<AttRow[]>([])
 
   useEffect(() => {
     if (!user) return
-    if (isDemoMode()) {
-      loadDemoData()
-    } else {
-      loadRealData()
-    }
-  }, [user, loadDemoData, loadRealData])
+    setRapports(Rapports.list())
+    setObservations(Observations.list())
+    setRecus(Recus.list())
+    setAttestations(Attestations.list())
+  }, [user])
 
-  if (userLoading || loading) {
-    return (
-      <div className="space-y-6 p-6 animate-pulse">
-        <div className="h-40 rounded-2xl bg-white/5" />
-        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
-          {[...Array(4)].map((_, i) => <div key={i} className="h-32 rounded-2xl bg-white/5" />)}
-        </div>
-      </div>
-    )
+  const stats = useMemo(() => ({
+    pvEnAttente: rapports.filter(r => r.statut === 'en_validation').length,
+    obsCritique: observations.filter(o => o.gravite >= 4).length,
+    recusValides24h: recus.filter(r => r.valide_econome).length,
+    attestBloquees: attestations.filter(a => a.statut === 'bloquee').length,
+  }), [rapports, observations, recus, attestations])
+
+  if (loading) {
+    return <div className="space-y-3">{[...Array(4)].map((_, i) => <div key={i} className="h-32 rounded-2xl bg-ss-text/[0.03] ss-shimmer" />)}</div>
   }
 
-  const activityIcon: Record<string, string> = { cert: '📜', insc: '✅', courr: '📬', warn: '⚠️' }
-  const activityColor: Record<string, string> = { cert: ACCENT, insc: '#22C55E', courr: '#16A34A', warn: '#FBBF24' }
-
   return (
-    <div className="space-y-6 animate-fade-in pb-24 lg:pb-6">
+    <div className="space-y-5">
+      <PageHeader
+        title="Bureau de la Secrétaire — Assistante de Direction"
+        description="4 modules opérationnels : PV, observations, traçabilité financière, attestations."
+        icon={FileSignature}
+        accent="info"
+      />
 
-      {/* Bannière Hero */}
-      <div className="relative rounded-2xl overflow-hidden min-h-[160px] flex items-end"
-        style={{ background: `linear-gradient(135deg, rgba(2,6,23,0.95) 0%, rgba(40,15,0,0.88) 60%, rgba(2,6,23,0.95) 100%)`, border: `1px solid ${ACCENT}30`, backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
-        <div className="absolute inset-0"
-          style={{ background: `radial-gradient(ellipse at 70% 50%, ${ACCENT}18 0%, transparent 65%)` }} />
-        <div className="relative z-10 p-6 lg:p-8 w-full flex items-center justify-between">
-          <div>
-            <div className="flex items-center gap-4 mb-3">
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl"
-                style={{ background: `${ACCENT}25`, border: `1.5px solid ${ACCENT}50` }}>
-                📋
-              </div>
-              <div>
-                <h1 className="text-xl sm:text-2xl font-extrabold text-white">
-                  Bonjour, {user?.prenom} {user?.nom}
-                </h1>
-                <p className="text-base font-semibold mt-0.5" style={{ color: ACCENT }}>
-                  Secrétaire Général — {ecole?.nom ?? 'École'}
-                </p>
-              </div>
-            </div>
-            <p className="text-sm text-slate-300">
-              {new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-            </p>
-          </div>
-          <div className="flex gap-2 shrink-0">
-            <Link href="/secretaire/inscriptions"
-              className="px-3 py-2 lg:px-5 lg:py-2.5 rounded-xl text-xs lg:text-sm font-bold transition-all hover:opacity-85 min-h-[44px] flex items-center"
-              style={{ background: `${ACCENT}22`, border: `1px solid ${ACCENT}45`, color: ACCENT }}>
-              <span className="hidden sm:inline">+ Inscription</span>
-              <span className="sm:hidden">+</span>
-            </Link>
-            <Link href="/secretaire/certificats"
-              className="hidden lg:inline-flex px-5 py-2.5 rounded-xl text-sm font-bold text-white transition-all hover:opacity-85"
-              style={{ background: ACCENT, boxShadow: `0 4px 20px ${ACCENT}50` }}>
-              Émettre certificat
-            </Link>
-          </div>
-        </div>
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <Stat color="#FBBF24" icon={ClipboardList} label="PV à valider" value={stats.pvEnAttente} />
+        <Stat color="#F87171" icon={AlertTriangle} label="Observations critiques" value={stats.obsCritique} />
+        <Stat color="#22C55E" icon={CheckCircle2} label="Reçus validés Économe" value={stats.recusValides24h} />
+        <Stat color="#A78BFA" icon={Lock} label="Attestations bloquées" value={stats.attestBloquees} />
       </div>
 
-      {/* StatCards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <StatCard title="Élèves inscrits" value={stats.inscriptions} subtitle="total année" icon="📝" color="orange" href="/secretaire/inscriptions" delay={0} />
-        <StatCard title="Certificats émis" value={stats.certificats} subtitle="cette année" icon="📜" color="teal" href="/secretaire/certificats" delay={80} />
-        <StatCard title="Dossiers incomplets" value={stats.dossiers} subtitle="sans photo" icon="⚠️" color="gold" trend={stats.dossiers > 0 ? 'up' : undefined} href="/secretaire/dossiers" delay={160} />
-        <StatCard title="Messages reçus" value={stats.courrier} subtitle="non traités" icon="📬" color="red" href="/secretaire/courrier" delay={240} />
-      </div>
-
-      {/* Grille principale */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-
-        {/* Activité récente */}
-        <div className="xl:col-span-2 rounded-2xl p-6" style={CARD}>
-          <h2 className="text-lg font-bold text-white mb-5 flex items-center gap-2">
-            <span style={{ color: ACCENT }}>⏱</span> Activité récente
-          </h2>
-          {activite.length === 0 ? (
-            <div className="flex flex-col items-center py-8 text-center">
-              <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3 text-2xl" style={{ background: `${ACCENT}15`, border: `1px solid ${ACCENT}25` }}>📋</div>
-              <p className="text-sm" style={{ color: '#94A3B8' }}>Aucune activité récente</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {activite.map((a, i) => (
-                <div key={i} className="flex items-start gap-3 p-4 rounded-xl"
-                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
-                  <span className="text-xl mt-0.5">{activityIcon[a.type] || '📋'}</span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-white leading-snug">{a.text}</p>
-                    <p className="text-xs text-slate-400 mt-1">{a.time}</p>
-                  </div>
-                  <div className="w-2.5 h-2.5 rounded-full mt-1.5 shrink-0"
-                    style={{ background: activityColor[a.type] || ACCENT, boxShadow: `0 0 8px ${activityColor[a.type] || ACCENT}` }} />
+      <div className="grid gap-4 lg:grid-cols-2">
+        {/* 1. Rapports & PV */}
+        <Section
+          icon={ClipboardList}
+          title="Rapports & Comptes-rendus"
+          accent="#FBBF24"
+          actionLabel="Nouveau PV"
+          onAction={() => {
+            const r = Rapports.create({
+              type: 'reunion_equipe',
+              titre: 'Nouveau PV (à compléter)',
+              date_evenement: new Date().toISOString().slice(0, 10),
+              contenu_pv: '',
+              redige_par: `${user?.prenom} ${user?.nom}`,
+              statut: 'brouillon',
+            })
+            setRapports([r, ...rapports])
+          }}
+        >
+          <ul className="divide-y divide-ss-text/5">
+            {rapports.slice(0, 5).map(r => (
+              <li key={r.id} className="flex items-start gap-2 py-2.5">
+                <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-ss-text/5 text-[10px] font-bold text-ss-text/70">
+                  {TYPE_RAP_LABEL[r.type]?.charAt(0) ?? '?'}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold text-ss-text">{r.titre}</p>
+                  <p className="text-[11px] text-ss-text/50">
+                    {TYPE_RAP_LABEL[r.type] ?? r.type} · {r.date_evenement}
+                  </p>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Actions rapides */}
-        <div className="rounded-2xl p-6" style={CARD}>
-          <h2 className="text-lg font-bold text-white mb-5 flex items-center gap-2">
-            <span style={{ color: ACCENT }}>⚡</span> Actions rapides
-          </h2>
-          <div className="space-y-3">
-            {[
-              { href: '/secretaire/inscriptions', label: 'Gérer les inscriptions', icon: '📝', color: ACCENT },
-              { href: '/secretaire/certificats',  label: 'Émettre un certificat',  icon: '📜', color: '#16A34A' },
-              { href: '/secretaire/dossiers',     label: 'Dossiers administratifs', icon: '🗂', color: '#FBBF24' },
-              { href: '/secretaire/courrier',     label: 'Registre du courrier',   icon: '📬', color: '#22C55E' },
-            ].map((action, i) => (
-              <Link key={i} href={action.href}
-                className="flex items-center gap-3 p-4 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
-                style={{ background: `${action.color}12`, border: `1px solid ${action.color}35` }}>
-                <span className="text-2xl">{action.icon}</span>
-                <span className="text-sm font-semibold text-white">{action.label}</span>
-                <span className="ml-auto text-slate-400 text-lg">›</span>
-              </Link>
+                <span className={`rounded-md border px-2 py-0.5 text-[10px] font-bold ${STATUT_RAP_STYLE[r.statut]}`}>
+                  {r.statut.replace('_', ' ')}
+                </span>
+              </li>
             ))}
-          </div>
+          </ul>
+        </Section>
+
+        {/* 2. Observations élèves */}
+        <Section icon={Eye} title="Observations élèves" accent="#F87171">
+          <ul className="divide-y divide-ss-text/5">
+            {observations.slice(0, 5).map(o => {
+              const style = TYPE_OBS_STYLE[o.type] ?? TYPE_OBS_STYLE.autre
+              return (
+                <li key={o.id} className="flex items-start gap-2 py-2.5">
+                  <span className="mt-1 h-2 w-2 shrink-0 rounded-full" style={{ background: style.dot }} aria-hidden />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-bold text-ss-text">{o.eleve_nom}</p>
+                    <p className="line-clamp-2 text-[11px] text-ss-text/70">{o.contenu}</p>
+                    <p className="mt-0.5 text-[10px] text-ss-text/50">
+                      {style.label} · {o.source_role} · {'★'.repeat(o.gravite)}
+                    </p>
+                  </div>
+                </li>
+              )
+            })}
+          </ul>
+        </Section>
+
+        {/* 3. Traçabilité financière */}
+        <Section icon={Banknote} title="Traçabilité financière (lecture seule)" accent="#22C55E">
+          <ul className="divide-y divide-ss-text/5">
+            {recus.slice(0, 5).map(r => (
+              <li key={r.id} className="flex items-start gap-2 py-2.5">
+                <span
+                  className={[
+                    'mt-1 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[9px] font-black',
+                    r.valide_econome
+                      ? 'bg-emerald-500 text-ss-text'
+                      : 'border border-amber-400 text-amber-300',
+                  ].join(' ')}
+                  aria-label={r.valide_econome ? 'Validé Économe' : 'En attente'}
+                >
+                  {r.valide_econome ? '✓' : '…'}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-ss-text">{r.eleve_nom}</p>
+                  <p className="text-[11px] text-ss-text/60">
+                    {r.matricule} · {r.montant.toLocaleString('fr-SN')} F · {methodeLabel(r.methode)}
+                  </p>
+                </div>
+                <span
+                  className={[
+                    'shrink-0 rounded-md border px-1.5 py-0.5 text-[10px] font-bold',
+                    r.methode === 'especes'
+                      ? 'border-amber-400/30 bg-amber-400/10 text-amber-200'
+                      : 'border-cyan-400/30 bg-cyan-400/10 text-cyan-200',
+                  ].join(' ')}
+                >
+                  {r.methode === 'especes' ? '🏛 Caisse' : '📱 Mobile'}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </Section>
+
+        {/* 4. Bulletins & Attestations */}
+        <Section icon={FileSignature} title="Bulletins & Attestations" accent="#A78BFA">
+          <ul className="divide-y divide-ss-text/5">
+            {attestations.slice(0, 6).map(a => (
+              <li key={a.id} className="flex items-start gap-2 py-2.5">
+                <StatutBadge statut={a.statut} />
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-ss-text">{a.eleve_nom}</p>
+                  <p className="text-[11px] text-ss-text/60">
+                    Attestation de {a.type}{a.matricule ? ` · ${a.matricule}` : ''}
+                  </p>
+                </div>
+                {a.statut === 'demandee' && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const updated = Attestations.delivrer(a.id)
+                      if (updated) setAttestations(Attestations.list())
+                    }}
+                    className="shrink-0 rounded-md bg-purple-500 px-2 py-1 text-[10px] font-bold text-ss-text hover:bg-purple-400"
+                  >
+                    Délivrer
+                  </button>
+                )}
+                {a.statut === 'bloquee' && (
+                  <span className="shrink-0 inline-flex items-center gap-1 rounded-md border border-red-400/30 bg-red-400/10 px-2 py-1 text-[10px] font-bold text-red-300">
+                    <Lock className="h-3 w-3" aria-hidden /> Reçu non validé
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-3 rounded-lg border border-amber-400/20 bg-amber-400/5 px-3 py-2 text-[11px] text-amber-200">
+            ⚠️ Une attestation reste « bloquée » tant que le reçu de paiement n'a pas été validé par l'Économe.
+          </p>
+        </Section>
+      </div>
+    </div>
+  )
+}
+
+function Stat({
+  color, icon: Icon, label, value,
+}: { color: string; icon: typeof CheckCircle2; label: string; value: number }) {
+  return (
+    <div
+      className="glass-card rounded-2xl border p-3"
+      style={{ borderColor: `${color}33`, background: `${color}10` }}
+    >
+      <div className="flex items-center gap-2">
+        <span className="flex h-8 w-8 items-center justify-center rounded-lg" style={{ background: `${color}25`, color }}>
+          <Icon className="h-4 w-4" aria-hidden />
+        </span>
+        <div className="min-w-0">
+          <p className="text-[11px] uppercase tracking-wider text-ss-text/60">{label}</p>
+          <p className="text-lg font-black text-ss-text">{value}</p>
         </div>
       </div>
     </div>
   )
+}
+
+function Section({
+  icon: Icon, title, accent, actionLabel, onAction, children,
+}: {
+  icon: typeof CheckCircle2
+  title: string
+  accent: string
+  actionLabel?: string
+  onAction?: () => void
+  children: React.ReactNode
+}) {
+  return (
+    <section
+      className="glass-card rounded-2xl border p-4"
+      style={{ borderColor: `${accent}28`, background: `${accent}07` }}
+    >
+      <header className="mb-3 flex items-center justify-between gap-2">
+        <h2 className="inline-flex items-center gap-2 text-sm font-bold text-ss-text">
+          <span className="flex h-7 w-7 items-center justify-center rounded-md" style={{ background: `${accent}20`, color: accent }}>
+            <Icon className="h-4 w-4" aria-hidden />
+          </span>
+          {title}
+        </h2>
+        {actionLabel && (
+          <button
+            type="button"
+            onClick={onAction}
+            className="inline-flex items-center gap-1 rounded-md border border-ss-text/15 bg-ss-text/10 px-2 py-1 text-[11px] font-semibold text-ss-text hover:bg-ss-text/20"
+          >
+            <Plus className="h-3 w-3" aria-hidden /> {actionLabel}
+          </button>
+        )}
+      </header>
+      {children}
+    </section>
+  )
+}
+
+function StatutBadge({ statut }: { statut: AttRow['statut'] }) {
+  const map: Record<string, { color: string; label: string; emoji: string }> = {
+    demandee: { color: '#FBBF24', label: 'En attente', emoji: '🟡' },
+    bloquee:  { color: '#F87171', label: 'Bloquée',    emoji: '🔴' },
+    delivree: { color: '#22C55E', label: 'Délivrée',   emoji: '🟢' },
+    annulee:  { color: 'var(--ss-text-muted)', label: 'Annulée',    emoji: '⚫' },
+  }
+  const s = map[statut]
+  return (
+    <span
+      className="mt-0.5 inline-flex shrink-0 items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] font-bold"
+      style={{ borderColor: `${s.color}50`, background: `${s.color}15`, color: s.color }}
+    >
+      {s.emoji} {s.label}
+    </span>
+  )
+}
+
+function methodeLabel(m: RecuDemo['methode']) {
+  const map: Record<string, string> = {
+    wave: 'Wave', orange_money: 'Orange Money', mtn_momo: 'MTN MoMo', especes: 'Espèces',
+  }
+  return map[m] ?? m
 }

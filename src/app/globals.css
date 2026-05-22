@@ -3,17 +3,24 @@
 @import "shadcn/tailwind.css";
 
 /* ═══════════════════════════════════════════════
-   Design System v2.0
+   Design System v2.0 — thème clair/sombre commutable
    ═══════════════════════════════════════════════ */
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
   /* ===== SmartSchool SN — Design System v2.0 ===== */
+  /*
+   * Les tokens semantiques (fond / texte / bordure) referencent des
+   * variables CSS commutables (--ss-*) definies plus bas dans :root
+   * (theme clair) et .dark (theme sombre). Les utilitaires Tailwind
+   * bg-ss-bg / text-ss-text / border-ss-border basculent donc
+   * automatiquement selon le theme actif.
+   */
 
   /* ── Core Backgrounds ── */
-  --color-ss-bg:           #020617;
-  --color-ss-bg-secondary: #0F172A;
-  --color-ss-bg-card:      #1E293B;
+  --color-ss-bg:           var(--ss-bg);
+  --color-ss-bg-secondary: var(--ss-bg-secondary);
+  --color-ss-bg-card:      var(--ss-bg-card);
 
   /* ── Accent Colors (Professional SaaS Palette) ── */
   --color-ss-green:  #22C55E;
@@ -23,13 +30,13 @@
   --color-ss-purple: #A78BFA;
 
   /* ── Typography ── */
-  --color-ss-text:           #F8FAFC;
-  --color-ss-text-secondary: #94A3B8;
-  --color-ss-text-muted:     #64748B;
-  --color-ss-text-disabled:  #475569;
+  --color-ss-text:           var(--ss-text);
+  --color-ss-text-secondary: var(--ss-text-secondary);
+  --color-ss-text-muted:     var(--ss-text-muted);
+  --color-ss-text-disabled:  var(--ss-text-disabled);
 
   /* ── Borders ── */
-  --color-ss-border: #1E293B;
+  --color-ss-border: var(--ss-border);
 
   /* ── Senegal Flag (Branding Only) ── */
   --sn-green:  #00853F;
@@ -95,7 +102,103 @@
 .border-sn-yellow { border-color: #FDEF42; }
 .border-sn-red    { border-color: #E31B23; }
 
+/* ═══════════════════════════════════════════════
+   THEMES — Clair (:root) & Sombre (.dark)
+   Bascule via next-themes (attribut class sur <html>).
+   Theme par defaut : sombre.
+   ═══════════════════════════════════════════════ */
+
+/* ── THEME CLAIR (defaut :root) ── */
 :root {
+  --radius: 0.75rem;
+
+  /* Tokens semantiques SmartSchool */
+  --ss-bg:            #FFFFFF;
+  --ss-bg-secondary:  #F4F4F5;
+  --ss-bg-card:       #FAFAFA;
+  --ss-text:          #09090B;
+  --ss-text-secondary:#52525B;
+  --ss-text-muted:    #71717A;
+  --ss-text-disabled: #A1A1AA;
+  --ss-border:        rgba(0,0,0,0.08);
+
+  /* Surfaces glass / effets — variantes claires */
+  --ss-glass-bg:        rgba(255,255,255,0.72);
+  --ss-glass-dark-bg:   rgba(244,244,245,0.85);
+  --ss-glass-border:    rgba(0,0,0,0.08);
+  --ss-glass-card-bg:   rgba(0,0,0,0.025);
+  --ss-glass-card-hover:rgba(0,0,0,0.05);
+  --ss-surface:         #FAFAFA;
+  --ss-surface-elevated:#FFFFFF;
+  --ss-shimmer-base:      rgba(0,0,0,0.04);
+  --ss-shimmer-highlight: rgba(0,0,0,0.08);
+  --ss-scrollbar:       #D4D4D8;
+  --ss-scrollbar-hover: #A1A1AA;
+  --ss-hover-shadow:    rgba(0,0,0,0.12);
+  --ss-overlay:         rgba(0,0,0,0.5);
+
+  /* shadcn — valeurs claires */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.15 0 0);
+  --card: oklch(0.99 0 0);
+  --card-foreground: oklch(0.15 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.15 0 0);
+  --primary: oklch(0.62 0.19 150);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.96 0.005 250);
+  --secondary-foreground: oklch(0.2 0 0);
+  --muted: oklch(0.96 0.005 250);
+  --muted-foreground: oklch(0.45 0 0);
+  --accent: oklch(0.96 0.005 250);
+  --accent-foreground: oklch(0.2 0 0);
+  --destructive: oklch(0.6 0.25 25);
+  --border: oklch(0.92 0.004 250);
+  --input: oklch(0.92 0.004 250);
+  --ring: oklch(0.62 0.19 150);
+  --chart-1: oklch(0.62 0.19 150);
+  --chart-2: oklch(0.62 0.15 200);
+  --chart-3: oklch(0.65 0.15 55);
+  --chart-4: oklch(0.6 0.25 25);
+  --chart-5: oklch(0.6 0.18 290);
+  --sidebar: oklch(0.98 0.003 250);
+  --sidebar-foreground: oklch(0.25 0 0);
+  --sidebar-primary: oklch(0.62 0.19 150);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.95 0.005 250);
+  --sidebar-accent-foreground: oklch(0.25 0 0);
+  --sidebar-border: oklch(0.92 0.004 250);
+  --sidebar-ring: oklch(0.62 0.19 150);
+}
+
+/* ── THEME SOMBRE (.dark — defaut applique par next-themes) ── */
+.dark {
+  /* Tokens semantiques SmartSchool */
+  --ss-bg:            #020617;
+  --ss-bg-secondary:  #0F172A;
+  --ss-bg-card:       #1E293B;
+  --ss-text:          #F8FAFC;
+  --ss-text-secondary:#94A3B8;
+  --ss-text-muted:    #64748B;
+  --ss-text-disabled: #475569;
+  --ss-border:        #1E293B;
+
+  /* Surfaces glass / effets — variantes sombres (valeurs historiques) */
+  --ss-glass-bg:        rgba(15,23,42,0.60);
+  --ss-glass-dark-bg:   rgba(2,6,23,0.85);
+  --ss-glass-border:    rgba(255,255,255,0.06);
+  --ss-glass-card-bg:   rgba(255,255,255,0.04);
+  --ss-glass-card-hover:rgba(255,255,255,0.06);
+  --ss-surface:         #0F172A;
+  --ss-surface-elevated:#1E293B;
+  --ss-shimmer-base:      rgba(255,255,255,0.03);
+  --ss-shimmer-highlight: rgba(255,255,255,0.08);
+  --ss-scrollbar:       #1E293B;
+  --ss-scrollbar-hover: #334155;
+  --ss-hover-shadow:    rgba(0,0,0,0.3);
+  --ss-overlay:         rgba(2,6,23,0.8);
+
+  /* shadcn — valeurs sombres (historiques) */
   --background: oklch(0.06 0.01 250);
   --foreground: oklch(0.97 0 0);
   --card: oklch(0.1 0.015 250);
@@ -119,7 +222,6 @@
   --chart-3: oklch(0.75 0.15 55);
   --chart-4: oklch(0.6 0.25 25);
   --chart-5: oklch(0.7 0.18 290);
-  --radius: 0.75rem;
   --sidebar: oklch(0.08 0.015 250);
   --sidebar-foreground: oklch(0.85 0 0);
   --sidebar-primary: oklch(0.72 0.19 150);
@@ -145,16 +247,18 @@
   html {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     scroll-behavior: smooth;
+    /* Transition fluide lors de la bascule de theme */
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
-  /* ── Scrollbar ── */
+  /* ── Scrollbar (commutable selon le theme) ── */
   ::-webkit-scrollbar { width: 5px; height: 5px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb {
-    background: #1E293B;
+    background: var(--ss-scrollbar);
     border-radius: 99px;
   }
-  ::-webkit-scrollbar-thumb:hover { background: #334155; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--ss-scrollbar-hover); }
 }
 
 /* ═══════════════════════════════════════════════
@@ -224,42 +328,42 @@
 
 /* Standard glass card — for most cards */
 .glass {
-  background: rgba(15, 23, 42, 0.60);
+  background: var(--ss-glass-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--ss-glass-border);
 }
 
 /* Darker glass — for navbars, overlays */
 .glass-dark {
-  background: rgba(2, 6, 23, 0.85);
+  background: var(--ss-glass-dark-bg);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--ss-glass-border);
 }
 
 /* Glass card with hover interaction */
 .glass-card {
-  background: rgba(15, 23, 42, 0.50);
+  background: var(--ss-glass-card-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--ss-glass-border);
   transition: all 0.2s ease-out;
 }
 .glass-card:hover {
-  background: rgba(15, 23, 42, 0.70);
-  border-color: rgba(255, 255, 255, 0.10);
+  background: var(--ss-glass-card-hover);
+  border-color: var(--ss-glass-border);
   transform: translateY(-2px);
 }
 
 /* Surface — solid elevated cards */
 .surface {
-  background: #0F172A;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--ss-surface);
+  border: 1px solid var(--ss-glass-border);
 }
 .surface-elevated {
-  background: #1E293B;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--ss-surface-elevated);
+  border: 1px solid var(--ss-glass-border);
 }
 
 /* ═══════════════════════════════════════════════
@@ -362,9 +466,9 @@
 .ss-shimmer {
   background: linear-gradient(
     90deg,
-    rgba(255,255,255,0.03) 25%,
-    rgba(255,255,255,0.08) 50%,
-    rgba(255,255,255,0.03) 75%
+    var(--ss-shimmer-base) 25%,
+    var(--ss-shimmer-highlight) 50%,
+    var(--ss-shimmer-base) 75%
   );
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
@@ -385,7 +489,7 @@
 }
 .hover-lift:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+  box-shadow: 0 12px 32px var(--ss-hover-shadow);
 }
 
 /* Scrollbar hide (Firefox + IE + WebKit) */
@@ -412,8 +516,8 @@
 
 /* Glass card utility — pattern unifié */
 .glass-card {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--ss-glass-card-bg);
+  border: 1px solid var(--ss-glass-border);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-radius: 1rem;
@@ -422,116 +526,26 @@
   transition: background 0.2s ease, border-color 0.2s ease;
 }
 .glass-card-hover:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.12);
+  background: var(--ss-glass-card-hover);
+  border-color: var(--ss-glass-border);
 }
 
 /* Pilier cards — glassmorphism */
 .pilier-card {
-  background: rgba(15, 23, 42, 0.50);
+  background: var(--ss-glass-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--ss-glass-border);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .pilier-card:hover {
-  background: rgba(15, 23, 42, 0.70);
-  border-color: rgba(255, 255, 255, 0.10);
+  background: var(--ss-glass-dark-bg);
+  border-color: var(--ss-glass-border);
   transform: translateY(-4px);
-  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 16px 32px var(--ss-hover-shadow);
 }
 
-/* ══════════════════════════════════════════
-   MODE VIDÉO PARENT — Glassmorphisme total
-   ══════════════════════════════════════════ */
-.parent-video-mode {
-  background: transparent !important;
-}
 
-.parent-video-mode > aside {
-  background: rgba(2, 6, 23, 0.65) !important;
-  backdrop-filter: blur(24px) !important;
-  -webkit-backdrop-filter: blur(24px) !important;
-  border-right: 1px solid rgba(56, 189, 248, 0.10) !important;
-  margin: 0 !important;
-  padding-left: 0 !important;
-}
-
-.parent-video-mode > div > header,
-.parent-video-mode > div > nav,
-.parent-video-mode > div > div:first-child {
-  background: rgba(2, 6, 23, 0.55) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  border-bottom: 1px solid rgba(56, 189, 248, 0.06) !important;
-}
-
-.parent-video-mode > div > main {
-  background: transparent !important;
-}
-
-.parent-video-mode > div > main::-webkit-scrollbar { width: 4px; }
-.parent-video-mode > div > main::-webkit-scrollbar-track { background: transparent; }
-.parent-video-mode > div > main::-webkit-scrollbar-thumb {
-  background: rgba(56, 189, 248, 0.15);
-  border-radius: 10px;
-}
-.parent-video-mode > div > main::-webkit-scrollbar-thumb:hover {
-  background: rgba(56, 189, 248, 0.25);
-}
-
-/* ══════════════════════════════════════════
-   MODE VIDÉO — Cards dans les dashboards
-   ══════════════════════════════════════════ */
-[data-dashboard][style*="transparent"] main .rounded-2xl,
-[data-dashboard][style*="transparent"] main .rounded-xl {
-  background-color: rgba(2, 6, 23, 0.78) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  border-color: rgba(255, 255, 255, 0.06) !important;
-}
-
-[data-dashboard][style*="transparent"] main .grid .rounded-2xl,
-[data-dashboard][style*="transparent"] main .grid .rounded-xl {
-  background-color: rgba(2, 6, 23, 0.85) !important;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35) !important;
-}
-
-[data-dashboard][style*="transparent"] main .relative.rounded-2xl.overflow-hidden {
-  background-color: rgba(2, 6, 23, 0.70) !important;
-  backdrop-filter: blur(24px) !important;
-  -webkit-backdrop-filter: blur(24px) !important;
-}
-
-[data-dashboard][style*="transparent"] main input,
-[data-dashboard][style*="transparent"] main select {
-  background-color: rgba(2, 6, 23, 0.90) !important;
-}
-
-[data-dashboard][style*="transparent"] main .rounded-full {
-  background-color: unset !important;
-  backdrop-filter: unset !important;
-  -webkit-backdrop-filter: unset !important;
-  border-color: unset !important;
-  box-shadow: unset !important;
-}
-
-/* ══════════════════════════════════════════
-   VIDEO CONTROLS HIDE
-   ══════════════════════════════════════════ */
-video::-webkit-media-controls,
-video::-webkit-media-controls-enclosure,
-video::-webkit-media-controls-panel,
-video::-webkit-media-controls-play-button,
-video::-webkit-media-controls-start-playback-button,
-video::-webkit-media-controls-overlay-play-button {
-  display: none !important;
-  -webkit-appearance: none !important;
-  opacity: 0 !important;
-}
-video {
-  -webkit-media-controls: none;
-}
 
 /* ═══════════════════════════════════════
    REDUCED MOTION PREFERENCES
@@ -600,52 +614,5 @@ video {
     page-break-inside: avoid;
     margin-bottom: 16px;
   }
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   VIDEO GLASS — Glassmorphisme dashboard avec vidéo fond
-   Activé par la classe .video-glass-active sur [data-dashboard]
-   Remplace l'approche JS MutationObserver (trop coûteuse)
-   ═══════════════════════════════════════════════════════════════ */
-
-[data-dashboard].video-glass-active {
-  background: transparent !important;
-}
-
-[data-dashboard].video-glass-active > aside {
-  background: rgba(2, 6, 23, 0.65) !important;
-  backdrop-filter: blur(24px) !important;
-  -webkit-backdrop-filter: blur(24px) !important;
-  border-right: 1px solid color-mix(in srgb, var(--glass-accent, #22C55E) 12%, transparent) !important;
-  box-shadow: 4px 0 32px rgba(0,0,0,0.4) !important;
-}
-
-[data-dashboard].video-glass-active > div {
-  background: transparent !important;
-}
-
-[data-dashboard].video-glass-active nav:first-child,
-[data-dashboard].video-glass-active header:first-child {
-  background: rgba(2, 6, 23, 0.55) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  border-bottom: 1px solid color-mix(in srgb, var(--glass-accent, #22C55E) 8%, transparent) !important;
-}
-
-[data-dashboard].video-glass-active main {
-  background: transparent !important;
-}
-
-/* Cartes glass dans main — ciblage CSS pur, pas de JS */
-[data-dashboard].video-glass-active main .rounded-2xl:not(button):not(a):not(input):not(select) {
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-}
-
-/* Inputs dans main → fond opaque pour lisibilité */
-[data-dashboard].video-glass-active main input,
-[data-dashboard].video-glass-active main select,
-[data-dashboard].video-glass-active main textarea {
-  background-color: rgba(2, 6, 23, 0.92) !important;
 }
 

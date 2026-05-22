@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState, useMemo } from 'react'
 import { useUser } from '@/hooks/useUser'
@@ -92,19 +92,19 @@ export default function SurveillantExportPage() {
   }
 
   if (userLoading) {
-    return <div className="space-y-4">{[...Array(3)].map((_, i) => <div key={i} className="h-28 rounded-2xl ss-shimmer" style={{ background: 'rgba(255,255,255,0.03)' }} />)}</div>
+    return <div className="space-y-4">{[...Array(3)].map((_, i) => <div key={i} className="h-28 rounded-2xl ss-shimmer" style={{ background: 'var(--ss-glass-card-bg)' }} />)}</div>
   }
 
   return (
     <div className="space-y-5 pb-6 animate-fade-in">
       {/* Header */}
-      <h1 className="text-2xl font-black text-white">Export Rapports</h1>
+      <h1 className="text-2xl font-black text-ss-text">Export Rapports</h1>
 
       {/* Controls */}
-      <div className="rounded-2xl p-5 space-y-4" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+      <div className="rounded-2xl p-5 space-y-4" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
         {/* Type toggle */}
         <div>
-          <label className="text-xs font-bold uppercase tracking-wider block mb-2" style={{ color: '#94A3B8' }}>Type de rapport</label>
+          <label className="text-xs font-bold uppercase tracking-wider block mb-2" style={{ color: 'var(--ss-text-muted)' }}>Type de rapport</label>
           <div className="flex gap-2">
             {([
               { key: 'absences' as const, label: 'Absences eleves', icon: '📅' },
@@ -113,9 +113,9 @@ export default function SurveillantExportPage() {
               <button key={t.key} onClick={() => setExportType(t.key)}
                 className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all"
                 style={{
-                  background: exportType === t.key ? 'rgba(255,214,0,0.12)' : 'rgba(255,255,255,0.04)',
-                  color: exportType === t.key ? '#FBBF24' : '#94A3B8',
-                  border: `1px solid ${exportType === t.key ? 'rgba(255,214,0,0.3)' : 'rgba(255,255,255,0.08)'}`,
+                  background: exportType === t.key ? 'rgba(255,214,0,0.12)' : 'var(--ss-glass-card-bg)',
+                  color: exportType === t.key ? '#FBBF24' : 'var(--ss-text-muted)',
+                  border: `1px solid ${exportType === t.key ? 'rgba(255,214,0,0.3)' : 'var(--ss-glass-card-hover)'}`,
                 }}>
                 <span>{t.icon}</span> {t.label}
               </button>
@@ -126,26 +126,26 @@ export default function SurveillantExportPage() {
         {/* Date range */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label className="text-xs font-bold uppercase tracking-wider block mb-1.5" style={{ color: '#94A3B8' }}>Date debut</label>
+            <label className="text-xs font-bold uppercase tracking-wider block mb-1.5" style={{ color: 'var(--ss-text-muted)' }}>Date debut</label>
             <input type="date" value={dateDebut} onChange={e => setDateDebut(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl text-sm font-medium text-white outline-none transition-all"
-              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }} />
+              className="w-full px-3 py-2.5 rounded-xl text-sm font-medium text-ss-text outline-none transition-all"
+              style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-border)' }} />
           </div>
           <div>
-            <label className="text-xs font-bold uppercase tracking-wider block mb-1.5" style={{ color: '#94A3B8' }}>Date fin</label>
+            <label className="text-xs font-bold uppercase tracking-wider block mb-1.5" style={{ color: 'var(--ss-text-muted)' }}>Date fin</label>
             <input type="date" value={dateFin} onChange={e => setDateFin(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl text-sm font-medium text-white outline-none transition-all"
-              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }} />
+              className="w-full px-3 py-2.5 rounded-xl text-sm font-medium text-ss-text outline-none transition-all"
+              style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-border)' }} />
           </div>
         </div>
 
         {/* Classe filter (absences only) */}
         {exportType === 'absences' && (
           <div>
-            <label className="text-xs font-bold uppercase tracking-wider block mb-1.5" style={{ color: '#94A3B8' }}>Classe</label>
+            <label className="text-xs font-bold uppercase tracking-wider block mb-1.5" style={{ color: 'var(--ss-text-muted)' }}>Classe</label>
             <select value={classeFilter} onChange={e => setClasseFilter(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl text-sm font-medium text-white outline-none"
-              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+              className="w-full px-3 py-2.5 rounded-xl text-sm font-medium text-ss-text outline-none"
+              style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-border)' }}>
               <option value="all">Toutes les classes</option>
               {DEMO_CLASSES.map(c => (
                 <option key={c.id} value={c.id}>{c.niveau} {c.nom}</option>
@@ -156,49 +156,49 @@ export default function SurveillantExportPage() {
       </div>
 
       {/* Preview */}
-      <div className="rounded-2xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+      <div className="rounded-2xl p-5" style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-bold text-[#94A3B8] uppercase tracking-wider">Apercu</h2>
+          <h2 className="text-sm font-bold text-[var(--ss-text-muted)] uppercase tracking-wider">Apercu</h2>
           <span className="text-xs px-2 py-1 rounded-full" style={{ background: 'rgba(255,214,0,0.1)', color: '#FBBF24', border: '1px solid rgba(255,214,0,0.2)' }}>
             {currentData.length} enregistrement(s)
           </span>
         </div>
 
         {currentData.length === 0 ? (
-          <p className="text-sm text-center py-6" style={{ color: '#475569' }}>Aucune donnee pour cette periode</p>
+          <p className="text-sm text-center py-6" style={{ color: 'var(--ss-text-disabled)' }}>Aucune donnee pour cette periode</p>
         ) : (
           <div className="overflow-x-auto scrollbar-hide">
             <table className="w-full text-xs min-w-[500px]">
               <thead>
-                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+                <tr style={{ borderBottom: '1px solid var(--ss-glass-card-hover)' }}>
                   {exportType === 'absences' ? (
                     <>
-                      <th className="py-2 px-2 text-left font-bold" style={{ color: '#475569' }}>Date</th>
-                      <th className="py-2 px-2 text-left font-bold" style={{ color: '#475569' }}>Eleve</th>
-                      <th className="py-2 px-2 text-left font-bold" style={{ color: '#475569' }}>Classe</th>
-                      <th className="py-2 px-2 text-left font-bold" style={{ color: '#475569' }}>Type</th>
-                      <th className="py-2 px-2 text-left font-bold" style={{ color: '#475569' }}>Justifiee</th>
+                      <th className="py-2 px-2 text-left font-bold" style={{ color: 'var(--ss-text-disabled)' }}>Date</th>
+                      <th className="py-2 px-2 text-left font-bold" style={{ color: 'var(--ss-text-disabled)' }}>Eleve</th>
+                      <th className="py-2 px-2 text-left font-bold" style={{ color: 'var(--ss-text-disabled)' }}>Classe</th>
+                      <th className="py-2 px-2 text-left font-bold" style={{ color: 'var(--ss-text-disabled)' }}>Type</th>
+                      <th className="py-2 px-2 text-left font-bold" style={{ color: 'var(--ss-text-disabled)' }}>Justifiee</th>
                     </>
                   ) : (
                     <>
-                      <th className="py-2 px-2 text-left font-bold" style={{ color: '#475569' }}>Date</th>
-                      <th className="py-2 px-2 text-left font-bold" style={{ color: '#475569' }}>Professeur</th>
-                      <th className="py-2 px-2 text-left font-bold" style={{ color: '#475569' }}>Heure</th>
-                      <th className="py-2 px-2 text-left font-bold" style={{ color: '#475569' }}>Statut</th>
-                      <th className="py-2 px-2 text-right font-bold" style={{ color: '#475569' }}>Min retard</th>
+                      <th className="py-2 px-2 text-left font-bold" style={{ color: 'var(--ss-text-disabled)' }}>Date</th>
+                      <th className="py-2 px-2 text-left font-bold" style={{ color: 'var(--ss-text-disabled)' }}>Professeur</th>
+                      <th className="py-2 px-2 text-left font-bold" style={{ color: 'var(--ss-text-disabled)' }}>Heure</th>
+                      <th className="py-2 px-2 text-left font-bold" style={{ color: 'var(--ss-text-disabled)' }}>Statut</th>
+                      <th className="py-2 px-2 text-right font-bold" style={{ color: 'var(--ss-text-disabled)' }}>Min retard</th>
                     </>
                   )}
                 </tr>
               </thead>
               <tbody>
                 {previewData.map((row: any, idx: number) => (
-                  <tr key={idx} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                  <tr key={idx} style={{ borderBottom: '1px solid var(--ss-glass-card-bg)' }}>
                     {exportType === 'absences' ? (
                       <>
-                        <td className="py-2 px-2 text-white">{row.date}</td>
-                        <td className="py-2 px-2 text-white">{row.eleve}</td>
-                        <td className="py-2 px-2" style={{ color: '#94A3B8' }}>{row.classe}</td>
-                        <td className="py-2 px-2" style={{ color: '#94A3B8' }}>{row.type}</td>
+                        <td className="py-2 px-2 text-ss-text">{row.date}</td>
+                        <td className="py-2 px-2 text-ss-text">{row.eleve}</td>
+                        <td className="py-2 px-2" style={{ color: 'var(--ss-text-muted)' }}>{row.classe}</td>
+                        <td className="py-2 px-2" style={{ color: 'var(--ss-text-muted)' }}>{row.type}</td>
                         <td className="py-2 px-2">
                           <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold"
                             style={{ background: row.justifiee === 'Oui' ? 'rgba(0,230,118,0.15)' : 'rgba(255,23,68,0.15)', color: row.justifiee === 'Oui' ? '#22C55E' : '#F87171' }}>
@@ -208,11 +208,11 @@ export default function SurveillantExportPage() {
                       </>
                     ) : (
                       <>
-                        <td className="py-2 px-2 text-white">{row.date}</td>
-                        <td className="py-2 px-2 text-white">{row.professeur}</td>
-                        <td className="py-2 px-2" style={{ color: '#94A3B8' }}>{row.heure}</td>
-                        <td className="py-2 px-2" style={{ color: '#94A3B8' }}>{row.statut}</td>
-                        <td className="py-2 px-2 text-right text-white">{row.minutes}</td>
+                        <td className="py-2 px-2 text-ss-text">{row.date}</td>
+                        <td className="py-2 px-2 text-ss-text">{row.professeur}</td>
+                        <td className="py-2 px-2" style={{ color: 'var(--ss-text-muted)' }}>{row.heure}</td>
+                        <td className="py-2 px-2" style={{ color: 'var(--ss-text-muted)' }}>{row.statut}</td>
+                        <td className="py-2 px-2 text-right text-ss-text">{row.minutes}</td>
                       </>
                     )}
                   </tr>
@@ -220,7 +220,7 @@ export default function SurveillantExportPage() {
               </tbody>
             </table>
             {currentData.length > 20 && (
-              <p className="text-[10px] text-center mt-2" style={{ color: '#475569' }}>
+              <p className="text-[10px] text-center mt-2" style={{ color: 'var(--ss-text-disabled)' }}>
                 ... et {currentData.length - 20} autre(s) enregistrement(s)
               </p>
             )}

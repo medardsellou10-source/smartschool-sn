@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState, useEffect } from 'react'
 import { toast } from 'react-hot-toast'
@@ -169,13 +169,13 @@ export default function ExportMinistrePage() {
                 </button>
                 <button
                   onClick={() => handleDownloadCSV(exp.id)}
-                  className="flex-1 px-3 py-2 text-xs font-medium rounded-lg bg-[#00853F] text-white hover:bg-[#006B32] transition-colors"
+                  className="flex-1 px-3 py-2 text-xs font-medium rounded-lg bg-[#00853F] text-ss-text hover:bg-[#006B32] transition-colors"
                 >
                   📥 CSV
                 </button>
                 <button
                   onClick={() => handleDownloadJSON(exp.id)}
-                  className="flex-1 px-3 py-2 text-xs font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+                  className="flex-1 px-3 py-2 text-xs font-medium rounded-lg bg-blue-600 text-ss-text hover:bg-blue-700 transition-colors"
                 >
                   📥 JSON
                 </button>

@@ -490,7 +490,7 @@ export default function SuiviGPSPage() {
               ) : (
                 feedItems.map(item => (
                   <div key={item.id} className="flex items-start gap-2 text-xs">
-                    <span className={`w-5 h-5 rounded-full ${item.color} flex items-center justify-center text-white text-[10px] shrink-0 mt-0.5`}>
+                    <span className={`w-5 h-5 rounded-full ${item.color} flex items-center justify-center text-ss-text text-[10px] shrink-0 mt-0.5`}>
                       {item.icon}
                     </span>
                     <div className="flex-1 min-w-0">

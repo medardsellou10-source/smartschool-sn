@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -188,7 +188,7 @@ export default function ProfesseurMessagesPage() {
   const selectedConvData = conversations.find(c => c.id === selectedConv)
 
   if (userLoading) {
-    return <div className="space-y-4">{[...Array(3)].map((_, i) => <div key={i} className="h-20 rounded-2xl ss-shimmer" style={{ background: 'rgba(255,255,255,0.03)' }} />)}</div>
+    return <div className="space-y-4">{[...Array(3)].map((_, i) => <div key={i} className="h-20 rounded-2xl ss-shimmer" style={{ background: 'var(--ss-glass-card-bg)' }} />)}</div>
   }
 
   return (
@@ -205,22 +205,22 @@ export default function ProfesseurMessagesPage() {
       <div className="flex gap-4 h-[calc(100%-80px)]">
         {/* Conversation list */}
         <div className={`${selectedConv ? 'hidden lg:block' : ''} w-full lg:w-80 shrink-0 rounded-2xl overflow-hidden flex flex-col`}
-          style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-          <div className="p-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-            <p className="text-xs font-bold uppercase tracking-wider" style={{ color: '#94A3B8' }}>Conversations</p>
+          style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
+          <div className="p-3" style={{ borderBottom: '1px solid var(--ss-glass-card-hover)' }}>
+            <p className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--ss-text-muted)' }}>Conversations</p>
           </div>
           <div className="flex-1 overflow-y-auto">
             {conversations.length === 0 ? (
               <div className="flex flex-col items-center py-10 text-center px-4">
                 <div className="text-3xl mb-3">💬</div>
-                <p className="text-sm" style={{ color: '#94A3B8' }}>Aucune conversation</p>
+                <p className="text-sm" style={{ color: 'var(--ss-text-muted)' }}>Aucune conversation</p>
               </div>
             ) : conversations.map(conv => (
               <button key={conv.id} onClick={() => setSelectedConv(conv.id)}
                 className="w-full text-left p-4 transition-all"
                 style={{
                   background: selectedConv === conv.id ? 'rgba(0,230,118,0.08)' : 'transparent',
-                  borderBottom: '1px solid rgba(255,255,255,0.04)',
+                  borderBottom: '1px solid var(--ss-glass-card-bg)',
                 }}>
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xs font-bold shrink-0"
@@ -229,14 +229,14 @@ export default function ProfesseurMessagesPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <p className="text-sm font-bold text-white truncate">{conv.parent_nom}</p>
+                      <p className="text-sm font-bold text-ss-text truncate">{conv.parent_nom}</p>
                       {conv.nonLu > 0 && (
                         <span className="w-5 h-5 rounded-full text-[9px] font-black flex items-center justify-center shrink-0"
                           style={{ background: '#22C55E', color: '#020617' }}>{conv.nonLu}</span>
                       )}
                     </div>
-                    <p className="text-[10px] mt-0.5" style={{ color: '#475569' }}>{conv.eleve_nom} · {conv.classe}</p>
-                    <p className="text-xs mt-1 truncate" style={{ color: '#94A3B8' }}>{conv.dernierMessage}</p>
+                    <p className="text-[10px] mt-0.5" style={{ color: 'var(--ss-text-disabled)' }}>{conv.eleve_nom} · {conv.classe}</p>
+                    <p className="text-xs mt-1 truncate" style={{ color: 'var(--ss-text-muted)' }}>{conv.dernierMessage}</p>
                   </div>
                 </div>
               </button>
@@ -246,26 +246,26 @@ export default function ProfesseurMessagesPage() {
 
         {/* Message thread */}
         <div className={`${!selectedConv ? 'hidden lg:flex' : 'flex'} flex-1 flex-col rounded-2xl overflow-hidden`}
-          style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
 
           {!selectedConv ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center px-6">
               <div className="text-4xl mb-4">💬</div>
-              <p className="text-white font-semibold">Selectionnez une conversation</p>
-              <p className="text-sm mt-1" style={{ color: '#94A3B8' }}>Choisissez un parent dans la liste</p>
+              <p className="text-ss-text font-semibold">Selectionnez une conversation</p>
+              <p className="text-sm mt-1" style={{ color: 'var(--ss-text-muted)' }}>Choisissez un parent dans la liste</p>
             </div>
           ) : (
             <>
               {/* Thread header */}
-              <div className="flex items-center gap-3 px-4 py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.02)' }}>
-                <button onClick={() => setSelectedConv(null)} className="lg:hidden text-white text-lg mr-1">&larr;</button>
+              <div className="flex items-center gap-3 px-4 py-3" style={{ borderBottom: '1px solid var(--ss-glass-card-hover)', background: 'var(--ss-glass-card-bg)' }}>
+                <button onClick={() => setSelectedConv(null)} className="lg:hidden text-ss-text text-lg mr-1">&larr;</button>
                 <div className="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold shrink-0"
                   style={{ background: 'rgba(0,230,118,0.1)', border: '1px solid rgba(0,230,118,0.2)', color: '#22C55E' }}>
                   {selectedConvData?.parent_nom.split(' ').map(n => n[0]).join('')}
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-white">{selectedConvData?.parent_nom}</p>
-                  <p className="text-[10px]" style={{ color: '#475569' }}>Parent de {selectedConvData?.eleve_nom} · {selectedConvData?.classe}</p>
+                  <p className="text-sm font-bold text-ss-text">{selectedConvData?.parent_nom}</p>
+                  <p className="text-[10px]" style={{ color: 'var(--ss-text-disabled)' }}>Parent de {selectedConvData?.eleve_nom} · {selectedConvData?.classe}</p>
                 </div>
               </div>
 
@@ -277,13 +277,13 @@ export default function ProfesseurMessagesPage() {
                     <div key={msg.id} className={`flex ${isProf ? 'justify-end' : 'justify-start'}`}>
                       <div className="max-w-[80%] px-4 py-2.5 rounded-2xl"
                         style={{
-                          background: isProf ? 'rgba(0,230,118,0.12)' : 'rgba(255,255,255,0.06)',
-                          border: `1px solid ${isProf ? 'rgba(0,230,118,0.25)' : 'rgba(255,255,255,0.1)'}`,
+                          background: isProf ? 'rgba(0,230,118,0.12)' : 'var(--ss-glass-card-hover)',
+                          border: `1px solid ${isProf ? 'rgba(0,230,118,0.25)' : 'var(--ss-glass-border)'}`,
                           borderBottomRightRadius: isProf ? '4px' : '16px',
                           borderBottomLeftRadius: isProf ? '16px' : '4px',
                         }}>
-                        <p className="text-sm text-white leading-relaxed">{msg.contenu}</p>
-                        <p className="text-[10px] mt-1" style={{ color: '#475569' }}>
+                        <p className="text-sm text-ss-text leading-relaxed">{msg.contenu}</p>
+                        <p className="text-[10px] mt-1" style={{ color: 'var(--ss-text-disabled)' }}>
                           {new Date(msg.date).toLocaleTimeString('fr-SN', { hour: '2-digit', minute: '2-digit' })}
                         </p>
                       </div>
@@ -294,15 +294,15 @@ export default function ProfesseurMessagesPage() {
               </div>
 
               {/* Compose */}
-              <div className="px-4 py-3 flex gap-2" style={{ borderTop: '1px solid rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.02)' }}>
+              <div className="px-4 py-3 flex gap-2" style={{ borderTop: '1px solid var(--ss-glass-card-hover)', background: 'var(--ss-glass-card-bg)' }}>
                 <input
                   type="text"
                   value={newMessage}
                   onChange={e => setNewMessage(e.target.value)}
                   onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() } }}
                   placeholder="Ecrire un message..."
-                  className="flex-1 px-4 py-2.5 rounded-xl text-sm text-white outline-none placeholder:text-[#475569]"
-                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
+                  className="flex-1 px-4 py-2.5 rounded-xl text-sm text-ss-text outline-none placeholder:text-[var(--ss-text-disabled)]"
+                  style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-border)' }}
                 />
                 <button onClick={handleSend} disabled={!newMessage.trim()}
                   className="px-4 py-2.5 rounded-xl text-sm font-bold transition-all hover:opacity-90 disabled:opacity-40 shrink-0"
