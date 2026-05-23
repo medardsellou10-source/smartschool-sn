@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo} from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { isDemoMode, DEMO_PROFESSEURS, DEMO_POINTAGES } from '@/lib/demo-data'
@@ -23,7 +23,7 @@ export default function ProfesseursCenseurPage() {
 
   useEffect(() => {
     if (!isDemoMode() || !user) return
-    const today = new Date().toISOString().split('T')[0]
+    const today = useMemo(() => new Date(), []).toISOString().split('T')[0]
     const matieres = ['Mathématiques', 'Français', 'SVT', 'Physique-Chimie', 'Histoire-Géo', 'Anglais', 'Arabe', 'EPS']
     const rows = DEMO_PROFESSEURS.map((p, i) => {
       const pointage = DEMO_POINTAGES.find(pt => pt.prof_id === p.id && pt.date_pointage === today)
@@ -42,9 +42,9 @@ export default function ProfesseursCenseurPage() {
 
   useEffect(() => {
     if (isDemoMode() || !user) return
-    const supabase = createClient()
+    const supabase = useMemo(() => createClient(), [])
     async function load() {
-      const today = new Date().toISOString().split('T')[0]
+      const today = useMemo(() => new Date(), []).toISOString().split('T')[0]
       const { data: profs } = await (supabase.from('utilisateurs') as any)
         .select('id, nom, prenom')
         .eq('ecole_id', (user as any).ecole_id)

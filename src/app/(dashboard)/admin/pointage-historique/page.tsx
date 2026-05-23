@@ -32,7 +32,7 @@ function downloadCSV(headers: string[], rows: string[][], filename: string) {
 
 export default function AdminPointageHistoriquePage() {
   const { user, loading: userLoading } = useUser()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   const [selectedMonth, setSelectedMonth] = useState(() => {
     const now = new Date()

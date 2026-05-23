@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useMemo} from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { GrilleNotes } from '@/components/notes/GrilleNotes'
@@ -46,7 +46,7 @@ function getCurrentTrimestre(): number {
 
 export default function NotesPage() {
   const { user, loading: userLoading } = useUser()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   // Sélections
   const [classes, setClasses] = useState<Classe[]>([])

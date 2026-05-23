@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useMemo} from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { useOffline } from '@/hooks/useOffline'
@@ -27,7 +27,7 @@ const ONBOARDING_KEY = 'ss_demo_parent_onboarded_v1'
 export default function ParentDashboard() {
   const { user, loading: userLoading } = useUser()
   const { isOffline, lastSync, cacheData, getCachedData } = useOffline()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   // WAED #7 — Guard de première connexion
   const [onboarded, setOnboarded] = useState<boolean | null>(null)

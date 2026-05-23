@@ -3,7 +3,6 @@ import { Navbar } from '@/components/layout/Navbar'
 import { BottomNav } from '@/components/layout/BottomNav'
 import { RealtimeNotif } from '@/components/dashboard/RealtimeNotif'
 import { RegisterSW } from '@/components/pwa/RegisterSW'
-import ChatWidget from '@/components/chat/ChatWidget'
 import { ImpersonationBanner } from '@/components/admin/ImpersonationBanner'
 
 // Pas de force-dynamic : le shell du dashboard est statique, seul le contenu est dynamique
@@ -21,7 +20,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </div>
       <RealtimeNotif />
       <RegisterSW />
-      <ChatWidget />
     </div>
   )
 }

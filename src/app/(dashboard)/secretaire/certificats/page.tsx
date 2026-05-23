@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo} from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { isDemoMode, DEMO_CERTIFICATS } from '@/lib/demo-data'
@@ -17,7 +17,7 @@ const TYPE_LABEL: Record<string, string> = {
 
 export default function CertificatsPage() {
   const { user, loading: userLoading } = useUser()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
   const [certificats, setCertificats] = useState<Certificat[]>([])
   const [loading, setLoading] = useState(true)
   const [toast, setToast] = useState<string | null>(null)

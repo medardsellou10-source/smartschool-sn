@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useRef, useCallback } from 'react'
+import { useEffect, useState, useRef, useCallback, useMemo} from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { isDemoMode } from '@/lib/demo-data'
@@ -54,7 +54,7 @@ const DEMO_MESSAGES: Record<string, Message[]> = {
 
 export default function ProfesseurMessagesPage() {
   const { user, loading: userLoading } = useUser()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [selectedConv, setSelectedConv] = useState<string | null>(null)

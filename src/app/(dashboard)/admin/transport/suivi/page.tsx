@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { useEffect, useState, useCallback, useRef, useMemo} from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { PageHeader } from '@/components/dashboard/PageHeader'
 import { MapPin } from 'lucide-react'
@@ -121,7 +121,7 @@ export default function SuiviGPSPage() {
   // ─── Load data ─────────────────────────────────────────────────────────────
 
   const loadData = useCallback(async () => {
-    const supabase = createClient()
+    const supabase = useMemo(() => createClient(), [])
 
     const [vehiculesRes, trajetsRes, arretsRes, positionsRes] = await Promise.all([
       (supabase.from('vehicules') as any).select('*').order('immatriculation'),
@@ -157,7 +157,7 @@ export default function SuiviGPSPage() {
   // ─── Supabase Realtime ─────────────────────────────────────────────────────
 
   useEffect(() => {
-    const supabase = createClient()
+    const supabase = useMemo(() => createClient(), [])
 
     const channel = supabase
       .channel('transport-gps')

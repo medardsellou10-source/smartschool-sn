@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo} from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { isDemoMode } from '@/lib/demo-data'
@@ -148,7 +148,7 @@ export default function AbonnementPage() {
       setLoading(false)
       return
     }
-    const supabase = createClient()
+    const supabase = useMemo(() => createClient(), [])
     async function load() {
       const [aboRes, plansRes] = await Promise.all([
         (supabase.from('abonnements') as any)

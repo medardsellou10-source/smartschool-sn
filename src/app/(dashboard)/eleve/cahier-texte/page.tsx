@@ -30,7 +30,7 @@ const DEMO_CAHIER: CahierItem[] = [
 
 export default function EleveCahierTextePage() {
   const { user, loading: userLoading } = useUser()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   const [items, setItems] = useState<CahierItem[]>([])
   const [loading, setLoading] = useState(true)

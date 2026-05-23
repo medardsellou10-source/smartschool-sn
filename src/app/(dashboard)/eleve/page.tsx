@@ -42,7 +42,7 @@ function getCurrentTrimestre() {
 
 export default function EleveDashboard() {
   const { user, loading: userLoading } = useUser()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   const [eleve, setEleve] = useState<EleveProfile | null>(null)
   const [moyenneGenerale, setMoyenneGenerale] = useState<number | null>(null)
@@ -198,7 +198,7 @@ export default function EleveDashboard() {
     return grouped
   }, [emploiTemps])
 
-  const today = new Date()
+  const today = useMemo(() => new Date(), [])
   const jourSemaine = today.getDay() === 0 ? 7 : today.getDay()
   const matiereColorMap = useMemo(() => {
     const map: Record<string, string> = {}

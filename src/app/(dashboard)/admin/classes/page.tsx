@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useMemo} from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { isDemoMode, DEMO_CLASSES, DEMO_PROFESSEURS, DEMO_ELEVES } from '@/lib/demo-data'
@@ -67,7 +67,7 @@ export default function ClassesPage() {
       return
     }
 
-    const supabase = createClient()
+    const supabase = useMemo(() => createClient(), [])
     const [classesRes, profsRes] = await Promise.all([
       (supabase.from('classes') as any)
         .select('*, eleves(count), utilisateurs!titulaire_id(nom, prenom)')
@@ -182,7 +182,7 @@ export default function ClassesPage() {
     }
 
     try {
-      const supabase = createClient()
+      const supabase = useMemo(() => createClient(), [])
       const payload = {
         ecole_id: ecoleId,
         nom: formNom.trim(),

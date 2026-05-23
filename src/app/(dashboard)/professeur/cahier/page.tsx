@@ -41,7 +41,7 @@ interface CahierEntry {
 
 export default function CahierPage() {
   const { user, loading: userLoading } = useUser()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   const profId = user?.id || ''
 

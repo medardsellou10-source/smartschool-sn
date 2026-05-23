@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo} from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { isDemoMode, DEMO_EXAMENS } from '@/lib/demo-data'
@@ -21,7 +21,7 @@ const TYPE_ICON: Record<string, string> = { bfem: '🎓', bac: '🏆', compositi
 
 export default function ExamensPage() {
   const { user, loading: userLoading } = useUser()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
   const [examens, setExamens] = useState<Examen[]>([])
   const [loading, setLoading] = useState(true)
   const [filtre, setFiltre] = useState<'tous' | 'en_cours' | 'planifie' | 'termine'>('tous')

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useMemo} from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { useEcole } from '@/hooks/useEcole'
@@ -40,7 +40,7 @@ interface BulletinClasse {
 export default function CenseurDashboard() {
   const { user, loading: userLoading } = useUser()
   const { ecole } = useEcole()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
   const trimestre = getTrimestreActuel()
   const [stats, setStats] = useState({ profsPresents: 0, totalProfs: 0, coursEnCours: 0, examens: 0, bulletins: 0 })
   const [examens, setExamens] = useState<ExamenItem[]>([])
@@ -49,7 +49,7 @@ export default function CenseurDashboard() {
 
   const loadDemoData = useCallback(() => {
     if (!user) return
-    const today = new Date().toISOString().split('T')[0]
+    const today = useMemo(() => new Date(), []).toISOString().split('T')[0]
     const todayPointages = DEMO_POINTAGES.filter(p => p.date_pointage === today && p.statut !== 'absent')
     const examEnCours = DEMO_EXAMENS.filter(e => e.statut === 'en_cours').length + DEMO_EXAMENS.filter(e => e.statut === 'planifie').length
     const bullValides = DEMO_BULLETINS_CENSEUR.filter(b => b.statut === 'valide').reduce((s, b) => s + b.valides, 0)
@@ -70,7 +70,7 @@ export default function CenseurDashboard() {
     if (!user?.ecole_id) return
     setLoading(true)
     const ecoleId = user.ecole_id
-    const today = new Date().toISOString().split('T')[0]
+    const today = useMemo(() => new Date(), []).toISOString().split('T')[0]
     const now = new Date()
     const nowTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
     const jsDay = now.getDay()

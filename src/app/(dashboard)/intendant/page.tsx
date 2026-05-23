@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useMemo} from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { useEcole } from '@/hooks/useEcole'
@@ -24,7 +24,7 @@ interface BudgetData {
 export default function IntendantDashboard() {
   const { user, loading: userLoading } = useUser()
   const { ecole } = useEcole()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
   const [budget, setBudget] = useState<BudgetData | null>(null)
   const [loading, setLoading] = useState(true)
 

@@ -37,7 +37,7 @@ interface AppelRecu {
 
 export default function AbsencesPage() {
   const { user, loading: userLoading } = useUser()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   // ── Onglet actif ───────────────────────────────────────────────────────────
   const [onglet, setOnglet] = useState<'appels' | 'saisie'>('appels')

@@ -39,7 +39,7 @@ export default function ProfesseursPage() {
       return
     }
 
-    const supabase = createClient()
+    const supabase = useMemo(() => createClient(), [])
     const { data } = await supabase
       .from('utilisateurs')
       .select('id, nom, prenom, telephone, actif')

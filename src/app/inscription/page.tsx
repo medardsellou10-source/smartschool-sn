@@ -61,15 +61,15 @@ function Dropdown({
 
   return (
     <div ref={ref} className="relative">
-      <label className="block text-xs font-medium mb-1.5" style={{ color: 'rgba(255,255,255,0.5)' }}>{label}</label>
+      <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--ss-text-muted)' }}>{label}</label>
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm text-left transition-all"
         style={{
-          background: 'rgba(255,255,255,0.05)',
-          border: open ? '1px solid rgba(0,230,118,0.5)' : '1px solid rgba(255,255,255,0.1)',
-          color: 'white',
+          background: 'var(--ss-glass-card-bg)',
+          border: open ? '1px solid rgba(0,230,118,0.5)' : '1px solid var(--ss-glass-border)',
+          color: 'var(--ss-text)',
         }}
       >
         <span className="flex items-center gap-2">
@@ -82,8 +82,8 @@ function Dropdown({
       {open && (
         <div className="absolute left-0 right-0 z-50 mt-1 rounded-xl overflow-hidden overflow-y-auto"
           style={{
-            background: '#0F172A',
-            border: '1px solid rgba(255,255,255,0.12)',
+            background: 'var(--ss-bg-secondary)',
+            border: '1px solid var(--ss-glass-border)',
             boxShadow: '0 20px 60px rgba(0,0,0,0.8)',
             maxHeight: '220px',
           }}>
@@ -94,10 +94,10 @@ function Dropdown({
               onClick={() => { onChange(opt.v); setOpen(false) }}
               className="w-full text-left px-4 py-2.5 text-sm transition-colors flex items-center gap-2"
               style={{
-                color: opt.v === value ? '#22C55E' : 'rgba(255,255,255,0.8)',
+                color: opt.v === value ? '#22C55E' : 'var(--ss-text-secondary)',
                 background: opt.v === value ? 'rgba(0,230,118,0.08)' : 'transparent',
               }}
-              onMouseEnter={e => { if (opt.v !== value) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.05)' }}
+              onMouseEnter={e => { if (opt.v !== value) (e.currentTarget as HTMLElement).style.background = 'var(--ss-glass-card-bg)' }}
               onMouseLeave={e => { if (opt.v !== value) (e.currentTarget as HTMLElement).style.background = 'transparent' }}
             >
               {'badge' in opt && <span>{opt.badge}</span>}
@@ -155,14 +155,14 @@ function InscriptionForm() {
   const planInfo = PLANS.find(p => p.id === planChoisi) || PLANS[1]
   const totalSteps = 4
 
-  const inputClass = "w-full px-4 py-3 rounded-xl text-sm text-white placeholder:text-white/30 focus:outline-none transition-all"
+  const inputClass = "w-full px-4 py-3 rounded-xl text-sm text-ss-text placeholder:text-ss-text-secondary focus:outline-none transition-all"
   const inputStyle = {
-    background: 'rgba(255,255,255,0.05)',
-    border: '1px solid rgba(255,255,255,0.1)',
+    background: 'var(--ss-glass-card-bg)',
+    border: '1px solid var(--ss-glass-border)',
   }
   const inputFocusStyle = { outline: 'none' }
   const labelClass = "block text-xs font-medium mb-1.5"
-  const labelStyle = { color: 'rgba(255,255,255,0.5)' }
+  const labelStyle = { color: 'var(--ss-text-muted)' }
 
   function validateStep1() {
     if (!nomEcole.trim()) return "Le nom de l'école est requis"
@@ -225,7 +225,7 @@ function InscriptionForm() {
 
   return (
     <main className="min-h-screen flex items-center justify-center px-4 py-16"
-      style={{ background: '#020617' }}>
+      style={{ background: 'var(--ss-bg)' }}>
 
       {/* Fond lumineux */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
@@ -242,9 +242,9 @@ function InscriptionForm() {
           <Link href="/" className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center"
               style={{ background: 'linear-gradient(135deg, #00853F, #FDEF42, #E31B23)' }}>
-              <span className="text-white font-black text-sm">SS</span>
+              <span className="text-ss-text font-black text-sm">SS</span>
             </div>
-            <span className="text-white font-bold text-lg">SmartSchool SN</span>
+            <span className="text-ss-text font-bold text-lg">SmartSchool SN</span>
           </Link>
         </div>
 
@@ -252,7 +252,7 @@ function InscriptionForm() {
         <div className="flex gap-2 mb-8">
           {Array.from({ length: totalSteps }).map((_, i) => (
             <div key={i} className="flex-1 h-1.5 rounded-full overflow-hidden"
-              style={{ background: 'rgba(255,255,255,0.08)' }}>
+              style={{ background: 'var(--ss-glass-card-hover)' }}>
               <div className="h-full rounded-full transition-all duration-500"
                 style={{
                   width: step > i ? '100%' : '0%',
@@ -265,8 +265,8 @@ function InscriptionForm() {
         {/* Carte principale */}
         <div className="rounded-2xl p-7"
           style={{
-            background: 'rgba(15,23,42,0.95)',
-            border: '1px solid rgba(255,255,255,0.08)',
+            background: 'var(--ss-bg-card)',
+            border: '1px solid var(--ss-glass-card-hover)',
             backdropFilter: 'blur(20px)',
           }}>
 
@@ -274,8 +274,8 @@ function InscriptionForm() {
           {step === 1 && (
             <div className="space-y-5">
               <div>
-                <h1 className="text-2xl font-black text-white mb-0.5">Votre établissement</h1>
-                <p className="text-sm" style={{ color: 'rgba(255,255,255,0.35)' }}>Étape 1/4 — Informations de l'école</p>
+                <h1 className="text-2xl font-black text-ss-text mb-0.5">Votre établissement</h1>
+                <p className="text-sm" style={{ color: 'var(--ss-text-disabled)' }}>Étape 1/4 — Informations de l'école</p>
               </div>
 
               {/* WAED-CI #5 — Sélecteur de pays premium */}
@@ -289,7 +289,7 @@ function InscriptionForm() {
                 <p className={labelClass} style={labelStyle}>Pays de votre établissement *</p>
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <PaysSelector variant="pill" />
-                  <span className="text-[11px] text-white/60">
+                  <span className="text-[11px] text-ss-text-secondary">
                     {config.drapeau} {config.ministere} · {config.indicatif}
                   </span>
                 </div>
@@ -337,7 +337,7 @@ function InscriptionForm() {
                           {meta.label}
                           <span className="font-normal opacity-70">· {allRoles.length} rôles</span>
                         </p>
-                        <p className="text-[10px] mt-0.5 leading-relaxed" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                        <p className="text-[10px] mt-0.5 leading-relaxed" style={{ color: 'var(--ss-text-disabled)' }}>
                           {meta.cycle}{meta.exam ? ` · ${meta.exam}` : ''} · {meta.ages}
                         </p>
                       </div>
@@ -369,14 +369,14 @@ function InscriptionForm() {
                           <p className="text-[11px] font-bold flex items-center gap-1" style={{ color: r.color }}>
                             {r.icon} {r.label}
                           </p>
-                          <p className="text-[10px] mt-0.5 leading-snug" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                          <p className="text-[10px] mt-0.5 leading-snug" style={{ color: 'var(--ss-text-muted)' }}>
                             {r.description}
                           </p>
                         </div>
                       ))}
                     </div>
 
-                    <div className="px-4 pb-3 text-[10px]" style={{ color: 'rgba(255,255,255,0.25)' }}>
+                    <div className="px-4 pb-3 text-[10px]" style={{ color: 'var(--ss-text-disabled)' }}>
                       Ces rôles seront actifs dans votre dashboard. Ajoutez les utilisateurs après inscription.
                     </div>
                   </div>
@@ -421,8 +421,8 @@ function InscriptionForm() {
             // Chrome qui remplissait "Téléphone" avec un email et pré-remplissait le password.
             <form className="space-y-4" autoComplete="off" onSubmit={e => e.preventDefault()}>
               <div>
-                <h1 className="text-2xl font-black text-white mb-0.5">Compte administrateur</h1>
-                <p className="text-sm" style={{ color: 'rgba(255,255,255,0.35)' }}>Étape 2/4 — Votre accès directeur</p>
+                <h1 className="text-2xl font-black text-ss-text mb-0.5">Compte administrateur</h1>
+                <p className="text-sm" style={{ color: 'var(--ss-text-disabled)' }}>Étape 2/4 — Votre accès directeur</p>
               </div>
 
               {/* Inputs leurre pour neutraliser l'autofill Chrome (masqués) */}
@@ -468,7 +468,7 @@ function InscriptionForm() {
                   <button type="button" onClick={() => setShowMdp(v => !v)}
                     className="absolute right-3 top-1/2 -translate-y-1/2"
                     aria-label={showMdp ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
-                    style={{ color: 'rgba(255,255,255,0.5)' }}>
+                    style={{ color: 'var(--ss-text-muted)' }}>
                     {showMdp ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
@@ -488,16 +488,16 @@ function InscriptionForm() {
           {step === 3 && (
             <div className="space-y-4">
               <div>
-                <h1 className="text-2xl font-black text-white mb-0.5">Choisissez votre plan</h1>
-                <p className="text-sm" style={{ color: 'rgba(255,255,255,0.35)' }}>Étape 3/4 — Commencez avec 14 jours gratuits</p>
+                <h1 className="text-2xl font-black text-ss-text mb-0.5">Choisissez votre plan</h1>
+                <p className="text-sm" style={{ color: 'var(--ss-text-disabled)' }}>Étape 3/4 — Commencez avec 14 jours gratuits</p>
               </div>
 
               {/* Toggle facturation */}
-              <div className="flex gap-1 p-1 rounded-xl" style={{ background: 'rgba(255,255,255,0.05)' }}>
+              <div className="flex gap-1 p-1 rounded-xl" style={{ background: 'var(--ss-glass-card-bg)' }}>
                 {(['mensuel', 'annuel'] as const).map(f => (
                   <button key={f} type="button" onClick={() => setFacturation(f)}
                     className="flex-1 py-2 rounded-lg text-sm font-semibold transition-all"
-                    style={facturation === f ? { background: '#22C55E', color: '#020617' } : { color: 'rgba(255,255,255,0.4)' }}>
+                    style={facturation === f ? { background: '#22C55E', color: '#020617' } : { color: 'var(--ss-text-muted)' }}>
                     {f === 'mensuel' ? 'Mensuel' : 'Annuel (-20%)'}
                   </button>
                 ))}
@@ -514,21 +514,21 @@ function InscriptionForm() {
                     <button key={pid} type="button" onClick={() => setPlanChoisi(pid)}
                       className="w-full text-left rounded-xl p-4 transition-all"
                       style={{
-                        background: actif ? `${couleur}12` : 'rgba(255,255,255,0.03)',
-                        border: actif ? `1px solid ${couleur}50` : '1px solid rgba(255,255,255,0.07)',
+                        background: actif ? `${couleur}12` : 'var(--ss-glass-card-bg)',
+                        border: actif ? `1px solid ${couleur}50` : '1px solid var(--ss-glass-card-hover)',
                       }}>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           <span className="text-xl">{isEssai ? '🆓' : plan?.icon}</span>
                           <div>
                             <div className="flex items-center gap-2">
-                              <span className="font-bold text-white text-sm">{isEssai ? 'Essai gratuit 14 jours' : plan?.nom}</span>
+                              <span className="font-bold text-ss-text text-sm">{isEssai ? 'Essai gratuit 14 jours' : plan?.nom}</span>
                               {!isEssai && (plan as any)?.populaire && (
                                 <span className="text-xs px-2 py-0.5 rounded-full font-bold text-[#020617]"
                                   style={{ background: couleur }}>Populaire</span>
                               )}
                             </div>
-                            <div className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                            <div className="text-xs" style={{ color: 'var(--ss-text-muted)' }}>
                               {isEssai ? 'Toutes les fonctionnalités, 50 élèves' : plan?.desc}
                             </div>
                           </div>
@@ -544,7 +544,7 @@ function InscriptionForm() {
                                   : (plan?.prix ?? 0)
                                 ).toLocaleString('fr-SN')} FCFA
                               </div>
-                              <div className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>/mois</div>
+                              <div className="text-xs" style={{ color: 'var(--ss-text-disabled)' }}>/mois</div>
                             </>
                           )}
                         </div>
@@ -560,29 +560,29 @@ function InscriptionForm() {
           {step === 4 && (
             <div className="space-y-4">
               <div>
-                <h1 className="text-2xl font-black text-white mb-0.5">Finaliser l'inscription</h1>
-                <p className="text-sm" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                <h1 className="text-2xl font-black text-ss-text mb-0.5">Finaliser l'inscription</h1>
+                <p className="text-sm" style={{ color: 'var(--ss-text-disabled)' }}>
                   Étape 4/4 — {planChoisi === 'essai' ? "Confirmer l'essai gratuit" : 'Mode de paiement'}
                 </p>
               </div>
 
               {/* Récap */}
               <div className="rounded-xl p-4 space-y-2"
-                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
-                <p className="text-xs uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.35)' }}>Récapitulatif</p>
+                style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
+                <p className="text-xs uppercase tracking-wider" style={{ color: 'var(--ss-text-disabled)' }}>Récapitulatif</p>
                 {[
                   ['École', nomEcole],
                   ['Administrateur', `${adminPrenom} ${adminNom}`],
                   ['Plan', planChoisi === 'essai' ? <span><Rocket className="w-4 h-4 inline-block mr-1"/> Essai Gratuit 14j</span> : <span className="flex items-center gap-1">{planInfo.icon} {planInfo.nom}</span>],
                 ].map(([k, v]) => (
                   <div key={k as string} className="flex justify-between text-sm">
-                    <span style={{ color: 'rgba(255,255,255,0.5)' }}>{k as string}</span>
-                    <span className="font-semibold text-white">{v as React.ReactNode}</span>
+                    <span style={{ color: 'var(--ss-text-muted)' }}>{k as string}</span>
+                    <span className="font-semibold text-ss-text">{v as React.ReactNode}</span>
                   </div>
                 ))}
                 {planChoisi !== 'essai' && (
-                  <div className="flex justify-between text-sm pt-2" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-                    <span style={{ color: 'rgba(255,255,255,0.5)' }}>Montant</span>
+                  <div className="flex justify-between text-sm pt-2" style={{ borderTop: '1px solid var(--ss-glass-card-hover)' }}>
+                    <span style={{ color: 'var(--ss-text-muted)' }}>Montant</span>
                     <span className="font-black" style={{ color: planInfo.couleur }}>
                       {(facturation === 'annuel'
                         ? Math.round(planInfo.prix * 0.8 * 12)
@@ -597,14 +597,14 @@ function InscriptionForm() {
                 <div className="rounded-xl p-5 text-center"
                   style={{ background: 'rgba(0,230,118,0.07)', border: '1px solid rgba(0,230,118,0.2)' }}>
                   <div className="text-3xl mb-2"><CheckCircle2 className="w-12 h-12 text-ss-green mx-auto mb-4" /></div>
-                  <div className="font-bold text-white mb-1">Aucune carte bancaire requise</div>
-                  <div className="text-sm" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                  <div className="font-bold text-ss-text mb-1">Aucune carte bancaire requise</div>
+                  <div className="text-sm" style={{ color: 'var(--ss-text-muted)' }}>
                     Votre école sera active immédiatement. Upgradez quand vous voulez.
                   </div>
                 </div>
               ) : (
                 <div className="space-y-2">
-                  <p className="text-xs uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                  <p className="text-xs uppercase tracking-wider" style={{ color: 'var(--ss-text-disabled)' }}>
                     Méthode de paiement {config.drapeau} {config.nom}
                   </p>
                   {(isCI
@@ -613,12 +613,12 @@ function InscriptionForm() {
                         { id: 'orange_money', icon: <Smartphone className="w-5 h-5 text-orange-500" />, label: 'Orange Money CI 🟠',   desc: 'Paiement Orange Money Côte d\'Ivoire' },
                         { id: 'moov_money',   icon: <Smartphone className="w-5 h-5 text-blue-400" />,   label: 'Moov Money 🔵',       desc: 'Moov Money Côte d\'Ivoire (préfixe 01)' },
                         { id: 'wave',         icon: <Smartphone className="w-5 h-5 text-cyan-400" />,   label: 'Wave CI 🌊',           desc: 'Wave Côte d\'Ivoire (en expansion)' },
-                        { id: 'essai',        icon: <Rocket className="w-5 h-5 text-slate-400" />,     label: 'Démarrer en essai gratuit', desc: '14 jours gratuits — sans carte bancaire' },
+                        { id: 'essai',        icon: <Rocket className="w-5 h-5 text-ss-text-muted" />,     label: 'Démarrer en essai gratuit', desc: '14 jours gratuits — sans carte bancaire' },
                       ]
                     : [
                         { id: 'wave',         icon: <Smartphone className="w-5 h-5 text-blue-400" />,   label: 'Wave 🌊',              desc: 'Paiement instantané Wave Sénégal' },
                         { id: 'orange_money', icon: <Smartphone className="w-5 h-5 text-orange-500" />, label: 'Orange Money 🟠',     desc: 'Paiement Orange Money Sénégal' },
-                        { id: 'essai',        icon: <Rocket className="w-5 h-5 text-slate-400" />,     label: 'Démarrer en essai gratuit', desc: 'Commencer avec 14 jours gratuits' },
+                        { id: 'essai',        icon: <Rocket className="w-5 h-5 text-ss-text-muted" />,     label: 'Démarrer en essai gratuit', desc: 'Commencer avec 14 jours gratuits' },
                       ]
                   ).map(m => (
                     <button key={m.id} type="button"
@@ -626,12 +626,12 @@ function InscriptionForm() {
                       className="w-full text-left rounded-xl p-3.5 transition-all"
                       style={methodePaiement === m.id
                         ? { background: 'rgba(0,230,118,0.08)', border: '1px solid rgba(0,230,118,0.3)' }
-                        : { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                        : { background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)' }}>
                       <div className="flex items-center gap-3">
                         <span className="text-xl">{m.icon}</span>
                         <div>
-                          <div className="font-bold text-white text-sm">{m.label}</div>
-                          <div className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>{m.desc}</div>
+                          <div className="font-bold text-ss-text text-sm">{m.label}</div>
+                          <div className="text-xs" style={{ color: 'var(--ss-text-muted)' }}>{m.desc}</div>
                         </div>
                       </div>
                     </button>
@@ -653,7 +653,7 @@ function InscriptionForm() {
                         type="tel"
                         inputMode="tel"
                       />
-                      <p className="mt-1 text-[11px] text-white/50">
+                      <p className="mt-1 text-[11px] text-ss-text-secondary">
                         Format attendu : <span className="font-mono">{config.formatTelDisplay}</span>
                       </p>
                     </div>
@@ -676,7 +676,7 @@ function InscriptionForm() {
             {step > 1 && (
               <button type="button" onClick={() => { setStep(s => s - 1); setError('') }}
                 className="px-5 py-3 rounded-xl text-sm font-semibold transition-colors"
-                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.6)' }}>
+                style={{ background: 'var(--ss-glass-card-bg)', border: '1px solid var(--ss-glass-card-hover)', color: 'var(--ss-text-muted)' }}>
                 ← Retour
               </button>
             )}
@@ -690,14 +690,14 @@ function InscriptionForm() {
             </button>
           </div>
 
-          <p className="text-center text-xs mt-5" style={{ color: 'rgba(255,255,255,0.25)' }}>
+          <p className="text-center text-xs mt-5" style={{ color: 'var(--ss-text-disabled)' }}>
             Déjà inscrit ?{' '}
             <Link href="/login" className="hover:underline" style={{ color: '#22C55E' }}>Se connecter</Link>
           </p>
         </div>
 
         {/* Badges sécurité */}
-        <div className="flex items-center justify-center gap-4 mt-5 text-xs" style={{ color: 'rgba(255,255,255,0.2)' }}>
+        <div className="flex items-center justify-center gap-4 mt-5 text-xs" style={{ color: 'var(--ss-text-disabled)' }}>
           <span><Lock className="w-3 h-3 inline-block mr-1" /> Données chiffrées</span>
           <span>•</span>
           <span><ShieldCheck className="w-3 h-3 inline-block mr-1" /> Hébergement sécurisé</span>
@@ -712,14 +712,14 @@ function InscriptionForm() {
 export default function InscriptionPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#020617' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--ss-bg)' }}>
         <div className="text-center">
           <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4"
             style={{ background: 'linear-gradient(135deg, #00853F, #FDEF42, #E31B23)' }}>
-            <span className="text-white font-black text-sm">SS</span>
+            <span className="text-ss-text font-black text-sm">SS</span>
           </div>
           <div className="w-8 h-8 border-2 border-[#22C55E] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-white/50 text-sm">Chargement du formulaire...</p>
+          <p className="text-ss-text-secondary text-sm">Chargement du formulaire...</p>
         </div>
       </div>
     }>

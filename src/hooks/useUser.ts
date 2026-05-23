@@ -99,13 +99,13 @@ export function useUser() {
   const pathname = usePathname()
   const demo = isDemoMode()
 
-  // En mode démo : résoudre immédiatement depuis le pathname (zéro réseau)
-  const demoUser = demo ? getDemoUser(pathname) : null
-
-  const [user, setUser] = useState<Utilisateur | null>(
-    demo ? demoUser : _cachedUser
-  )
-  const [loading, setLoading] = useState(demo ? false : _cachedUser === null)
+  // Initialisation hydration-safe : la valeur initiale DOIT être identique
+  // côté serveur et côté client (sinon React #418 — mismatch d'hydratation).
+  // isDemoMode() renvoie false au SSR (pas de cookie/localStorage) et true
+  // au client : on ne l'utilise donc PAS dans l'initialiseur. L'utilisateur
+  // démo est résolu juste après le montage, dans l'effet ci-dessous.
+  const [user, setUser] = useState<Utilisateur | null>(_cachedUser)
+  const [loading, setLoading] = useState(_cachedUser === null)
 
   // Référence stable pour éviter les updates sur composant démonté
   const mounted = useRef(true)

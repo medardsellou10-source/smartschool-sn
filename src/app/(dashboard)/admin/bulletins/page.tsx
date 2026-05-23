@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo} from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { isDemoMode, DEMO_CLASSES, DEMO_ELEVES } from '@/lib/demo-data'
@@ -32,7 +32,7 @@ export default function AdminBulletinsPage() {
         setLoading(false)
         return
       }
-      const supabase = createClient()
+      const supabase = useMemo(() => createClient(), [])
       const { data } = await (supabase.from('classes') as any)
         .select('id, nom, niveau')
         .eq('ecole_id', ecoleId)
@@ -52,7 +52,7 @@ export default function AdminBulletinsPage() {
           .map(e => ({ id: e.id, nom: e.nom, prenom: e.prenom, matricule: e.matricule })))
         return
       }
-      const supabase = createClient()
+      const supabase = useMemo(() => createClient(), [])
       const { data } = await (supabase.from('eleves') as any)
         .select('id, nom, prenom, matricule')
         .eq('classe_id', selectedClasse)

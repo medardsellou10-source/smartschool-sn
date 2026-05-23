@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useMemo} from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { PageHeader } from '@/components/dashboard/PageHeader'
@@ -162,7 +162,7 @@ export default function TransportPage() {
   // ── Load data ─────────────────────────────────────────────────
   const loadVehicules = useCallback(async () => {
     if (!ecoleId) return
-    const supabase = createClient()
+    const supabase = useMemo(() => createClient(), [])
     const { data } = await (supabase.from('vehicules') as any)
       .select('*')
       .eq('ecole_id', ecoleId)
@@ -172,7 +172,7 @@ export default function TransportPage() {
 
   const loadTrajets = useCallback(async () => {
     if (!ecoleId) return
-    const supabase = createClient()
+    const supabase = useMemo(() => createClient(), [])
     const { data } = await (supabase.from('trajets') as any)
       .select('*, vehicules(immatriculation, marque, modele)')
       .eq('ecole_id', ecoleId)
@@ -193,7 +193,7 @@ export default function TransportPage() {
       setArrets([])
       return
     }
-    const supabase = createClient()
+    const supabase = useMemo(() => createClient(), [])
     const { data } = await (supabase.from('arrets') as any)
       .select('*')
       .eq('trajet_id', selectedTrajetId)
@@ -203,7 +203,7 @@ export default function TransportPage() {
 
   const loadAbonnements = useCallback(async () => {
     if (!ecoleId) return
-    const supabase = createClient()
+    const supabase = useMemo(() => createClient(), [])
     const { data } = await (supabase.from('abonnements_transport') as any)
       .select(`
         *,
@@ -237,7 +237,7 @@ export default function TransportPage() {
 
   const loadEleves = useCallback(async () => {
     if (!ecoleId) return
-    const supabase = createClient()
+    const supabase = useMemo(() => createClient(), [])
     const { data } = await (supabase.from('eleves') as any)
       .select('id, nom, prenom, classes(nom, niveau)')
       .eq('ecole_id', ecoleId)
@@ -255,7 +255,7 @@ export default function TransportPage() {
 
   const loadAllArrets = useCallback(async () => {
     if (!ecoleId) return []
-    const supabase = createClient()
+    const supabase = useMemo(() => createClient(), [])
     const { data } = await (supabase.from('arrets') as any)
       .select('id, nom')
       .order('nom', { ascending: true })
@@ -355,19 +355,19 @@ export default function TransportPage() {
   // ── Delete helpers ────────────────────────────────────────────
   const handleDeleteVehicule = async (id: string) => {
     if (!confirm('Supprimer ce vehicule ?')) return
-    const supabase = createClient()
+    const supabase = useMemo(() => createClient(), [])
     await (supabase.from('vehicules') as any).delete().eq('id', id)
     await loadVehicules()
   }
   const handleDeleteTrajet = async (id: string) => {
     if (!confirm('Supprimer ce trajet ?')) return
-    const supabase = createClient()
+    const supabase = useMemo(() => createClient(), [])
     await (supabase.from('trajets') as any).delete().eq('id', id)
     await loadTrajets()
   }
   const handleDeleteArret = async (id: string) => {
     if (!confirm('Supprimer cet arret ?')) return
-    const supabase = createClient()
+    const supabase = useMemo(() => createClient(), [])
     await (supabase.from('arrets') as any).delete().eq('id', id)
     await loadArrets()
   }
@@ -375,7 +375,7 @@ export default function TransportPage() {
   // ── Toggle abonnement statut ──────────────────────────────────
   const handleToggleAbonnement = async (a: Abonnement) => {
     const newStatut: AbonnementStatut = a.statut === 'actif' ? 'suspendu' : 'actif'
-    const supabase = createClient()
+    const supabase = useMemo(() => createClient(), [])
     await (supabase.from('abonnements_transport') as any)
       .update({ statut: newStatut })
       .eq('id', a.id)
@@ -392,7 +392,7 @@ export default function TransportPage() {
     setError('')
 
     try {
-      const supabase = createClient()
+      const supabase = useMemo(() => createClient(), [])
 
       if (modalType === 'vehicule') {
         if (!fvImmat.trim() || !fvMarque.trim()) {

@@ -40,7 +40,7 @@ function getCurrentTrimestre(): number {
 export default function BulletinsPage() {
   const { user, loading: userLoading } = useUser()
   const { isOffline, cacheData, getCachedData } = useOffline()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   const [enfants, setEnfants] = useState<Enfant[]>([])
   const [selectedEnfant, setSelectedEnfant] = useState('')

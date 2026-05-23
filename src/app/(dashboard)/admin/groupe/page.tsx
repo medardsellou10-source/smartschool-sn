@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useMemo} from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { StatCard } from '@/components/dashboard/StatCard'
@@ -127,7 +127,7 @@ export default function GroupeDashboard() {
     if (!ecoleId) return
     setLoading(true)
 
-    const supabase = createClient()
+    const supabase = useMemo(() => createClient(), [])
 
     // 1. Recuperer l'ecole courante avec son groupe_id
     const { data: ecole } = await (supabase.from('ecoles') as any)
@@ -150,7 +150,7 @@ export default function GroupeDashboard() {
     const groupeNom = groupeData?.nom || 'Groupe Scolaire'
 
     // 3. Charger les donnees reelles de l'ecole courante
-    const today = new Date().toISOString().split('T')[0]
+    const today = useMemo(() => new Date(), []).toISOString().split('T')[0]
 
     const [elevesRes, profsRes, classesRes, facturesRes, absencesRes] = await Promise.all([
       supabase.from('eleves').select('id', { count: 'exact', head: true }).eq('ecole_id', ecoleId).eq('actif', true),

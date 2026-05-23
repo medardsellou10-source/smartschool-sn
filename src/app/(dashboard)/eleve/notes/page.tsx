@@ -311,7 +311,7 @@ function LeaderboardPanel({ note, onClose }: { note: NoteEval; onClose: () => vo
 // ── Page principale ────────────────────────────────────────────
 export default function EleveNotesPage() {
   const { user } = useUser()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
   const [notes, setNotes] = useState<NoteEval[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedMatiere, setSelectedMatiere] = useState<string>('all')

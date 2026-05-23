@@ -5,7 +5,7 @@
  * Réservé Directeur (rang ≥ 100). Démo + prod compatibles.
  */
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo} from 'react'
 import { Hash, Save, Eye, RotateCw } from 'lucide-react'
 import Link from 'next/link'
 import { useUser } from '@/hooks/useUser'
@@ -83,7 +83,7 @@ export default function MatriculesPage() {
     }
     let cancel = false
     ;(async () => {
-      const supabase = createClient()
+      const supabase = useMemo(() => createClient(), [])
       const { data } = await (supabase.from('matricule_templates') as any)
         .select('*')
         .eq('ecole_id', user.ecole_id)
@@ -127,7 +127,7 @@ export default function MatriculesPage() {
     if (isDemoMode()) {
       saveTemplate(t)
     } else if (user) {
-      const supabase = createClient()
+      const supabase = useMemo(() => createClient(), [])
       await (supabase.from('matricule_templates') as any)
         .update({
           template_pattern: t.template_pattern,

@@ -6,7 +6,7 @@
 
 import { useUser } from '@/hooks/useUser'
 import { isDemoMode, DEMO_ELEVES } from '@/lib/demo-data'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo} from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { PageHeader } from '@/components/dashboard/PageHeader'
 import { CalendarDays } from 'lucide-react'
@@ -24,7 +24,7 @@ export default function EleveEmploiTempsPage() {
     }
     let cancel = false
     ;(async () => {
-      const supabase = createClient()
+      const supabase = useMemo(() => createClient(), [])
       const { data } = await (supabase.from('eleves') as any)
         .select('classe_id')
         .eq('user_id', user.id)

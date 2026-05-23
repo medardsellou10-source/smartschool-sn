@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useMemo} from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { StatCard } from '@/components/dashboard/StatCard'
@@ -49,7 +49,7 @@ interface RepartitionStatut {
 
 export default function FinancesPage() {
   const { user, loading: userLoading } = useUser()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   const [kpis, setKpis] = useState<KPIs | null>(null)
   const [repartition, setRepartition] = useState<RepartitionStatut[]>([])
@@ -325,7 +325,7 @@ function ExportButton({ ecoleId }: { ecoleId: string }) {
     setExporting(true)
     try {
       const XLSX = await import('xlsx')
-      const supabase = createClient()
+      const supabase = useMemo(() => createClient(), [])
 
       // Récupérer données
       const [facturesRes, paiementsRes] = await Promise.all([

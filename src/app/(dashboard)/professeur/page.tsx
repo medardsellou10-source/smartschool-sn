@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { StatCard } from '@/components/dashboard/StatCard'
@@ -39,9 +39,13 @@ interface PointageItem {
 
 export default function ProfesseurDashboard() {
   const { user, loading: userLoading } = useUser()
-  const supabase = createClient()
+  // Références stables : sans useMemo, createClient() et new Date() renvoient
+  // un nouvel objet à chaque rendu → loadDemoData/loadRealData (useCallback qui
+  // les listent en dépendances) seraient recréés à chaque rendu → l'effet de
+  // chargement boucle à l'infini ("Maximum update depth exceeded").
+  const supabase = useMemo(() => createClient(), [])
 
-  const today = new Date()
+  const today = useMemo(() => new Date(), [])
   const jsDay = today.getDay()
   const jourSemaine = jsDay === 0 ? 7 : jsDay
   const profId = user?.id || ''

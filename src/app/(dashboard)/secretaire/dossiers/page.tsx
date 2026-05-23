@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo} from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { isDemoMode, DEMO_INSCRIPTIONS } from '@/lib/demo-data'
@@ -9,7 +9,7 @@ const ACCENT = '#FF6D00'
 
 export default function DossiersPage() {
   const { user, loading: userLoading } = useUser()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
   const [dossiers, setDossiers] = useState<typeof DEMO_INSCRIPTIONS>([])
   const [loading, setLoading] = useState(true)
   const [toast, setToast] = useState<string | null>(null)

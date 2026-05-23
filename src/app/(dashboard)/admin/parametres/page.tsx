@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { useEffect, useState, useCallback, useRef, useMemo} from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { useEcole } from '@/hooks/useEcole'
@@ -41,7 +41,7 @@ const COULEURS_PRESET = [
 export default function ParametresPage() {
   const { user, loading: userLoading } = useUser()
   const { refetch: refetchEcole } = useEcole()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
   const [ecole, setEcole] = useState<Ecole | null>(null)
   const [loading, setLoading] = useState(true)
 

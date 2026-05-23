@@ -35,7 +35,7 @@ interface Absence {
 
 export default function AbsencesPage() {
   const { user, loading: userLoading } = useUser()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   const [enfants, setEnfants] = useState<Enfant[]>([])
   const [selectedEnfant, setSelectedEnfant] = useState('')
@@ -45,7 +45,7 @@ export default function AbsencesPage() {
 
   // Charger notifications du surveillant depuis localStorage
   useEffect(() => {
-    const today = new Date().toISOString().split('T')[0]
+    const today = useMemo(() => new Date(), []).toISOString().split('T')[0]
     const raw = localStorage.getItem('ss_notifs_parents')
     if (raw) {
       try {
@@ -319,7 +319,7 @@ export default function AbsencesPage() {
               }
             } else if (!cell.isWeekend) {
               // Passé = présent (vert subtil)
-              const today = new Date().toISOString().split('T')[0]
+              const today = useMemo(() => new Date(), []).toISOString().split('T')[0]
               if (cell.date <= today) {
                 bg = 'bg-ss-green/8'
                 textColor = 'text-ss-text'

@@ -42,7 +42,7 @@ function getCurrentTrimestre() {
 
 export default function EleveBulletinsPage() {
   const { user, loading: userLoading } = useUser()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   const [trimestre, setTrimestre] = useState(getCurrentTrimestre())
   const [moyennes, setMoyennes] = useState<MoyenneMatiere[]>([])

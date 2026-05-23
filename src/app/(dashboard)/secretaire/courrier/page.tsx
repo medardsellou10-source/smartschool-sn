@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo} from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { isDemoMode, DEMO_COURRIERS } from '@/lib/demo-data'
@@ -11,7 +11,7 @@ type Courrier = typeof DEMO_COURRIERS[0]
 
 export default function CourrierPage() {
   const { user, loading: userLoading } = useUser()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
   const [courriers, setCourriers] = useState<Courrier[]>([])
   const [loading, setLoading] = useState(true)
   const [onglet, setOnglet] = useState<'tous' | 'entrant' | 'sortant'>('tous')

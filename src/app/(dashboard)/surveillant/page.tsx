@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { useEffect, useState, useCallback, useRef, useMemo} from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { StatCard } from '@/components/dashboard/StatCard'
@@ -25,7 +25,7 @@ const JOUR_LABELS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam']
 
 export default function SurveillantDashboard() {
   const { user, loading: userLoading } = useUser()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   const [stats, setStats] = useState({ presents: 0, retards: 0, graves: 0, absents: 0, total: 0 })
   const [statsLoading, setStatsLoading] = useState(true)
@@ -50,7 +50,7 @@ export default function SurveillantDashboard() {
 
   const loadStats = useCallback(async () => {
     if (!ecoleId) return
-    const today = new Date().toISOString().split('T')[0]
+    const today = useMemo(() => new Date(), []).toISOString().split('T')[0]
     const { data } = await supabase.from('pointages_profs').select('*').eq('ecole_id', ecoleId).eq('date_pointage', today)
     const rows = (data || []) as unknown as PointageRow[]
     const { count: totalProfs } = await supabase.from('utilisateurs').select('*', { count: 'exact', head: true }).eq('ecole_id', ecoleId).eq('role', 'professeur').eq('actif', true)
@@ -68,7 +68,7 @@ export default function SurveillantDashboard() {
   useEffect(() => {
     if (!ecoleId) return
     if (isDemoMode()) {
-      const today = new Date().toISOString().split('T')[0]
+      const today = useMemo(() => new Date(), []).toISOString().split('T')[0]
       const todayP = DEMO_POINTAGES.filter(p => p.date_pointage === today)
       const total = DEMO_PROFESSEURS.length
       setStats({ presents: todayP.filter(r => r.statut === 'a_heure').length, retards: todayP.filter(r => r.statut === 'retard_leger').length, graves: todayP.filter(r => r.statut === 'retard_grave').length, absents: Math.max(0, total - todayP.length), total })

@@ -37,10 +37,10 @@ let cachedEcoleId: string | null = null
 
 export function useEcole() {
   const { user, loading: userLoading } = useUser()
-  const [ecole, setEcole] = useState<EcoleBranding | null>(
-    isDemoMode() ? DEMO_BRANDING : null
-  )
-  const [loading, setLoading] = useState(!isDemoMode())
+  // Initialisation hydration-safe : identique serveur/client (évite React #418).
+  // Le branding démo est résolu après le montage via fetchEcole() dans l'effet.
+  const [ecole, setEcole] = useState<EcoleBranding | null>(null)
+  const [loading, setLoading] = useState(true)
 
   const fetchEcole = useCallback(async () => {
     if (isDemoMode()) {

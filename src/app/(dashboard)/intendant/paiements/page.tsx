@@ -118,7 +118,7 @@ export default function PaiementsPage() {
     }
     if (!user) return
 
-    const supabase = createClient()
+    const supabase = useMemo(() => createClient(), [])
     async function load() {
       const ecoleId = (user as any).ecole_id
 
@@ -178,7 +178,7 @@ export default function PaiementsPage() {
     setDetailRow(row)
     if (isDemoMode()) return
 
-    const supabase = createClient()
+    const supabase = useMemo(() => createClient(), [])
     const { data: lignes } = await (supabase as any)
       .from('lignes_paiement_scolarite')
       .select('montant, methode, reference, date_paiement, paiements_scolarite(type_poste)')
@@ -203,7 +203,7 @@ export default function PaiementsPage() {
   async function handleEnregistrerPaiement(eleveId: string, typePoste: string, montant: number, methode: string) {
     if (isDemoMode()) { showToast('Mode démo — paiement simulé ✓'); return }
     setSaving(true)
-    const supabase = createClient()
+    const supabase = useMemo(() => createClient(), [])
     const ecoleId = (user as any).ecole_id
 
     // Trouver le tarif_id
@@ -536,7 +536,7 @@ export default function PaiementsPage() {
                     </>
                   ) : (
                     <button onClick={async () => {
-                      const supabase = createClient()
+                      const supabase = useMemo(() => createClient(), [])
                       await (supabase.from('eleves') as any).update({
                         pause_empathique: false,
                         pause_empathique_motif: null,
@@ -860,7 +860,7 @@ export default function PaiementsPage() {
                   const dureeLabel = { '2_semaines': '2 semaines', '1_mois': '1 mois', '2_mois': '2 mois', 'indefini': 'Jusqu\'à nouvel ordre' }[pauseDuree] || pauseDuree
                   const datePause = new Date().toISOString()
                   
-                  const supabase = createClient()
+                  const supabase = useMemo(() => createClient(), [])
                   await (supabase.from('eleves') as any).update({
                     pause_empathique: true,
                     pause_empathique_motif: motifFinal,

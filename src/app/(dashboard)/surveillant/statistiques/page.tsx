@@ -28,7 +28,7 @@ function getPeriodeDates(periode: Periode): { start: string; end: string } {
 
 export default function SurveillantStatistiquesPage() {
   const { user, loading: userLoading } = useUser()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   const [periode, setPeriode] = useState<Periode>('mois')
   const [loading, setLoading] = useState(false)

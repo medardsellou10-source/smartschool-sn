@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useMemo} from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { useOffline } from '@/hooks/useOffline'
@@ -39,7 +39,7 @@ const STATUT_LABELS: Record<string, string> = {
 export default function PaiementPage() {
   const { user, loading: userLoading } = useUser()
   const { isOffline } = useOffline()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   const [factures, setFactures] = useState<Facture[]>([])
   const [loading, setLoading] = useState(true)

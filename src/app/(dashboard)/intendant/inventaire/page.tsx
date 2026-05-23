@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo} from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { isDemoMode, DEMO_INVENTAIRE } from '@/lib/demo-data'
@@ -18,7 +18,7 @@ const ETAT_STYLE: Record<string, { bg: string; color: string; label: string }> =
 
 export default function InventairePage() {
   const { user, loading: userLoading } = useUser()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
   const [articles, setArticles] = useState<Article[]>([])
   const [loading, setLoading] = useState(true)
   const [categorie, setCategorie] = useState<string>('Toutes')

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useMemo} from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { isDemoMode, DEMO_PROFESSEURS, DEMO_USERS, DEMO_ELEVES, DEMO_CLASSES } from '@/lib/demo-data'
@@ -93,7 +93,7 @@ export default function UtilisateursPage() {
       return
     }
 
-    const supabase = createClient()
+    const supabase = useMemo(() => createClient(), [])
 
     // Charger le type d'établissement de l'école
     const { data: ecoleData } = await supabase
@@ -162,7 +162,7 @@ export default function UtilisateursPage() {
       )
       return
     }
-    const supabase = createClient()
+    const supabase = useMemo(() => createClient(), [])
     await (supabase.from('utilisateurs') as any)
       .update({ actif: !currentActif })
       .eq('id', userId)

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo} from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/hooks/useUser'
 import { isDemoMode, DEMO_BUDGET } from '@/lib/demo-data'
@@ -10,7 +10,7 @@ function fmt(val: number) { return new Intl.NumberFormat('fr-FR').format(val) + 
 
 export default function BudgetPage() {
   const { user, loading: userLoading } = useUser()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
   const [budget, setBudget] = useState<typeof DEMO_BUDGET | null>(null)
   const [loading, setLoading] = useState(true)
 

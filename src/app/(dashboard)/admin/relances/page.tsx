@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo} from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { PageHeader } from '@/components/dashboard/PageHeader'
 import { Mail } from 'lucide-react'
@@ -49,7 +49,7 @@ export default function RelancesPage() {
 
   async function loadData() {
     setLoading(true)
-    const today = new Date().toISOString().split('T')[0]
+    const today = useMemo(() => new Date(), []).toISOString().split('T')[0]
 
     // Factures en attente avec date dépassée
     const { data: facturesData } = await (supabase.from('factures') as any)
