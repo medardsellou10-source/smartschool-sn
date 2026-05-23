@@ -61,7 +61,7 @@ export default function ElevesPage() {
       return
     }
 
-    const supabase = useMemo(() => createClient(), [])
+    const supabase = createClient()
     const [elevesRes, classesRes] = await Promise.all([
       (supabase.from('eleves') as any)
         .select('id, nom, prenom, classe_id, sexe, matricule, actif, classes(nom, niveau)')

@@ -49,7 +49,7 @@ export default function RelancesPage() {
 
   async function loadData() {
     setLoading(true)
-    const today = useMemo(() => new Date(), []).toISOString().split('T')[0]
+    const today = new Date().toISOString().split('T')[0]
 
     // Factures en attente avec date dépassée
     const { data: facturesData } = await (supabase.from('factures') as any)

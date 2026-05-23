@@ -218,7 +218,7 @@ export default function ProfesseurElearningPage() {
       setMatieres(demoMatieresPourProf() as Matiere[])
       return
     }
-    const supabase = useMemo(() => createClient(), [])
+    const supabase = createClient()
     const { data } = await (supabase.from('matieres') as any)
       .select('id, nom')
       .eq('ecole_id', ecoleId)
@@ -232,7 +232,7 @@ export default function ProfesseurElearningPage() {
       setClasses(demoClassesPourProf(profId || '') as Classe[])
       return
     }
-    const supabase = useMemo(() => createClient(), [])
+    const supabase = createClient()
     const { data } = await (supabase.from('classes') as any)
       .select('id, nom, niveau')
       .eq('ecole_id', ecoleId)
@@ -246,7 +246,7 @@ export default function ProfesseurElearningPage() {
       setCours(demoListCours() as Cours[])
       return
     }
-    const supabase = useMemo(() => createClient(), [])
+    const supabase = createClient()
     const { data } = await (supabase.from('cours') as any)
       .select('*, matieres(nom), classes(nom, niveau)')
       .eq('ecole_id', ecoleId)
@@ -267,7 +267,7 @@ export default function ProfesseurElearningPage() {
       setDevoirs(demoListDevoirs() as Devoir[])
       return
     }
-    const supabase = useMemo(() => createClient(), [])
+    const supabase = createClient()
     const { data } = await (supabase.from('devoirs') as any)
       .select('*, matieres(nom), classes(nom, niveau)')
       .eq('ecole_id', ecoleId)
@@ -299,7 +299,7 @@ export default function ProfesseurElearningPage() {
       setClassesVirtuelles(demoListCV() as ClasseVirtuelle[])
       return
     }
-    const supabase = useMemo(() => createClient(), [])
+    const supabase = createClient()
     const { data } = await (supabase.from('classes_virtuelles') as any)
       .select('*, matieres(nom), classes(nom, niveau)')
       .eq('ecole_id', ecoleId)
@@ -323,7 +323,7 @@ export default function ProfesseurElearningPage() {
       setLoadingSoumissions(false)
       return
     }
-    const supabase = useMemo(() => createClient(), [])
+    const supabase = createClient()
     const { data } = await (supabase.from('soumissions_devoirs') as any)
       .select('*, eleves(nom, prenom)')
       .eq('devoir_id', devoirId)
@@ -417,7 +417,7 @@ export default function ProfesseurElearningPage() {
       return
     }
 
-    const supabase = useMemo(() => createClient(), [])
+    const supabase = createClient()
     const payload = {
       ecole_id: ecoleId,
       prof_id: profId,
@@ -463,7 +463,7 @@ export default function ProfesseurElearningPage() {
       return
     }
 
-    const supabase = useMemo(() => createClient(), [])
+    const supabase = createClient()
     const payload = {
       ecole_id: ecoleId,
       prof_id: profId,
@@ -509,7 +509,7 @@ export default function ProfesseurElearningPage() {
       return
     }
 
-    const supabase = useMemo(() => createClient(), [])
+    const supabase = createClient()
     const payload = {
       ecole_id: ecoleId,
       prof_id: profId,
@@ -538,7 +538,7 @@ export default function ProfesseurElearningPage() {
   const deleteCours = async (id: string) => {
     if (!confirm('Supprimer ce cours ?')) return
     if (isDemoMode()) { demoRemoveCours(id); await loadCours(); return }
-    const supabase = useMemo(() => createClient(), [])
+    const supabase = createClient()
     await (supabase.from('cours') as any).delete().eq('id', id)
     await loadCours()
   }
@@ -546,7 +546,7 @@ export default function ProfesseurElearningPage() {
   const deleteDevoir = async (id: string) => {
     if (!confirm('Supprimer ce devoir ?')) return
     if (isDemoMode()) { demoRemoveDevoir(id); await loadDevoirs(); return }
-    const supabase = useMemo(() => createClient(), [])
+    const supabase = createClient()
     await (supabase.from('devoirs') as any).delete().eq('id', id)
     await loadDevoirs()
   }
@@ -554,7 +554,7 @@ export default function ProfesseurElearningPage() {
   const deleteClasseVirtuelle = async (id: string) => {
     if (!confirm('Supprimer cette classe virtuelle ?')) return
     if (isDemoMode()) { demoRemoveCV(id); await loadClassesVirtuelles(); return }
-    const supabase = useMemo(() => createClient(), [])
+    const supabase = createClient()
     await (supabase.from('classes_virtuelles') as any).delete().eq('id', id)
     await loadClassesVirtuelles()
   }
@@ -567,7 +567,7 @@ export default function ProfesseurElearningPage() {
       await loadClassesVirtuelles()
       return
     }
-    const supabase = useMemo(() => createClient(), [])
+    const supabase = createClient()
     await (supabase.from('classes_virtuelles') as any)
       .update({ statut: 'en_cours' })
       .eq('id', cv.id)
@@ -580,7 +580,7 @@ export default function ProfesseurElearningPage() {
     const note = gradingNotes[soumissionId]
     const commentaire = gradingComments[soumissionId]
     if (!note || isNaN(parseFloat(note))) return
-    const supabase = useMemo(() => createClient(), [])
+    const supabase = createClient()
     await (supabase.from('soumissions_devoirs') as any)
       .update({
         note: parseFloat(note),
@@ -595,7 +595,7 @@ export default function ProfesseurElearningPage() {
   const corrigerTout = async () => {
     const toGrade = soumissions.filter(s => s.note === null && gradingNotes[s.id] && !isNaN(parseFloat(gradingNotes[s.id])))
     if (toGrade.length === 0) return
-    const supabase = useMemo(() => createClient(), [])
+    const supabase = createClient()
     for (const s of toGrade) {
       await (supabase.from('soumissions_devoirs') as any)
         .update({

@@ -83,7 +83,7 @@ export default function MatriculesPage() {
     }
     let cancel = false
     ;(async () => {
-      const supabase = useMemo(() => createClient(), [])
+      const supabase = createClient()
       const { data } = await (supabase.from('matricule_templates') as any)
         .select('*')
         .eq('ecole_id', user.ecole_id)
@@ -127,7 +127,7 @@ export default function MatriculesPage() {
     if (isDemoMode()) {
       saveTemplate(t)
     } else if (user) {
-      const supabase = useMemo(() => createClient(), [])
+      const supabase = createClient()
       await (supabase.from('matricule_templates') as any)
         .update({
           template_pattern: t.template_pattern,

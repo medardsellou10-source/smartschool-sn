@@ -121,7 +121,7 @@ export default function SuiviGPSPage() {
   // ─── Load data ─────────────────────────────────────────────────────────────
 
   const loadData = useCallback(async () => {
-    const supabase = useMemo(() => createClient(), [])
+    const supabase = createClient()
 
     const [vehiculesRes, trajetsRes, arretsRes, positionsRes] = await Promise.all([
       (supabase.from('vehicules') as any).select('*').order('immatriculation'),
@@ -157,7 +157,7 @@ export default function SuiviGPSPage() {
   // ─── Supabase Realtime ─────────────────────────────────────────────────────
 
   useEffect(() => {
-    const supabase = useMemo(() => createClient(), [])
+    const supabase = createClient()
 
     const channel = supabase
       .channel('transport-gps')

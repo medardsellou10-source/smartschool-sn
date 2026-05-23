@@ -133,7 +133,7 @@ export default function EmploisTempsPage() {
       return
     }
 
-    const supabase = useMemo(() => createClient(), [])
+    const supabase = createClient()
     const [classesRes, matieresRes, profsRes] = await Promise.all([
       supabase
         .from('classes')
@@ -192,7 +192,7 @@ export default function EmploisTempsPage() {
       return
     }
 
-    const supabase = useMemo(() => createClient(), [])
+    const supabase = createClient()
     const { data } = await (supabase.from('emplois_temps') as any)
       .select('*, matieres(nom, couleur), utilisateurs(nom, prenom)')
       .eq('ecole_id', ecoleId)
@@ -313,7 +313,7 @@ export default function EmploisTempsPage() {
     }
 
     try {
-      const supabase = useMemo(() => createClient(), [])
+      const supabase = createClient()
       const payload = {
         ecole_id: ecoleId,
         classe_id: selectedClasse,
@@ -352,7 +352,7 @@ export default function EmploisTempsPage() {
     }
 
     try {
-      const supabase = useMemo(() => createClient(), [])
+      const supabase = createClient()
       await (supabase.from('emplois_temps') as any).delete().eq('id', editCreneau.id)
       await loadEDT()
       setShowModal(false)

@@ -24,7 +24,7 @@ export default function EleveEmploiTempsPage() {
     }
     let cancel = false
     ;(async () => {
-      const supabase = useMemo(() => createClient(), [])
+      const supabase = createClient()
       const { data } = await (supabase.from('eleves') as any)
         .select('classe_id')
         .eq('user_id', user.id)

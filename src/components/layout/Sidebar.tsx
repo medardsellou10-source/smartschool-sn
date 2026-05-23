@@ -67,8 +67,9 @@ const MENUS: Record<string, NavItem[]> = {
     { href: '/admin/coges', label: 'COGES / APE 🇨🇮', icon: Icons.building },
     { href: '/admin/programme', label: 'Programme scolaire', icon: Icons.book },
     { href: '/admin/export-officiel', label: 'Bulletins / Export ministère', icon: Icons.file },
-    { href: '/admin/superadmin', label: 'SuperAdmin WAED 🌍', icon: Icons.chart },
-    { href: '/admin/waed-status', label: 'Statut déploiement WAED', icon: Icons.checkSquare },
+    // ── Entrées internes WAED masquées aux clients-écoles ──
+    // Routes /admin/superadmin et /admin/waed-status restent accessibles
+    // par URL directe pour le propriétaire (protection 2FA via /__waed-master).
     { href: '/admin/relances', label: 'Relances', icon: Icons.bell },
     { href: '/admin/transport', label: 'Transport', icon: Icons.bus },
     { href: '/admin/cantine', label: 'Cantine', icon: Icons.food },

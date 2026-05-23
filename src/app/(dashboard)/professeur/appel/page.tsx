@@ -52,7 +52,7 @@ export default function AppelPage() {
       setClasses(DEMO_CLASSES.map(c => ({ id: c.id, nom: c.nom, niveau: c.niveau })))
       return
     }
-    const supabase = useMemo(() => createClient(), [])
+    const supabase = createClient()
     const { data } = await (supabase.from('classes') as any)
       .select('id, nom, niveau')
       .eq('ecole_id', ecoleId)
@@ -74,7 +74,7 @@ export default function AppelPage() {
       return
     }
 
-    const supabase = useMemo(() => createClient(), [])
+    const supabase = createClient()
     const { data } = await (supabase.from('eleves') as any)
       .select('id, nom, prenom, matricule')
       .eq('classe_id', classeId)
@@ -117,7 +117,7 @@ export default function AppelPage() {
       return
     }
 
-    const supabase = useMemo(() => createClient(), [])
+    const supabase = createClient()
     const elevesIds = eleves.map(e => e.id)
     await (supabase.from('absences_eleves') as any)
       .delete().in('eleve_id', elevesIds).eq('date_absence', todayStr)
@@ -182,7 +182,7 @@ export default function AppelPage() {
     }
 
     if (!isDemoMode() && user && ecoleId) {
-      const supabase = useMemo(() => createClient(), [])
+      const supabase = createClient()
       // Notification Supabase pour le surveillant
       ;(supabase.from('notifications') as any).insert({
         ecole_id: ecoleId,

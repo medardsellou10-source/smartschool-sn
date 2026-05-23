@@ -161,7 +161,7 @@ export default function CantinePage() {
   // ── Load data ─────────────────────────────────────────────────
   const loadMenus = useCallback(async () => {
     if (!ecoleId) return
-    const supabase = useMemo(() => createClient(), [])
+    const supabase = createClient()
     const semaineStr = formatDate(semaineLundi)
     const { data } = await (supabase.from('menus_cantine') as any)
       .select('*')
@@ -173,7 +173,7 @@ export default function CantinePage() {
 
   const loadAbonnements = useCallback(async () => {
     if (!ecoleId) return
-    const supabase = useMemo(() => createClient(), [])
+    const supabase = createClient()
     const { data } = await (supabase.from('abonnements_cantine') as any)
       .select(`
         *,
@@ -201,7 +201,7 @@ export default function CantinePage() {
 
   const loadEleves = useCallback(async () => {
     if (!ecoleId) return
-    const supabase = useMemo(() => createClient(), [])
+    const supabase = createClient()
     const { data } = await (supabase.from('eleves') as any)
       .select('id, nom, prenom, classe_id, classes(nom, niveau)')
       .eq('ecole_id', ecoleId)
@@ -220,7 +220,7 @@ export default function CantinePage() {
 
   const loadClasses = useCallback(async () => {
     if (!ecoleId) return
-    const supabase = useMemo(() => createClient(), [])
+    const supabase = createClient()
     const { data } = await (supabase.from('classes') as any)
       .select('id, nom, niveau')
       .eq('ecole_id', ecoleId)
@@ -230,7 +230,7 @@ export default function CantinePage() {
 
   const loadPointages = useCallback(async () => {
     if (!ecoleId) return
-    const supabase = useMemo(() => createClient(), [])
+    const supabase = createClient()
     const { data } = await (supabase.from('repas_pris') as any)
       .select('eleve_id, present')
       .eq('ecole_id', ecoleId)
@@ -299,7 +299,7 @@ export default function CantinePage() {
   // ── Delete helpers ────────────────────────────────────────────
   const handleDeleteMenu = async (id: string) => {
     if (!confirm('Supprimer ce menu ?')) return
-    const supabase = useMemo(() => createClient(), [])
+    const supabase = createClient()
     await (supabase.from('menus_cantine') as any).delete().eq('id', id)
     toast.success('Le menu a été supprimé')
     await loadMenus()
@@ -307,7 +307,7 @@ export default function CantinePage() {
 
   const handleDeleteAbonnement = async (id: string) => {
     if (!confirm('Supprimer cet abonnement ?')) return
-    const supabase = useMemo(() => createClient(), [])
+    const supabase = createClient()
     await (supabase.from('abonnements_cantine') as any).delete().eq('id', id)
     toast.success("L'abonnement a été supprimé")
     await loadAbonnements()
@@ -316,7 +316,7 @@ export default function CantinePage() {
   // ── Toggle abonnement statut ──────────────────────────────────
   const handleToggleAbonnement = async (a: AbonnementCantine) => {
     const newStatut: AbonnementStatut = a.statut === 'actif' ? 'suspendu' : 'actif'
-    const supabase = useMemo(() => createClient(), [])
+    const supabase = createClient()
     await (supabase.from('abonnements_cantine') as any)
       .update({ statut: newStatut })
       .eq('id', a.id)
@@ -333,7 +333,7 @@ export default function CantinePage() {
     setError('')
 
     try {
-      const supabase = useMemo(() => createClient(), [])
+      const supabase = createClient()
 
       if (modalType === 'menu') {
         if (!fmPlat.trim()) {
@@ -410,7 +410,7 @@ export default function CantinePage() {
     if (!ecoleId) return
     setSaving(true)
     try {
-      const supabase = useMemo(() => createClient(), [])
+      const supabase = createClient()
       // Find menu_id for today
       const todayJour = getTodayJour()
       const currentMenu = menus.find(m => m.jour === todayJour) || null

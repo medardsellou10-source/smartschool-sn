@@ -93,7 +93,7 @@ export default function UtilisateursPage() {
       return
     }
 
-    const supabase = useMemo(() => createClient(), [])
+    const supabase = createClient()
 
     // Charger le type d'établissement de l'école
     const { data: ecoleData } = await supabase
@@ -162,7 +162,7 @@ export default function UtilisateursPage() {
       )
       return
     }
-    const supabase = useMemo(() => createClient(), [])
+    const supabase = createClient()
     await (supabase.from('utilisateurs') as any)
       .update({ actif: !currentActif })
       .eq('id', userId)

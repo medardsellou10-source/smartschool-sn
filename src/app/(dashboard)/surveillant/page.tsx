@@ -50,7 +50,7 @@ export default function SurveillantDashboard() {
 
   const loadStats = useCallback(async () => {
     if (!ecoleId) return
-    const today = useMemo(() => new Date(), []).toISOString().split('T')[0]
+    const today = new Date().toISOString().split('T')[0]
     const { data } = await supabase.from('pointages_profs').select('*').eq('ecole_id', ecoleId).eq('date_pointage', today)
     const rows = (data || []) as unknown as PointageRow[]
     const { count: totalProfs } = await supabase.from('utilisateurs').select('*', { count: 'exact', head: true }).eq('ecole_id', ecoleId).eq('role', 'professeur').eq('actif', true)
@@ -68,7 +68,7 @@ export default function SurveillantDashboard() {
   useEffect(() => {
     if (!ecoleId) return
     if (isDemoMode()) {
-      const today = useMemo(() => new Date(), []).toISOString().split('T')[0]
+      const today = new Date().toISOString().split('T')[0]
       const todayP = DEMO_POINTAGES.filter(p => p.date_pointage === today)
       const total = DEMO_PROFESSEURS.length
       setStats({ presents: todayP.filter(r => r.statut === 'a_heure').length, retards: todayP.filter(r => r.statut === 'retard_leger').length, graves: todayP.filter(r => r.statut === 'retard_grave').length, absents: Math.max(0, total - todayP.length), total })

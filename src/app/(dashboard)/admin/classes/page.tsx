@@ -67,7 +67,7 @@ export default function ClassesPage() {
       return
     }
 
-    const supabase = useMemo(() => createClient(), [])
+    const supabase = createClient()
     const [classesRes, profsRes] = await Promise.all([
       (supabase.from('classes') as any)
         .select('*, eleves(count), utilisateurs!titulaire_id(nom, prenom)')
@@ -182,7 +182,7 @@ export default function ClassesPage() {
     }
 
     try {
-      const supabase = useMemo(() => createClient(), [])
+      const supabase = createClient()
       const payload = {
         ecole_id: ecoleId,
         nom: formNom.trim(),

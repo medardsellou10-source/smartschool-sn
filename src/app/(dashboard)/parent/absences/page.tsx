@@ -45,7 +45,7 @@ export default function AbsencesPage() {
 
   // Charger notifications du surveillant depuis localStorage
   useEffect(() => {
-    const today = useMemo(() => new Date(), []).toISOString().split('T')[0]
+    const today = new Date().toISOString().split('T')[0]
     const raw = localStorage.getItem('ss_notifs_parents')
     if (raw) {
       try {
@@ -319,7 +319,7 @@ export default function AbsencesPage() {
               }
             } else if (!cell.isWeekend) {
               // Passé = présent (vert subtil)
-              const today = useMemo(() => new Date(), []).toISOString().split('T')[0]
+              const today = new Date().toISOString().split('T')[0]
               if (cell.date <= today) {
                 bg = 'bg-ss-green/8'
                 textColor = 'text-ss-text'

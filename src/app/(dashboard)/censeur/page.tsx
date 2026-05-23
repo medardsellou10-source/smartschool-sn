@@ -49,7 +49,7 @@ export default function CenseurDashboard() {
 
   const loadDemoData = useCallback(() => {
     if (!user) return
-    const today = useMemo(() => new Date(), []).toISOString().split('T')[0]
+    const today = new Date().toISOString().split('T')[0]
     const todayPointages = DEMO_POINTAGES.filter(p => p.date_pointage === today && p.statut !== 'absent')
     const examEnCours = DEMO_EXAMENS.filter(e => e.statut === 'en_cours').length + DEMO_EXAMENS.filter(e => e.statut === 'planifie').length
     const bullValides = DEMO_BULLETINS_CENSEUR.filter(b => b.statut === 'valide').reduce((s, b) => s + b.valides, 0)
@@ -70,7 +70,7 @@ export default function CenseurDashboard() {
     if (!user?.ecole_id) return
     setLoading(true)
     const ecoleId = user.ecole_id
-    const today = useMemo(() => new Date(), []).toISOString().split('T')[0]
+    const today = new Date().toISOString().split('T')[0]
     const now = new Date()
     const nowTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
     const jsDay = now.getDay()

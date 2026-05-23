@@ -325,7 +325,7 @@ function ExportButton({ ecoleId }: { ecoleId: string }) {
     setExporting(true)
     try {
       const XLSX = await import('xlsx')
-      const supabase = useMemo(() => createClient(), [])
+      const supabase = createClient()
 
       // Récupérer données
       const [facturesRes, paiementsRes] = await Promise.all([

@@ -148,7 +148,7 @@ export default function AbonnementPage() {
       setLoading(false)
       return
     }
-    const supabase = useMemo(() => createClient(), [])
+    const supabase = createClient()
     async function load() {
       const [aboRes, plansRes] = await Promise.all([
         (supabase.from('abonnements') as any)

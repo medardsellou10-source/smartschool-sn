@@ -69,8 +69,8 @@ export default function AdminDashboard() {
   const loadData = useCallback(async () => {
     if (!ecoleId) return
     setLoading(true)
-    const supabase = useMemo(() => createClient(), [])
-    const today = useMemo(() => new Date(), []).toISOString().split('T')[0]
+    const supabase = createClient()
+    const today = new Date().toISOString().split('T')[0]
 
     const [elevesRes, profsRes, absencesRes, facturesRes, paiementsRes, notifsRes, pointagesRes] = await Promise.all([
       supabase.from('eleves').select('id', { count: 'exact', head: true }).eq('ecole_id', ecoleId).eq('actif', true),
@@ -116,7 +116,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (!ecoleId) return
-    const supabase = useMemo(() => createClient(), [])
+    const supabase = createClient()
     const channel = supabase.channel('admin_feed')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'pointages_profs', filter: `ecole_id=eq.${ecoleId}` }, (payload: any) => {
         const statut = payload.new.statut
