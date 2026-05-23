@@ -82,7 +82,8 @@ const MOBILE_MENUS: Record<string, { emoji: string; label: string; href: string 
   intendant: [
     { emoji: '🏠', label: 'Accueil', href: '/intendant' },
     { emoji: '📈', label: 'Budget', href: '/intendant/budget' },
-    { emoji: '💰', label: 'Paiements', href: '/intendant/paiements' },
+    { emoji: '💰', label: 'Paiements parents', href: '/intendant/paiements' },
+    { emoji: '💼', label: 'Salaires personnel', href: '/intendant/salaires' },
     { emoji: '🍽️', label: 'Cantine', href: '/intendant/cantine' },
     { emoji: '🗄️', label: 'Inventaire', href: '/intendant/inventaire' },
   ],
