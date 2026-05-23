@@ -10,7 +10,7 @@
  */
 
 import { useMemo, useState } from 'react'
-import { Printer, RefreshCw, UserPlus } from 'lucide-react'
+import { Printer, RefreshCw, UserPlus, Download } from 'lucide-react'
 import { PageHeader } from '@/components/dashboard/PageHeader'
 import { useUser } from '@/hooks/useUser'
 
@@ -86,8 +86,35 @@ export default function WelcomeParentPage() {
           >
             <Printer className="h-4 w-4" aria-hidden /> Imprimer la fiche
           </button>
+          <button
+            type="button"
+            onClick={async () => {
+              const res = await fetch('/api/parents/welcome-pdf', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  parent: { prenom: parentPrenom, nom: parentNom, telephone },
+                  eleves: enfants.map(e => ({ prenom: e.prenom, nom: e.nom, classe: e.classe, matricule: e.matricule })),
+                  ecole: { nom: 'Lycée Cheikh Anta Diop', contact_whatsapp: '+221 77 000 00 00' },
+                  mdp_temporaire: mdp,
+                  login_base_url: typeof window !== 'undefined' ? window.location.origin : undefined,
+                }),
+              })
+              if (!res.ok) { alert('Erreur génération PDF'); return }
+              const blob = await res.blob()
+              const url = URL.createObjectURL(blob)
+              const a = document.createElement('a')
+              a.href = url
+              a.download = `WAED-Bienvenue-${parentPrenom}-${parentNom}.pdf`
+              document.body.appendChild(a); a.click(); a.remove()
+              setTimeout(() => URL.revokeObjectURL(url), 1000)
+            }}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-ss-text/15 bg-ss-text/5 px-3 py-2 text-xs font-bold text-ss-text-secondary hover:bg-ss-text/10"
+          >
+            <Download className="h-4 w-4" aria-hidden /> Télécharger PDF
+          </button>
           <p className="self-center text-[11px] text-ss-text-secondary">
-            La fiche imprimée n'inclut que la zone aperçu ci-dessous.
+            La fiche imprimée n'inclut que la zone aperçu ci-dessous. Le PDF est généré côté serveur.
           </p>
         </div>
       </section>
