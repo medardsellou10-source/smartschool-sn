@@ -150,8 +150,8 @@ export default function AppelPage() {
     setSubmitting(false)
   }
 
-  // ── Envoyer au Surveillant ────────────────────────────────────
-  const handleEnvoyerAuSurveillant = () => {
+  // ── Envoyer au Surveillant (+ Censeur + Parents) ──────────────
+  const handleEnvoyerAuSurveillant = async () => {
     const absentsListe = eleves.filter(e => e.statut !== 'present').map(e => ({
       id: e.id,
       nom: e.nom,
@@ -183,15 +183,35 @@ export default function AppelPage() {
 
     if (!isDemoMode() && user && ecoleId) {
       const supabase = createClient()
-      // Notification Supabase pour le surveillant
-      ;(supabase.from('notifications') as any).insert({
+      // Notifications: chaîne Surveillant → Censeur → Parents
+      const notifBase = {
         ecole_id: ecoleId,
-        user_id: user.id,
-        type_notif: 'appel_transmis_surveillant',
-        titre: `Appel transmis — ${selectedClasseNom}`,
         contenu: JSON.stringify(appel),
         priorite: 3,
-      })
+      }
+      // 1) Surveillants
+      const { data: survs } = await (supabase.from('utilisateurs') as any)
+        .select('id').eq('ecole_id', ecoleId).eq('role', 'surveillant')
+      // 2) Censeurs (vue agrégée)
+      const { data: cens } = await (supabase.from('utilisateurs') as any)
+        .select('id').eq('ecole_id', ecoleId).eq('role', 'censeur')
+      // 3) Parents des élèves absents
+      const { data: elevesAbs } = await (supabase.from('eleves') as any)
+        .select('parent_principal_id').in('id', absentsListe.map(e => e.id))
+
+      const cibles = [
+        ...(survs || []).map((u: any) => ({ user_id: u.id, type_notif: 'appel_transmis_surveillant', titre: `Appel transmis — ${selectedClasseNom}` })),
+        ...(cens || []).map((u: any) => ({ user_id: u.id, type_notif: 'appel_pour_censeur', titre: `Appel ${selectedClasseNom} : ${absentsListe.length} signalement(s)` })),
+        ...(elevesAbs || []).filter((e: any) => e.parent_principal_id).map((e: any) => ({
+          user_id: e.parent_principal_id, type_notif: 'absence_enfant',
+          titre: `Absence signalée — ${dateLabel}`,
+        })),
+      ]
+      if (cibles.length > 0) {
+        await (supabase.from('notifications') as any).insert(
+          cibles.map(c => ({ ...notifBase, ...c }))
+        )
+      }
     }
 
     setEnvoyeSurveillant(true)

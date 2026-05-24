@@ -164,11 +164,9 @@ export default function SupportPedagogiquePage() {
 
   const tabs: { id: TabId; label: string; icon: string }[] = [
     { id: 'semaine', label: 'Ma Semaine', icon: '🗓️' },
-    { id: 'grille', label: 'Grille Horaire', icon: '📅' },
     { id: 'planning', label: 'Planning Annuel', icon: '📆' },
     { id: 'modules', label: 'Modules & Leçons', icon: '📚' },
     { id: 'suivi', label: 'Suivi des Cours', icon: '✅' },
-    { id: 'semestre', label: 'Planning Semestriel', icon: '📊' },
     { id: 'ressources', label: 'Ressources', icon: '🌐' },
   ]
 

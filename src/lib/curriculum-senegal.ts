@@ -69,6 +69,22 @@ export interface RessourceEnLigne {
   description: string
   annee?: string
   source?: string
+  /** URL d'aperçu (miniature YouTube auto, image PhET, etc.) */
+  thumbnail_url?: string
+  /** Durée approximative en minutes (vidéos / TP) */
+  duree_min?: number
+  /** Niveau de difficulté affichable */
+  difficulte?: 'facile' | 'moyen' | 'difficile'
+}
+
+/** Helpers — extraction de l'ID YouTube et URL miniature haute qualité */
+export function youtubeIdFromUrl(url: string): string | null {
+  const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/)
+  return m ? m[1] : null
+}
+export function youtubeThumb(url: string): string | null {
+  const id = youtubeIdFromUrl(url)
+  return id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : null
 }
 
 // ── Grilles Horaires Hebdomadaires ─────────────────────────────────────────────
@@ -1470,7 +1486,12 @@ export function getProgramme(matiere: string, niveau: string, serie?: string): P
 }
 
 export function getRessources(filters: { matiere?: string; niveau?: string; type?: RessourceEnLigne['type']; serie?: string }): RessourceEnLigne[] {
-  return RESSOURCES_EN_LIGNE.filter(r => {
+  // Fusion : ressources historiques + bibliothèque étendue (Maternelle→Terminale)
+  // Import dynamique pour éviter dépendance circulaire
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { RESSOURCES_EXTENSIVES } = require('./ressources-extensives') as { RESSOURCES_EXTENSIVES: RessourceEnLigne[] }
+  const all = [...RESSOURCES_EN_LIGNE, ...RESSOURCES_EXTENSIVES]
+  return all.filter(r => {
     if (filters.matiere && r.matiere !== filters.matiere) return false
     if (filters.niveau && r.niveau !== filters.niveau) return false
     if (filters.type && r.type !== filters.type) return false
