@@ -58,11 +58,15 @@ export function PageHeader({
       <div className="flex items-start gap-3 min-w-0 flex-1">
         {Icon && (
           <div
-            className="shrink-0 w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center"
-            style={{ background: palette.bg, border: `1px solid ${palette.border}` }}
+            className="shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center shadow-sm transition-transform hover:scale-105"
+            style={{
+              background: `linear-gradient(135deg, ${palette.bg} 0%, ${palette.bg.replace('0.12', '0.04')} 100%)`,
+              border: `1px solid ${palette.border}`,
+              boxShadow: `inset 0 1px 0 rgba(255,255,255,0.06), 0 1px 3px rgba(0,0,0,0.04)`,
+            }}
             aria-hidden="true"
           >
-            <Icon size={20} style={{ color: palette.color }} />
+            <Icon size={22} style={{ color: palette.color }} strokeWidth={2.2} />
           </div>
         )}
 
