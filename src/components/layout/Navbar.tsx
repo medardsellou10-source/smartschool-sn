@@ -84,6 +84,7 @@ const MOBILE_MENUS: Record<string, { emoji: string; label: string; href: string 
     { emoji: '📈', label: 'Budget', href: '/intendant/budget' },
     { emoji: '💰', label: 'Paiements parents', href: '/intendant/paiements' },
     { emoji: '💼', label: 'Salaires personnel', href: '/intendant/salaires' },
+    { emoji: '🛒', label: 'Achats fournisseurs', href: '/intendant/achats' },
     { emoji: '🍽️', label: 'Cantine', href: '/intendant/cantine' },
     { emoji: '🗄️', label: 'Inventaire', href: '/intendant/inventaire' },
   ],
@@ -92,6 +93,7 @@ const MOBILE_MENUS: Record<string, { emoji: string; label: string; href: string 
     { emoji: '👨‍🏫', label: 'Pointage profs', href: '/censeur/professeurs' },
     { emoji: '📅', label: 'Emplois du temps', href: '/censeur/emplois-temps' },
     { emoji: '📝', label: 'Examens', href: '/censeur/examens' },
+    { emoji: '🎓', label: 'Conseils de classe', href: '/censeur/conseils-classe' },
     { emoji: '✅', label: 'Bulletins', href: '/censeur/bulletins' },
   ],
 }
