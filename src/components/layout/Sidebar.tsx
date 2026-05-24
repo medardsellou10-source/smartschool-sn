@@ -79,6 +79,7 @@ const MENUS: Record<string, NavItem[]> = {
     { href: '/admin/groupe', label: 'Groupe scolaire', icon: Icons.building },
     { href: '/admin/export', label: 'Export État', icon: Icons.export },
     { href: '/admin/whatsapp', label: 'WhatsApp', icon: Icons.message },
+    { href: '/admin/ressources-sync', label: 'Sync YouTube', icon: Icons.teacher },
     { href: '/admin/abonnement', label: 'Mon Abonnement', icon: Icons.card },
     { href: '/admin/parametres', label: 'Configuration', icon: Icons.settings },
   ],
@@ -120,7 +121,8 @@ const MENUS: Record<string, NavItem[]> = {
     { href: '/eleve/emploi-temps', label: 'Emploi du temps (semaine)', icon: Icons.calendar },
     { href: '/eleve/edt-mobile', label: 'Emploi du temps (jour)', icon: Icons.calendar },
     { href: '/eleve/cahier-texte', label: 'Cahier de texte', icon: Icons.book },
-    { href: '/eleve/ressources', label: 'Ressources & Annales', icon: Icons.teacher },
+    { href: '/eleve/ressources', label: 'Ressources & Vidéos', icon: Icons.teacher },
+    { href: '/eleve/annales', label: 'Annales BAC/BFEM', icon: Icons.file },
     { href: '/eleve/elearning', label: 'E-Learning', icon: Icons.monitor },
   ],
   secretaire: [
@@ -146,6 +148,7 @@ const MENUS: Record<string, NavItem[]> = {
   censeur: [
     { href: '/censeur',               label: 'Accueil',          icon: Icons.home },
     { href: '/censeur/pilotage',      label: 'Pilotage école',   icon: Icons.chart },
+    { href: '/censeur/appels-du-jour', label: 'Appels du jour (live)', icon: Icons.clipboard },
     { href: '/censeur/activites',     label: 'Activités (validation)', icon: Icons.checkSquare },
     { href: '/censeur/professeurs',   label: 'Pointage profs',   icon: Icons.teacher },
     { href: '/censeur/emplois-temps', label: 'Emplois du temps', icon: Icons.calendar },
