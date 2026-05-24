@@ -73,14 +73,14 @@ function genHeures() {
 }
 const HEURES = genHeures()
 
-// 6 couleurs pour les matières
+// 6 couleurs pour les matières — lisibles en mode clair ET sombre
 const COULEURS_MATIERES = [
-  'bg-blue-500/20 text-blue-300 border-blue-500/30',
-  'bg-purple-500/20 text-purple-300 border-purple-500/30',
-  'bg-green-500/20 text-green-300 border-green-500/30',
-  'bg-orange-500/20 text-orange-300 border-orange-500/30',
-  'bg-pink-500/20 text-pink-300 border-pink-500/30',
-  'bg-yellow-500/20 text-yellow-300 border-yellow-500/30',
+  'bg-blue-500/15 text-blue-700 dark:text-blue-200 border border-blue-500/30',
+  'bg-purple-500/15 text-purple-700 dark:text-purple-200 border border-purple-500/30',
+  'bg-green-500/15 text-green-700 dark:text-green-200 border border-green-500/30',
+  'bg-orange-500/15 text-orange-700 dark:text-orange-200 border border-orange-500/30',
+  'bg-pink-500/15 text-pink-700 dark:text-pink-200 border border-pink-500/30',
+  'bg-amber-500/15 text-amber-800 dark:text-amber-200 border border-amber-500/30',
 ]
 
 function getMatiereCouleur(matiereId: string, matieres: Matiere[]): string {
@@ -509,7 +509,7 @@ export default function EmploisTempsPage() {
       {/* Modal assigner / modifier cours */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
-          <div className="bg-[#141833] rounded-2xl p-6 max-w-md w-full shadow-2xl">
+          <div className="bg-ss-bg-card border border-ss-border rounded-2xl p-6 max-w-md w-full shadow-2xl">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-lg font-bold text-ss-text">
                 {editCreneau ? 'Modifier le cours' : 'Assigner un cours'}
@@ -625,7 +625,7 @@ export default function EmploisTempsPage() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex-1 bg-ss-cyan text-ss-text font-medium text-sm py-2.5 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
+                  className="flex-1 bg-ss-info text-white font-semibold text-sm py-2.5 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
                 >
                   {saving ? 'Enregistrement...' : editCreneau ? 'Modifier' : 'Assigner'}
                 </button>

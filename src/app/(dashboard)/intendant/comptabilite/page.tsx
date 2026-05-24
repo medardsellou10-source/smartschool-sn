@@ -314,8 +314,8 @@ function TypeBadge({ t }: { t: 'actif'|'passif'|'charge'|'produit' }) {
   return <span className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase" style={{ color: meta.c, background: meta.bg }}>{t}</span>
 }
 
-function Th({ children }: { children: React.ReactNode }) { return <th className="px-3 py-2 text-[11px] font-bold uppercase tracking-wider text-ss-text-muted">{children}</th> }
-function Td({ children }: { children: React.ReactNode }) { return <td className="px-3 py-2 text-ss-text-secondary">{children}</td> }
+function Th({ children }: { children?: React.ReactNode }) { return <th className="px-3 py-2 text-[11px] font-bold uppercase tracking-wider text-ss-text-muted">{children}</th> }
+function Td({ children }: { children?: React.ReactNode }) { return <td className="px-3 py-2 text-ss-text-secondary">{children}</td> }
 
 function EcritureModal({ e, onClose, onSave }: { e: Ecriture; onClose: () => void; onSave: (e: Ecriture) => void }) {
   const [d, setD] = useState<Ecriture>(e)

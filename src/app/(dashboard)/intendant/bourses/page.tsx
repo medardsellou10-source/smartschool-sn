@@ -173,7 +173,7 @@ export default function BoursesPage() {
   )
 }
 
-function Th({ children }: { children: React.ReactNode }) { return <th className="px-3 py-2 text-[11px] font-bold uppercase tracking-wider text-ss-text-muted">{children}</th> }
+function Th({ children }: { children?: React.ReactNode }) { return <th className="px-3 py-2 text-[11px] font-bold uppercase tracking-wider text-ss-text-muted">{children}</th> }
 function Td({ children, className }: { children: React.ReactNode; className?: string }) { return <td className={`px-3 py-2 text-ss-text-secondary ${className ?? ''}`}>{children}</td> }
 
 function Kpi({ label, value, sub, color }: { label: string; value: string; sub: string; color: 'green'|'cyan'|'gold'|'red' }) {

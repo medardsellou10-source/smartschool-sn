@@ -180,7 +180,7 @@ export default function FiscalitePage() {
   )
 }
 
-function Th({ children }: { children: React.ReactNode }) { return <th className="px-3 py-2 text-[11px] font-bold uppercase tracking-wider text-ss-text-muted">{children}</th> }
+function Th({ children }: { children?: React.ReactNode }) { return <th className="px-3 py-2 text-[11px] font-bold uppercase tracking-wider text-ss-text-muted">{children}</th> }
 function Td({ children, className }: { children: React.ReactNode; className?: string }) { return <td className={`px-3 py-2 text-ss-text-secondary ${className ?? ''}`}>{children}</td> }
 
 function Kpi({ label, value, Icon, color }: { label: string; value: string; Icon: typeof Landmark; color: 'green'|'red'|'cyan'|'gold' }) {

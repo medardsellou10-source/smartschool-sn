@@ -590,6 +590,126 @@
 .fade-up { animation: role-fade-up 0.5s ease-out both; }
 .blob    { animation: role-pulse-slow 8s ease-in-out infinite; }
 
+/* ══════════════════════════════════════════════════════════════════════
+   LISIBILITÉ MODE CLAIR — OVERRIDES UNIVERSELS (premium contrast)
+   ─────────────────────────────────────────────────────────────────────
+   Beaucoup de pages dashboard utilisent des classes Tailwind « dark-first »
+   (text-X-300/400 sur fond sombre). En mode clair, ces couleurs deviennent
+   illisibles (gris pâle sur blanc). Ces règles remappent automatiquement
+   les couleurs problématiques vers des nuances plus profondes (600/700)
+   sans toucher au code des composants. Pour cibler uniquement le mode
+   clair, on utilise :root:not(.dark) avec une spécificité suffisante.
+   ══════════════════════════════════════════════════════════════════════ */
+
+:root:not(.dark) {
+  /* ── Textes colorés trop pâles : remap vers versions saturées ── */
+  & .text-blue-200, & .text-blue-300, & .text-blue-400 { color: #1d4ed8 !important; }
+  & .text-sky-200, & .text-sky-300, & .text-sky-400 { color: #0369a1 !important; }
+  & .text-cyan-200, & .text-cyan-300, & .text-cyan-400 { color: #0e7490 !important; }
+  & .text-indigo-200, & .text-indigo-300, & .text-indigo-400 { color: #4338ca !important; }
+  & .text-violet-200, & .text-violet-300, & .text-violet-400 { color: #6d28d9 !important; }
+  & .text-purple-200, & .text-purple-300, & .text-purple-400 { color: #7c3aed !important; }
+  & .text-fuchsia-200, & .text-fuchsia-300, & .text-fuchsia-400 { color: #a21caf !important; }
+  & .text-pink-200, & .text-pink-300, & .text-pink-400 { color: #be185d !important; }
+  & .text-rose-200, & .text-rose-300, & .text-rose-400 { color: #be123c !important; }
+  & .text-red-200, & .text-red-300, & .text-red-400 { color: #b91c1c !important; }
+  & .text-orange-200, & .text-orange-300, & .text-orange-400 { color: #c2410c !important; }
+  & .text-amber-200, & .text-amber-300, & .text-amber-400 { color: #b45309 !important; }
+  & .text-yellow-200, & .text-yellow-300, & .text-yellow-400 { color: #a16207 !important; }
+  & .text-lime-200, & .text-lime-300, & .text-lime-400 { color: #4d7c0f !important; }
+  & .text-green-200, & .text-green-300, & .text-green-400 { color: #15803d !important; }
+  & .text-emerald-200, & .text-emerald-300, & .text-emerald-400 { color: #047857 !important; }
+  & .text-teal-200, & .text-teal-300, & .text-teal-400 { color: #0f766e !important; }
+
+  /* ── Gris pâles invisibles sur blanc ── */
+  & .text-slate-300, & .text-slate-400 { color: #475569 !important; }
+  & .text-gray-300, & .text-gray-400 { color: #4b5563 !important; }
+  & .text-zinc-300, & .text-zinc-400 { color: #52525b !important; }
+  & .text-neutral-300, & .text-neutral-400 { color: #525252 !important; }
+  & .text-stone-300, & .text-stone-400 { color: #57534e !important; }
+  & .text-white\/60, & .text-white\/70, & .text-white\/80 { color: #334155 !important; }
+  & .text-white\/50 { color: #475569 !important; }
+
+  /* ── Fonds sombres hardcodés (modals, panels) → surfaces claires ── */
+  & .bg-\[\#141833\],
+  & .bg-\[\#0A0E27\],
+  & .bg-\[\#0B1120\],
+  & .bg-\[\#020617\] {
+    background-color: var(--ss-bg-card) !important;
+    color: var(--ss-text) !important;
+    border-color: var(--ss-border);
+  }
+  & .bg-\[\#141833\] *, & .bg-\[\#0A0E27\] *, & .bg-\[\#0B1120\] *, & .bg-\[\#020617\] * {
+    color: inherit;
+  }
+  /* Inputs/selects à l'intérieur des modals doivent rester lisibles */
+  & .bg-\[\#141833\] input,
+  & .bg-\[\#141833\] select,
+  & .bg-\[\#141833\] textarea,
+  & .bg-\[\#0A0E27\] input,
+  & .bg-\[\#0A0E27\] select,
+  & .bg-\[\#0A0E27\] textarea,
+  & .bg-\[\#0B1120\] input,
+  & .bg-\[\#0B1120\] select,
+  & .bg-\[\#0B1120\] textarea {
+    background-color: var(--ss-bg-secondary) !important;
+    color: var(--ss-text) !important;
+    border-color: var(--ss-border) !important;
+  }
+
+  /* ── Tints colorés très transparents (bg-X-500/10) garder ok ── */
+  /* Ces fonds clairs (X-500/10) restent lisibles, on n'y touche pas. */
+
+  /* ── Borders pâles invisibles ── */
+  & .border-white\/5, & .border-white\/10, & .border-white\/20 {
+    border-color: rgba(15, 23, 42, 0.12) !important;
+  }
+  & .divide-white\/5 > :not([hidden]) ~ :not([hidden]),
+  & .divide-white\/10 > :not([hidden]) ~ :not([hidden]) {
+    border-color: rgba(15, 23, 42, 0.10) !important;
+  }
+
+  /* ── Placeholders gris pâles ── */
+  & .placeholder\:text-slate-400::placeholder,
+  & .placeholder\:text-gray-400::placeholder,
+  & .placeholder\:text-white\/40::placeholder,
+  & .placeholder\:text-white\/50::placeholder {
+    color: #64748b !important;
+  }
+
+  /* ── Liens et hover sur fonds clairs ── */
+  & .hover\:text-white:hover { color: var(--ss-text) !important; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   LISIBILITÉ MODE SOMBRE — RENFORCEMENTS PREMIUM
+   Quelques classes très foncées (text-X-600/700/800/900) deviennent
+   invisibles sur fond sombre. On les remonte vers les versions claires.
+   ══════════════════════════════════════════════════════════════════════ */
+
+.dark {
+  & .text-blue-600, & .text-blue-700, & .text-blue-800, & .text-blue-900 { color: #93c5fd !important; }
+  & .text-sky-600, & .text-sky-700, & .text-sky-800, & .text-sky-900 { color: #7dd3fc !important; }
+  & .text-cyan-600, & .text-cyan-700, & .text-cyan-800, & .text-cyan-900 { color: #67e8f9 !important; }
+  & .text-indigo-600, & .text-indigo-700, & .text-indigo-800, & .text-indigo-900 { color: #a5b4fc !important; }
+  & .text-violet-600, & .text-violet-700, & .text-violet-800, & .text-violet-900 { color: #c4b5fd !important; }
+  & .text-purple-600, & .text-purple-700, & .text-purple-800, & .text-purple-900 { color: #d8b4fe !important; }
+  & .text-pink-600, & .text-pink-700, & .text-pink-800, & .text-pink-900 { color: #f9a8d4 !important; }
+  & .text-rose-600, & .text-rose-700, & .text-rose-800, & .text-rose-900 { color: #fda4af !important; }
+  & .text-red-600, & .text-red-700, & .text-red-800, & .text-red-900 { color: #fca5a5 !important; }
+  & .text-orange-600, & .text-orange-700, & .text-orange-800, & .text-orange-900 { color: #fdba74 !important; }
+  & .text-amber-600, & .text-amber-700, & .text-amber-800, & .text-amber-900 { color: #fcd34d !important; }
+  & .text-yellow-600, & .text-yellow-700, & .text-yellow-800, & .text-yellow-900 { color: #fde047 !important; }
+  & .text-green-600, & .text-green-700, & .text-green-800, & .text-green-900 { color: #86efac !important; }
+  & .text-emerald-600, & .text-emerald-700, & .text-emerald-800, & .text-emerald-900 { color: #6ee7b7 !important; }
+  & .text-teal-600, & .text-teal-700, & .text-teal-800, & .text-teal-900 { color: #5eead4 !important; }
+
+  & .text-slate-700, & .text-slate-800, & .text-slate-900 { color: #cbd5e1 !important; }
+  & .text-gray-700, & .text-gray-800, & .text-gray-900 { color: #d1d5db !important; }
+  & .text-zinc-700, & .text-zinc-800, & .text-zinc-900 { color: #d4d4d8 !important; }
+  & .text-black { color: var(--ss-text) !important; }
+}
+
 /* ══════════════════════════════════════════
    PRINT CSS
    ══════════════════════════════════════════ */

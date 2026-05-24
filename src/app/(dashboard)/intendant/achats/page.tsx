@@ -223,8 +223,8 @@ export default function AchatsPage() {
 
 // ── Helpers UI ─────────────────────────────────────────────────────────────
 
-function Th({ children }: { children: React.ReactNode }) { return <th className="px-3 py-2 text-[11px] font-bold uppercase tracking-wider text-ss-text-muted">{children}</th> }
-function Td({ children }: { children: React.ReactNode }) { return <td className="px-3 py-2 text-ss-text-secondary">{children}</td> }
+function Th({ children }: { children?: React.ReactNode }) { return <th className="px-3 py-2 text-[11px] font-bold uppercase tracking-wider text-ss-text-muted">{children}</th> }
+function Td({ children }: { children?: React.ReactNode }) { return <td className="px-3 py-2 text-ss-text-secondary">{children}</td> }
 
 function Kpi({ label, value, sub, color, Icon }: { label: string; value: string; sub: string; color: 'cyan'|'gold'|'green'|'red'; Icon: typeof ShoppingCart }) {
   const palette = ({
