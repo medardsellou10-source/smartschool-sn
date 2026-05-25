@@ -63,7 +63,7 @@ const BOTTOM_MENUS: Record<string, BottomItem[]> = {
     { href: '/eleve',               label: 'Accueil',   icon: HomeIcon },
     { href: '/eleve/notes',         label: 'Notes',     icon: ChartIcon },
     { href: '/eleve/elearning',     label: 'E-Learning',icon: MonitorIcon },
-    { href: '/eleve/correction',    label: 'Correction',icon: RobotIcon },
+    { href: '/eleve/annales',       label: 'Annales',   icon: BookIcon },
     { href: '/eleve/emploi-temps',  label: 'Planning',  icon: ClipIcon },
   ],
   secretaire: [

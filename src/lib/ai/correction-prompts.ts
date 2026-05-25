@@ -2,12 +2,25 @@
 // PROMPTS GEMINI — Moteur Correction 3 Étapes
 // ═══════════════════════════════════════════════════════════════════════════
 
+/** Niveau d'exigence de la correction */
+export type StrictnessMode = 'strict' | 'standard' | 'bienveillant'
+
+/** Détermine le cycle scolaire (Maternelle/Primaire/Collège/Lycée) à partir du niveau */
+export function cycleFromNiveau(niveau: string): 'maternelle' | 'primaire' | 'collège' | 'lycée' {
+  const n = (niveau || '').toLowerCase()
+  if (/mat/.test(n)) return 'maternelle'
+  if (/cp|ce1|ce2|cm1|cm2/.test(n)) return 'primaire'
+  if (/6|5|4|3.*[èe]me|collège|college|bfem/.test(n)) return 'collège'
+  return 'lycée'
+}
+
 // ── PROMPT 1 : Extraction structure du corrigé ───────────────────────────
 
 export function buildPromptEtape1(matiere: string, niveau: string): string {
-  return `Tu es un expert en éducation sénégalaise et un analyste de documents pédagogiques.
+  const cycle = cycleFromNiveau(niveau)
+  return `Tu es un expert en éducation ouest-africaine (Sénégal, Côte d'Ivoire) et un analyste de documents pédagogiques.
 
-Tu reçois une IMAGE du CORRIGÉ OFFICIEL d'un examen de ${matiere} pour la classe de ${niveau} dans un lycée sénégalais.
+Tu reçois une IMAGE du CORRIGÉ OFFICIEL d'un examen de ${matiere} pour la classe de ${niveau} en ${cycle}.
 
 TON OBJECTIF : Extraire la structure COMPLÈTE et EXHAUSTIVE de ce corrigé de manière parfaitement fidèle.
 
@@ -126,12 +139,38 @@ export function buildPromptEtape3(
   nomEleve: string,
   matiere: string,
   niveau: string,
-  evalType: string
+  evalType: string,
+  mode: StrictnessMode = 'standard'
 ): string {
-  return `Tu es un PROFESSEUR EXPERT en ${matiere}, correcteur officiel pour les examens de ${niveau} dans un lycée sénégalais.
+  const cycle = cycleFromNiveau(niveau)
+  const baremeRules = {
+    strict: `MODE STRICT (examen officiel type BAC/BFEM) :
+1. Le corrigé officiel est LA RÉFÉRENCE ABSOLUE — aucune dérogation possible.
+2. CHAQUE étape attendue doit être présente : démarche + calcul + justification + résultat.
+3. Réponse partiellement correcte (étape manquante) : maximum 50% des points.
+4. Erreur de calcul même si la méthode est juste : maximum 60% des points.
+5. Présentation défaillante (pas d'unité, pas de phrase de réponse) : -25%.
+6. Réponse correcte sans démonstration (en maths/sciences) : maximum 30% des points.
+7. Pas de demi-tolérance : applique le barème à la virgule près.`,
+    standard: `MODE STANDARD (devoir surveillé en classe) :
+1. Le corrigé officiel fait loi. Comparer STRICTEMENT chaque réponse.
+2. Les demi-points sont AUTORISÉS pour les réponses partiellement exactes.
+3. Bonne démarche + erreur mineure de calcul : au moins 50% des points.
+4. Réponse correcte mal présentée : perte maximale de 25% des points.
+5. Toute démarche valide reconnue (même différente du corrigé) si le résultat est juste.
+6. Aucun point négatif. Note minimale par question = 0.`,
+    bienveillant: `MODE BIENVEILLANT (évaluation formative, contrôle continu) :
+1. Le corrigé indique la réponse type mais d'autres formulations valables sont acceptées.
+2. Toute démarche correcte vaut au moins 75% des points même avec erreur finale.
+3. Effort visible de raisonnement : +1 point bonus (dans la limite du barème).
+4. Présentation non comptée tant que la réponse est compréhensible.
+5. Aucun point négatif. Note minimale par question = 0.`,
+  }[mode]
 
-Tu dois effectuer une correction RIGOUREUSE, JUSTE et PÉDAGOGIQUE.
-Élève : ${nomEleve} | Type d'évaluation : ${evalType}
+  return `Tu es un PROFESSEUR EXPERT en ${matiere}, correcteur officiel pour les examens de ${niveau} (${cycle}) au Sénégal/Côte d'Ivoire.
+
+Tu dois effectuer une correction RIGOUREUSE, JUSTE et PÉDAGOGIQUE, conforme au barème officiel.
+Élève : ${nomEleve} | Type d'évaluation : ${evalType} | Mode : ${mode.toUpperCase()}
 
 ─────────────────────────────────────────
 CORRIGÉ OFFICIEL (référence absolue) :
@@ -141,13 +180,12 @@ RÉPONSES DE L'ÉLÈVE :
 ${extractionCopieJson}
 ─────────────────────────────────────────
 
-PRINCIPES DE CORRECTION (lycée sénégalais) :
-1. Le corrigé officiel fait loi. Comparer STRICTEMENT chaque réponse.
-2. Les demi-points sont AUTORISÉS pour les réponses partiellement exactes.
-3. Bonne démarche + erreur mineure : au moins 50% des points.
-4. Réponse correcte mal présentée : perte maximale de 25% des points.
-5. Aucun point négatif. Note minimale par question = 0.
-6. Sois BIENVEILLANT dans les feedbacks : l'élève doit comprendre comment progresser.
+${baremeRules}
+
+7. Sois BIENVEILLANT et CONSTRUCTIF dans les feedbacks : l'élève doit comprendre comment progresser.
+8. Pour chaque question, compare LIGNE PAR LIGNE la réponse de l'élève avec la réponse attendue.
+9. La somme des points_obtenus DOIT être ≤ total_points du corrigé. Vérifie l'arithmétique.
+10. La note finale est sur 20 : note_finale = round((total_points_obtenus / total_points_max) * 20, 2)
 
 STATUTS :
 - "CORRECT" : réponse juste, méthode correcte → 100% des points
