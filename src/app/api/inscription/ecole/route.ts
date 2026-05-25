@@ -29,12 +29,19 @@ export async function POST(req: Request) {
     if (!isSupabaseConfigured()) {
       await new Promise(r => setTimeout(r, 1200)) // Délai réaliste
       const demoId = `demo-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
+      const reason = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
+        ? 'NEXT_PUBLIC_DEMO_MODE=true sur Vercel — passez la variable à false pour activer la prod.'
+        : !process.env.SUPABASE_SERVICE_ROLE_KEY
+        ? 'SUPABASE_SERVICE_ROLE_KEY manquante sur Vercel.'
+        : 'Configuration Supabase incomplète.'
       return NextResponse.json({
         success: true,
         mode: 'demo',
         ecole_id: demoId,
-        message: 'École créée avec succès (mode démonstration)',
+        message: 'École créée en mode démonstration',
         redirect_url: null,
+        warning_admin: reason,
+        doc_url: '/GO-LIVE-CHECKLIST.md',
       })
     }
 

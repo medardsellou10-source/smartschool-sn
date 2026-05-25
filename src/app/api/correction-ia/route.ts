@@ -24,7 +24,11 @@ export async function POST(req: NextRequest) {
 
     const apiKey = process.env.GOOGLE_GEMINI_API_KEY
     if (!apiKey) {
-      return NextResponse.json({ success: false, error: 'GOOGLE_GEMINI_API_KEY non configurée' }, { status: 503 })
+      return NextResponse.json({
+        success: false,
+        error: 'GOOGLE_GEMINI_API_KEY non configurée',
+        action_admin: 'Ajoutez la clé dans Vercel → Settings → Environment Variables.\nObtenir une clé gratuite : https://aistudio.google.com/app/apikey',
+      }, { status: 503 })
     }
 
     // Préparer corrigé en base64
@@ -62,7 +66,15 @@ export async function POST(req: NextRequest) {
 
         results.push(result)
       } catch (err: any) {
-        console.error(`[CorrectionIA] Erreur pour ${studentName}:`, err.message)
+        const msg = err?.message ?? 'Erreur inconnue'
+        const isQuota = /quota|RESOURCE_EXHAUSTED|429|rate.*limit/i.test(msg)
+        const isAuth  = /401|403|PERMISSION_DENIED|API_KEY_INVALID/i.test(msg)
+        const friendly = isQuota
+          ? `⚠️ Quota Gemini dépassé. Attendez 1 min ou passez sur le plan payant (https://ai.google.dev/pricing).`
+          : isAuth
+          ? `🔑 Clé GOOGLE_GEMINI_API_KEY invalide ou révoquée. Régénérer sur https://aistudio.google.com/app/apikey`
+          : `Erreur lors de la correction : ${msg}`
+        console.error(`[CorrectionIA] Erreur pour ${studentName}:`, msg)
         // Retourner un résultat d'erreur minimal pour ne pas bloquer les autres copies
         results.push({
           id: crypto.randomUUID(),
@@ -80,7 +92,7 @@ export async function POST(req: NextRequest) {
           points_forts: [],
           points_faibles: [],
           conseils: [],
-          appreciation_generale: `Erreur lors de la correction : ${err.message}`,
+          appreciation_generale: friendly,
           questions_correctes: 0,
           questions_partielles: 0,
           questions_incorrectes: 0,

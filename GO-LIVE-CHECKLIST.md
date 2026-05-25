@@ -46,22 +46,50 @@
 
 ## 🟡 À CONFIGURER AVANT GO-LIVE
 
-### Variables d'environnement Vercel **CRITIQUES**
+### Variables d'environnement Vercel **CRITIQUES — VALEURS PRÊTES À COPIER**
 
-Vérifier sur https://vercel.com/medardsellou10-8487s-projects/smartschool-sn/settings/environment-variables :
+🔗 Aller sur : https://vercel.com/medardsellou10-8487s-projects/smartschool-sn/settings/environment-variables
 
-| Variable | Statut attendu | Source |
+Pour chacune : `Add New` → Name + Value → Environment : `Production`, `Preview`, `Development` (tout cocher) → `Save`.
+
+#### ✅ Valeurs exactes à copier-coller (Supabase prod)
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://lgifumhjnvralwztythk.supabase.co
+
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxnaWZ1bWhqbnZyYWx3enR5dGhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0MTg4OTcsImV4cCI6MjA4OTk5NDg5N30.UewsTyGsmue-xVIZfH9MwmcC4PYcZGo7UplXbbTzu9w
+
+NEXT_PUBLIC_APP_URL=https://smartschool-sn.vercel.app
+
+NEXT_PUBLIC_DEMO_MODE=false
+```
+
+#### 🔐 Valeur SERVICE_ROLE — à récupérer toi-même (secret)
+
+```env
+SUPABASE_SERVICE_ROLE_KEY=<récupère sur https://supabase.com/dashboard/project/lgifumhjnvralwztythk/settings/api-keys>
+```
+
+Onglet "Project API keys" → "service_role" → cliquer **Reveal** → copier la clé `eyJ…` (jwt).
+⚠️ **Ne JAMAIS** mettre cette clé en `NEXT_PUBLIC_*` (elle bypass RLS).
+
+#### 🔑 Clés API tierces (optionnelles mais recommandées)
+
+| Variable | Valeur | Source |
 |---|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | `https://lgifumhjnvralwztythk.supabase.co` | Supabase → Project Settings → API |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `eyJ…` (jwt) | Supabase → Project Settings → API |
-| `SUPABASE_SERVICE_ROLE_KEY` | `eyJ…` (jwt, **secret**) | Supabase → Project Settings → API |
-| `NEXT_PUBLIC_DEMO_MODE` | **`false` ou supprimée** | (sinon toutes les inscriptions restent en mode démo) |
-| `NEXT_PUBLIC_APP_URL` | `https://smartschool-sn.vercel.app` | Domaine prod |
-| `GOOGLE_GEMINI_API_KEY` | `AIza…` | https://aistudio.google.com/app/apikey |
+| `GOOGLE_GEMINI_API_KEY` | `AIza…` | https://aistudio.google.com/app/apikey (gratuit 50 req/min) |
 | `YOUTUBE_API_KEY` | `AIza…` | https://console.cloud.google.com/apis/credentials |
-| `WAVE_API_KEY` | `wave_sn_prod_…` (optionnel) | Wave Sénégal Business |
-| `WHATSAPP_TOKEN` | (optionnel) | WhatsApp Business API |
-| `AFRICASTALKING_API_KEY` | (optionnel) | Africa's Talking SMS |
+| `WAVE_API_KEY` | `wave_sn_prod_…` | https://business.wave.com (compte Sénégal Business) |
+| `WHATSAPP_TOKEN` | longue durée | https://developers.facebook.com/apps |
+| `AFRICASTALKING_API_KEY` | atsk_… | https://account.africastalking.com |
+
+#### ✅ Vérification post-config
+
+Une fois les env vars sauvegardées :
+1. **Redéployer** : Vercel → Deployments → ⋯ → Redeploy (sans cache)
+2. **Tester health-check** : https://smartschool-sn.vercel.app/api/health
+   - Doit retourner `status: "ok"` ou `"warn"` (jamais `"fail"`)
+3. **Tester l'inscription** : `/inscription` → 4 étapes → vérifier que la réponse retourne `mode:"production"` (pas `"demo"`)
 
 **🔴 Bloquant identifié** : Le test API d'inscription retourne `mode: "demo"`.
 **Cause probable** : `NEXT_PUBLIC_DEMO_MODE=true` ou `SUPABASE_SERVICE_ROLE_KEY` manquante.
