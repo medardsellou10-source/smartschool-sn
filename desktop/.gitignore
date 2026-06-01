@@ -1,0 +1,13 @@
+# Tauri build artifacts
+src-tauri/target/
+src-tauri/Cargo.lock
+src-tauri/gen/
+
+# Node
+node_modules/
+package-lock.json
+
+# Tauri signing keys (NEVER commit)
+*.key
+*.pub
+tauri-key/

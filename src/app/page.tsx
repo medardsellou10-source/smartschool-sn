@@ -587,6 +587,7 @@ export default function LandingPage() {
           </a>
           <div className="w-px h-4 bg-ss-border" />
           <a href="#tarifs" className="hover:text-ss-text transition-colors">Tarifs</a>
+          <Link href="/telecharger" className="hover:text-ss-text transition-colors">Télécharger</Link>
           <a href="#faq" className="hover:text-ss-text transition-colors">FAQ</a>
         </div>
 
@@ -630,6 +631,7 @@ export default function LandingPage() {
               <Shield className="w-4 h-4" /> Admin
             </a>
             <a href="#tarifs" onClick={() => setMenuOpen(false)} className="text-ss-text-secondary">Tarifs</a>
+            <Link href="/telecharger" onClick={() => setMenuOpen(false)} className="text-ss-text-secondary">Télécharger</Link>
             <a href="#faq" onClick={() => setMenuOpen(false)} className="text-ss-text-secondary">FAQ</a>
             <hr className="border-ss-border" />
             <div className="flex items-center justify-between">

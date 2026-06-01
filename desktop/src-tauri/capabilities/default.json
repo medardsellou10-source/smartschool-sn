@@ -1,0 +1,14 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Permissions par défaut pour SmartSchool Desktop. Pas d'accès filesystem, pas d'exécution de processus.",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "shell:allow-open",
+    "notification:default",
+    "updater:default",
+    "process:default",
+    "process:allow-restart"
+  ]
+}

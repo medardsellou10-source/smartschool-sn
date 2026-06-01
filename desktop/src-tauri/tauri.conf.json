@@ -1,0 +1,86 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "SmartSchool",
+  "version": "0.1.0",
+  "identifier": "sn.smartschool.app",
+  "build": {
+    "beforeDevCommand": "",
+    "beforeBuildCommand": "",
+    "devUrl": "https://smartschool-sn.vercel.app",
+    "frontendDist": "../public-shell"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "SmartSchool SN",
+        "url": "https://smartschool-sn.vercel.app",
+        "width": 1280,
+        "height": 800,
+        "minWidth": 1024,
+        "minHeight": 640,
+        "resizable": true,
+        "fullscreen": false,
+        "center": true,
+        "decorations": true,
+        "alwaysOnTop": false,
+        "skipTaskbar": false,
+        "hiddenTitle": false,
+        "titleBarStyle": "Visible"
+      }
+    ],
+    "security": {
+      "csp": null,
+      "dangerousDisableAssetCspModification": false
+    },
+    "withGlobalTauri": false
+  },
+  "bundle": {
+    "active": true,
+    "createUpdaterArtifacts": true,
+    "targets": ["msi", "nsis"],
+    "publisher": "SmartSchool SN",
+    "category": "Education",
+    "shortDescription": "Gestion scolaire numérique",
+    "longDescription": "SmartSchool SN — Plateforme complète de gestion scolaire pour le Sénégal et la Côte d'Ivoire. Bulletins, notes, comptabilité, correction IA, paiements Wave/Orange Money, suivi pédagogique.",
+    "copyright": "© 2026 SmartSchool SN",
+    "homepage": "https://smartschool-sn.vercel.app",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "windows": {
+      "certificateThumbprint": null,
+      "digestAlgorithm": "sha256",
+      "timestampUrl": "http://timestamp.digicert.com",
+      "wix": {
+        "language": ["fr-FR", "en-US"]
+      },
+      "nsis": {
+        "languages": ["French", "English"],
+        "displayLanguageSelector": false,
+        "installMode": "currentUser",
+        "installerIcon": "icons/icon.ico"
+      },
+      "webviewInstallMode": {
+        "type": "embedBootstrapper"
+      }
+    }
+  },
+  "plugins": {
+    "updater": {
+      "active": true,
+      "endpoints": [
+        "https://smartschool-sn.vercel.app/api/desktop/updater/{{target}}/{{current_version}}"
+      ],
+      "pubkey": "REPLACE_WITH_GENERATED_PUBKEY",
+      "dialog": true,
+      "windows": {
+        "installMode": "passive"
+      }
+    }
+  }
+}

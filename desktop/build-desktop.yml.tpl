@@ -1,0 +1,91 @@
+name: Build SmartSchool Desktop (Windows)
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+jobs:
+  build-tauri-windows:
+    name: Build .msi + .exe (Windows x86_64)
+    runs-on: windows-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - name: Cache Cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            desktop/src-tauri/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('desktop/src-tauri/Cargo.toml') }}
+
+      - name: Install desktop deps
+        working-directory: desktop
+        run: npm ci || npm install
+
+      - name: Generate Tauri icons (idempotent)
+        working-directory: desktop
+        run: npx @tauri-apps/cli icon ../public/icons/icon-512.png --output src-tauri/icons
+        continue-on-error: true
+
+      - name: Build Tauri MSI + NSIS
+        working-directory: desktop
+        env:
+          TAURI_SIGNING_PRIVATE_KEY:          ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: npm run tauri:build
+
+      - name: Locate artifacts
+        id: artifacts
+        shell: pwsh
+        run: |
+          $msi = Get-ChildItem -Recurse -Path desktop/src-tauri/target/release/bundle/msi -Filter "*.msi" | Select-Object -First 1
+          $exe = Get-ChildItem -Recurse -Path desktop/src-tauri/target/release/bundle/nsis -Filter "*.exe" | Select-Object -First 1
+          if ($msi) { echo "msi=$($msi.FullName)" >> $env:GITHUB_OUTPUT }
+          if ($exe) { echo "exe=$($exe.FullName)" >> $env:GITHUB_OUTPUT }
+
+      - name: Upload .msi as workflow artifact
+        if: steps.artifacts.outputs.msi
+        uses: actions/upload-artifact@v4
+        with:
+          name: SmartSchool-windows-msi
+          path: ${{ steps.artifacts.outputs.msi }}
+
+      - name: Upload .exe as workflow artifact
+        if: steps.artifacts.outputs.exe
+        uses: actions/upload-artifact@v4
+        with:
+          name: SmartSchool-windows-exe
+          path: ${{ steps.artifacts.outputs.exe }}
+
+      - name: Publish to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: SmartSchool Desktop ${{ github.ref_name }}
+          generate_release_notes: true
+          files: |
+            desktop/src-tauri/target/release/bundle/msi/*.msi
+            desktop/src-tauri/target/release/bundle/msi/*.msi.zip
+            desktop/src-tauri/target/release/bundle/msi/*.msi.zip.sig
+            desktop/src-tauri/target/release/bundle/nsis/*.exe
+            desktop/src-tauri/target/release/bundle/nsis/*.exe.sig
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
