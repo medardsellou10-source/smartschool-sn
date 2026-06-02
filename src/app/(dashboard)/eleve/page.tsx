@@ -211,7 +211,6 @@ export default function EleveDashboard() {
     return <div className="space-y-4">{[...Array(5)].map((_, i) => <div key={i} className="h-28 rounded-2xl ss-shimmer" style={{ background: 'var(--ss-glass-card-bg)' }} />)}</div>
   }
 
-  const moyColor = moyenneGenerale !== null ? (moyenneGenerale >= 14 ? '#22C55E' : moyenneGenerale >= 10 ? '#FBBF24' : '#F87171') : '#38BDF8'
 
   return (
     <div className="space-y-5 pb-24 lg:pb-6 animate-fade-in">
