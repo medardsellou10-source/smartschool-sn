@@ -6,6 +6,10 @@ on:
       - 'v*.*.*'
   workflow_dispatch:
 
+# Permet au GITHUB_TOKEN de créer/publier des Releases (fix 403)
+permissions:
+  contents: write
+
 jobs:
   build-tauri-windows:
     name: Build .msi + .exe (Windows x86_64)
