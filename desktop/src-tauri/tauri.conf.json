@@ -76,7 +76,7 @@
       "endpoints": [
         "https://smartschool-sn.vercel.app/api/desktop/updater/{{target}}/{{current_version}}"
       ],
-      "pubkey": "REPLACE_WITH_GENERATED_PUBKEY",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEVFOUJEOTZCREMzQTkxN0YKUldSL2tUcmNhOW1iN3IvejVPMXY0ZXBRYTZxRkp2YnkyM1RmOEhRamM3dzVYSDRFVWoyYUJvR2IK",
       "dialog": true,
       "windows": {
         "installMode": "passive"
