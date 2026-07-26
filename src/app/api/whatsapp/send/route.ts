@@ -1,8 +1,19 @@
 import { NextRequest } from 'next/server'
 import { sendWhatsApp } from '@/lib/whatsapp'
+import { requireStaff } from '@/lib/auth/api-guard'
+import { enforceRateLimit } from '@/lib/security/rate-limit'
 
 // API pour envoyer des messages WhatsApp depuis l'interface admin
 export async function POST(request: NextRequest) {
+  // ── Sécurité (audit SS-04) ─────────────────────────────────────────────
+  // Sans authentification, cette route permettait d'écrire aux parents depuis
+  // le compte WhatsApp Business de l'école : vecteur d'hameçonnage direct.
+  const guard = await requireStaff()
+  if (!guard.ok) return guard.response
+
+  const limited = enforceRateLimit(`wa:${guard.profil.id}`, 30, 60_000)
+  if (limited) return limited
+
   try {
     const body = await request.json()
     const { to, template, data, message } = body

@@ -6,10 +6,15 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import type { CorrectionComplete } from '@/lib/types/correction.types'
+import { requireRole } from '@/lib/auth/api-guard'
 
 export const runtime = 'nodejs'
 
 export async function POST(req: NextRequest) {
+  // ── Sécurité (audit SS-10) ─────────────────────────────────────────────
+  const guard = await requireRole(['professeur', 'admin_global', 'censeur'])
+  if (!guard.ok) return guard.response
+
   try {
     const body = await req.json() as {
       results: CorrectionComplete[]

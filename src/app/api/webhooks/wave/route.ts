@@ -1,107 +1,190 @@
-import crypto from 'crypto'
-import { createClient } from '@/lib/supabase/server'
+import { NextResponse } from 'next/server'
+import { createAdminClient } from '@/lib/supabase/admin'
+import {
+  verifyHmacSignature, safeJsonParse, isUuid,
+  claimWebhookEvent, markWebhookProcessed, validateAmount,
+} from '@/lib/security/webhook-verify'
 import { sendWhatsApp } from '@/lib/whatsapp'
 
-export async function POST(req: Request) {
-  const body = await req.text()
-  const signature = req.headers.get('wave-signature') || ''
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
-  // Vérification HMAC-SHA256
+/**
+ * POST /api/webhooks/wave — notification d'encaissement Wave.
+ *
+ * Corrections d'audit appliquées :
+ *   SS-03 : utilisait le client anon+cookies ; le RLS rejetait donc l'INSERT et
+ *           AUCUN paiement Wave n'était enregistré (argent débité, facture
+ *           impayée). Passage au client service_role.
+ *   SS-06 : comparaison de signature `!==` sensible aux attaques temporelles
+ *           → `timingSafeEqual`.
+ *   SS-07 : aucune protection contre le rejeu → verrou d'idempotence atomique.
+ *   SS-08 : montant inséré tel quel → validé contre le solde de la facture.
+ *   SS-15 : `JSON.parse` non protégé → parsing défensif.
+ *
+ * Le service_role contourne le RLS : toute la sécurité repose donc sur la
+ * vérification HMAC en amont. Elle n'est jamais optionnelle.
+ */
+export async function POST(req: Request) {
+  const rawBody = await req.text()
+
+  // ── 1. Authenticité : HMAC obligatoire ─────────────────────────────────
   const secret = process.env.WAVE_WEBHOOK_SECRET
   if (!secret) {
-    console.error('WAVE_WEBHOOK_SECRET non configuré')
-    return Response.json({ error: 'Server misconfigured' }, { status: 500 })
+    console.error('[wave] WAVE_WEBHOOK_SECRET non configuré — webhook refusé')
+    return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 })
   }
 
-  const expectedSig = crypto
-    .createHmac('sha256', secret)
-    .update(body)
-    .digest('hex')
-
-  // Wave envoie parfois "sha256=xxxx" ou juste "xxxx" — on normalise
-  const normalizedSig = signature.startsWith('sha256=') ? signature.slice(7) : signature
-
-  if (normalizedSig !== expectedSig) {
-    console.error('Wave webhook: signature invalide')
-    return Response.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!verifyHmacSignature(rawBody, req.headers.get('wave-signature'), secret)) {
+    console.warn('[wave] signature invalide — requête rejetée')
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const event = JSON.parse(body)
+  // ── 2. Parsing défensif ────────────────────────────────────────────────
+  const parsed = safeJsonParse<any>(rawBody)
+  if (!parsed.ok) {
+    return NextResponse.json({ error: 'Corps JSON invalide' }, { status: 400 })
+  }
+  const event = parsed.data
 
-  // Ignorer les événements non pertinents
-  if (event.type !== 'checkout.session.completed') {
-    return Response.json({ ok: true })
+  if (event?.type !== 'checkout.session.completed') {
+    return NextResponse.json({ ok: true, ignored: event?.type ?? 'inconnu' })
   }
 
-  const clientRef = event.data?.client_reference || ''
-  const factureId = clientRef.replace('SS-', '')
-  if (!factureId) {
-    return Response.json({ error: 'Référence manquante' }, { status: 400 })
+  const eventId = String(event?.data?.id ?? '')
+  if (!eventId) {
+    return NextResponse.json({ error: 'Identifiant d événement manquant' }, { status: 400 })
   }
 
-  const supabase = await createClient()
+  const factureId = String(event?.data?.client_reference ?? '').replace(/^SS-/, '')
+  if (!isUuid(factureId)) {
+    console.error('[wave] référence facture invalide', event?.data?.client_reference)
+    return NextResponse.json({ error: 'Référence invalide' }, { status: 400 })
+  }
 
-  // Récupérer ecole_id depuis la facture
+  const supabase = createAdminClient()
+
+  // ── 3. Idempotence : verrou atomique porté par la base ─────────────────
+  let premierPassage: boolean
+  try {
+    premierPassage = await claimWebhookEvent(supabase, 'wave', eventId, event)
+  } catch {
+    // Le verrou est indisponible : on refuse plutôt que de risquer un double
+    // crédit. Wave rejouera le webhook.
+    return NextResponse.json({ error: 'Indisponible, réessayez' }, { status: 503 })
+  }
+  if (!premierPassage) {
+    return NextResponse.json({ ok: true, message: 'Événement déjà traité' })
+  }
+
+  // ── 4. Facture cible ───────────────────────────────────────────────────
   const { data: facture } = await (supabase
     .from('factures') as any)
-    .select('ecole_id, eleve_id, eleves(nom, prenom, parent_principal_id, utilisateurs!eleves_parent_principal_id_fkey(nom, telephone))')
+    .select(`
+      id, ecole_id, eleve_id, montant_total, solde_restant,
+      eleves ( nom, prenom, parent_principal_id,
+                utilisateurs!eleves_parent_principal_id_fkey ( nom, telephone ) )
+    `)
     .eq('id', factureId)
-    .single()
+    .maybeSingle()
 
   if (!facture) {
-    console.error('Wave webhook: facture introuvable', factureId)
-    return Response.json({ error: 'Facture introuvable' }, { status: 404 })
+    await markWebhookProcessed(supabase, 'wave', eventId, {
+      status: 'rejected', detail: 'facture introuvable',
+    })
+    console.error('[wave] facture introuvable', factureId)
+    return NextResponse.json({ error: 'Facture introuvable' }, { status: 404 })
   }
 
-  // Enregistrer le paiement
+  // ── 5. Cohérence devise + montant ──────────────────────────────────────
+  const devise = String(event?.data?.currency ?? 'XOF').toUpperCase()
+  if (devise !== 'XOF') {
+    await markWebhookProcessed(supabase, 'wave', eventId, {
+      status: 'rejected', detail: `devise inattendue ${devise}`,
+    })
+    return NextResponse.json({ error: 'Devise non supportée' }, { status: 400 })
+  }
+
+  const check = validateAmount(event?.data?.amount, Number(facture.solde_restant) || 0)
+  if (!check.ok) {
+    await markWebhookProcessed(supabase, 'wave', eventId, {
+      status: 'rejected', detail: check.raison,
+    })
+    console.error('[wave] montant rejeté', eventId, check.raison)
+    return NextResponse.json({ error: 'Montant incohérent' }, { status: 400 })
+  }
+  const montant = check.montant
+
+  // ── 6. Enregistrement ──────────────────────────────────────────────────
   const { error: insertErr } = await (supabase.from('paiements') as any).insert({
     facture_id: factureId,
     ecole_id: facture.ecole_id,
-    montant: event.data.amount,
+    montant,
     methode: 'wave',
-    reference_transaction: event.data.id,
-    telephone_payeur: event.data.client_phone || null,
+    reference_transaction: eventId,
+    telephone_payeur: event?.data?.client_phone ?? null,
     statut_confirmation: 'confirmed',
     webhook_payload: event,
   })
 
   if (insertErr) {
-    console.error('Wave webhook: erreur insertion paiement', insertErr)
-    return Response.json({ error: 'Erreur serveur' }, { status: 500 })
-  }
-  // Le trigger PostgreSQL fn_update_facture_statut() met à jour factures.statut automatiquement
-
-  // Notifier le parent
-  const parentId = facture.eleves?.parent_principal_id
-  const parentTelephone = facture.eleves?.utilisateurs?.telephone
-  const parentNom = facture.eleves?.utilisateurs?.nom
-  const elevePrenom = facture.eleves?.prenom
-  const montant = event.data.amount
-  if (parentId) {
-    const montantFmt = new Intl.NumberFormat('fr-SN').format(montant)
-    await (supabase.from('notifications') as any).insert({
-      user_id: parentId,
-      ecole_id: facture.ecole_id,
-      type_notif: 'paiement_confirme',
-      priorite: 1,
-      titre: 'Paiement confirmé',
-      contenu: `Votre paiement Wave de ${montantFmt} FCFA pour ${facture.eleves?.nom || 'votre enfant'} a été reçu.`,
-    })
-
-    // Envoi WhatsApp au parent
-    if (parentTelephone) {
-      await sendWhatsApp({
-        to: parentTelephone,
-        template: 'paiement_confirme',
-        data: {
-          parentNom: parentNom || 'Parent',
-          montant: new Intl.NumberFormat('fr-SN').format(montant),
-          elevePrenom: elevePrenom || 'votre enfant',
-          ecoleNom: 'SmartSchool SN',
-        }
+    // 23505 : la contrainte UNIQUE a intercepté un doublon passé entre les
+    // mailles du verrou. Ce n'est pas une erreur fonctionnelle.
+    if ((insertErr as any).code === '23505') {
+      await markWebhookProcessed(supabase, 'wave', eventId, {
+        status: 'processed', detail: 'doublon absorbé par la contrainte unique',
       })
+      return NextResponse.json({ ok: true, message: 'Déjà enregistré' })
     }
+    await markWebhookProcessed(supabase, 'wave', eventId, {
+      status: 'rejected', detail: insertErr.message,
+    })
+    console.error('[wave] insertion paiement', insertErr)
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 
-  return Response.json({ received: true }, { status: 200 })
+  // Le trigger fn_update_facture_statut() recalcule factures.statut.
+  await markWebhookProcessed(supabase, 'wave', eventId, { status: 'processed' })
+
+  // ── 7. Notification du parent (best-effort, jamais bloquant) ───────────
+  await notifierParent(supabase, facture, montant, 'Wave').catch(err =>
+    console.error('[wave] notification parent', err?.message))
+
+  return NextResponse.json({ received: true }, { status: 200 })
+}
+
+async function notifierParent(
+  supabase: ReturnType<typeof createAdminClient>,
+  facture: any,
+  montant: number,
+  libelleMethode: string,
+) {
+  const parentId = facture.eleves?.parent_principal_id
+  if (!parentId) return
+
+  const montantFmt = new Intl.NumberFormat('fr-SN').format(montant)
+  const elevePrenom = facture.eleves?.prenom ?? 'votre enfant'
+
+  await (supabase.from('notifications') as any).insert({
+    user_id: parentId,
+    ecole_id: facture.ecole_id,
+    type_notif: 'paiement_confirme',
+    priorite: 1,
+    titre: 'Paiement confirmé',
+    contenu: `Votre paiement ${libelleMethode} de ${montantFmt} FCFA pour ${elevePrenom} a bien été reçu.`,
+  })
+
+  const telephone = facture.eleves?.utilisateurs?.telephone
+  if (telephone) {
+    await sendWhatsApp({
+      to: telephone,
+      template: 'paiement_confirme',
+      data: {
+        parentNom: facture.eleves?.utilisateurs?.nom ?? 'Parent',
+        montant: montantFmt,
+        elevePrenom,
+        ecoleNom: 'SmartSchool SN',
+      },
+    })
+  }
 }

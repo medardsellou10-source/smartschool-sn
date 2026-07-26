@@ -1,8 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requireStaff } from '@/lib/auth/api-guard'
+import { enforceRateLimit } from '@/lib/security/rate-limit'
 
 export const runtime = 'nodejs'
 
 export async function POST(req: NextRequest) {
+  // ── Sécurité (audit SS-04) ─────────────────────────────────────────────
+  // Route ouverte auparavant : un tiers pouvait émettre un volume illimité de
+  // SMS facturés au propriétaire du compte Twilio, et surtout usurper le
+  // numéro de confiance de l'école pour hameçonner les parents.
+  const guard = await requireStaff()
+  if (!guard.ok) return guard.response
+
+  // Plafond par agent : 30 SMS/minute couvre un envoi de classe, pas un spam.
+  const limited = enforceRateLimit(`sms:${guard.profil.id}`, 30, 60_000)
+  if (limited) return limited
+
   const { to, message, ecoleNom } = await req.json()
 
   if (!to || !message) {

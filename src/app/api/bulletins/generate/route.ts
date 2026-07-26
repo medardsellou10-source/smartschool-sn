@@ -1,10 +1,15 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import PDFDocument from 'pdfkit'
+import { requireUser } from '@/lib/auth/api-guard'
 
 export const runtime = 'nodejs'
 
 export async function POST(req: Request) {
+  // ── Sécurité ───────────────────────────────────────────────────────────
+  const guard = await requireUser()
+  if (!guard.ok) return guard.response
+
   const { eleveId, trimestre } = await req.json()
 
   if (!eleveId || !trimestre) {

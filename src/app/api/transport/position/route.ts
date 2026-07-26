@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import { requireStaff } from '@/lib/auth/api-guard'
 
 // Calcule la distance en metres entre deux points GPS (formule Haversine)
 function haversineDistance(
@@ -17,6 +18,24 @@ function haversineDistance(
 }
 
 export async function POST(req: Request) {
+  // ── Sécurité (audit SS-11) ───────────────────────────────────────────────
+  // Route service_role sans authentification : n'importe qui pouvait injecter
+  // de fausses positions de bus scolaires (enjeu de sécurité physique des
+  // enfants) ou saturer la table.
+  //
+  // Deux modes d'accès sont acceptés, car le traceur embarqué n'a pas
+  // forcément de session navigateur :
+  //   1. un jeton partagé TRANSPORT_INGEST_TOKEN (boîtier / application dédiée)
+  //   2. une session de personnel de l'établissement
+  const ingestToken = process.env.TRANSPORT_INGEST_TOKEN
+  const bearer = req.headers.get('authorization')
+  const jetonValide = Boolean(ingestToken) && bearer === `Bearer ${ingestToken}`
+
+  if (!jetonValide) {
+    const guard = await requireStaff()
+    if (!guard.ok) return guard.response
+  }
+
   // Initialisation lazily pour éviter les erreurs pendant le build
   const supabaseAdmin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

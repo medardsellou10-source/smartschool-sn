@@ -8,9 +8,16 @@ import { createClient } from '@supabase/supabase-js'
 const CRON_SECRET = process.env.CRON_SECRET || ''
 
 export async function GET(request: Request) {
-  // Vérifier l'authentification du cron
+  // ── Sécurité (audit SS-12) ─────────────────────────────────────────────
+  // L'ancienne condition `if (CRON_SECRET && ...)` échouait en mode ouvert :
+  // si la variable d'environnement était absente, le test était faux et la
+  // route devenait publique. On refuse désormais par défaut.
   const authHeader = request.headers.get('authorization')
-  if (CRON_SECRET && authHeader !== `Bearer ${CRON_SECRET}`) {
+  if (!CRON_SECRET) {
+    console.error('[cron/relances] CRON_SECRET non configuré — exécution refusée')
+    return NextResponse.json({ error: 'Cron non configuré' }, { status: 503 })
+  }
+  if (authHeader !== `Bearer ${CRON_SECRET}`) {
     return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
   }
 

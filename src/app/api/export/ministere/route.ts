@@ -4,6 +4,7 @@
 
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { requireRole } from '@/lib/auth/api-guard'
 
 function getSupabase() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL!
@@ -20,26 +21,23 @@ function toCSV(headers: string[], rows: string[][]): string {
 }
 
 export async function GET(request: Request) {
+  // ── Sécurité (audit SS-02) ─────────────────────────────────────────────
+  // Cette route utilise la clé service_role : elle contourne totalement le RLS.
+  // Sans authentification, `?ecole_id=` permettait de vider la base de
+  // n'importe quel établissement (élèves, professeurs, notes, finances).
+  // L'établissement est désormais imposé par le profil serveur de l'appelant ;
+  // le paramètre d'URL n'est plus jamais pris en compte.
+  const guard = await requireRole(['admin_global', 'censeur', 'secretaire'])
+  if (!guard.ok) return guard.response
+  const targetEcoleId = guard.profil.ecole_id!
+
   const { searchParams } = new URL(request.url)
   const type = searchParams.get('type') || 'eleves'
   const format = searchParams.get('format') || 'json'
-  const ecoleId = searchParams.get('ecole_id')
 
   const supabase = getSupabase()
   if (!supabase) {
     return NextResponse.json({ error: 'Service non configuré' }, { status: 503 })
-  }
-
-  // Déterminer l'école
-  let targetEcoleId = ecoleId
-  if (!targetEcoleId) {
-    // Utiliser la première école active
-    const { data: ecole } = await supabase.from('ecoles').select('id').eq('actif', true).limit(1).single()
-    targetEcoleId = ecole?.id
-  }
-
-  if (!targetEcoleId) {
-    return NextResponse.json({ error: 'École non trouvée' }, { status: 404 })
   }
 
   // Info école

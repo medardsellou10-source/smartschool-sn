@@ -2,8 +2,18 @@ import { NextRequest } from 'next/server'
 import { chat } from '@/lib/ai/engine'
 import { isDemoMode } from '@/lib/demo-data'
 import { executeTool } from '@/lib/ai/tools-registry'
+import { requireUser } from '@/lib/auth/api-guard'
+import { enforceRateLimit } from '@/lib/security/rate-limit'
 
 export async function POST(request: NextRequest) {
+  // ── Sécurité (audit SS-13) ─────────────────────────────────────────────
+  // Appels LLM facturés : réservés aux comptes authentifiés et plafonnés.
+  const guard = await requireUser()
+  if (!guard.ok) return guard.response
+
+  const limited = enforceRateLimit(`chat:${guard.profil.id}`, 20, 60_000)
+  if (limited) return limited
+
   try {
     const body = await request.json()
     const { messages, userRole, userId, conversationId } = body

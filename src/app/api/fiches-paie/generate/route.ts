@@ -11,6 +11,7 @@
  */
 
 import PDFDocument from 'pdfkit'
+import { requireRole } from '@/lib/auth/api-guard'
 
 export const runtime = 'nodejs'
 
@@ -49,6 +50,11 @@ function fcfa(n: number): string {
 }
 
 export async function POST(req: Request) {
+  // ── Sécurité ───────────────────────────────────────────────────────────
+  // Les fiches de paie exposent les rémunérations nominatives du personnel.
+  const guard = await requireRole(['admin_global', 'intendant'])
+  if (!guard.ok) return guard.response
+
   let body: FicheBody
   try {
     body = (await req.json()) as FicheBody

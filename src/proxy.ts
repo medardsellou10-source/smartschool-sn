@@ -215,6 +215,18 @@ export async function proxy(request: NextRequest) {
 
   // 3. Non-authentifié sur une route protégée → /login
   if (!user) {
+    // Défense en profondeur (audit SS-01 à SS-13) : `isProtectedRoute()` ne
+    // couvre que les préfixes de PAGES (/admin, /parent, …). Toutes les routes
+    // /api/* échappaient donc au contrôle et étaient joignables sans session.
+    // Chaque handler applique désormais sa propre garde (`@/lib/auth/api-guard`)
+    // mais on refuse ici par défaut, pour qu'un futur endpoint oublié ne soit
+    // pas exposé. Réponse JSON 401 plutôt qu'une redirection HTML.
+    if (pathname.startsWith('/api/')) {
+      return NextResponse.json(
+        { error: 'Authentification requise' },
+        { status: 401, headers: { 'Cache-Control': 'no-store' } },
+      )
+    }
     if (!isProtectedRoute(pathname)) return response
     const loginUrl = new URL('/login', request.url)
     loginUrl.searchParams.set('redirect', pathname)

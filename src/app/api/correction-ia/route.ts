@@ -1,11 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { extraireStructureCorrige, corrigerUneCopie } from '@/lib/ai/correction-engine'
+import { requireRole } from '@/lib/auth/api-guard'
+import { enforceRateLimit } from '@/lib/security/rate-limit'
 
 export const runtime = 'nodejs'
 // Timeout Vercel : 5 minutes pour les grosses séries
 export const maxDuration = 300
 
 export async function POST(req: NextRequest) {
+  // ── Sécurité (audit SS-13) ─────────────────────────────────────────────
+  // maxDuration = 300 s et appels Gemini facturés : sans authentification ni
+  // plafond, cette route est un levier d'épuisement de quota et de coût.
+  const guard = await requireRole(['professeur', 'admin_global', 'censeur'])
+  if (!guard.ok) return guard.response
+
+  const limited = enforceRateLimit(`correction:${guard.profil.id}`, 5, 60_000)
+  if (limited) return limited
+
   try {
     const formData = await req.formData()
 

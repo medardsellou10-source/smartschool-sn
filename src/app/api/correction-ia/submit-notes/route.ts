@@ -11,6 +11,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import type { CorrectionComplete } from '@/lib/types/correction.types'
+import { requireRole } from '@/lib/auth/api-guard'
 
 export const runtime = 'nodejs'
 
@@ -38,6 +39,12 @@ export interface NotesSoumission {
 }
 
 export async function POST(req: NextRequest) {
+  // ── Sécurité (audit SS-10) ─────────────────────────────────────────────
+  // Route service_role : sans authentification, n'importe qui pouvait écrire
+  // des notes arbitraires sur n'importe quel élève.
+  const guard = await requireRole(['professeur', 'admin_global', 'censeur'])
+  if (!guard.ok) return guard.response
+
   try {
     const body = await req.json() as NotesSoumission
 

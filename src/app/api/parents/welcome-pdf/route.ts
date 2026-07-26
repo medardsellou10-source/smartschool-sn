@@ -23,6 +23,7 @@
 
 import PDFDocument from 'pdfkit'
 import QRCode from 'qrcode'
+import { requireStaff } from '@/lib/auth/api-guard'
 
 export const runtime = 'nodejs'
 
@@ -52,6 +53,12 @@ function buildLoginUrl(base: string, telephone: string, token: string): string {
 }
 
 export async function POST(req: Request) {
+  // ── Sécurité (audit SS-09) ─────────────────────────────────────────────
+  // Ce PDF contient l'identifiant ET le mot de passe temporaire du parent :
+  // sa génération doit être réservée au personnel de l'établissement.
+  const guard = await requireStaff()
+  if (!guard.ok) return guard.response
+
   let body: Body
   try {
     body = (await req.json()) as Body
