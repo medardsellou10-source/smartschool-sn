@@ -54,7 +54,16 @@ const PUBLIC_PREFIXES = [
   '/mentions-legales',
   '/contact',
   '/auth/callback',
-  '/api/webhooks',
+  // ── Routes API sans session utilisateur ────────────────────────────────
+  // Depuis le durcissement (audit SS-01…SS-13), le proxy renvoie 401 sur tout
+  // /api/* sans session. Les appelants machine-à-machine n'ont pas de cookie :
+  // ils sont listés ici et portent leur propre authentification (signature
+  // HMAC, CRON_SECRET, jeton dédié) dans leur handler.
+  '/api/webhooks',        // signature HMAC vérifiée par le handler
+  '/api/cron/',           // CRON_SECRET vérifié par le handler
+  '/api/twilio/sms',      // webhook SMS entrant Twilio
+  '/api/health',          // sonde de monitoring (Uptimerobot, Better Uptime)
+  '/api/desktop/updater', // auto-update Tauri : l'app n'a pas de session
   '/api/agent/',
   '/api/inscription/',
   '/api/waitlist',
