@@ -152,6 +152,9 @@ export async function POST(req: Request) {
     ecole_id: facture.ecole_id,
     montant,
     methode: 'orange_money',
+    // Encaissement Mobile Money : confirme par le PSP, donc valide d'office.
+    canal_paiement: 'mobile',
+    valide_econome: true,
     reference_transaction: transactionId,
     telephone_payeur: checkData?.data?.phone_number ?? null,
     statut_confirmation: 'confirmed',

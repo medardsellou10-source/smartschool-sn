@@ -263,8 +263,15 @@ export async function POST(req: Request) {
       ecole_id: profil.ecole_id,
       montant,
       methode: 'especes',
+      // `canal_paiement` vaut 'mobile' par défaut en base : sans cette valeur
+      // explicite, les encaissements en espèces seraient comptés comme Mobile
+      // Money et fausseraient la répartition du tableau de bord Économe.
+      canal_paiement: 'especes',
       reference_transaction: reference,
       statut_confirmation: 'confirmed',
+      // L'agent qui saisit l'encaissement en atteste physiquement.
+      valide_econome: true,
+      valide_par: profil.id,
     }
 
     let { error } = await (supabase.from('paiements') as any)
