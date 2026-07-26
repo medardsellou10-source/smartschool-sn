@@ -177,6 +177,64 @@ supabase/migrations/…_securite_paiements.sql
                                  paiement_tentatives, RLS parent-scoped, montant > 0
 ```
 
-## ✅ Vérification
+## ✅ Vérification en production
 
-Voir la section « Tests de non-régression sécurité » en fin de `GO-LIVE-CHECKLIST.md`.
+Tests d'exploitation rejoués contre `smartschool-sn.vercel.app` après
+déploiement (`eb48a91`) — tous les vecteurs sont fermés :
+
+| Faille | Vecteur testé | Résultat |
+|---|---|---|
+| SS-01 | `POST /api/paiements/initier` méthode `especes`, montant 999 999 | `401` — bloqué |
+| SS-02 | `GET /api/export/ministere?type=eleves` | `401` — bloqué |
+| SS-04 | `POST /api/sms/send` · `POST /api/whatsapp/send` | `401` — bloqué |
+| SS-09 | `POST /api/parents/welcome-pdf` | `401` — bloqué |
+| SS-10 | `POST /api/correction-ia/submit-notes` | `401` — bloqué |
+| SS-11 | `POST /api/transport/position` | `401` — bloqué |
+| SS-12 | `GET /api/cron/relances` sans `Authorization` | `503` — refus par défaut |
+| SS-13 | `POST /api/chat` | `401` — bloqué |
+
+Non-régression vérifiée : landing, `/inscription`, `/telecharger`,
+`/api/desktop/updater` (auto-update Tauri) et `/api/health` répondent
+normalement.
+
+### Migration appliquée en base
+
+Les quatre lots ont été appliqués au projet `lgifumhjnvralwztythk`.
+L'état RLS constaté avant correction confirmait le diagnostic :
+
+```
+factures  | ecole_isolation | ALL | (ecole_id = my_ecole_id())
+paiements | ecole_isolation | ALL | (ecole_id = my_ecole_id())
+```
+
+Remplacé par : `factures_staff_all`, `factures_parent_read`,
+`factures_eleve_read`, `paiements_finance_all`, `paiements_direction_read`,
+`paiements_parent_read`.
+
+---
+
+## ⚠️ Point de vigilance : `SUPABASE_SERVICE_ROLE_KEY`
+
+Les webhooks utilisent désormais le client `service_role`. Or la sonde
+`/api/health` signale que cette variable **n'est toujours pas configurée**
+sur Vercel :
+
+```
+[FAIL] env.SUPABASE_SERVICE_ROLE_KEY   MISSING — critical
+[WARN] config.demo_mode                DEMO_MODE=true
+```
+
+Conséquence : les webhooks Wave et CinetPay renvoient une erreur au lieu
+d'enregistrer le paiement. Ce n'est pas une régression — ils étaient déjà
+totalement non fonctionnels (SS-03), mais ils échouent maintenant de façon
+explicite et fermée plutôt que silencieuse.
+
+**L'encaissement Mobile Money ne fonctionnera qu'une fois ces deux variables
+corrigées** (procédure détaillée dans `GO-LIVE-CHECKLIST.md`) :
+
+| Variable | Valeur attendue |
+|---|---|
+| `SUPABASE_SERVICE_ROLE_KEY` | clé `service_role` du dashboard Supabase |
+| `NEXT_PUBLIC_DEMO_MODE` | `false` |
+| `WAVE_WEBHOOK_SECRET` | secret de signature fourni par Wave |
+| `CINETPAY_SECRET_KEY` | secret HMAC CinetPay (active la vérification `x-token`) |
