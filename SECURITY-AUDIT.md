@@ -490,3 +490,56 @@ Je ne l'ai pas restreinte parce que je ne peux pas vérifier ici, sans risque,
 que le logo continuerait de s'afficher sur la page de connexion — qui est
 consultée avant toute authentification. À trancher avec un test réel avant
 d'y toucher.
+
+## SS-34 — Une facture soldée sans le moindre paiement
+
+**Vérifié : une secrétaire a marqué une facture de 150 000 FCFA entièrement
+payée, avec zéro ligne de paiement en face.** État restauré après le test.
+
+SS-01 avait durci `/api/paiements/initier` — le montant y est recalculé côté
+serveur et jamais lu dans la requête. Mais l'application parle majoritairement
+à la base **en direct** via le client Supabase, et la policy `factures_staff_all`
+est `FOR ALL`. La porte est donc restée ouverte juste à côté de celle qu'on
+avait fermée.
+
+Conséquence : toute la piste comptable — `paiements`, `encaisse_par`,
+`num_recu`, `reference_transaction` — pouvait être contournée. Une secrétaire
+pouvait solder la facture d'une famille sans qu'un franc ne change de main, ou
+encaisser en espèces et équilibrer les livres sans laisser de trace.
+
+**Principe retenu** : `montant_verse` et `statut` sont *dérivés* des paiements.
+Ils ne s'écrivent plus que depuis le déclencheur de recalcul, qui se signale
+par un drapeau de session. Seule l'annulation reste une décision humaine, et
+elle est réservée à la direction.
+
+Deux défauts adjacents, corrigés au passage :
+
+- **La suppression d'un paiement ne recalculait rien.** Le déclencheur ne
+  couvrait que INSERT et UPDATE. Effacer la ligne laissait donc la facture
+  soldée tout en faisant disparaître la trace de qui avait encaissé — le
+  schéma même d'un détournement. Il couvre désormais DELETE.
+- **Le statut ne redescendait jamais** : la branche `ELSE statut` figeait
+  « payé » même sans paiement confirmé restant.
+
+Ajouté : `CHECK (montant_total > 0)`, absent jusqu'ici.
+
+Vérifié après correction, cycle complet : saisie directe du montant refusée,
+passage direct au statut « payé » refusé, un paiement réel solde bien la
+facture (150 000, statut `paye`), sa suppression la ramène à 50 000 et
+`partiellement_paye`. État final identique à l'état initial.
+
+### Un défaut que j'ai introduit et corrigé dans la foulée
+
+Ma première version du déclencheur cassait l'enregistrement des paiements :
+avec `search_path` vide, les littéraux du `CASE` ne se résolvaient plus vers
+l'enum `facture_statut`. L'ancienne version s'en sortait par accident — sa
+branche `ELSE` renvoyait la colonne elle-même, ce qui typait l'expression. En
+la remplaçant par un littéral, toutes les branches sont devenues de type
+inconnu. Détecté par le test du chemin légitime, qui est précisément là pour
+ça, et corrigé par un cast explicite.
+
+### Ce que ma crainte initiale n'était pas
+
+J'ai d'abord suspecté `solde_restant` de ne pas être maintenu par le
+déclencheur. Vérification faite, c'est une colonne **générée**
+(`montant_total - montant_verse`) : elle est cohérente par construction.
