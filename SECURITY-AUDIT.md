@@ -238,3 +238,85 @@ corrigées** (procédure détaillée dans `GO-LIVE-CHECKLIST.md`) :
 | `NEXT_PUBLIC_DEMO_MODE` | `false` |
 | `WAVE_WEBHOOK_SECRET` | secret de signature fourni par Wave |
 | `CINETPAY_SECRET_KEY` | secret HMAC CinetPay (active la vérification `x-token`) |
+
+---
+
+## 🔴 CRITIQUE — deuxième passe (audit base de données, 2026-07-27)
+
+Le premier audit portait sur le code applicatif. Cette passe interroge la base
+elle-même : cohérence des tables avec le code, RLS, droits, référentiels.
+
+**Périmètre vérifié :** les 56 tables et vues interrogées par le code existent
+toutes en base ; aucun lien de navigation mort dans les menus. Deux failles
+d'élévation de privilège en revanche, plus graves que celles de la première passe
+car exploitables en une requête.
+
+### SS-18 — Référentiel de privilèges ouvert à un visiteur anonyme
+**Table :** `roles_hierarchie` (et `pays_config`)
+
+RLS **désactivé**, et `anon` comme `authenticated` disposaient de
+`INSERT, UPDATE, DELETE, TRUNCATE`. La clé anon étant publique par conception
+(elle est dans le bundle client), un visiteur **non authentifié** pouvait :
+
+```sql
+UPDATE roles_hierarchie
+   SET rang = 100, peut_impersonifier_inferieurs = true
+ WHERE role_code = 'parent';
+```
+
+`fn_set_user_rank()` — déclencheur sur `utilisateurs` — lit cette table pour
+renseigner `rang` et `peut_impersonifier` ; `can_impersonate()` s'appuie ensuite
+dessus. Tout parent obtenait donc un rang de direction et le droit d'usurper les
+comptes de son établissement. Un simple `TRUNCATE` suffisait aussi à casser la
+hiérarchie entière.
+
+**Correctif :** droits d'écriture retirés, RLS activé, policy de lecture seule,
+`fn_set_user_rank()` passée en `SECURITY DEFINER` avec `search_path` figé.
+
+### SS-19 — Auto-promotion au rang d'administrateur
+**Table :** `utilisateurs`
+
+La policy `utilisateurs_update` porte :
+
+```
+USING ((id = auth.uid()) OR (is_admin() AND ecole_id = my_ecole_id()))
+```
+
+sans `with_check`, donc identique. Or **le RLS de Postgres filtre des lignes,
+jamais des colonnes** : la condition `id = auth.uid()` reste vraie après
+modification. Tout utilisateur authentifié pouvait donc exécuter :
+
+```js
+supabase.from('utilisateurs').update({ role: 'admin_global' }).eq('id', monId)
+```
+
+Le déclencheur de rang attribuait ensuite `rang = 100` et le droit d'usurpation.
+Le même chemin permettait de changer `ecole_id` pour basculer dans
+l'établissement d'un concurrent et en lire les données.
+
+C'est la faille la plus grave rencontrée : accessible à **tout compte**
+(parent, élève, professeur), en une seule requête, sans préparation.
+
+**Correctif :** le RLS ne pouvant pas restreindre les colonnes, un déclencheur
+`BEFORE UPDATE` compare l'ancienne et la nouvelle ligne et refuse toute
+modification de `role`, `ecole_id`, `rang`, `peut_impersonifier` ou `actif` qui
+ne viendrait pas d'un administrateur de l'établissement d'origine. Le contexte
+serveur (`service_role`, où `auth.uid()` est NULL) reste libre, afin que
+l'inscription et l'invitation continuent de fonctionner.
+
+**Vérifié en base :**
+
+| Test | Résultat |
+|---|---|
+| Auto-promotion `role → admin_global` | bloqué |
+| Changement d'`ecole_id` | bloqué |
+| Utilisateur modifiant son téléphone | autorisé (pas de régression) |
+| Contexte serveur (inscription, invitation) | autorisé (pas de régression) |
+
+### Faux positif écarté
+
+Un premier balayage signalait 40 policies « ouvertes » sur la base d'un
+`with_check` absent. C'était une erreur de méthode : pour une policy `UPDATE`,
+un `with_check` à NULL n'ouvre rien — Postgres réutilise alors l'expression
+`USING`. Seule `utilisateurs_update` posait un problème réel, pour la raison
+distincte exposée en SS-19.
