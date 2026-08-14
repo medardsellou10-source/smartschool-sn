@@ -1,14 +1,20 @@
 'use client'
 
 /**
- * PREMIUM #1 — Page de validation 2FA Super Admin.
- * Code à 6 chiffres + recovery codes. En démo, code valide = 123456.
+ * Second facteur du cockpit propriétaire.
+ *
+ * La validation était auparavant faite ici même, en comparant la saisie à une
+ * constante (`123456`) présente dans le dépôt, puis la page posait elle-même
+ * son cookie via `document.cookie`. Contrôle et jeton étaient donc tous deux
+ * à la portée du client.
+ *
+ * Ce composant ne fait plus que transmettre la saisie : c'est
+ * `POST /api/master/2fa` qui compare le code et pose un cookie httpOnly signé,
+ * inaccessible au JavaScript de la page.
  */
 
 import { useState } from 'react'
 import { ShieldCheck, KeyRound, Eye, EyeOff } from 'lucide-react'
-
-const DEMO_VALID_CODE = '123456'
 
 export default function Waed2FAPage() {
   const [code, setCode] = useState('')
@@ -17,21 +23,30 @@ export default function Waed2FAPage() {
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault()
     setError('')
     setSubmitting(true)
-    const target = showRecovery ? recovery : code
-    const expected = showRecovery ? 'WAED-MASTER-7421' : DEMO_VALID_CODE
-    setTimeout(() => {
-      if (target === expected) {
-        document.cookie = 'super_admin_2fa=verified; path=/; max-age=7200; SameSite=Lax'
-        window.location.href = '/__waed-master'
-      } else {
-        setError(showRecovery ? 'Code recovery invalide' : 'Code TOTP invalide (démo : 123456)')
-        setSubmitting(false)
+    try {
+      const res = await fetch('/api/master/2fa', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: showRecovery ? recovery : code }),
+      })
+      if (res.ok) {
+        window.location.href = '/waed-master'
+        return
       }
-    }, 400)
+      const data = await res.json().catch(() => ({}))
+      setError(
+        res.status === 429
+          ? 'Trop de tentatives. Réessayez dans quelques minutes.'
+          : (data?.error ?? 'Code invalide'),
+      )
+    } catch {
+      setError('Vérification impossible. Réessayez.')
+    }
+    setSubmitting(false)
   }
 
   return (
@@ -61,8 +76,8 @@ export default function Waed2FAPage() {
           </div>
 
           <p className="mb-5 text-xs text-white/65">
-            Entrez le code à 6 chiffres généré par votre Google Authenticator.
-            Mode démo : <code className="rounded bg-white/10 px-1 font-mono text-amber-200">123456</code>.
+            Entrez votre code de second facteur. Il est vérifié côté serveur ;
+            après 5 tentatives, l'accès est suspendu 10 minutes.
           </p>
 
           <form onSubmit={submit} className="space-y-4">

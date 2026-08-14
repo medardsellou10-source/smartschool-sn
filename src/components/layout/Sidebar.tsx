@@ -70,7 +70,7 @@ const MENUS: Record<string, NavItem[]> = {
     { href: '/admin/export-officiel', label: 'Bulletins / Export ministère', icon: Icons.file },
     // ── Entrées internes WAED masquées aux clients-écoles ──
     // Routes /admin/superadmin et /admin/waed-status restent accessibles
-    // par URL directe pour le propriétaire (protection 2FA via /__waed-master).
+    // par URL directe pour le propriétaire (protection 2FA via /waed-master).
     { href: '/admin/relances', label: 'Relances', icon: Icons.bell },
     { href: '/admin/transport', label: 'Transport', icon: Icons.bus },
     { href: '/admin/cantine', label: 'Cantine', icon: Icons.food },

@@ -14,6 +14,7 @@
  */
 
 import { NextResponse } from 'next/server'
+import { ownerConfigStatus } from '@/lib/auth/owner'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -59,7 +60,17 @@ export async function GET() {
       : 'production mode',
   })
 
-  // 3) Supabase connectivity (HEAD sur un table publique)
+  // 3) Cockpit proprietaire : acces owner configure ?
+  const owner = ownerConfigStatus()
+  checks.push({
+    name: 'config.cockpit_proprietaire',
+    status: owner.ok ? 'ok' : 'warn',
+    message: owner.ok
+      ? 'acces proprietaire operationnel'
+      : `inaccessible - variables manquantes : ${owner.manquant.join(', ')}`,
+  })
+
+  // 4) Supabase connectivity (HEAD sur un table publique)
   if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
     const tStart = Date.now()
     try {
@@ -88,7 +99,7 @@ export async function GET() {
     checks.push({ name: 'supabase.rest', status: 'fail', message: 'NEXT_PUBLIC_SUPABASE_URL missing' })
   }
 
-  // 4) Auth Supabase (vérifier que l'endpoint répond)
+  // 5) Auth Supabase (vérifier que l'endpoint répond)
   if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
     const tStart = Date.now()
     try {

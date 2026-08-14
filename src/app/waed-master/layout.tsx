@@ -16,9 +16,9 @@ export const metadata: Metadata = {
 }
 
 const NAV = [
-  { href: '/__waed-master',        label: 'Dashboard',       icon: LayoutDashboard },
-  { href: '/__waed-master/ecoles', label: 'Écoles (CRM)',     icon: Building2 },
-  { href: '/__waed-master/revenus',label: 'Revenus SaaS',     icon: Wallet },
+  { href: '/waed-master',        label: 'Dashboard',       icon: LayoutDashboard },
+  { href: '/waed-master/ecoles', label: 'Écoles (CRM)',     icon: Building2 },
+  { href: '/waed-master/revenus',label: 'Revenus SaaS',     icon: Wallet },
 ]
 
 export default function WaedMasterLayout({ children }: { children: React.ReactNode }) {
@@ -37,7 +37,7 @@ export default function WaedMasterLayout({ children }: { children: React.ReactNo
       {/* Header sticky */}
       <header className="sticky top-0 z-40 border-b border-white/[0.06] bg-[#05060F]/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3">
-          <Link href="/__waed-master" className="flex items-center gap-2.5">
+          <Link href="/waed-master" className="flex items-center gap-2.5">
             <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 text-amber-950 shadow-lg">
               <Crown className="h-5 w-5" aria-hidden />
             </span>

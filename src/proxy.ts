@@ -16,6 +16,7 @@
 
 import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
+import { OWNER_2FA_COOKIE, isOwnerEmail, verifyOwnerToken } from '@/lib/auth/owner'
 
 // ── Tables de routage ────────────────────────────────────────────────────────
 
@@ -156,22 +157,49 @@ export async function proxy(request: NextRequest) {
   const supabaseReady = isSupabaseConfigured()
   const demoRole = request.cookies.get('ss_demo_role')?.value
 
-  // ─── PREMIUM #1 — URL secrète Super Admin (cockpit Créateur SaaS) ────
-  // /__waed-master et /__waed-2fa sont accessibles UNIQUEMENT si :
-  //   - mode démo + cookie ss_demo_role === 'super_admin'
-  //   - OU session Supabase + utilisateurs.role === 'super_admin'
-  //   - ET le cookie super_admin_2fa est présent (sauf sur /__waed-2fa)
-  // Sinon → 404 (rewrite, on ne révèle pas l'existence de la route).
-  if (pathname.startsWith('/__waed-master') || pathname.startsWith('/__waed-2fa')) {
-    const isSuper = demoAllowed && demoRole === 'super_admin'
-    if (!isSuper) {
-      return NextResponse.rewrite(new URL('/404', request.url))
+  // ─── COCKPIT PROPRIÉTAIRE (données business de toutes les écoles) ────────
+  //
+  // Le contrôle précédent était :
+  //     const isSuper = demoAllowed && demoRole === 'super_admin'
+  // `demoRole` vient du cookie `ss_demo_role`, que n'importe quel visiteur
+  // écrit depuis sa console ; `demoAllowed` vaut `true` en production. Le
+  // second facteur était un code en dur validé côté client, qui posait
+  // lui-même son cookie. Autrement dit : aucun contrôle réel.
+  //
+  // Trois facteurs sont désormais exigés, tous vérifiés côté serveur :
+  //   1. session Supabase valide ;
+  //   2. e-mail présent dans l'allowlist OWNER_EMAILS ;
+  //   3. jeton de second facteur signé (HMAC), en cookie httpOnly.
+  //
+  // Tout échec renvoie la page 404 sans rien révéler de l'existence de la route.
+  if (pathname.startsWith('/waed-master') || pathname.startsWith('/waed-2fa')) {
+    const introuvable = () => NextResponse.rewrite(new URL('/not-found', request.url))
+
+    // Échappatoire de développement local : uniquement quand Supabase n'est PAS
+    // configuré (donc jamais en production, où il l'est).
+    if (!supabaseReady) {
+      return demoRole === 'super_admin' ? NextResponse.next({ request }) : introuvable()
     }
-    // 2FA requis pour /__waed-master (pas pour la page 2FA elle-même)
-    if (pathname.startsWith('/__waed-master')) {
-      const has2fa = request.cookies.get('super_admin_2fa')?.value === 'verified'
-      if (!has2fa) {
-        return NextResponse.redirect(new URL('/__waed-2fa', request.url))
+
+    const masterClient = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() { return request.cookies.getAll() },
+          setAll() { /* lecture seule ici */ },
+        },
+      },
+    )
+    const { data: { user: owner } } = await masterClient.auth.getUser()
+
+    if (!owner || !isOwnerEmail(owner.email)) return introuvable()
+
+    // La page de saisie du second facteur est logiquement exclue de son propre contrôle.
+    if (pathname.startsWith('/waed-master')) {
+      const jeton = request.cookies.get(OWNER_2FA_COOKIE)?.value
+      if (!(await verifyOwnerToken(jeton, owner.id))) {
+        return NextResponse.redirect(new URL('/waed-2fa', request.url))
       }
     }
     return NextResponse.next({ request })

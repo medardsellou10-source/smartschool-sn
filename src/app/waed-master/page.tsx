@@ -141,7 +141,7 @@ export default function WaedMasterDashboard() {
             <TrendingUp className="h-4 w-4 text-emerald-300" aria-hidden /> Évolution MRR — 12 mois
           </h2>
           <Link
-            href="/__waed-master/revenus"
+            href="/waed-master/revenus"
             className="inline-flex items-center gap-1 rounded-md border border-white/10 bg-white/5 px-2 py-1 text-[11px] font-semibold text-white/80 hover:bg-white/10"
           >
             Voir le détail <ChevronRight className="h-3 w-3" />
@@ -179,8 +179,8 @@ export default function WaedMasterDashboard() {
 
       {/* CTA rapide */}
       <section className="grid gap-3 sm:grid-cols-3">
-        <QuickAction href="/__waed-master/ecoles" icon={Users}    title="CRM Écoles"   sub="Filtrer · suspendre · impersonifier" />
-        <QuickAction href="/__waed-master/revenus" icon={Wallet}   title="Revenus"      sub="MRR / ARR / Churn / Cohorts" />
+        <QuickAction href="/waed-master/ecoles" icon={Users}    title="CRM Écoles"   sub="Filtrer · suspendre · impersonifier" />
+        <QuickAction href="/waed-master/revenus" icon={Wallet}   title="Revenus"      sub="MRR / ARR / Churn / Cohorts" />
         <QuickAction href="/inscription"           icon={Plus}     title="+ Nouvelle école" sub="Inviter un nouveau client" external />
       </section>
     </div>
