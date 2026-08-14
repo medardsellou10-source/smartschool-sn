@@ -410,3 +410,45 @@ plan comptable à zéro — jamais les montants.
 **Le lanterneur ne regardait que les tables.** `diagnostic_vues()` ajoute deux
 familles de contrôles — vue encore en mode DEFINER, objet lisible par `anon` —
 et le cockpit les affiche désormais aux côtés des autres.
+
+## SS-31 — Fonctions SECURITY DEFINER ouvertes à PUBLIC
+
+Postgres accorde `EXECUTE` à **PUBLIC** sur toute fonction nouvellement créée.
+Un `REVOKE` ciblé sur `anon` ne retire donc rien : le droit vient de PUBLIC.
+
+**Conséquence vérifiée : le rôle `anon` appelait `diagnostic_configuration()`
+et recevait la cartographie complète des faiblesses du système.** L'outil bâti
+pour trouver les failles servait de reconnaissance à un attaquant.
+
+C'est aussi l'erreur exacte commise dans la migration SS-30 sur
+`diagnostic_vues` — `REVOKE … FROM anon, authenticated` y était sans effet.
+Corrigée ici, et le contrôle correspondant ajouté au lanterneur pour qu'elle
+ne puisse pas se reproduire silencieusement.
+
+Également refermé :
+
+- **fonctions de déclencheur** (`fn_audit_changes`, `fn_protege_note_soumission`,
+  `fn_update_facture_statut`…) appelables directement par un client ;
+- **`can_impersonate(reel_id, cible_id)`** prenait l'identité de l'appelant en
+  **paramètre** — donc sondable par n'importe qui, sur n'importe quel couple
+  d'utilisateurs. La signature est conservée pour ne pas casser l'appel
+  existant, mais l'identité est désormais imposée par `auth.uid()` ;
+- **`agent_*`** : le journal et l'insertion de notifications n'ont plus besoin
+  du rôle `anon`, la route `/api/agent/diffuseur-notes` appelant désormais ces
+  RPC avec la session de l'enseignant plutôt qu'avec un client anonyme.
+
+`get_user_credentials` était, elle, correctement gardée en interne : elle exige
+un rang supérieur et le même établissement, et `auth.uid()` étant nul pour un
+anonyme, l'appel échouait déjà. L'accès anonyme est retiré par principe.
+
+## SS-32 — search_path non figé sur les fonctions SECURITY DEFINER
+
+Une fonction SECURITY DEFINER dont le `search_path` n'est pas figé résout ses
+noms d'objets selon le chemin de l'appelant : un objet créé plus tôt dans le
+chemin masque celui attendu, et s'exécute avec les droits du propriétaire.
+Neuf fonctions applicatives étaient concernées, dont `my_role()` et
+`my_ecole_id()` — celles sur lesquelles repose **tout** le RLS.
+
+Vérifié après correction : 0 fonction sans `search_path` figé, et aucune
+régression — l'intendant lit toujours ses 15 fiches élèves, un élève lit 0
+paiement, un parent voit ses 3 enfants et pas un de plus.

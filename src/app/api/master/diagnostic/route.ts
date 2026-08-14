@@ -50,10 +50,12 @@ export async function GET() {
   const supabase = createAdminClient()
 
   // ── 1. Contrôles de base de données ─────────────────────────────────────
-  // `diagnostic_vues` couvre le point aveugle du RLS : une vue en mode DEFINER
-  // interroge ses tables sources avec les droits de son propriétaire.
+  // `diagnostic_vues` et `diagnostic_fonctions` couvrent les deux points
+  // aveugles du RLS : une vue en mode DEFINER interroge ses tables sources avec
+  // les droits de son propriétaire, et une fonction SECURITY DEFINER ouverte à
+  // PUBLIC fait de même pour quiconque.
   try {
-    for (const fn of ['diagnostic_configuration', 'diagnostic_vues']) {
+    for (const fn of ['diagnostic_configuration', 'diagnostic_vues', 'diagnostic_fonctions']) {
       const { data, error } = await (supabase.rpc as any)(fn)
       if (error) {
         controles.push({

@@ -6,17 +6,15 @@
  * Génère un message personnalisé via Claude Haiku 4.5 et insère
  * des notifications pour l'élève + le parent.
  *
- * Sécurité : utilise la fonction SECURITY DEFINER `agent_insert_notification`
- * → pas besoin du service_role_key, la clé anon suffit.
+ * Sécurité : appelant enseignant, élève cible borné à son établissement
+ * (SS-27). Les RPC SECURITY DEFINER sont appelées avec la session de
+ * l'appelant, non plus avec la clé anon (SS-31).
  */
 
-import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import { requireRole } from '@/lib/auth/api-guard'
 import { enforceRateLimit } from '@/lib/security/rate-limit'
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY!
 const MODEL = 'claude-haiku-4-5-20251001'
 
@@ -57,8 +55,11 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  // Client avec anon key (les fonctions SECURITY DEFINER gèrent les permissions)
-  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  // On reutilise la session de l'appelant plutot qu'un client anonyme : les
+  // fonctions SECURITY DEFINER appelees plus bas n'ont plus a etre ouvertes au
+  // role anon (SS-31).
+  // `as any` : les types generes ne couvrent pas encore ces RPC.
+  const supabase = guard.supabase as any
 
   // ── Anti-doublon : vérifier si on a déjà envoyé pour ce couple ──────────────
   const notifRef = `${eleve_id}_${evaluation_id}`
@@ -117,7 +118,7 @@ export async function POST(req: NextRequest) {
     .eq('absent_eval', false)
 
   const classAvg = classNotes?.length
-    ? classNotes.reduce((s, n) => s + (n.note ?? 0), 0) / classNotes.length
+    ? classNotes.reduce((s: number, n: any) => s + (n.note ?? 0), 0) / classNotes.length
     : null
 
   // ── Appel Claude Haiku 4.5 ────────────────────────────────────────────────────
