@@ -378,3 +378,35 @@ légitimement publics mais écrivaient en base avec la clé de service sans
 aucun plafond. `inscription/ecole` crée un **établissement entier** : sans
 limite, la base se remplit de faux locataires depuis une seule machine.
 Plafonds par IP : 5/h pour les deux formulaires, 3/h pour l'inscription.
+
+## SS-30 — Vues en mode DEFINER, lisibles sans authentification
+
+**La faille la plus large de tout l'audit.**
+
+Une vue est le point aveugle du RLS. Par défaut Postgres l'exécute avec les
+droits de son propriétaire (`security_invoker` à off) : elle interroge ses
+tables sources **sans appliquer leur RLS**. Dix vues applicatives étaient dans
+ce cas, et toutes portaient un `GRANT SELECT` à `anon` — le rôle de la clé
+publique, livrée par conception dans le bundle du navigateur.
+
+Vérifié avant correction en se plaçant réellement dans le rôle `anon` :
+`v_balance_generale` 21 lignes et `v_moteur_financier` 2 lignes, **sans la
+moindre authentification**. Les huit autres ne renvoyaient rien uniquement
+parce que leur table source est vide aujourd'hui ; l'accès, lui, était
+accordé — le jour où l'école saisit sa paie, la donnée devient publique.
+
+Étaient concernées : comptabilité (balance générale, grand livre), paie
+mensuelle, réconciliation des paiements, bourses, achats fournisseurs,
+journal d'audit critique, et `v_users_impersonifiables` — **nom, rôle,
+téléphone et rang de privilège de chaque utilisateur de chaque
+établissement**, c'est-à-dire à la fois une fuite de données personnelles et
+la liste de courses d'un attaquant choisissant qui usurper.
+
+Correctif : `security_invoker = true` sur les 14 vues applicatives, et
+`REVOKE` du rôle `anon`. Vérifié après : 0 vue en DEFINER, 0 objet lisible
+par `anon`, l'intendant conserve sa comptabilité, et un élève ne voit que le
+plan comptable à zéro — jamais les montants.
+
+**Le lanterneur ne regardait que les tables.** `diagnostic_vues()` ajoute deux
+familles de contrôles — vue encore en mode DEFINER, objet lisible par `anon` —
+et le cockpit les affiche désormais aux côtés des autres.

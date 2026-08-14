@@ -50,15 +50,19 @@ export async function GET() {
   const supabase = createAdminClient()
 
   // ── 1. Contrôles de base de données ─────────────────────────────────────
+  // `diagnostic_vues` couvre le point aveugle du RLS : une vue en mode DEFINER
+  // interroge ses tables sources avec les droits de son propriétaire.
   try {
-    const { data, error } = await (supabase.rpc as any)('diagnostic_configuration')
-    if (error) {
-      controles.push({
-        categorie: 'BASE', objet: 'diagnostic_configuration', statut: 'ERREUR',
-        detail: `fonction de diagnostic injoignable : ${error.message}`,
-      })
-    } else {
-      for (const l of (data ?? []) as Controle[]) controles.push(l)
+    for (const fn of ['diagnostic_configuration', 'diagnostic_vues']) {
+      const { data, error } = await (supabase.rpc as any)(fn)
+      if (error) {
+        controles.push({
+          categorie: 'BASE', objet: fn, statut: 'ERREUR',
+          detail: `fonction de diagnostic injoignable : ${error.message}`,
+        })
+      } else {
+        for (const l of (data ?? []) as Controle[]) controles.push(l)
+      }
     }
   } catch (err: any) {
     controles.push({
