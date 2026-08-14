@@ -452,3 +452,41 @@ Neuf fonctions applicatives étaient concernées, dont `my_role()` et
 Vérifié après correction : 0 fonction sans `search_path` figé, et aucune
 régression — l'intendant lit toujours ses 15 fiches élèves, un élève lit 0
 paiement, un parent voit ses 3 enfants et pas un de plus.
+
+## SS-33 — Stockage : écriture sans rôle ni cloisonnement
+
+Le bucket `ecole-assets` n'exigeait, pour écrire, remplacer ou supprimer un
+objet, que d'être authentifié — `auth.role() = 'authenticated'`. Aucun
+contrôle de rôle, aucun cloisonnement par établissement.
+
+Tout compte, **élève compris**, pouvait donc effacer ou remplacer le logo de
+n'importe quelle école — y compris d'une **autre** école — et déposer des
+fichiers arbitraires dans un espace public servi depuis le domaine du projet.
+
+Le code applicatif écrivait déjà sous `{ecole_id}/…` : la politique ne fait
+qu'imposer une convention qui n'était que verbale. Écriture réservée à
+`admin_global` et `secretaire`, premier segment du chemin contraint à
+l'établissement de l'appelant.
+
+`image/svg+xml` est également retiré des formats acceptés : un SVG est un
+document exécutable, et il était servi depuis un bucket public. PNG, JPEG,
+WebP et GIF couvrent le besoin réel, qui est d'afficher un logo.
+
+Vérifié : un élève est refusé, un administrateur écrivant chez une autre école
+est refusé, un administrateur écrivant chez lui passe toujours.
+
+**Le lanterneur ne regardait ni le stockage ni ses politiques** — elles vivent
+dans le schéma `storage` et échappaient à tous les contrôles précédents.
+`diagnostic_stockage()` ajoute quatre familles : écriture sans rôle, écriture
+sans cloisonnement, bucket public acceptant un format exécutable, bucket sans
+limite de taille.
+
+### Point laissé ouvert volontairement
+
+La politique de lecture autorise `anon` à **lister** le contenu du bucket, ce
+qui révèle les identifiants d'établissement et les noms de fichiers. Sur un
+bucket public dont les URL sont de toute façon devinables, l'enjeu est faible.
+Je ne l'ai pas restreinte parce que je ne peux pas vérifier ici, sans risque,
+que le logo continuerait de s'afficher sur la page de connexion — qui est
+consultée avant toute authentification. À trancher avec un test réel avant
+d'y toucher.

@@ -53,9 +53,14 @@ export async function GET() {
   // `diagnostic_vues` et `diagnostic_fonctions` couvrent les deux points
   // aveugles du RLS : une vue en mode DEFINER interroge ses tables sources avec
   // les droits de son propriétaire, et une fonction SECURITY DEFINER ouverte à
-  // PUBLIC fait de même pour quiconque.
+  // PUBLIC fait de même pour quiconque. `diagnostic_stockage` couvre les
+  // buckets, dont les politiques vivent dans le schéma storage et échappaient
+  // donc à tous les contrôles précédents.
   try {
-    for (const fn of ['diagnostic_configuration', 'diagnostic_vues', 'diagnostic_fonctions']) {
+    for (const fn of [
+      'diagnostic_configuration', 'diagnostic_vues',
+      'diagnostic_fonctions', 'diagnostic_stockage',
+    ]) {
       const { data, error } = await (supabase.rpc as any)(fn)
       if (error) {
         controles.push({
