@@ -50,6 +50,7 @@ export default function EleveElearningPage() {
   const [showSoumission, setShowSoumission] = useState<string | null>(null)
   const [soumissionTexte, setSoumissionTexte] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [erreurSoumission, setErreurSoumission] = useState<string | null>(null)
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -68,9 +69,19 @@ export default function EleveElearningPage() {
       .select('id, ecole_id').eq('id', user.id).single()
     if (!profil) { setLoading(false); return }
 
+    // Même correction qu'à la soumission : `.limit(1)` sur l'école renvoyait
+    // le PREMIER élève de l'établissement. Chaque élève voyait donc les cours,
+    // devoirs et copies d'un camarade choisi arbitrairement.
     const { data: eleve } = await (supabase.from('eleves') as any)
-      .select('id, classe_id').eq('ecole_id', profil.ecole_id).limit(1).single()
-    if (!eleve) { setLoading(false); return }
+      .select('id, classe_id').eq('user_id', user.id).maybeSingle()
+    if (!eleve) {
+      setErreurSoumission(
+        "Votre compte n'est pas encore rattaché à votre fiche élève. " +
+        "Contactez le secrétariat de votre établissement.",
+      )
+      setLoading(false)
+      return
+    }
 
     // Cours de ma classe
     const { data: coursData } = await (supabase.from('cours') as any)
@@ -115,16 +126,44 @@ export default function EleveElearningPage() {
     if (!user) { setSubmitting(false); return }
     const { data: profil } = await (supabase.from('utilisateurs') as any)
       .select('ecole_id').eq('id', user.id).single()
-    const { data: eleve } = await (supabase.from('eleves') as any)
-      .select('id').eq('ecole_id', profil.ecole_id).limit(1).single()
 
-    await (supabase.from('soumissions_devoirs') as any).upsert({
+    // La fiche élève se retrouve par son rattachement au compte connecté.
+    //
+    // Cette ligne prenait auparavant `.limit(1)` sur l'école — c'est-à-dire le
+    // PREMIER élève de l'établissement, quel que soit l'élève connecté. Toutes
+    // les copies étaient donc déposées sous le même nom. C'était un
+    // contournement du rattachement `eleves.user_id`, qui n'est renseigné sur
+    // aucune fiche (voir la catégorie LIEN du diagnostic).
+    //
+    // On échoue désormais visiblement plutôt que d'attribuer la copie au
+    // mauvais élève : une soumission mal attribuée est plus coûteuse à
+    // détecter et à réparer qu'un message d'erreur.
+    const { data: eleve } = await (supabase.from('eleves') as any)
+      .select('id').eq('user_id', user.id).maybeSingle()
+
+    if (!eleve) {
+      setErreurSoumission(
+        "Votre compte n'est pas encore rattaché à votre fiche élève. " +
+        "Contactez le secrétariat de votre établissement.",
+      )
+      setSubmitting(false)
+      return
+    }
+
+    const { error } = await (supabase.from('soumissions_devoirs') as any).upsert({
       ecole_id: profil.ecole_id,
       devoir_id: devoirId,
       eleve_id: eleve.id,
       contenu: soumissionTexte,
     }, { onConflict: 'devoir_id,eleve_id' })
 
+    if (error) {
+      setErreurSoumission("Envoi impossible. Réessayez dans un instant.")
+      setSubmitting(false)
+      return
+    }
+
+    setErreurSoumission(null)
     setSoumissionTexte('')
     setShowSoumission(null)
     setSubmitting(false)
@@ -263,6 +302,11 @@ export default function EleveElearningPage() {
                   </div>
                 ) : showSoumission === d.id ? (
                   <div className="mt-3 space-y-2">
+                    {erreurSoumission && (
+                      <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-700 dark:text-red-300">
+                        {erreurSoumission}
+                      </p>
+                    )}
                     <textarea value={soumissionTexte} onChange={e => setSoumissionTexte(e.target.value)}
                       placeholder="Écrivez votre réponse ici..."
                       className="w-full bg-ss-bg-card border border-ss-border rounded-lg p-3 text-ss-text text-sm min-h-[100px]" />
