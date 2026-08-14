@@ -12,6 +12,8 @@
 
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
+import { requireRole } from '@/lib/auth/api-guard'
+import { enforceRateLimit } from '@/lib/security/rate-limit'
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -20,6 +22,15 @@ const MODEL = 'claude-haiku-4-5-20251001'
 
 export async function POST(req: NextRequest) {
   const startMs = Date.now()
+
+  // SS-27 : la route etait ouverte. Elle consomme du credit LLM et insere des
+  // notifications via une fonction SECURITY DEFINER, donc hors RLS : sans garde,
+  // n'importe qui pouvait adresser une fausse note a n'importe quel parent.
+  const guard = await requireRole(['professeur', 'admin_global', 'censeur'])
+  if (!guard.ok) return guard.response
+
+  const limite = enforceRateLimit('agent-notes:' + guard.user.id, 30, 60_000)
+  if (limite) return limite
 
   const body = await req.json().catch(() => null)
   const { eleve_id, evaluation_id } = body ?? {}
@@ -30,6 +41,20 @@ export async function POST(req: NextRequest) {
 
   if (!ANTHROPIC_API_KEY) {
     return NextResponse.json({ error: 'ANTHROPIC_API_KEY non configurée' }, { status: 500 })
+  }
+
+  // Et il doit viser un eleve de son propre etablissement : la fonction
+  // SECURITY DEFINER appelee plus bas ne verifie pas l'ecole.
+  const { data: eleveCible } = await (guard.supabase.from('eleves') as any)
+    .select('id')
+    .eq('id', eleve_id)
+    .eq('ecole_id', guard.profil.ecole_id)
+    .maybeSingle()
+  if (!eleveCible) {
+    return NextResponse.json(
+      { error: 'Eleve introuvable dans votre etablissement' },
+      { status: 404 },
+    )
   }
 
   // Client avec anon key (les fonctions SECURITY DEFINER gèrent les permissions)

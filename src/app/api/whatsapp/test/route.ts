@@ -1,4 +1,6 @@
 import { NextRequest } from 'next/server'
+import { requireRole } from '@/lib/auth/api-guard'
+import { enforceRateLimit } from '@/lib/security/rate-limit'
 import { chat } from '@/lib/ai/engine'
 import { executeTool } from '@/lib/ai/tools-registry'
 
@@ -7,6 +9,14 @@ const testSessions = new Map<string, { messages: { role: 'user' | 'assistant'; c
 
 // Simulateur WhatsApp — mode démo autonome (sans Supabase)
 export async function POST(request: NextRequest) {
+  // SS-29 : la route etait ouverte et relaie vers le moteur LLM — un proxy IA
+  // gratuit finance par la cle du projet. Reservee a l'administrateur.
+  const guard = await requireRole(['admin_global'])
+  if (!guard.ok) return guard.response
+
+  const limite = enforceRateLimit('whatsapp-test:' + guard.user.id, 20, 60_000)
+  if (limite) return limite
+
   try {
     const body = await request.json()
     const { from, message, mode } = body

@@ -1,5 +1,20 @@
+/**
+ * POST /api/notifications/grade
+ *
+ * Prévient les parents qu'une note vient d'être publiée (WhatsApp puis SMS).
+ *
+ * Sécurité — réf. SECURITY-AUDIT.md SS-26 :
+ *   La route était ouverte et le numéro du destinataire était lu dans le corps
+ *   de la requête. N'importe qui pouvait donc faire envoyer un message de son
+ *   choix, vers un numéro de son choix, sur le compte Twilio de l'école.
+ *   Désormais : appelant enseignant authentifié, débit plafonné, et les
+ *   numéros sont relus en base à partir des identifiants d'élèves — le corps
+ *   de la requête ne choisit plus jamais qui est appelé.
+ */
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { requireRole } from '@/lib/auth/api-guard'
+import { enforceRateLimit } from '@/lib/security/rate-limit'
+import { tryCreateAdminClient } from '@/lib/supabase/admin'
 
 export const runtime = 'nodejs'
 
@@ -7,6 +22,7 @@ interface NotePubliee {
   eleveId: string
   elevenom: string
   elevePrenom: string
+  /** Ignoré : conservé pour compatibilité avec l'ancien client. */
   parentTelephone?: string
   note: number | null
   absent: boolean
@@ -28,7 +44,48 @@ interface PublishPayload {
   profNom: string
 }
 
+/** Numéro du parent principal, relu en base et borné à l'école de l'appelant. */
+async function telephonesParEleve(
+  eleveIds: string[],
+  ecoleId: string,
+): Promise<Map<string, string>> {
+  const map = new Map<string, string>()
+  const admin = tryCreateAdminClient()
+  if (!admin || eleveIds.length === 0) return map
+
+  const { data: eleves } = await (admin.from('eleves') as any)
+    .select('id, parent_principal_id')
+    .eq('ecole_id', ecoleId)
+    .in('id', eleveIds)
+
+  const parentIds = [...new Set(
+    (eleves ?? []).map((e: any) => e.parent_principal_id).filter(Boolean),
+  )] as string[]
+  if (parentIds.length === 0) return map
+
+  const { data: parents } = await (admin.from('utilisateurs') as any)
+    .select('id, telephone')
+    .eq('ecole_id', ecoleId)
+    .in('id', parentIds)
+
+  const telParParent = new Map<string, string>()
+  for (const p of parents ?? []) {
+    if (p.telephone) telParParent.set(p.id, p.telephone)
+  }
+  for (const e of eleves ?? []) {
+    const tel = telParParent.get(e.parent_principal_id)
+    if (tel) map.set(e.id, tel)
+  }
+  return map
+}
+
 export async function POST(req: NextRequest) {
+  const guard = await requireRole(['professeur', 'admin_global', 'censeur'])
+  if (!guard.ok) return guard.response
+
+  const limite = enforceRateLimit(`notif-grade:${guard.user.id}`, 10, 60_000)
+  if (limite) return limite
+
   try {
     const body: PublishPayload = await req.json()
     const {
@@ -42,6 +99,15 @@ export async function POST(req: NextRequest) {
       notes,
       profNom,
     } = body
+
+    if (!Array.isArray(notes)) {
+      return NextResponse.json({ error: 'notes[] requis' }, { status: 400 })
+    }
+
+    const telephones = await telephonesParEleve(
+      notes.map(n => n.eleveId).filter(Boolean),
+      guard.profil.ecole_id!,
+    )
 
     const accountSid = process.env.TWILIO_ACCOUNT_SID
     const authToken = process.env.TWILIO_AUTH_TOKEN
@@ -60,9 +126,10 @@ export async function POST(req: NextRequest) {
 
       // Envoyer un message WhatsApp/SMS à chaque parent
       for (const note of notes) {
-        if (!note.parentTelephone) continue
+        const numero = telephones.get(note.eleveId)
+        if (!numero) continue
 
-        let tel = note.parentTelephone.replace(/\s/g, '').replace(/^0/, '')
+        let tel = numero.replace(/\s/g, '').replace(/^0/, '')
         if (!tel.startsWith('+')) tel = '+221' + tel
 
         const noteStr = note.absent
@@ -104,12 +171,10 @@ export async function POST(req: NextRequest) {
     }
 
     // Broadcast via Supabase Realtime si configuré
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-    if (supabaseUrl && supabaseServiceKey) {
+    const admin = tryCreateAdminClient()
+    if (admin) {
       try {
-        const supabase = createClient(supabaseUrl, supabaseServiceKey)
-        await supabase.channel('grade-published').send({
+        await admin.channel('grade-published').send({
           type: 'broadcast',
           event: 'new_grade',
           payload: {
@@ -133,7 +198,7 @@ export async function POST(req: NextRequest) {
       demo: !isTwilioConfigured,
       sent,
       errors,
-      total: notes.filter(n => n.parentTelephone).length,
+      total: telephones.size,
       results: results.slice(0, 5), // Ne renvoyer que les 5 premiers pour la réponse
     })
   } catch (err: any) {

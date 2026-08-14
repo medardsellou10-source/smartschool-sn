@@ -320,3 +320,61 @@ Un premier balayage signalait 40 policies « ouvertes » sur la base d'un
 un `with_check` à NULL n'ouvre rien — Postgres réutilise alors l'expression
 `USING`. Seule `utilisateurs_update` posait un problème réel, pour la raison
 distincte exposée en SS-19.
+
+---
+
+## SS-26 à SS-29 — Routes API sans contrôle de rôle
+
+Le proxy renvoie 401 sur `/api/*` sans session, mais il ne vérifie **aucun
+rôle** : `ROUTE_REQUIRES_ROLE` ne couvre que les préfixes de tableau de bord
+(`/admin`, `/professeur`, …). Le contrôle de rôle appartient donc aux routes,
+et quatre d'entre elles n'en avaient pas. Dans un logiciel scolaire, « tout
+compte authentifié » signifie chaque élève et chaque parent.
+
+### SS-26 · `/api/notifications/grade` — composeur SMS à contenu libre
+
+Le numéro du destinataire était lu dans le corps de la requête
+(`notes[].parentTelephone`), tout comme le texte affiché (`ecoleNom`,
+`profNom`, `remarqueGlobale`). Un compte quelconque pouvait donc faire
+envoyer le message de son choix vers le numéro de son choix, sur le compte
+Twilio de l'établissement — facturation, harcèlement par SMS, et hameçonnage
+sous l'identité de l'école.
+
+Correctif : appelant enseignant, débit plafonné à 10/min, et **les numéros
+sont relus en base** à partir des identifiants d'élèves, bornés à
+l'établissement de l'appelant. Le corps de la requête ne choisit plus jamais
+qui est appelé.
+
+### SS-27 · `/api/agent/diffuseur-notes` — ouverte au public
+
+`/api/agent/` figurait dans les préfixes publics du proxy alors que la seule
+route concernée est appelée depuis le navigateur par un enseignant connecté.
+**Vérifié en production : HTTP 200 sans aucune session.** La route consomme du
+crédit Claude et insère des notifications via une fonction SECURITY DEFINER,
+donc hors RLS : un anonyme pouvait adresser une fausse note à un parent.
+
+Correctif : préfixe public retiré du proxy, rôle enseignant exigé, élève cible
+borné à l'établissement de l'appelant, débit plafonné.
+
+### SS-28 · `/api/twilio/test` — SMS vers un numéro arbitraire
+
+Route de diagnostic sans contrôle de rôle : `to` venait du corps de la
+requête. Un élève disposait d'un envoyeur de SMS gratuit vers n'importe quel
+numéro au monde, facturé à l'école.
+
+Correctif : `admin_global` uniquement, 3 envois par heure.
+
+### SS-29 · `/api/whatsapp/test` — passerelle LLM gratuite
+
+Même défaut, relayé vers `lib/ai/engine` : n'importe quel compte pouvait
+utiliser la clé API du projet comme un service de conversation gratuit.
+
+Correctif : `admin_global` uniquement, 20 requêtes par minute.
+
+### Formulaires publics — plafonds de débit
+
+`/api/contact`, `/api/waitlist` et `/api/inscription/ecole` sont
+légitimement publics mais écrivaient en base avec la clé de service sans
+aucun plafond. `inscription/ecole` crée un **établissement entier** : sans
+limite, la base se remplit de faux locataires depuis une seule machine.
+Plafonds par IP : 5/h pour les deux formulaires, 3/h pour l'inscription.

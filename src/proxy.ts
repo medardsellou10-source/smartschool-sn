@@ -65,7 +65,6 @@ const PUBLIC_PREFIXES = [
   '/api/twilio/sms',      // webhook SMS entrant Twilio
   '/api/health',          // sonde de monitoring (Uptimerobot, Better Uptime)
   '/api/desktop/updater', // auto-update Tauri : l'app n'a pas de session
-  '/api/agent/',
   '/api/inscription/',
   '/api/waitlist',
   '/api/contact',

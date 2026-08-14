@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { clientIp, enforceRateLimit } from '@/lib/security/rate-limit'
 
 export async function POST(req: NextRequest) {
+  // Route publique ecrivant en base avec la cle de service : sans plafond,
+  // un seul client peut inonder la table.
+  const limite = enforceRateLimit('contact:' + clientIp(req), 5, 3600_000)
+  if (limite) return limite
+
   try {
     const { nom, email, message } = await req.json()
 

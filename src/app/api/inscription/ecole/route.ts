@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { clientIp, enforceRateLimit } from '@/lib/security/rate-limit'
 
 function isSupabaseConfigured(): boolean {
   // Si le mode démo est explicitement activé, on simule sans Supabase
@@ -12,6 +13,11 @@ function isSupabaseConfigured(): boolean {
 }
 
 export async function POST(req: Request) {
+  // Cette route cree un etablissement entier. Sans plafond, elle permet de
+  // remplir la base de faux tenants depuis une seule machine.
+  const limite = enforceRateLimit('inscription-ecole:' + clientIp(req), 3, 3600_000)
+  if (limite) return limite
+
   try {
     const body = await req.json()
     const { ecole, admin, abonnement } = body

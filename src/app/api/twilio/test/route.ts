@@ -1,9 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requireRole } from '@/lib/auth/api-guard'
+import { enforceRateLimit } from '@/lib/security/rate-limit'
 
 export const runtime = 'nodejs'
 
 // Route de test Twilio — envoie un SMS de test et vérifie la config WhatsApp
 export async function POST(req: NextRequest) {
+  // SS-28 : cette route envoyait un SMS vers un numero fourni dans le corps de
+  // la requete, sans authentification — un composeur SMS gratuit sur le compte
+  // Twilio de l'ecole. Reservee a l'administrateur, et fortement plafonnee.
+  const guard = await requireRole(['admin_global'])
+  if (!guard.ok) return guard.response
+
+  const limite = enforceRateLimit('twilio-test:' + guard.user.id, 3, 3600_000)
+  if (limite) return limite
+
   const { to } = await req.json()
 
   const accountSid = process.env.TWILIO_ACCOUNT_SID
@@ -38,6 +49,9 @@ export async function POST(req: NextRequest) {
 
 // Vérifie si Twilio est correctement configuré
 export async function GET() {
+  const guardGet = await requireRole(['admin_global'])
+  if (!guardGet.ok) return guardGet.response
+
   const accountSid = process.env.TWILIO_ACCOUNT_SID
   const authToken  = process.env.TWILIO_AUTH_TOKEN
   const phoneNumber = process.env.TWILIO_PHONE_NUMBER
