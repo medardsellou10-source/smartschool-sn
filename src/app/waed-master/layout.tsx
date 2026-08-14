@@ -6,7 +6,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import {
-  LayoutDashboard, Building2, Wallet, ShieldCheck, LogOut, Crown,
+  LayoutDashboard, Building2, Wallet, ShieldCheck, LogOut, Crown, Stethoscope,
 } from 'lucide-react'
 
 export const metadata: Metadata = {
@@ -19,6 +19,7 @@ const NAV = [
   { href: '/waed-master',        label: 'Dashboard',       icon: LayoutDashboard },
   { href: '/waed-master/ecoles', label: 'Écoles (CRM)',     icon: Building2 },
   { href: '/waed-master/revenus',label: 'Revenus SaaS',     icon: Wallet },
+  { href: '/waed-master/diagnostic', label: 'Diagnostic',   icon: Stethoscope },
 ]
 
 export default function WaedMasterLayout({ children }: { children: React.ReactNode }) {

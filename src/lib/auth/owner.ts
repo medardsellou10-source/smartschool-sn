@@ -137,3 +137,36 @@ export function ownerConfigStatus(): {
   if (ownerEmails().length === 0) manquant.push('OWNER_EMAILS')
   return { ok: manquant.length === 0, manquant }
 }
+
+/* ── Garde propriétaire pour les routes API ──────────────────────────────── */
+
+/**
+ * Vérifie qu'un appel API provient bien du propriétaire : session valide,
+ * e-mail dans l'allowlist, et second facteur encore actif.
+ *
+ * Le proxy protège déjà les PAGES `/waed-master/*`, mais les routes
+ * `/api/master/*` sont servies hors de ce chemin : elles doivent refaire le
+ * contrôle elles-mêmes.
+ *
+ * @returns `null` si l'accès est accordé, sinon la réponse à renvoyer.
+ */
+export async function requireOwnerApi(): Promise<Response | null> {
+  const { createClient } = await import('@/lib/supabase/server')
+  const { cookies } = await import('next/headers')
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  // Réponse identique dans tous les cas de refus : ne pas révéler l'existence
+  // du cockpit ni l'identité du propriétaire.
+  const refus = new Response(JSON.stringify({ error: 'Not found' }), {
+    status: 404, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+  })
+
+  if (!user || !isOwnerEmail(user.email)) return refus
+
+  const jeton = (await cookies()).get(OWNER_2FA_COOKIE)?.value
+  if (!(await verifyOwnerToken(jeton, user.id))) return refus
+
+  return null
+}
