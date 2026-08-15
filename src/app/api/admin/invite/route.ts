@@ -125,12 +125,26 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: `Profil non créé : ${profileErr.message}` }, { status: 500 })
   }
 
-  // ── 6. Si élève : créer enregistrement dans `eleves` ──
-  if (role === 'eleve' && classe_id) {
+  // ── 6. Si élève : créer la fiche dans `eleves` ──
+  //
+  // Réf. audit SS-41. Deux défauts corrigés ici :
+  //
+  //   1. `user_id` n'était jamais renseigné. Douze policies indexent dessus
+  //      (notes, absences, copies, notifications, conversations…) : un élève
+  //      invité n'avait donc accès à rien de tout cela. La fiche portait à la
+  //      place `id = newUserId`, convention que seule `factures_eleve_read`
+  //      suivait — d'où un élève qui voyait ses factures et rien d'autre.
+  //      L'identifiant de fiche est désormais autonome et le rattachement
+  //      passe par `user_id`, la convention majoritaire.
+  //
+  //   2. Sans `classe_id`, aucune fiche n'était créée : le compte existait
+  //      avec le rôle élève mais sans dossier scolaire. La classe est
+  //      facultative — on inscrit avant d'affecter.
+  if (role === 'eleve') {
     const { error: eleveErr } = await (admin.from('eleves') as any).insert({
-      id: newUserId,
+      user_id: newUserId,
       ecole_id,
-      classe_id,
+      classe_id: classe_id || null,
       nom: nom.trim(),
       prenom: prenom.trim(),
       matricule: matricule?.trim() || `MAT-${Date.now()}`,
@@ -138,8 +152,14 @@ export async function POST(request: NextRequest) {
       actif: true,
     })
     if (eleveErr) {
-      // Ne bloque pas l'invitation, juste loguer
-      console.error('[invite] Erreur création eleve:', eleveErr.message)
+      // L'echec etait auparavant avale : l'administrateur lisait « invitation
+      // envoyee » alors que l'eleve n'avait pas de dossier. On annule plutot.
+      await admin.auth.admin.deleteUser(newUserId)
+      await (admin.from('utilisateurs') as any).delete().eq('id', newUserId)
+      return NextResponse.json(
+        { error: `Fiche élève non créée : ${eleveErr.message}` },
+        { status: 500 },
+      )
     }
   }
 

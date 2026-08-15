@@ -693,3 +693,10 @@ compatibles, et leurs rôles figurent bien dans les listes autorisées.
 ## SS-39 et SS-40 — le versant lecture
 
 Tout l audit avait porte sur l ecriture. Voir le message du commit pour le detail : cloisonnement inter-etablissements verifie sans aucune fuite, annuaire restreint, copies et donnees familiales cloisonnees, et `diagnostic_lecture()` ajoute au lanterneur.
+
+## SS-41 — Deux conventions contradictoires pour identifier un eleve
+
+Voir le message du commit : 12 policies passent par `eleves.user_id`, une
+seule par `eleves.id`, et le flux d invitation suivait la minoritaire en
+laissant `user_id` vide. Un eleve invite voyait ses factures et rien d autre.
+Aligne, avec deux autres defauts du meme flux corriges.
