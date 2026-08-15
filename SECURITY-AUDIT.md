@@ -543,3 +543,57 @@ inconnu. Détecté par le test du chemin légitime, qui est précisément là po
 J'ai d'abord suspecté `solde_restant` de ne pas être maintenu par le
 déclencheur. Vérification faite, c'est une colonne **générée**
 (`montant_total - montant_verse`) : elle est cohérente par construction.
+
+## SS-35 — Le pointage GPS des enseignants n'a jamais fonctionné
+
+Deux défauts cumulés dans `fn_calcul_pointage`, tous deux antérieurs à cet
+audit :
+
+1. **`timetz - timetz` — cet opérateur n'existe pas dans PostgreSQL.**
+   Vérifié dans `pg_operator` : aucun. L'expression du calcul de retard ne
+   pouvait donc jamais s'évaluer. Le défaut est présent **dès le schéma
+   initial** (`20260323221609_schema_initial.sql`, ligne 308).
+2. **`ST_GeographyFromText` et `ST_Distance` non qualifiés** alors que la
+   fonction porte `search_path = ''`. PostGIS étant installé dans `public`,
+   les noms ne se résolvaient pas.
+
+Toute insertion dans `pointages_profs` échouait donc. Les 22 lignes présentes
+datent d'avril 2026 et aucune n'a été enregistrée depuis.
+
+À noter pour le processus : la définition du dépôt ne porte **ni**
+`SECURITY DEFINER` **ni** `search_path`, alors que la fonction en production
+portait les deux. L'état de production avait divergé du dépôt — quelque chose
+a été appliqué hors de l'historique des migrations.
+
+Corrigé, et vérifié sur le cycle complet : arrivée 07h55 → `a_heure`, 0 min ;
+08h12 → `retard_leger`, 12 min ; 09h05 → `retard_grave`, 65 min ; pointage
+depuis 55 km → refusé.
+
+Corrigé aussi, le message d'erreur : `RAISE` ne connaît que `%`, si bien que
+le `%.1f` d'origine fuyait littéralement dans le texte. `PointageGPS.tsx`
+affiche ce message à l'enseignant, qui lisait « hors périmètre
+(55324.07419869.1f m) ». Il lit désormais « (55324 m) ».
+
+## SS-36 — Un enseignant validait son propre pointage
+
+`pointages_self_write` est `FOR ALL` sur `prof_id = auth.uid()` : rien
+n'empêchait de renseigner soi-même `valide_par` et de se déclarer validé par
+la direction — sur la table qui alimente le suivi des retards.
+
+Le déclencheur refuse désormais toute écriture de `valide_par` par un compte
+qui n'est pas de la direction. Il couvre en outre `UPDATE`, alors qu'il ne
+couvrait qu'`INSERT` : le statut dérivé pouvait sinon être réécrit après coup.
+
+Vérifié : l'enseignant est refusé, le censeur passe.
+
+## SS-37 — Le registre d'absences était lisible par tous
+
+`abs_select_ecole` autorisait la lecture à **tout membre de l'établissement**.
+Vérifié : un élève lisait les 9 enregistrements de son école — motif
+d'absence, qui peut être médical, et pièce justificative comprise, pour ses
+camarades.
+
+Lecture désormais réservée au personnel pour l'établissement, et aux parents
+pour leurs seuls enfants. Vérifié après correction : élève 0, parent 4 (ses
+enfants), censeur 4 (soit la totalité de son établissement — les 9 autres
+appartiennent à l'autre école).
