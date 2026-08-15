@@ -5,6 +5,7 @@ import {
   claimWebhookEvent, markWebhookProcessed, validateAmount,
 } from '@/lib/security/webhook-verify'
 import { sendWhatsApp } from '@/lib/whatsapp'
+import { planFinancePar, finDePeriode } from '@/lib/billing/plans'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -56,7 +57,21 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Identifiant d événement manquant' }, { status: 400 })
   }
 
-  const factureId = String(event?.data?.client_reference ?? '').replace(/^SS-/, '')
+  const reference = String(event?.data?.client_reference ?? '')
+  const devise = String(event?.data?.currency ?? 'XOF').toUpperCase()
+
+  const supabaseTot = createAdminClient()
+
+  // ── 3bis. Reglement d'abonnement ───────────────────────────────────────
+  // SS-44 : cette branche n'existait pas. La reference SS-ABONNEMENT-<uuid>
+  // perdait son prefixe puis echouait au controle UUID, si bien que TOUT
+  // reglement d'abonnement etait rejete en 400 : l'ecole payait et son plan
+  // n'etait jamais active.
+  if (reference.startsWith('SS-ABONNEMENT-')) {
+    return traiterAbonnement(supabaseTot, reference, event, eventId, devise)
+  }
+
+  const factureId = reference.replace(/^SS-/, '')
   if (!isUuid(factureId)) {
     console.error('[wave] référence facture invalide', event?.data?.client_reference)
     return NextResponse.json({ error: 'Référence invalide' }, { status: 400 })
@@ -97,7 +112,6 @@ export async function POST(req: Request) {
   }
 
   // ── 5. Cohérence devise + montant ──────────────────────────────────────
-  const devise = String(event?.data?.currency ?? 'XOF').toUpperCase()
   if (devise !== 'XOF') {
     await markWebhookProcessed(supabase, 'wave', eventId, {
       status: 'rejected', detail: `devise inattendue ${devise}`,
@@ -190,4 +204,117 @@ async function notifierParent(
       },
     })
   }
+}
+
+/**
+ * Règlement d'un abonnement SmartSchool (SS-44).
+ *
+ * Le montant reçu détermine le plan activé : on retient le palier le plus
+ * élevé effectivement couvert, jamais davantage. Un versement partiel
+ * n'ouvre donc rien, et un trop-perçu n'ouvre pas le palier supérieur.
+ *
+ * L'idempotence est déjà acquise en amont : le verrou porte sur l'identifiant
+ * d'événement, quel que soit le type de règlement.
+ */
+async function traiterAbonnement(
+  supabase: ReturnType<typeof createAdminClient>,
+  reference: string,
+  event: any,
+  eventId: string,
+  devise: string,
+) {
+  const ecoleId = reference.replace(/^SS-ABONNEMENT-/, '')
+  if (!isUuid(ecoleId)) {
+    await markWebhookProcessed(supabase, 'wave', eventId, {
+      status: 'rejected', detail: 'référence établissement invalide',
+    })
+    return NextResponse.json({ error: 'Référence invalide' }, { status: 400 })
+  }
+
+  if (devise !== 'XOF') {
+    await markWebhookProcessed(supabase, 'wave', eventId, {
+      status: 'rejected', detail: `devise inattendue ${devise}`,
+    })
+    return NextResponse.json({ error: 'Devise non supportée' }, { status: 400 })
+  }
+
+  const { data: ecole } = await (supabase.from('ecoles') as any)
+    .select('id, nom').eq('id', ecoleId).maybeSingle()
+
+  if (!ecole) {
+    await markWebhookProcessed(supabase, 'wave', eventId, {
+      status: 'rejected', detail: 'établissement introuvable',
+    })
+    return NextResponse.json({ error: 'Établissement introuvable' }, { status: 404 })
+  }
+
+  // L'abonnement en cours porte le mode de facturation choisi à l'inscription.
+  const { data: abo } = await (supabase.from('abonnements') as any)
+    .select('id, mode_facturation')
+    .eq('ecole_id', ecoleId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  const mode: 'mensuel' | 'annuel' =
+    abo?.mode_facturation === 'annuel' ? 'annuel' : 'mensuel'
+
+  const montant = Number(event?.data?.amount)
+  const finance = planFinancePar(montant, mode)
+
+  if (!finance) {
+    // Le montant ne couvre aucun palier : on trace et on n'active rien.
+    await markWebhookProcessed(supabase, 'wave', eventId, {
+      status: 'rejected',
+      detail: `montant ${montant} insuffisant pour un plan en ${mode}`,
+    })
+    console.error('[wave] abonnement : montant insuffisant', ecoleId, montant)
+    return NextResponse.json({ error: 'Montant insuffisant' }, { status: 400 })
+  }
+
+  const debut = new Date()
+  const fin = finDePeriode(debut, mode)
+
+  const { error: aboErr } = await (supabase.from('abonnements') as any).insert({
+    ecole_id: ecoleId,
+    plan_id: finance.planId,
+    statut: 'actif',
+    mode_facturation: mode,
+    date_debut: debut.toISOString(),
+    date_fin: fin.toISOString(),
+    montant_paye: finance.prix,
+    methode_paiement: 'wave',
+    reference_paiement: eventId,
+    auto_renouvellement: false,
+  })
+
+  if (aboErr) {
+    console.error('[wave] abonnement non enregistré', aboErr.message)
+    return NextResponse.json({ error: 'Enregistrement impossible' }, { status: 500 })
+  }
+
+  // Le plan de l'établissement ne s'ouvre qu'ici, après encaissement vérifié.
+  const { error: ecoleErr } = await (supabase.from('ecoles') as any)
+    .update({
+      plan_id: finance.planId,
+      plan_type: finance.planId,
+      abonnement_statut: 'actif',
+    })
+    .eq('id', ecoleId)
+
+  if (ecoleErr) {
+    console.error('[wave] plan non applique a l ecole', ecoleErr.message)
+  }
+
+  await markWebhookProcessed(supabase, 'wave', eventId, {
+    status: 'processed',
+    detail: `plan ${finance.planId} (${mode}) actif jusqu au ${fin.toISOString().slice(0, 10)}`,
+  })
+
+  return NextResponse.json({
+    ok: true,
+    abonnement: finance.planId,
+    mode,
+    jusqu_au: fin.toISOString().slice(0, 10),
+  })
 }

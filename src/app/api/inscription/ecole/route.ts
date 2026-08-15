@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { prixPlan } from '@/lib/billing/plans'
 import { clientIp, enforceRateLimit } from '@/lib/security/rate-limit'
 
 function isSupabaseConfigured(): boolean {
@@ -171,8 +172,10 @@ export async function POST(req: Request) {
     // et l'activation du plan releve d'un webhook d'abonnement (absent a ce
     // jour — voir SECURITY-AUDIT.md SS-42).
     if (planDemande !== 'essai' && abonnement?.methode_paiement === 'wave' && process.env.WAVE_API_KEY) {
-      const prixMensuel: Record<string, number> = { basique: 25000, standard: 50000, etablissement: 100000 }
-      const montant = prixMensuel[planDemande] || 25000
+      // Table de prix partagee avec le webhook d'activation (SS-44) : deux
+      // tables separees auraient derive.
+      const modeFact = abonnement?.mode_facturation === 'annuel' ? 'annuel' : 'mensuel'
+      const montant = prixPlan(planDemande, modeFact) ?? 25000
       const waveRes = await fetch('https://api.wave.com/v1/checkout/sessions', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${process.env.WAVE_API_KEY}`, 'Content-Type': 'application/json' },

@@ -720,3 +720,18 @@ repare a l iteration 11 aurait ete faux pour tout client hors de Dakar. La page
 de parametres affichait ces coordonnees sans permettre de les saisir. La
 position est desormais laissee vide a l inscription, et saisissable dans les
 parametres.
+
+## SS-44 — Le webhook d abonnement n existait pas
+
+La reference `SS-ABONNEMENT-<uuid>` perdait son prefixe puis echouait au
+controle UUID : tout reglement d abonnement repartait en 400. L ecole payait,
+son plan n etait jamais active. La branche est ajoutee dans le webhook Wave
+existant, reprenant ses protections (HMAC, verrou d idempotence, devise).
+
+Le montant recu determine le plan : palier le plus eleve effectivement
+couvert, jamais davantage. Table de prix desormais partagee avec
+l inscription (`src/lib/billing/plans.ts`).
+
+Deux defauts de calcul trouves en ecrivant les controles : debordement de fin
+de mois (31 janvier + 1 mois donnait le 3 mars) et melange heure locale / UTC.
+Controles conserves : `npm run test:tarifs`, 20 controles.
