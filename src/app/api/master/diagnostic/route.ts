@@ -55,11 +55,16 @@ export async function GET() {
   // les droits de son propriétaire, et une fonction SECURITY DEFINER ouverte à
   // PUBLIC fait de même pour quiconque. `diagnostic_stockage` couvre les
   // buckets, dont les politiques vivent dans le schéma storage et échappaient
-  // donc à tous les contrôles précédents.
+  // donc à tous les contrôles précédents. `diagnostic_execution` sort de
+  // l'inspection de forme : il EXÉCUTE chaque déclencheur sur une écriture
+  // factice, systématiquement annulée. Un corps présent mais inexécutable —
+  // le défaut SS-35, vivant depuis le schéma initial — ne se voit pas
+  // autrement.
   try {
     for (const fn of [
       'diagnostic_configuration', 'diagnostic_vues',
       'diagnostic_fonctions', 'diagnostic_stockage', 'diagnostic_pointage',
+      'diagnostic_execution',
     ]) {
       const { data, error } = await (supabase.rpc as any)(fn)
       if (error) {

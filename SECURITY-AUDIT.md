@@ -597,3 +597,49 @@ Lecture désormais réservée au personnel pour l'établissement, et aux parents
 pour leurs seuls enfants. Vérifié après correction : élève 0, parent 4 (ses
 enfants), censeur 4 (soit la totalité de son établissement — les 9 autres
 appartiennent à l'autre école).
+
+## Suite de SS-35 — le lanterneur exécute au lieu d'inspecter
+
+SS-35 a vécu depuis mars 2026 parce que tous les contrôles portaient sur la
+**forme** des objets : le déclencheur était présent, actif, correctement nommé
+et rattaché à la bonne table. Son corps ne pouvait simplement jamais
+s'évaluer. Aucune inspection statique ne voit cela — PL/pgSQL ne résout les
+noms qu'à l'exécution.
+
+### Recherche exhaustive des autres fonctions mortes
+
+Les seize déclencheurs et les fonctions applicatives ont été **exécutés**, un
+par un, sur des écritures factices annulées. Résultat : **aucune autre fonction
+morte**. Les quelques échecs rencontrés venaient de mon propre jeu d'essai —
+signatures devinées, année hors bornes, ligne comptable sans montant — et non
+du code audité.
+
+Deux vérifications ont écarté de fausses pistes :
+
+- `preview_matricule` renvoyait `LYCE-001-{NIVEAU}-2026-0001`, gabarit non
+  substitué. Vérification faite, c'est le comportement attendu quand on ne
+  passe aucune variable : le chemin réel, `tg_auto_matricule_eleve`, produit
+  bien `LYCE-001-6ME-2026-0001` avec une classe et `…-XX-…` sans. Aucun des 50
+  matricules en base ne contient de gabarit.
+- Les deux essais retournant `-0001`, j'ai vérifié le compteur : il est
+  persisté dans `matricule_templates`, et `eleves.matricule` porte une
+  contrainte d'unicité. Une course échouerait bruyamment plutôt que de créer
+  un doublon.
+
+### `diagnostic_execution()`
+
+Le lanterneur exerce désormais chaque déclencheur sur une écriture factice,
+dans une sous-transaction systématiquement annulée. Vérifié : zéro résidu.
+
+**Règle de verdict** : seule la classe d'erreur 42 — fonction, opérateur,
+colonne ou table introuvable — signe un corps inexécutable. Une violation de
+contrainte (classe 23) prouve au contraire que le déclencheur s'est exécuté,
+le contrôle d'intégrité venant après lui ; un refus applicatif (P0001) aussi.
+Ma première version signalait à tort une année hors bornes : cette règle rend
+le contrôle insensible à la validité du jeu d'essai.
+
+**Le détecteur a lui-même été éprouvé.** En cassant volontairement la
+résolution de noms de `fn_auto_matricule_eleve`, le verdict est passé de OK à
+« CORPS INEXÉCUTABLE (42P01) : relation "classes" does not exist », puis est
+revenu à OK après restauration — le tout dans une transaction unique. Un
+détecteur qu'on n'a jamais vu détecter ne vaut rien.
