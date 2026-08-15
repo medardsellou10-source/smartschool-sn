@@ -1,9 +1,26 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+/**
+ * Actions serveur — relances et encaissement especes.
+ *
+ * Réf. audit SS-38 : une action serveur est un point d'entree POST public.
+ * Le RLS etait ici l'unique barriere, et il ne filtre ni les colonnes ni la
+ * cadence : les relances pouvaient etre declenchees en boucle (facturation
+ * Twilio), et l'encaissement especes n'inscrivait personne dans `encaisse_par`.
+ */
+
+import { requireRole, FINANCE_ROLES } from '@/lib/auth/api-guard'
+import { rateLimit } from '@/lib/security/rate-limit'
 
 export async function envoyerRelanceSMS(factureId: string) {
-  const supabase = await createClient()
+  const guard = await requireRole(FINANCE_ROLES)
+  if (!guard.ok) return { success: false, error: 'Action reservee au service financier' }
+
+  if (!rateLimit(`relance-sms:${guard.user.id}`, 30, 60_000).allowed) {
+    return { success: false, error: 'Trop de relances. Reessayez dans un instant.' }
+  }
+
+  const supabase = guard.supabase as any
 
   // Récupérer facture + élève + parent
   const { data: facture, error: fetchErr } = await (supabase
@@ -79,7 +96,14 @@ export async function envoyerRelanceSMS(factureId: string) {
 }
 
 export async function envoyerRelanceWhatsApp(factureId: string) {
-  const supabase = await createClient()
+  const guard = await requireRole(FINANCE_ROLES)
+  if (!guard.ok) return { success: false, error: 'Action reservee au service financier' }
+
+  if (!rateLimit(`relance-wa:${guard.user.id}`, 30, 60_000).allowed) {
+    return { success: false, error: 'Trop de relances. Reessayez dans un instant.' }
+  }
+
+  const supabase = guard.supabase as any
 
   // Récupérer les infos
   const { data: facture } = await (supabase.from('factures') as any)
@@ -120,7 +144,14 @@ export async function envoyerRelanceWhatsApp(factureId: string) {
 }
 
 export async function marquerPayeEspeces(factureId: string, montant: number, reference: string) {
-  const supabase = await createClient()
+  const guard = await requireRole(FINANCE_ROLES)
+  if (!guard.ok) return { success: false, error: 'Encaissement reserve au service financier' }
+
+  if (!Number.isFinite(montant) || montant <= 0) {
+    return { success: false, error: 'Montant invalide' }
+  }
+
+  const supabase = guard.supabase as any
 
   const { data: facture } = await (supabase
     .from('factures') as any)
@@ -142,6 +173,9 @@ export async function marquerPayeEspeces(factureId: string, montant: number, ref
     methode: 'especes',
     reference_transaction: reference || `ESP-${Date.now()}`,
     statut_confirmation: 'confirmed',
+    // Sans cette colonne, un encaissement especes n'a aucun responsable
+    // identifie : la piste comptable s'arrete a la ligne de paiement.
+    encaisse_par: guard.user.id,
   })
 
   if (error) {

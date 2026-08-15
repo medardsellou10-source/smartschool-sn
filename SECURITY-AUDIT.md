@@ -643,3 +643,49 @@ résolution de noms de `fn_auto_matricule_eleve`, le verdict est passé de OK à
 « CORPS INEXÉCUTABLE (42P01) : relation "classes" does not exist », puis est
 revenu à OK après restauration — le tout dans une transaction unique. Un
 détecteur qu'on n'a jamais vu détecter ne vaut rien.
+
+## SS-38 — Les actions serveur, seul chemin d'écriture encore non gardé
+
+Une action serveur (`'use server'`) est un point d'entrée POST public, adressé
+par identifiant d'action. Le proxy n'y applique qu'un contrôle de rôle **par
+préfixe d'URL** : un compte authentifié peut donc invoquer n'importe quelle
+action depuis sa propre page. Les cinq actions du projet ne vérifiaient rien —
+le RLS était l'unique barrière.
+
+### Ce que le RLS couvrait effectivement
+
+Il faut le dire précisément, parce que mon premier test a conclu l'inverse.
+J'avais écrit l'essai sous la forme `INSERT … SELECT … FROM factures`, et il a
+« réussi » : un élève semblait enregistrer un encaissement. C'est le faux
+positif déjà rencontré à l'itération 4 — quand le RLS vide la source du
+`SELECT`, l'`INSERT` écrit zéro ligne et ne lève aucune erreur.
+
+Refait avec des valeurs explicites, l'élève est **refusé** (« new row violates
+row-level security policy »), et la table reste à 3 lignes. Le RLS tient.
+
+### Ce qu'il ne couvrait pas
+
+Le RLS filtre des lignes. Il ne filtre ni les colonnes, ni la cadence, ni
+l'attribution — exactement les trois trous trouvés ici :
+
+- **`validerAbsence(absenceId, valideurId)`** prenait l'identité du valideur
+  **en paramètre**, écrite telle quelle dans `valide_par`. Même motif que
+  `can_impersonate` (SS-31) : n'importe qui pouvait attribuer la validation
+  d'une absence à un collègue qui ne l'avait jamais faite. L'identité vient
+  désormais de la session ; le paramètre est conservé, ignoré, pour ne pas
+  casser l'appel existant.
+- **`marquerPayeEspeces`** n'inscrivait personne dans `encaisse_par`. Un
+  encaissement en espèces n'avait donc aucun responsable identifié — la
+  colonne existait depuis SS-01, mais seule la route API la renseignait. La
+  piste comptable s'arrêtait à la ligne de paiement.
+- **`envoyerRelanceSMS` / `envoyerRelanceWhatsApp` / `envoyerAlerteRetard`**
+  n'avaient aucun plafond : un appel en boucle facturait autant de messages
+  Twilio.
+
+Ajouté aussi : refus explicite plutôt qu'échec silencieux (le RLS renvoyait
+« succès » sur zéro ligne), et rejet des montants nuls ou négatifs.
+
+Vérifié après correction : l'intendant encaisse et son identité est tracée ;
+un élève est refusé ; le surveillant valide toujours une absence. Les appelants
+existants — `surveillant/page.tsx` et `TableauImpayes.tsx` — restent
+compatibles, et leurs rôles figurent bien dans les listes autorisées.
