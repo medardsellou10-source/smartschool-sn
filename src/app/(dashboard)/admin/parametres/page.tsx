@@ -48,7 +48,8 @@ export default function ParametresPage() {
   // Edit states — infos générales
   const [editingEcole, setEditingEcole] = useState(false)
   const [editingUser, setEditingUser] = useState(false)
-  const [ecoleForm, setEcoleForm] = useState({ nom: '', region: '', ville: '', rayon_pointage_m: 200 })
+  const [ecoleForm, setEcoleForm] = useState({ nom: '', region: '', ville: '', rayon_pointage_m: 200,
+    latitude: null as number | null, longitude: null as number | null })
   const [userForm, setUserForm] = useState({ nom: '', prenom: '', telephone: '' })
 
   // Identité visuelle
@@ -90,7 +91,8 @@ export default function ParametresPage() {
         image_hero_url: null,
       }
       setEcole(e)
-      setEcoleForm({ nom: e.nom, region: e.region, ville: e.ville, rayon_pointage_m: e.rayon_pointage_m })
+      setEcoleForm({ nom: e.nom, region: e.region, ville: e.ville, rayon_pointage_m: e.rayon_pointage_m,
+        latitude: e.latitude, longitude: e.longitude })
       setBrandingForm({
         logo_url: e.logo_url || '',
         slogan: e.slogan || '',
@@ -109,7 +111,8 @@ export default function ParametresPage() {
     if (data) {
       const e = { ...data, couleur_primaire: data.couleur_primaire || '#22C55E' } as Ecole
       setEcole(e)
-      setEcoleForm({ nom: e.nom, region: e.region, ville: e.ville, rayon_pointage_m: e.rayon_pointage_m })
+      setEcoleForm({ nom: e.nom, region: e.region, ville: e.ville, rayon_pointage_m: e.rayon_pointage_m,
+        latitude: e.latitude, longitude: e.longitude })
       setBrandingForm({
         logo_url: e.logo_url || '',
         slogan: e.slogan || '',
@@ -130,6 +133,24 @@ export default function ParametresPage() {
     setTimeout(() => setSaveStatus(null), 4000)
   }
 
+  // La position de l'etablissement sert de centre au perimetre de pointage.
+  // Elle n'etait renseignable nulle part : l'inscription ecrivait les
+  // coordonnees du centre de Dakar pour toutes les ecoles (SS-43).
+  function handleUsePosition() {
+    if (!navigator.geolocation) {
+      showStatus('error', "La géolocalisation n'est pas disponible sur cet appareil")
+      return
+    }
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        setEcoleForm(f => ({ ...f, latitude: pos.coords.latitude, longitude: pos.coords.longitude }))
+        showStatus('success', 'Position relevée — pensez à enregistrer')
+      },
+      () => showStatus('error', "Position refusée. Saisissez les coordonnées à la main."),
+      { enableHighAccuracy: true, timeout: 10000 },
+    )
+  }
+
   async function handleSaveEcole() {
     if (isDemoMode()) {
       setEcole(prev => prev ? { ...prev, ...ecoleForm } : prev)
@@ -140,6 +161,7 @@ export default function ParametresPage() {
     const { error } = await (supabase.from('ecoles') as any).update({
       nom: ecoleForm.nom, region: ecoleForm.region, ville: ecoleForm.ville,
       rayon_pointage_m: ecoleForm.rayon_pointage_m,
+      latitude: ecoleForm.latitude, longitude: ecoleForm.longitude,
     }).eq('id', ecoleId!)
     if (error) { showStatus('error', 'Erreur lors de la sauvegarde'); return }
     setEditingEcole(false)
@@ -486,7 +508,8 @@ export default function ParametresPage() {
             </button>
           ) : (
             <div className="flex gap-2">
-              <button onClick={() => { setEditingEcole(false); if (ecole) setEcoleForm({ nom: ecole.nom, region: ecole.region, ville: ecole.ville, rayon_pointage_m: ecole.rayon_pointage_m }) }}
+              <button onClick={() => { setEditingEcole(false); if (ecole) setEcoleForm({ nom: ecole.nom, region: ecole.region, ville: ecole.ville, rayon_pointage_m: ecole.rayon_pointage_m,
+                latitude: ecole.latitude, longitude: ecole.longitude }) }}
                 className="text-xs font-bold px-3 py-1.5 rounded-lg"
                 style={{ color: 'var(--ss-text-muted)', border: '1px solid var(--ss-glass-border)' }}>
                 Annuler
@@ -509,8 +532,31 @@ export default function ParametresPage() {
               editing={editingEcole} onChange={v => setEcoleForm(f => ({ ...f, ville: v }))} />
             <EditableField label="Rayon de pointage (m)" value={editingEcole ? String(ecoleForm.rayon_pointage_m) : `${ecole.rayon_pointage_m} m`}
               editing={editingEcole} type="number" onChange={v => setEcoleForm(f => ({ ...f, rayon_pointage_m: Number(v) || 200 }))} />
-            <InfoField label="Coordonnées GPS"
-              value={ecole.latitude && ecole.longitude ? `${ecole.latitude.toFixed(4)}, ${ecole.longitude.toFixed(4)}` : 'Non configurées'} />
+            {editingEcole ? (
+              <div>
+                <p className="text-xs text-ss-text-muted mb-1">Coordonnées GPS de l'établissement</p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <input type="number" step="0.000001" placeholder="Latitude"
+                    value={ecoleForm.latitude ?? ''}
+                    onChange={e => setEcoleForm(f => ({ ...f, latitude: e.target.value === '' ? null : Number(e.target.value) }))}
+                    className="w-36 px-2 py-1.5 rounded-lg bg-ss-surface border border-ss-border text-ss-text text-sm" />
+                  <input type="number" step="0.000001" placeholder="Longitude"
+                    value={ecoleForm.longitude ?? ''}
+                    onChange={e => setEcoleForm(f => ({ ...f, longitude: e.target.value === '' ? null : Number(e.target.value) }))}
+                    className="w-36 px-2 py-1.5 rounded-lg bg-ss-surface border border-ss-border text-ss-text text-sm" />
+                  <button type="button" onClick={handleUsePosition}
+                    className="px-3 py-1.5 rounded-lg bg-ss-primary/15 text-ss-primary text-sm font-medium">
+                    Utiliser ma position
+                  </button>
+                </div>
+                <p className="text-xs text-ss-text-muted mt-1">
+                  Centre du périmètre de pointage. Sans elle, les enseignants ne peuvent pas pointer.
+                </p>
+              </div>
+            ) : (
+              <InfoField label="Coordonnées GPS"
+                value={ecole.latitude && ecole.longitude ? `${ecole.latitude.toFixed(4)}, ${ecole.longitude.toFixed(4)}` : 'Non configurées'} />
+            )}
             <InfoField label="Plan" value={ecole.plan_type.charAt(0).toUpperCase() + ecole.plan_type.slice(1)} />
             <InfoField label="Expiration du plan"
               value={new Date(ecole.date_expiration).toLocaleDateString('fr-SN', { day: 'numeric', month: 'long', year: 'numeric' })} />

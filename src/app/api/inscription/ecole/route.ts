@@ -28,8 +28,14 @@ export async function POST(req: Request) {
     if (!admin?.mot_de_passe)       return NextResponse.json({ error: 'Mot de passe requis' }, { status: 400 })
     if (admin.mot_de_passe.length < 8) return NextResponse.json({ error: 'Mot de passe minimum 8 caractères' }, { status: 400 })
 
-    const planId = abonnement?.plan_id || 'essai'
-    const isTrial = planId === 'essai' || abonnement?.methode_paiement === 'essai'
+    // SS-42 : le plan venait du corps de la requete, et `isTrial` aussi. Une
+    // ecole pouvait donc s'inscrire en « enterprise » avec montant_paye = 0 et
+    // fausser les revenus du cockpit. Aucun paiement n'etant verifie ici, toute
+    // inscription demarre en essai ; le plan demande est conserve comme
+    // intention commerciale dans `abonnements`.
+    const planDemande: string = abonnement?.plan_id || 'essai'
+    const planId = 'essai'
+    const isTrial = true
 
     // ── MODE DÉMO (Supabase non configuré) ─────────────────────────────────
     if (!isSupabaseConfigured()) {
@@ -86,12 +92,19 @@ export async function POST(req: Request) {
         ville: ecole.ville?.trim() || ecole.region || 'Dakar',
         telephone: ecole.telephone?.trim() || null,
         site_web: ecole.site_web?.trim() || null,
-        plan_id: isTrial ? 'essai' : planId,
-        plan_type: isTrial ? 'starter' : planId,    // colonne legacy
+        plan_id: planId,
+        plan_type: 'starter',    // colonne legacy
         abonnement_statut: 'trial',
         trial_fin: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
-        latitude: 14.6937,
-        longitude: -17.4441,
+        // SS-43 : ces coordonnees etaient celles du centre de Dakar, ecrites
+        // pour TOUTE ecole quelle que soit sa region. `fn_calcul_pointage`
+        // s'en sert comme centre du perimetre de pointage : un enseignant a
+        // Saint-Louis n'aurait jamais pu pointer, et un passant a Dakar
+        // l'aurait pu pour une ecole de Ziguinchor. On laisse la position
+        // vide — le declencheur refuse alors le pointage avec un message
+        // explicite, jusqu'a ce que l'etablissement renseigne sa position.
+        latitude: null,
+        longitude: null,
         actif: true,
       })
       .select('id').single()
@@ -126,7 +139,7 @@ export async function POST(req: Request) {
     try {
       await supabase.from('abonnements').insert({
         ecole_id: ecoleId,
-        plan_id: isTrial ? 'essai' : planId,
+        plan_id: planDemande,
         statut: 'trial',
         mode_facturation: abonnement?.mode_facturation || 'mensuel',
         date_debut: dateDebut.toISOString(),
@@ -153,17 +166,21 @@ export async function POST(req: Request) {
 
     // 6. Si paiement Wave demandé (plan payant) → créer session Wave
     let waveRedirectUrl: string | null = null
-    if (!isTrial && abonnement?.methode_paiement === 'wave' && process.env.WAVE_API_KEY) {
+    // Le plan payant reste propose au paiement : seule son ATTRIBUTION attend
+    // la confirmation. L'ecole demarre en essai, le reglement Wave se fait,
+    // et l'activation du plan releve d'un webhook d'abonnement (absent a ce
+    // jour — voir SECURITY-AUDIT.md SS-42).
+    if (planDemande !== 'essai' && abonnement?.methode_paiement === 'wave' && process.env.WAVE_API_KEY) {
       const prixMensuel: Record<string, number> = { basique: 25000, standard: 50000, etablissement: 100000 }
-      const montant = prixMensuel[planId] || 25000
+      const montant = prixMensuel[planDemande] || 25000
       const waveRes = await fetch('https://api.wave.com/v1/checkout/sessions', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${process.env.WAVE_API_KEY}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
           currency: 'XOF',
           amount: montant,
-          error_url: `${process.env.NEXT_PUBLIC_APP_URL}/inscription/confirmation?ecole=${encodeURIComponent(ecole.nom)}&email=${encodeURIComponent(admin.email)}&plan=${planId}&status=error`,
-          success_url: `${process.env.NEXT_PUBLIC_APP_URL}/inscription/confirmation?ecole=${encodeURIComponent(ecole.nom)}&email=${encodeURIComponent(admin.email)}&plan=${planId}&status=success`,
+          error_url: `${process.env.NEXT_PUBLIC_APP_URL}/inscription/confirmation?ecole=${encodeURIComponent(ecole.nom)}&email=${encodeURIComponent(admin.email)}&plan=${planDemande}&status=error`,
+          success_url: `${process.env.NEXT_PUBLIC_APP_URL}/inscription/confirmation?ecole=${encodeURIComponent(ecole.nom)}&email=${encodeURIComponent(admin.email)}&plan=${planDemande}&status=success`,
           client_reference: `SS-ABONNEMENT-${ecoleId}`,
         }),
       }).catch(() => null)

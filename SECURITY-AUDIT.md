@@ -700,3 +700,23 @@ Voir le message du commit : 12 policies passent par `eleves.user_id`, une
 seule par `eleves.id`, et le flux d invitation suivait la minoritaire en
 laissant `user_id` vide. Un eleve invite voyait ses factures et rien d autre.
 Aligne, avec deux autres defauts du meme flux corriges.
+
+## SS-42 — Plan auto-declare a l inscription
+
+Le plan et le drapeau `isTrial` venaient du corps de la requete : une ecole
+pouvait s inscrire en plan payant avec `montant_paye = 0`. L inscription
+demarre desormais en essai, le plan demande etant conserve dans `abonnements`.
+
+**Non clos** : la session de paiement Wave est preservee, mais aucun webhook
+d abonnement n existe — le webhook Wave ne traite que les factures d eleves.
+Apres reglement, le plan doit donc etre active a la main. Le defaut change de
+sens (plus de plan gratuit) mais n est pas resolu.
+
+## SS-43 — Toutes les ecoles placees au centre de Dakar
+
+L inscription ecrivait des coordonnees codees en dur, quelle que soit la
+region. `fn_calcul_pointage` s en sert comme centre du perimetre : le pointage
+repare a l iteration 11 aurait ete faux pour tout client hors de Dakar. La page
+de parametres affichait ces coordonnees sans permettre de les saisir. La
+position est desormais laissee vide a l inscription, et saisissable dans les
+parametres.
