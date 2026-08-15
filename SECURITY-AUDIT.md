@@ -735,3 +735,23 @@ l inscription (`src/lib/billing/plans.ts`).
 Deux defauts de calcul trouves en ecrivant les controles : debordement de fin
 de mois (31 janvier + 1 mois donnait le 3 mars) et melange heure locale / UTC.
 Controles conserves : `npm run test:tarifs`, 20 controles.
+
+## SS-45 a SS-48 — L identite venait d un parametre
+
+Trouvees en interrogeant les analyseurs de securite Supabase, jamais consultes
+au cours des dix-huit iterations precedentes. Mon balayage cherchait les
+fonctions ouvertes a `anon` ; celles-ci sont reservees aux comptes connectes,
+et c est precisement la qu etait le trou.
+
+- **SS-45** `valider_activite` : un eleve a valide une activite d une AUTRE
+  ecole en passant l identifiant du censeur.
+- **SS-46** `generer_matricule` : un eleve a consomme le compteur de
+  matricules d une autre ecole (1 vers 2).
+- **SS-47** tables `super_admin_*` : tous droits accordes a `anon` et
+  `authenticated`, secrets TOTP conserves. Table de config supprimee, journal
+  d audit verrouille et enfin alimente.
+- **SS-48** `agent_insert_notification` : un eleve a depose une fausse
+  notification « Paiement confirme » chez un utilisateur d une autre ecole.
+
+Corrige aussi : comparaison du code 2FA du cockpit en temps constant.
+`diagnostic_identite()` encode le motif pour l avenir.

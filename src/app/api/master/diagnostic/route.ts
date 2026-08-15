@@ -65,6 +65,7 @@ export async function GET() {
       'diagnostic_configuration', 'diagnostic_vues',
       'diagnostic_fonctions', 'diagnostic_stockage', 'diagnostic_pointage',
       'diagnostic_execution', 'diagnostic_lecture', 'diagnostic_rattachement',
+      'diagnostic_identite',
     ]) {
       const { data, error } = await (supabase.rpc as any)(fn)
       if (error) {

@@ -4,6 +4,38 @@ import {
   OWNER_2FA_COOKIE, isOwnerEmail, signOwnerToken, twoFactorConfigured,
 } from '@/lib/auth/owner'
 import { enforceRateLimit, clientIp } from '@/lib/security/rate-limit'
+import { timingSafeCompare } from '@/lib/security/webhook-verify'
+import { tryCreateAdminClient } from '@/lib/supabase/admin'
+
+/**
+ * Journal des acces au cockpit (SS-47). L'interface affirmait au proprietaire
+ * que « toutes les actions sont auditees » alors que la table restait vide :
+ * une promesse d'audit non tenue donne confiance sans donner de trace.
+ *
+ * L'ecriture passe par le service_role et ne doit jamais faire echouer
+ * l'authentification elle-meme.
+ */
+async function journaliser(
+  action: string,
+  userId: string | null,
+  req: Request,
+  metadata: Record<string, unknown> = {},
+) {
+  const admin = tryCreateAdminClient()
+  if (!admin) return
+  try {
+    await (admin.from('super_admin_audit') as any).insert({
+      user_id: userId,
+      action,
+      url_visited: new URL(req.url).pathname,
+      metadata,
+      ip_address: clientIp(req),
+      user_agent: req.headers.get('user-agent') ?? null,
+    })
+  } catch {
+    // Un journal indisponible ne bloque pas l'ouverture du cockpit.
+  }
+}
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -37,6 +69,9 @@ export async function POST(req: Request) {
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user || !isOwnerEmail(user.email)) {
+    await journaliser('cockpit.acces_refuse', user?.id ?? null, req, {
+      raison: user ? 'hors allowlist' : 'sans session',
+    })
     // Même réponse que pour un code erroné : ne pas révéler qui est propriétaire.
     return NextResponse.json({ error: 'Code invalide' }, { status: 401 })
   }
@@ -48,8 +83,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Requête invalide' }, { status: 400 })
   }
 
-  if (code !== process.env.MASTER_2FA_CODE) {
+  // Comparaison a temps constant : meme raisonnement que pour les signatures
+  // de webhook (SS-06). Le plafond de tentatives rend l'attaque temporelle
+  // peu praticable, mais rien ne justifie de laisser la fuite ouverte.
+  if (!timingSafeCompare(code, process.env.MASTER_2FA_CODE ?? '')) {
     console.warn('[master] code 2FA invalide', { ip: clientIp(req), user: user.email })
+    await journaliser('cockpit.code_invalide', user.id, req)
     return NextResponse.json({ error: 'Code invalide' }, { status: 401 })
   }
 
@@ -57,6 +96,8 @@ export async function POST(req: Request) {
   if (!token) {
     return NextResponse.json({ error: 'Signature indisponible' }, { status: 503 })
   }
+
+  await journaliser('cockpit.ouverture', user.id, req)
 
   const res = NextResponse.json({ ok: true })
   res.cookies.set(OWNER_2FA_COOKIE, token, {
