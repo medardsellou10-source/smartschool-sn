@@ -689,3 +689,7 @@ Vérifié après correction : l'intendant encaisse et son identité est tracée 
 un élève est refusé ; le surveillant valide toujours une absence. Les appelants
 existants — `surveillant/page.tsx` et `TableauImpayes.tsx` — restent
 compatibles, et leurs rôles figurent bien dans les listes autorisées.
+
+## SS-39 et SS-40 — le versant lecture
+
+Tout l audit avait porte sur l ecriture. Voir le message du commit pour le detail : cloisonnement inter-etablissements verifie sans aucune fuite, annuaire restreint, copies et donnees familiales cloisonnees, et `diagnostic_lecture()` ajoute au lanterneur.
